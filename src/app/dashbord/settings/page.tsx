@@ -1,391 +1,434 @@
 "use client";
 
-import { useRole, UserRole } from "@/context/RoleContext";
-import { useState } from "react";
-import { User, Shield, Bell, CreditCard, Sliders, Check, Save } from "lucide-react";
+import { useRole } from "@/context/RoleContext";
+import { useState, useEffect } from "react";
+import {
+  User,
+  Shield,
+  Bell,
+  Link as LinkIcon,
+  CreditCard,
+  LogOut,
+  Pencil,
+  Mail,
+  MessageSquare,
+  Megaphone,
+  Check,
+  Lock,
+  Smartphone,
+  ChevronRight
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const { role, roleName } = useRole();
-  const [activeTab, setActiveTab] = useState("profile");
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("personal");
   const [successMsg, setSuccessMsg] = useState(false);
 
-  // Handle Form Save
+  // Form Fields State
+  const [personalInfo, setPersonalInfo] = useState({
+    fullName: "Zayed Mansoor",
+    email: "zayed.mansoor@example.com",
+    phone: "+880 1712-345678",
+    location: "Gulshan-2, Dhaka",
+  });
+
+  // Toggles State
+  const [toggles, setToggles] = useState({
+    twoFactor: true,
+    emailNotif: true,
+    smsAlert: false,
+    promotions: true,
+  });
+
+  // Smooth Scroll Helper
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  // Tab click handler
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (tabId === "personal" || tabId === "security" || tabId === "notifications") {
+      // These are on the main scrollable stack
+      setTimeout(() => scrollToSection(tabId), 50);
+    }
+  };
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setSuccessMsg(true);
     setTimeout(() => setSuccessMsg(false), 3000);
   };
 
-  // Determine dynamic tabs based on role
-  const getTabs = (r: UserRole) => {
-    switch (r) {
-      case "superadmin":
-      case "operator":
-        return [
-          { id: "profile", label: "My Profile", icon: User },
-          { id: "system", label: "System Config", icon: Sliders },
-          { id: "security", label: "Security & Access", icon: Shield },
-        ];
-      case "provider":
-        return [
-          { id: "profile", label: "My Profile", icon: User },
-          { id: "service", label: "Rates & Services", icon: Sliders },
-          { id: "security", label: "Verification & Pass", icon: Shield },
-        ];
-      case "customer":
-        return [
-          { id: "profile", label: "My Profile", icon: User },
-          { id: "billing", label: "Billing & Address", icon: CreditCard },
-          { id: "notifications", label: "Alert Config", icon: Bell },
-        ];
-      case "agent":
-        return [
-          { id: "profile", label: "My Profile", icon: User },
-          { id: "payout", label: "Payout Accounts", icon: CreditCard },
-          { id: "security", label: "Security & Pass", icon: Shield },
-        ];
-      default:
-        return [];
-    }
-  };
-
-  const tabs = getTabs(role);
+  // Custom Toggle Switch Component
+  const Switch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+    <button
+      type="button"
+      onClick={onChange}
+      className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none shrink-0 ${
+        checked ? "bg-rose-500" : "bg-slate-200"
+      }`}
+    >
+      <span
+        className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${
+          checked ? "translate-x-5" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-          <p className="text-slate-500 mt-1">Configure profile details and dashboard preferences for {roleName}.</p>
-        </div>
+    <div className="relative min-h-screen p-1 sm:p-6 overflow-hidden animate-in fade-in duration-200">
+      
+      {/* Background Watermark Pattern Wrapper */}
+      <div
+        className="absolute inset-0 pointer-events-none -z-10"
+        style={{
+          backgroundImage: "url('/Group1.png'), url('/Group2.png')",
+          backgroundSize: "800px",
+          backgroundRepeat: "repeat",
+          opacity: 0.05,
+        }}
+      />
+
+      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
         
+        {/* Save success toast */}
         {successMsg && (
-          <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm animate-in fade-in slide-in-from-top-1 duration-150">
-            <Check size={16} /> Changes saved successfully!
+          <div className="fixed top-6 right-6 bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg z-50 animate-in fade-in slide-in-from-top-3 duration-200">
+            <Check size={16} className="text-emerald-600" /> Changes saved successfully!
           </div>
         )}
-      </div>
 
-      {/* Main Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Left Column: Tab list */}
-        <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
-                  isActive
-                    ? "bg-rose-50 text-rose-600 font-semibold"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                }`}
-              >
-                <Icon size={18} />
-                <span className="text-sm">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right Column: Tab panels */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-3">
-          <form onSubmit={handleSave} className="space-y-6">
+        {/* Main Columns Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+          
+          {/* Left Column Navigation Panel (Responsive) */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 lg:p-6 lg:min-h-[480px] flex flex-col justify-between">
             
-            {/* Tab: Profile (Shared by all but has custom fields) */}
-            {activeTab === "profile" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Profile Information</h3>
-                  <p className="text-xs text-slate-500 mt-1">Update your basic profile inputs and contact detail.</p>
-                </div>
+            {/* Scrollable tab links on mobile, stacked list on desktop */}
+            <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1.5 pb-2 lg:pb-0 scrollbar-none whitespace-nowrap lg:whitespace-normal">
+              
+              {[
+                { id: "personal", label: "Personal Info", icon: User },
+                { id: "security", label: "Login & Security", icon: Shield },
+                { id: "notifications", label: "Notifications", icon: Bell },
+                { id: "linked", label: "Linked Accounts", icon: LinkIcon },
+                { id: "payment", label: "Payment Methods", icon: CreditCard },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id || 
+                  (activeTab === "personal" && tab.id === "personal") || 
+                  (activeTab === "security" && tab.id === "security") ||
+                  (activeTab === "notifications" && tab.id === "notifications");
+                
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleTabClick(tab.id)}
+                    className={`flex items-center gap-3 px-5 py-3 rounded-2xl text-left transition-all ${
+                      isActive
+                        ? "bg-rose-50 text-rose-500 font-bold"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-semibold"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span className="text-sm">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
-                    <input
-                      type="text"
-                      defaultValue={role === "superadmin" ? "Aftab Farhan" : role === "operator" ? "Tanvir Rahman" : role === "provider" ? "Kabir Hossain" : "Sharmin Akter"}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
-                    <input
-                      type="email"
-                      defaultValue={role === "superadmin" ? "aftab@rajseba.com" : role === "operator" ? "tanvir@rajseba.com" : role === "provider" ? "kabir.ac@rajseba.com" : "sharmin@gmail.com"}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
-                    <input
-                      type="tel"
-                      defaultValue={role === "provider" ? "+880 1712 345678" : "+880 1819 876543"}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-
-                  {role === "provider" && (
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Years of Experience</label>
-                      <input
-                        type="number"
-                        defaultValue="5"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {role === "provider" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Service Bio / Description</label>
-                    <textarea
-                      rows={3}
-                      defaultValue="Certified HVAC repair expert with 5 years experience servicing residential and commercial AC units in Dhaka."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium resize-none"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Tab: System Settings (Admin / Operator only) */}
-            {activeTab === "system" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">System Configurations</h3>
-                  <p className="text-xs text-slate-500 mt-1">Control platform rules, service prices, and dispatcher options.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Base Booking Commission (%)</label>
-                    <input
-                      type="number"
-                      defaultValue="15"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Professional Rating Requirement</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      defaultValue="4.5"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase">Operational Zones (Bangladesh)</label>
-                  <div className="flex flex-wrap gap-2">
-                    {["Gulshan", "Banani", "Uttara", "Dhanmondi", "Mirpur", "Wari"].map((zone, idx) => (
-                      <span key={idx} className="bg-rose-50 border border-rose-100 text-rose-600 px-3 py-1 rounded-xl text-xs font-semibold">
-                        {zone} ✓
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Service Provider Config (Provider only) */}
-            {activeTab === "service" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Rates &amp; Services Config</h3>
-                  <p className="text-xs text-slate-500 mt-1">Configure your active categories and hourly pricing rate.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Base Hourly Rate (৳)</label>
-                    <input
-                      type="number"
-                      defaultValue="450"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Gas Refill service charge (৳)</label>
-                    <input
-                      type="number"
-                      defaultValue="1400"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase">My Active Categories</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["AC Maintenance", "AC Leak Fixing", "Gas Refilling", "Compressor Replacement"].map((skill, idx) => (
-                      <label key={idx} className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100 cursor-pointer">
-                        <input type="checkbox" defaultChecked className="accent-rose-500" />
-                        <span className="font-medium">{skill}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Billing & Address (Customer only) */}
-            {activeTab === "billing" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Billing Address &amp; Accounts</h3>
-                  <p className="text-xs text-slate-500 mt-1">Manage saved home/office address and preferred payment options.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Primary Home Address</label>
-                  <input
-                    type="text"
-                    defaultValue="House 24, Road 4, Sector 12, Mirpur, Dhaka"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase">Saved Payment Methods</label>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 border border-rose-100 bg-rose-50/20 rounded-xl">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black bg-rose-500 text-white px-2 py-1 rounded">bKash</span>
-                        <span className="text-sm font-semibold text-slate-700">01712 ****78</span>
-                      </div>
-                      <span className="text-xs text-rose-500 font-bold">Primary</span>
-                    </div>
-
-                    <div className="flex items-center justify-between p-3 border border-slate-100 rounded-xl">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black bg-indigo-600 text-white px-2 py-1 rounded">Visa</span>
-                        <span className="text-sm font-semibold text-slate-700">**** **** **** 4812</span>
-                      </div>
-                      <button className="text-xs font-semibold text-slate-400 hover:text-rose-500 transition-colors">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Payout Accounts (Agent only) */}
-            {activeTab === "payout" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Payout Accounts</h3>
-                  <p className="text-xs text-slate-500 mt-1">Configure your bKash, Nagad or Bank Account details to withdraw commissions.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Primary Mobile Wallet</label>
-                    <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                      defaultValue="bKash"
-                    >
-                      <option value="bKash">bKash</option>
-                      <option value="Nagad">Nagad</option>
-                      <option value="Rocket">Rocket</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Wallet Phone Number</label>
-                    <input
-                      type="tel"
-                      defaultValue="+880 1712 345678"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Security & Passwords */}
-            {activeTab === "security" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Security Credentials</h3>
-                  <p className="text-xs text-slate-500 mt-1">Configure user login credentials and security tokens.</p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Current Password</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">New Password</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Notifications (Customer only) */}
-            {activeTab === "notifications" && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Notification Preferences</h3>
-                  <p className="text-xs text-slate-500 mt-1">Configure your preferred alerts and push notification logs.</p>
-                </div>
-
-                <div className="space-y-2">
-                  {[
-                    { label: "Email Booking Reciepts", desc: "Receive automated billing breakdowns via email", active: true },
-                    { label: "SMS Arrival Alerts", desc: "Get text messages when technician is en route to address", active: true },
-                    { label: "Monthly platform newsletters", desc: "Promotions and discount updates on seasonal services", active: false },
-                  ].map((notif, idx) => (
-                    <label key={idx} className="flex items-start gap-3 p-3 bg-slate-50/50 hover:bg-slate-50 rounded-xl border border-slate-100 cursor-pointer transition-colors">
-                      <input type="checkbox" defaultChecked={notif.active} className="accent-rose-500 mt-1" />
-                      <div>
-                        <h5 className="text-sm font-semibold text-slate-800">{notif.label}</h5>
-                        <p className="text-xs text-slate-400 mt-0.5">{notif.desc}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Save Button */}
-            <div className="flex justify-end pt-4 border-t border-slate-100">
+            {/* Separator & Logout button */}
+            <div className="hidden lg:block pt-6 border-t border-slate-100 mt-6">
               <button
-                type="submit"
-                className="bg-rose-500 hover:bg-rose-600 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-sm flex items-center gap-1.5 transition-all active:scale-[0.98]"
+                onClick={() => router.push("/login")}
+                className="w-full flex items-center gap-3 px-5 py-3 rounded-2xl text-left text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all font-semibold"
               >
-                <Save size={16} /> Save Settings
+                <LogOut size={18} />
+                <span className="text-sm">Logout</span>
               </button>
             </div>
 
-          </form>
-        </div>
-      </div>
+          </div>
 
+          {/* Right Column content area */}
+          <div className="lg:col-span-3 space-y-6">
+            
+            {/* Top User Profile Header Card */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                {/* Avatar with edit float icon */}
+                <div className="relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+                    alt="Zayed Mansoor Profile"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-white ring-4 ring-slate-100"
+                  />
+                  <button className="absolute bottom-0 right-0 p-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full border-2 border-white shadow-md transition-transform active:scale-90">
+                    <Pencil size={12} className="stroke-[2.5]" />
+                  </button>
+                </div>
+
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 leading-tight">Zayed Mansoor</h2>
+                  <p className="text-sm text-slate-400 mt-0.5 font-semibold">{personalInfo.email}</p>
+                  <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-500 text-xs font-bold px-3 py-1 rounded-full mt-2 border border-rose-100">
+                    ★ Premium Member
+                  </span>
+                </div>
+              </div>
+
+              <button className="bg-rose-500 hover:bg-rose-600 text-white font-bold px-6 py-2.5 rounded-full text-xs shadow-md shadow-rose-500/10 transition-all active:scale-[0.98]">
+                View Public Profile
+              </button>
+            </div>
+
+            {/* Render Main Stack (Personal Info, Security, Notifications) */}
+            {(activeTab === "personal" || activeTab === "security" || activeTab === "notifications") && (
+              <div className="space-y-6">
+                
+                {/* 1. Personal Info Card */}
+                <div id="personal" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
+                  <h3 className="text-lg font-bold text-slate-900">Personal Info</h3>
+
+                  <form onSubmit={handleSave} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
+                        <input
+                          type="text"
+                          value={personalInfo.fullName}
+                          onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-900 font-bold focus:outline-none focus:bg-white focus:border-rose-350 focus:ring-4 focus:ring-rose-500/5 transition-all"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+                        <input
+                          type="email"
+                          value={personalInfo.email}
+                          onChange={(e) => setPersonalInfo({ ...personalInfo, email: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-900 font-bold focus:outline-none focus:bg-white focus:border-rose-350 focus:ring-4 focus:ring-rose-500/5 transition-all"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Phone Number</label>
+                        <input
+                          type="tel"
+                          value={personalInfo.phone}
+                          onChange={(e) => setPersonalInfo({ ...personalInfo, phone: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-900 font-bold focus:outline-none focus:bg-white focus:border-rose-350 focus:ring-4 focus:ring-rose-500/5 transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Location</label>
+                        <input
+                          type="text"
+                          value={personalInfo.location}
+                          onChange={(e) => setPersonalInfo({ ...personalInfo, location: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3.5 text-sm text-slate-900 font-bold focus:outline-none focus:bg-white focus:border-rose-350 focus:ring-4 focus:ring-rose-500/5 transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        className="bg-rose-500 hover:bg-rose-600 text-white font-bold px-6 py-2.5 rounded-full text-xs shadow-md shadow-rose-500/10 transition-all active:scale-[0.98]"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* 2. Login & Security Card */}
+                <div id="security" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
+                  <h3 className="text-lg font-bold text-slate-900">Login &amp; Security</h3>
+
+                  <div className="divide-y divide-slate-100">
+                    {/* Password Row */}
+                    <div className="py-4 flex items-center justify-between gap-4 first:pt-0">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-800">Password</h4>
+                        <p className="text-xs text-slate-400 mt-1 font-semibold">Last updated 3 months ago</p>
+                      </div>
+                      <button className="text-rose-500 hover:text-rose-600 text-xs font-bold focus:outline-none hover:underline">
+                        Update
+                      </button>
+                    </div>
+
+                    {/* 2FA Row */}
+                    <div className="py-4 flex items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-800">Two-Factor Authentication</h4>
+                        <p className="text-xs text-slate-400 mt-1 font-semibold">Add an extra layer of security to your account.</p>
+                      </div>
+                      <Switch
+                        checked={toggles.twoFactor}
+                        onChange={() => setToggles({ ...toggles, twoFactor: !toggles.twoFactor })}
+                      />
+                    </div>
+
+                    {/* Recent Logins Row */}
+                    <div className="py-4 flex items-center justify-between gap-4 last:pb-0">
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-800">Recent Logins</h4>
+                        <p className="text-xs text-slate-400 mt-1 font-semibold">Chrome on MacOS • Dhaka, BD</p>
+                      </div>
+                      <button className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold px-4 py-2 rounded-xl border border-slate-100 transition-colors">
+                        Review
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Notifications Card */}
+                <div id="notifications" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
+                  <h3 className="text-lg font-bold text-slate-900">Notifications</h3>
+
+                  <div className="space-y-4">
+                    {/* Email Notifications Row */}
+                    <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 hover:bg-slate-50/80 rounded-2xl border border-slate-50 transition-colors">
+                      <div className="flex items-start gap-3.5">
+                        <div className="p-2.5 bg-rose-50 rounded-xl text-rose-500 shrink-0">
+                          <Mail size={18} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800">Email Notifications</h4>
+                          <p className="text-xs text-slate-400 mt-1 font-semibold">Updates about your bookings and account.</p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={toggles.emailNotif}
+                        onChange={() => setToggles({ ...toggles, emailNotif: !toggles.emailNotif })}
+                      />
+                    </div>
+
+                    {/* SMS Alerts Row */}
+                    <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 hover:bg-slate-50/80 rounded-2xl border border-slate-50 transition-colors">
+                      <div className="flex items-start gap-3.5">
+                        <div className="p-2.5 bg-rose-50 rounded-xl text-rose-500 shrink-0">
+                          <MessageSquare size={18} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800">SMS Alerts</h4>
+                          <p className="text-xs text-slate-400 mt-1 font-semibold">Urgent updates and service confirmations.</p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={toggles.smsAlert}
+                        onChange={() => setToggles({ ...toggles, smsAlert: !toggles.smsAlert })}
+                      />
+                    </div>
+
+                    {/* Promotions Row */}
+                    <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 hover:bg-slate-50/80 rounded-2xl border border-slate-50 transition-colors">
+                      <div className="flex items-start gap-3.5">
+                        <div className="p-2.5 bg-rose-50 rounded-xl text-rose-500 shrink-0">
+                          <Megaphone size={18} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-800">Promotions</h4>
+                          <p className="text-xs text-slate-400 mt-1 font-semibold">News, offers, and seasonal discounts.</p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={toggles.promotions}
+                        onChange={() => setToggles({ ...toggles, promotions: !toggles.promotions })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* Render Linked Accounts tab content */}
+            {activeTab === "linked" && (
+              <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Linked Accounts</h3>
+                  <p className="text-xs text-slate-400 mt-1 font-semibold">Manage your linked social accounts and login authenticators.</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-sm text-slate-700">G</div>
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-800">Google</h5>
+                        <p className="text-xs text-emerald-600 font-semibold mt-0.5">Connected</p>
+                      </div>
+                    </div>
+                    <button className="text-slate-400 hover:text-rose-500 text-xs font-bold transition-colors">Disconnect</button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center font-bold text-sm text-white">f</div>
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-800">Facebook</h5>
+                        <p className="text-xs text-slate-400 font-semibold mt-0.5">Not Connected</p>
+                      </div>
+                    </div>
+                    <button className="text-rose-500 hover:text-rose-600 text-xs font-bold transition-colors">Connect</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Render Payment Methods tab content */}
+            {activeTab === "payment" && (
+              <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Payment Methods</h3>
+                  <p className="text-xs text-slate-400 mt-1 font-semibold">Configure your saved wallets and cards for seamless checkouts.</p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-4 border border-rose-100 bg-rose-50/20 rounded-2xl">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-black bg-rose-500 text-white px-2 py-1 rounded">bKash</span>
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-800">01712 ****78</h5>
+                        <span className="text-[10px] text-rose-500 font-bold block mt-0.5">Primary Payment Option</span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-rose-500 font-extrabold uppercase">Active</span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-black bg-indigo-600 text-white px-2 py-1 rounded">Visa</span>
+                      <div>
+                        <h5 className="text-sm font-bold text-slate-800">**** **** **** 4812</h5>
+                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Expires 12/28</span>
+                      </div>
+                    </div>
+                    <button className="text-xs font-semibold text-slate-400 hover:text-rose-500 transition-colors">Delete</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
     </div>
   );
 }
