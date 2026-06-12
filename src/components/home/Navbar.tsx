@@ -17,15 +17,15 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Menu", href: "#menu" },
-  { label: "Contact", href: "#contact" },
+  { label: "Menu", href: "/menu" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const QUICK_ACTIONS = [
-  { label: "SERVICES", href: "#services", icon: Briefcase },
-  { label: "MAP", href: "#map", icon: MapIcon },
-  { label: "BOOKINGS", href: "#bookings", icon: Calendar },
-  { label: "PROFILE", href: "#profile", icon: User },
+  { label: "SERVICES", href: "/services", icon: Briefcase },
+  { label: "MAP", href: "/map", icon: MapIcon },
+  { label: "BOOKINGS", href: "/bookings", icon: Calendar },
+  { label: "PROFILE", href: "/profile", icon: User },
 ];
 
 export function Navbar() {

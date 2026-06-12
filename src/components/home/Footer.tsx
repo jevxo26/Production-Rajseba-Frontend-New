@@ -106,15 +106,18 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#FAF6F6] border-t border-slate-100 text-slate-600">
-
       {/* ── STATS BANNER ── */}
       <div className="bg-[#FF5A5F] text-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
             {STATS.map((s) => (
               <div key={s.label} className="space-y-0.5">
-                <p className="text-xl sm:text-2xl font-extrabold tracking-tight">{s.value}</p>
-                <p className="text-xs sm:text-sm text-rose-100 font-medium">{s.label}</p>
+                <p className="text-xl sm:text-2xl font-extrabold tracking-tight">
+                  {s.value}
+                </p>
+                <p className="text-xs sm:text-sm text-rose-100 font-medium">
+                  {s.label}
+                </p>
               </div>
             ))}
           </div>
@@ -124,7 +127,6 @@ export default function Footer() {
       {/* ── MAIN GRID ── */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
-
           {/* Col 1+2 — Brand + Contact + Social (spans 2 cols on lg) */}
           <div className="sm:col-span-2 lg:col-span-2 space-y-5">
             <Link href="/" aria-label="Rajseba home">
@@ -138,8 +140,9 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-slate-500 leading-relaxed max-w-sm">
-              Bangladesh's most trusted home services platform. Book verified professionals
-              for all your household needs — fast, safe, and affordable.
+              Bangladesh's most trusted home services platform. Book verified
+              professionals for all your household needs — fast, safe, and
+              affordable.
             </p>
 
             {/* Contact Info */}
@@ -188,7 +191,10 @@ export default function Footer() {
                     href={s.href}
                     className="text-sm text-slate-500 hover:text-[#FF5A5F] transition-colors duration-150 flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#FF5A5F] transition-colors flex-shrink-0" aria-hidden="true" />
+                    <span
+                      className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#FF5A5F] transition-colors flex-shrink-0"
+                      aria-hidden="true"
+                    />
                     {s.label}
                   </Link>
                 </li>
@@ -208,7 +214,10 @@ export default function Footer() {
                     href={l.href}
                     className="text-sm text-slate-500 hover:text-[#FF5A5F] transition-colors duration-150 flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#FF5A5F] transition-colors flex-shrink-0" aria-hidden="true" />
+                    <span
+                      className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-[#FF5A5F] transition-colors flex-shrink-0"
+                      aria-hidden="true"
+                    />
                     {l.label}
                   </Link>
                 </li>
@@ -218,7 +227,6 @@ export default function Footer() {
 
           {/* Col 5 — Newsletter + App Download */}
           <div className="space-y-6 sm:col-span-2 lg:col-span-1">
-
             {/* Newsletter */}
             <div className="space-y-3">
               <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase">
@@ -229,14 +237,25 @@ export default function Footer() {
               </p>
               {subscribed ? (
                 <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 flex-shrink-0" aria-hidden="true">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm3.707-9.293a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4z" clipRule="evenodd" />
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-4 h-4 flex-shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm3.707-9.293a1 1 0 0 0-1.414-1.414L9 10.586 7.707 9.293a1 1 0 0 0-1.414 1.414l2 2a1 1 0 0 0 1.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   You're subscribed!
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="space-y-2">
-                  <label htmlFor="footer-email" className="sr-only">Email address</label>
+                  <label htmlFor="footer-email" className="sr-only">
+                    Email address
+                  </label>
                   <input
                     id="footer-email"
                     type="email"
@@ -269,15 +288,35 @@ export default function Footer() {
                   aria-label="Download on Google Play"
                   className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 hover:border-[#FF5A5F] hover:shadow-sm transition-all group"
                 >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" aria-hidden="true">
-                    <path fill="#EA4335" d="M1.22 0L13.3 12 1.22 24c-.4-.1-.72-.5-.72-1V1c0-.5.32-.9.72-1z" />
-                    <path fill="#FBBC05" d="M17.5 8.3l-3.01 3.01L1.22 0c.18-.08.38-.1.6-.05l15.68 8.35z" />
-                    <path fill="#4285F4" d="M22.12 12c0 .56-.3 1.06-.78 1.33l-3.84 2.04-3.41-3.37 3.41-3.41 3.84 2.08c.48.27.78.77.78 1.33z" />
-                    <path fill="#34A853" d="M1.22 24c.18.07.38.09.6.04l15.68-8.35-3.01-3.01L1.22 24z" />
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5 flex-shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill="#EA4335"
+                      d="M1.22 0L13.3 12 1.22 24c-.4-.1-.72-.5-.72-1V1c0-.5.32-.9.72-1z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M17.5 8.3l-3.01 3.01L1.22 0c.18-.08.38-.1.6-.05l15.68 8.35z"
+                    />
+                    <path
+                      fill="#4285F4"
+                      d="M22.12 12c0 .56-.3 1.06-.78 1.33l-3.84 2.04-3.41-3.37 3.41-3.41 3.84 2.08c.48.27.78.77.78 1.33z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M1.22 24c.18.07.38.09.6.04l15.68-8.35-3.01-3.01L1.22 24z"
+                    />
                   </svg>
                   <div>
-                    <p className="text-[10px] text-slate-400 leading-none">Get it on</p>
-                    <p className="text-[13px] font-semibold text-slate-700 group-hover:text-[#FF5A5F] transition-colors leading-tight">Google Play</p>
+                    <p className="text-[10px] text-slate-400 leading-none">
+                      Get it on
+                    </p>
+                    <p className="text-[13px] font-semibold text-slate-700 group-hover:text-[#FF5A5F] transition-colors leading-tight">
+                      Google Play
+                    </p>
                   </div>
                 </a>
                 <a
@@ -287,27 +326,47 @@ export default function Footer() {
                   aria-label="Download on the App Store"
                   className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 hover:border-[#FF5A5F] hover:shadow-sm transition-all group"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-slate-700 flex-shrink-0" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5 text-slate-700 flex-shrink-0"
+                    aria-hidden="true"
+                  >
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
                   </svg>
                   <div>
-                    <p className="text-[10px] text-slate-400 leading-none">Download on the</p>
-                    <p className="text-[13px] font-semibold text-slate-700 group-hover:text-[#FF5A5F] transition-colors leading-tight">App Store</p>
+                    <p className="text-[10px] text-slate-400 leading-none">
+                      Download on the
+                    </p>
+                    <p className="text-[13px] font-semibold text-slate-700 group-hover:text-[#FF5A5F] transition-colors leading-tight">
+                      App Store
+                    </p>
                   </div>
                 </a>
               </div>
             </div>
-
           </div>
         </div>
       </div>
 
       {/* ── BOTTOM BAR ── */}
       <div className="border-t border-slate-100 bg-white/60">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-slate-400 text-center sm:text-left">
-            © {new Date().getFullYear()} Rajseba. All rights reserved. Premium Home Services in Bangladesh.
-          </p>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 flex flex-col-reverse sm:flex-row-reverse items-center justify-between gap-3">
+          {/* Copyright notice label */}
+          <div className="text-center md:text-right text-sm text-slate-500 font-medium">
+            <span>
+              © {new Date().getFullYear()}{" "}
+              <span className="font-bold">Rajsheba.</span> All rights reserved
+            </span>
+            <p>
+              Design & Developed by{" "}
+              <span className="text-primary font-semibold hover:text-secondary">
+                <Link href={"https://jevxo-core-ecosystem.vercel.app/"}>
+                  Jevxo
+                </Link>
+              </span>
+            </p>
+          </div>
           <div className="flex items-center gap-3">
             <a
               href="https://rajseba.com"
@@ -321,11 +380,13 @@ export default function Footer() {
             <button
               onClick={() => {
                 if (navigator.share) {
-                  navigator.share({
-                    title: "Rajseba",
-                    text: "Premium Home Services in Bangladesh",
-                    url: window.location.origin,
-                  }).catch(console.error);
+                  navigator
+                    .share({
+                      title: "Rajseba",
+                      text: "Premium Home Services in Bangladesh",
+                      url: window.location.origin,
+                    })
+                    .catch(console.error);
                 } else {
                   navigator.clipboard.writeText(window.location.origin);
                   alert("Link copied!");
@@ -346,7 +407,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
     </footer>
   );
 }

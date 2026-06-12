@@ -51,12 +51,11 @@ const nodeVariants = {
 
 const HowItWorks = () => {
   return (
-    <div className="bg-white border-y border-slate-100 py-20 lg:py-24 overflow-hidden relative">
+    <div className="bg-[#FAF8F8] border-y border-slate-100 py-20 lg:py-24 overflow-hidden relative">
       {/* Decorative light blurs */}
       <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF5A5F]/5 blur-[90px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
-        
         {/* Header Block */}
         <div className="text-center mb-16 lg:mb-20">
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
@@ -69,15 +68,20 @@ const HowItWorks = () => {
 
         {/* Timeline Path container */}
         <div className="relative">
-          
           {/* Connecting SVG Arrow 1 (Desktop) */}
           <div className="absolute left-[21%] w-[24%] top-6 hidden md:block z-0 pointer-events-none">
-            <svg className="w-full h-8 text-[#FF5A5F]" viewBox="0 0 100 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-              <motion.path 
-                d="M2 12H96M96 12L88 5M96 12L88 19" 
-                stroke="currentColor" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
+            <svg
+              className="w-full h-8 text-[#FF5A5F]"
+              viewBox="0 0 100 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+            >
+              <motion.path
+                d="M2 12H96M96 12L88 5M96 12L88 19"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray="8 4"
                 animate={{ strokeDashoffset: [0, -24] }}
@@ -88,12 +92,18 @@ const HowItWorks = () => {
 
           {/* Connecting SVG Arrow 2 (Desktop) */}
           <div className="absolute left-[56%] w-[24%] top-6 hidden md:block z-0 pointer-events-none">
-            <svg className="w-full h-8 text-[#FF5A5F]" viewBox="0 0 100 24" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-              <motion.path 
-                d="M2 12H96M96 12L88 5M96 12L88 19" 
-                stroke="currentColor" 
-                strokeWidth="2.5" 
-                strokeLinecap="round" 
+            <svg
+              className="w-full h-8 text-[#FF5A5F]"
+              viewBox="0 0 100 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+            >
+              <motion.path
+                d="M2 12H96M96 12L88 5M96 12L88 19"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray="8 4"
                 animate={{ strokeDashoffset: [0, -24] }}
@@ -103,7 +113,7 @@ const HowItWorks = () => {
           </div>
 
           {/* Staggered cardless step points */}
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -117,15 +127,13 @@ const HowItWorks = () => {
                   className="text-center group flex flex-col items-center"
                 >
                   {/* Timeline Step node bubble */}
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05, y: -2 }}
                     className="w-20 h-20 bg-slate-50 border border-slate-200 text-slate-800 rounded-full flex items-center justify-center text-xl font-extrabold mb-6 shadow-sm relative z-10 group-hover:border-[#FF5A5F]/40 group-hover:shadow-[0_8px_20px_rgba(255,90,95,0.1)] transition-all duration-300"
                   >
-                    <span className="text-[#FF5A5F]">
-                      {step.stepNumber}
-                    </span>
+                    <span className="text-[#FF5A5F]">{step.stepNumber}</span>
                   </motion.div>
-                  
+
                   <h3 className="font-extrabold text-slate-800 text-xl mb-3 group-hover:text-[#FF5A5F] transition-colors duration-200">
                     {step.title}
                   </h3>
@@ -137,16 +145,25 @@ const HowItWorks = () => {
                 {/* Vertical SVG Arrow for Mobile Screens */}
                 {i < 2 && (
                   <div className="flex md:hidden my-2 items-center justify-center text-[#FF5A5F] z-0 pointer-events-none">
-                    <svg className="w-6 h-10" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <motion.path 
-                        d="M12 2V36M12 36L6 30M12 36L18 30" 
-                        stroke="currentColor" 
-                        strokeWidth="2.5" 
-                        strokeLinecap="round" 
+                    <svg
+                      className="w-6 h-10"
+                      viewBox="0 0 24 40"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <motion.path
+                        d="M12 2V36M12 36L6 30M12 36L18 30"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeDasharray="6 4"
                         animate={{ strokeDashoffset: [0, 20] }}
-                        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.2,
+                          ease: "linear",
+                        }}
                       />
                     </svg>
                   </div>
@@ -155,7 +172,6 @@ const HowItWorks = () => {
             ))}
           </motion.div>
         </div>
-
       </div>
     </div>
   );
