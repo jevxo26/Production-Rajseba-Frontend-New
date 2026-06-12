@@ -52,7 +52,7 @@ const itemVariants = {
 
 export default function WhyChooseUs() {
   return (
-    <div className="bg-white py-20 lg:py-24 overflow-hidden">
+    <div className="bg-transparent py-12 md:py-16 lg:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         
         {/* Title block */}
@@ -83,7 +83,7 @@ export default function WhyChooseUs() {
                 className="text-center p-8 bg-white rounded-[32px] border border-slate-100/80 shadow-[0_15px_45px_rgba(15,23,42,0.015)] hover:shadow-[0_20px_50px_rgba(15,23,42,0.035)] transition-all duration-300 flex flex-col justify-center h-full"
               >
                 {/* 3D Circular Floating Icon Badge */}
-                <div className="mx-auto w-20 h-20 rounded-full bg-white flex items-center justify-center text-[#FF5A5F] mb-8 shadow-[0_8px_30px_rgba(255,90,95,0.06)] border border-slate-100/40 relative hover:scale-105 transition-transform duration-300">
+                <div className="mx-auto w-20 h-20 rounded-full bg-white flex items-center justify-center text-[#FF5A5F] mb-8 shadow-[0_8px_30px_rgba(255,90,95,0.25)] border border-slate-100/40 relative hover:scale-105 transition-transform duration-300">
                   {/* Concentric red boundary highlight */}
                   <div className="absolute inset-1 rounded-full border border-[#FF5A5F]/5 bg-slate-50/10" />
                   <IconComponent className="w-8 h-8 relative z-10" />

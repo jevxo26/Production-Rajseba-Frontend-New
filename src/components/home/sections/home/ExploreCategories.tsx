@@ -25,7 +25,6 @@ import {
 // Clean Data Architecture - Dynamic categories configurations
 const CATEGORIES_CONTENT = {
   title: "Explore Categories",
-  subtitle: "Find professional services tailored to your household needs",
   categories: [
     { label: "AC Repair", slug: "ac-repair", icon: TbAirConditioning, bg: "bg-cyan-50 text-cyan-600 hover:border-cyan-200" },
     { label: "Plumbing", slug: "plumbing", icon: FaFaucet, bg: "bg-sky-50 text-sky-600 hover:border-sky-200" },
@@ -67,15 +66,12 @@ const cardVariants = {
 
 const ExploreCategories = () => {
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 lg:py-24 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-20 overflow-hidden">
       {/* Title block */}
-      <div className="text-center mb-12 md:mb-16">
+      <div className="text-center md:text-left mb-12 md:mb-16">
         <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
           {CATEGORIES_CONTENT.title}
         </h2>
-        <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto">
-          {CATEGORIES_CONTENT.subtitle}
-        </p>
       </div>
 
       {/* Grid of items */}

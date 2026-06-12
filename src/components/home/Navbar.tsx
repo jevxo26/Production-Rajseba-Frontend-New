@@ -17,7 +17,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Menu", href: "/menu" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -201,7 +201,7 @@ export function Navbar() {
           </div>
 
           {/* Divider */}
-          <div className="hidden lg:block h-7 w-px bg-slate-200" />
+          <div className="hidden lg:block h-10 w-0.5 bg-primary/75" />
 
           {/* Auth Buttons (desktop/tablet) */}
           <div className="hidden md:flex items-center gap-2 lg:gap-3 flex-shrink-0">

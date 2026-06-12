@@ -51,7 +51,7 @@ const nodeVariants = {
 
 const HowItWorks = () => {
   return (
-    <div className="bg-[#FAF8F8] border-y border-slate-100 py-20 lg:py-24 overflow-hidden relative">
+    <div className="bg-transparent border-y border-slate-100 py-12 md:py-16 lg:py-20 overflow-hidden relative">
       {/* Decorative light blurs */}
       <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF5A5F]/5 blur-[90px] rounded-full pointer-events-none" />
 
@@ -129,7 +129,7 @@ const HowItWorks = () => {
                   {/* Timeline Step node bubble */}
                   <motion.div
                     whileHover={{ scale: 1.05, y: -2 }}
-                    className="w-20 h-20 bg-slate-50 border border-slate-200 text-slate-800 rounded-full flex items-center justify-center text-xl font-extrabold mb-6 shadow-sm relative z-10 group-hover:border-[#FF5A5F]/40 group-hover:shadow-[0_8px_20px_rgba(255,90,95,0.1)] transition-all duration-300"
+                    className="w-20 h-20 bg-white border border-slate-200 text-slate-800 rounded-full flex items-center justify-center text-xl font-extrabold mb-6 shadow-sm relative z-10 group-hover:border-[#FF5A5F]/40 group-hover:shadow-[0_8px_20px_rgba(255,90,95,0.1)] transition-all duration-300"
                   >
                     <span className="text-[#FF5A5F]">{step.stepNumber}</span>
                   </motion.div>

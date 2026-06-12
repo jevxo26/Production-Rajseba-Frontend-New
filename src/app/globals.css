@@ -357,7 +357,19 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 80px 24px 24px;
+  padding: 48px 24px 24px;
+}
+
+@media (min-width: 768px) {
+  .services-hero {
+    padding: 64px 24px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .services-hero {
+    padding: 80px 24px 24px;
+  }
 }
 
 .services-hero-content {

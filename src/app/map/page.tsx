@@ -4,13 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, Map as MapIcon, List as ListIcon, Info, ChevronRight } from "lucide-react";
 
 // Component imports
-import DhakaMap from "@/components/map/DhakaMap";
-import SidebarList from "@/components/map/SidebarList";
-import FilterSidebar from "@/components/map/FilterSidebar";
-import ExpertCard from "@/components/map/ExpertCard";
-import FiltersModal from "@/components/map/FiltersModal";
-import DetailModal from "@/components/map/DetailModal";
-import { Expert } from "@/components/map/types";
+import DhakaMap from "@/components/home/map/DhakaMap";
+import SidebarList from "@/components/home/map/SidebarList";
+import FilterSidebar from "@/components/home/map/FilterSidebar";
+import ExpertCard from "@/components/home/map/ExpertCard";
+import FiltersModal from "@/components/home/map/FiltersModal";
+import DetailModal from "@/components/home/map/DetailModal";
+import { Expert } from "@/components/home/map/types";
 
 // Dynamic Mock Database
 const EXPERTS_DATA: Expert[] = [
@@ -221,7 +221,7 @@ export default function MapPage() {
 
         {/* ==================== LIST TAB VIEW ==================== */}
         {activeTab === "list" && (
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 flex-1 w-full">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-20 flex-1 w-full">
             {/* Header Layout Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-10">
               <div>

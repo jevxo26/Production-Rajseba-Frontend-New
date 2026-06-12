@@ -79,7 +79,7 @@ export default function TopServices() {
   };
 
   return (
-    <div className="bg-[#FAF8F8] py-20 lg:py-24 overflow-hidden">
+    <div className="bg-transparent py-12 md:py-16 lg:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         
         {/* Header Block */}
