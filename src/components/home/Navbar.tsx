@@ -212,7 +212,7 @@ export function Navbar() {
               Login
             </Link>
             <Link
-              href="/register"
+              href="/signup"
               className="bg-[#FF5A5F] hover:bg-[#FF4449] text-white font-semibold py-2.5 px-5 rounded-lg text-sm lg:text-[15px] transition-all shadow-sm hover:shadow-md active:scale-95"
             >
               Signup
