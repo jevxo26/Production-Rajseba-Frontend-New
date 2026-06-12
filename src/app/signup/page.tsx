@@ -113,9 +113,17 @@ export default function RegisterPage() {
       const user = response?.data?.user || response?.user;
       if (user) {
         dispatch(setUser(user));
+        
+        // Redirect based on role
+        const userRole = (typeof user.role === 'object' && user.role) ? user.role.name : (user.role || 'client');
+        if (userRole === "client") {
+          router.push("/dashbord/overview")
+        } else {
+          router.push("/dashbord")
+        }
+      } else {
+        router.push("/dashbord/overview")
       }
-
-      router.push("/dashbord/overview")
     } catch (err: any) {
       console.error("OTP verification failed:", err)
       toast.error(err.data?.message || "Invalid OTP code.")

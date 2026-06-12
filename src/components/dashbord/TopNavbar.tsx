@@ -11,7 +11,6 @@ import Link from "next/link";
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const dispatch = useAppDispatch();
-  const setRole = (r: UserRole) => dispatch(setAuthRole(r));
   const roleName = getRoleName(role);
   const logout = () => dispatch(authLogout());
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -37,8 +36,8 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const rolesList: { value: UserRole; label: string; desc: string; icon: React.ComponentType<any>; color: string }[] = [
     { value: "superadmin", label: "Super Admin", desc: "System control", icon: Shield, color: "text-rose-500 bg-rose-50" },
     { value: "agent", label: "Agent", desc: "Booking agent", icon: Briefcase, color: "text-emerald-500 bg-emerald-50" },
-    { value: "provider", label: "Provider", desc: "Service professional", icon: HardHat, color: "text-teal-500 bg-teal-50" },
-    { value: "customer", label: "Customer", desc: "Client profile", icon: CircleUser, color: "text-indigo-500 bg-indigo-50" },
+    { value: "vendor", label: "Vendor", desc: "Service professional", icon: HardHat, color: "text-teal-500 bg-teal-50" },
+    { value: "client", label: "Client", desc: "Client profile", icon: CircleUser, color: "text-indigo-500 bg-indigo-50" },
   ];
 
   // Dynamic user data for navbar display
@@ -48,9 +47,9 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
         return { name: "Aftab Farhan", designation: "System Administrator", avatar: "AF" };
       case "agent":
         return { name: "Rezaul Karim", designation: "Booking Partner", avatar: "RK" };
-      case "provider":
+      case "vendor":
         return { name: "Kabir AC Repair", designation: "Verified Technician", avatar: "KR" };
-      case "customer":
+      case "client":
         return { name: "Sharmin Akter", designation: "Premium Client", avatar: "SA" };
       default:
         return { name: "John Doe", designation: "User", avatar: "JD" };
@@ -85,54 +84,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Right Navbar Controls */}
       <div className="flex items-center gap-4">
-        {/* Dynamic Role Switcher Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] text-sm font-medium"
-          >
-            <activeRoleConfig.icon size={16} className={activeRoleConfig.value === "superadmin" ? "text-rose-500" : activeRoleConfig.value === "agent" ? "text-emerald-500" : activeRoleConfig.value === "provider" ? "text-teal-500" : "text-indigo-500"} />
-            <span className="text-slate-700 hidden sm:inline">{roleName}</span>
-            <ChevronDown size={14} className="text-slate-400" />
-          </button>
 
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="px-4 py-2 border-b border-slate-100">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Switch Dashboard View</span>
-              </div>
-              <div className="p-1 space-y-0.5">
-                {rolesList.map((r) => {
-                  const Icon = r.icon;
-                  const isSelected = r.value === role;
-                  return (
-                    <button
-                      key={r.value}
-                      onClick={() => {
-                        setRole(r.value);
-                        setDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all ${
-                        isSelected ? "bg-rose-50 text-rose-900" : "hover:bg-slate-50 text-slate-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-1.5 rounded-lg ${r.color}`}>
-                          <Icon size={16} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold">{r.label}</p>
-                          <p className="text-xs text-slate-400">{r.desc}</p>
-                        </div>
-                      </div>
-                      {isSelected && <Check size={16} className="text-rose-500 mr-2" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Notifications Button */}
         <button className="p-2.5 hover:bg-slate-100 rounded-xl relative text-slate-600 hover:text-slate-900 transition-colors">

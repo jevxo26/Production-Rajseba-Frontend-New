@@ -89,10 +89,18 @@ export default function LoginPage() {
 
       const user = response?.data?.user || response?.user;
       if (user) {
+        const userRole = (typeof user.role === 'object' && user.role) ? user.role.name : (user.role || 'client');
         dispatch(setUser(user));
-      }
 
-      router.push("/dashbord/overview")
+        // Redirect based on role
+        if (userRole === "client") {
+          router.push("/dashbord/overview")
+        } else {
+          router.push("/dashbord")
+        }
+      } else {
+        router.push("/dashbord/overview")
+      }
     } catch (err: any) {
       console.error("OTP verification failed:", err)
       toast.error(err.data?.message || "Invalid OTP code.")

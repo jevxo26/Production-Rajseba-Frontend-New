@@ -58,12 +58,12 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },
           { icon: HelpCircle, label: "Support Desk", href: "/dashbord/support" },
         ];
-      case "provider":
+      case "vendor":
         return [
           { icon: Briefcase, label: "My Jobs", href: "/dashbord" },
           { icon: Settings, label: "Service Profile", href: "/dashbord/settings" },
         ];
-      case "customer":
+      case "client":
         return [
           { icon: LayoutGrid, label: "Dashboard", href: "/dashbord/overview" },
           { icon: Heart, label: "Saved Services", href: "/dashbord/saved" },
@@ -142,8 +142,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         })}
       </nav>
 
-      {/* Refer & Earn Promo Card (For customer role in expanded state) */}
-      {role === "customer" && !collapsed && (
+      {/* Refer & Earn Promo Card (For client role in expanded state) */}
+      {role === "client" && !collapsed && (
         <div className="bg-white/80 backdrop-blur-md border border-slate-100 p-4 rounded-3xl shadow-sm mb-4 mx-4">
           <div className="w-9 h-9 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center text-[#FF464C] mx-auto">
             <Gift size={16} />

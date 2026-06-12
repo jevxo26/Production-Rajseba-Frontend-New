@@ -2,6 +2,7 @@ import { baseApi } from '@/redux/api/baseApi';
 import { User, setUser } from './authSlice';
 
 export const authApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getUserProfile: builder.query<User, void>({
       query: () => '/users/me',

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type UserRole = "superadmin" | "agent" | "provider" | "customer";
+export type UserRole = "superadmin" | "agent" | "vendor" | "client";
 
 export interface User {
   id: string;
@@ -34,9 +34,15 @@ export const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = true;
       if (action.payload.role) {
-        state.role = action.payload.role as UserRole;
+        const roleString = typeof action.payload.role === 'object' ? (action.payload.role as any).name : action.payload.role;
+        state.role = roleString as UserRole;
         if (typeof window !== "undefined") {
-          localStorage.setItem("rajseba_user_role", action.payload.role);
+          localStorage.setItem("rajseba_user_role", roleString);
+        }
+      } else {
+        state.role = "client";
+        if (typeof window !== "undefined") {
+          localStorage.setItem("rajseba_user_role", "client");
         }
       }
     },
@@ -70,10 +76,10 @@ export const getRoleName = (r: UserRole | null): string => {
       return "Super Admin";
     case "agent":
       return "Agent";
-    case "provider":
-      return "Service Provider";
-    case "customer":
-      return "Customer";
+    case "vendor":
+      return "Vendor";
+    case "client":
+      return "Client";
     default:
       return "User";
   }
