@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const footerLinks = [
   { href: "#", label: "Privacy Policy" },
@@ -9,6 +12,12 @@ const footerLinks = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/dashbord")) {
+    return null;
+  }
+
   return (
     <footer className="footer">
       <div className="footer-container">

@@ -71,21 +71,19 @@ export default function SettingsPage() {
     <button
       type="button"
       onClick={onChange}
-      className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none shrink-0 ${
-        checked ? "bg-rose-500" : "bg-slate-200"
-      }`}
+      className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none shrink-0 ${checked ? "bg-rose-500" : "bg-slate-200"
+        }`}
     >
       <span
-        className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${
-          checked ? "translate-x-5" : "translate-x-0"
-        }`}
+        className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${checked ? "translate-x-5" : "translate-x-0"
+          }`}
       />
     </button>
   );
 
   return (
     <div className="relative min-h-screen p-1 sm:p-6 overflow-hidden animate-in fade-in duration-200">
-      
+
       {/* Background Watermark Pattern Wrapper */}
       <div
         className="absolute inset-0 pointer-events-none -z-10"
@@ -98,7 +96,7 @@ export default function SettingsPage() {
       />
 
       <div className="max-w-6xl mx-auto space-y-8 relative z-10">
-        
+
         {/* Save success toast */}
         {successMsg && (
           <div className="fixed top-6 right-6 bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-semibold px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-lg z-50 animate-in fade-in slide-in-from-top-3 duration-200">
@@ -108,13 +106,13 @@ export default function SettingsPage() {
 
         {/* Main Columns Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-          
+
           {/* Left Column Navigation Panel (Responsive) */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-4 lg:p-6 lg:min-h-[480px] flex flex-col justify-between">
-            
+
             {/* Scrollable tab links on mobile, stacked list on desktop */}
             <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible gap-1.5 pb-2 lg:pb-0 scrollbar-none whitespace-nowrap lg:whitespace-normal">
-              
+
               {[
                 { id: "personal", label: "Personal Info", icon: User },
                 { id: "security", label: "Login & Security", icon: Shield },
@@ -123,20 +121,19 @@ export default function SettingsPage() {
                 { id: "payment", label: "Payment Methods", icon: CreditCard },
               ].map((tab) => {
                 const Icon = tab.icon;
-                const isActive = activeTab === tab.id || 
-                  (activeTab === "personal" && tab.id === "personal") || 
+                const isActive = activeTab === tab.id ||
+                  (activeTab === "personal" && tab.id === "personal") ||
                   (activeTab === "security" && tab.id === "security") ||
                   (activeTab === "notifications" && tab.id === "notifications");
-                
+
                 return (
                   <button
                     key={tab.id}
                     onClick={() => handleTabClick(tab.id)}
-                    className={`flex items-center gap-3 px-5 py-3 rounded-2xl text-left transition-all ${
-                      isActive
-                        ? "bg-rose-50 text-rose-500 font-bold"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-semibold"
-                    }`}
+                    className={`flex items-center gap-3 px-5 py-3 rounded-2xl text-left transition-all ${isActive
+                      ? "bg-rose-50 text-rose-500 font-bold"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-semibold"
+                      }`}
                   >
                     <Icon size={18} />
                     <span className="text-sm">{tab.label}</span>
@@ -160,7 +157,7 @@ export default function SettingsPage() {
 
           {/* Right Column content area */}
           <div className="lg:col-span-3 space-y-6">
-            
+
             {/* Top User Profile Header Card */}
             <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
@@ -193,7 +190,7 @@ export default function SettingsPage() {
             {/* Render Main Stack (Personal Info, Security, Notifications) */}
             {(activeTab === "personal" || activeTab === "security" || activeTab === "notifications") && (
               <div className="space-y-6">
-                
+
                 {/* 1. Personal Info Card */}
                 <div id="personal" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
                   <h3 className="text-lg font-bold text-slate-900">Personal Info</h3>

@@ -14,6 +14,10 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
 
+  if (pathname?.startsWith("/dashbord")) {
+    return null;
+  }
+
   return (
     <header className="navbar">
       <div className="navbar-inner">

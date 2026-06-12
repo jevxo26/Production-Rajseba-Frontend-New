@@ -1,10 +1,8 @@
 @import "tailwindcss";
-<<<<<<< HEAD
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
-=======
 
 :root {
   --background: #ffffff;
@@ -29,12 +27,10 @@
   --transition-base: 0.2s ease;
   --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
->>>>>>> origin/shohan
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-<<<<<<< HEAD
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -241,31 +237,6 @@ body {
   &::-webkit-scrollbar-thumb:hover {
     background: #FF5B60;
   }
-}
-=======
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), "Inter", system-ui, -apple-system,
-    sans-serif;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ============================
@@ -1034,11 +1005,11 @@ body {
   transition: border-color var(--transition-base);
 }
 
-.filter-radio input:checked + .filter-radio-circle {
+.filter-radio input:checked+.filter-radio-circle {
   border-color: var(--brand-primary);
 }
 
-.filter-radio input:checked + .filter-radio-circle::after {
+.filter-radio input:checked+.filter-radio-circle::after {
   content: "";
   position: absolute;
   top: 3px;
@@ -1235,11 +1206,9 @@ body {
    HOME PAGE - HERO
    ============================ */
 .home-hero {
-  background: linear-gradient(
-    180deg,
-    var(--brand-hero-bg) 0%,
-    var(--white) 100%
-  );
+  background: linear-gradient(180deg,
+      var(--brand-hero-bg) 0%,
+      var(--white) 100%);
   min-height: calc(100vh - 64px);
   display: flex;
   align-items: center;
@@ -1368,11 +1337,9 @@ body {
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
-  background: linear-gradient(
-    180deg,
-    var(--brand-hero-bg) 0%,
-    var(--white) 100%
-  );
+  background: linear-gradient(180deg,
+      var(--brand-hero-bg) 0%,
+      var(--white) 100%);
 }
 
 .placeholder-content {
@@ -1391,10 +1358,12 @@ body {
 }
 
 @keyframes floatIcon {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -1579,4 +1548,3 @@ body {
   margin: 16px 0 0;
   font-weight: 500;
 }
->>>>>>> origin/shohan

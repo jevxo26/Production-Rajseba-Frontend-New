@@ -85,7 +85,7 @@ export default function CommissionPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -102,7 +102,7 @@ export default function CommissionPage() {
 
       {/* Balance Panel & Quick Withdraw Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Withdrawable Balance card */}
         <div className="bg-gradient-to-br from-rose-500 to-[#FF464C] text-white p-6 rounded-2xl shadow-lg shadow-rose-500/10 flex flex-col justify-between relative overflow-hidden min-h-[200px]">
           <div className="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-bl-full flex items-center justify-center font-bold text-white/10 text-3xl">

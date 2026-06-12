@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client";
 
 import { useState } from "react";
@@ -66,11 +65,13 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login Submit:", { email, password, remember });
+    // Add your login logic here
+    // Example: await signIn(email, password);
   };
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-white grid md:grid-cols-2 overflow-hidden">
-      
+
       {/* Left Column - Form Section (Full width on Mobile, 50% on Desktop) */}
       <div className="flex flex-col justify-between p-6 md:p-12 lg:p-16 max-w-lg mx-auto w-full h-full min-h-[500px]">
 
@@ -147,7 +148,7 @@ export default function LoginPage() {
                 />
                 {LOGIN_CONTENT.rememberMe}
               </label>
-              <Link href="#" className="text-[#FF5A5F] font-bold hover:underline">
+              <Link href="/forgot-password" className="text-[#FF5A5F] font-bold hover:underline">
                 {LOGIN_CONTENT.forgotPass}
               </Link>
             </div>
@@ -185,7 +186,7 @@ export default function LoginPage() {
             </button>
             <button className="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200/80 bg-white hover:bg-slate-50 transition-colors font-bold text-sm text-slate-700 cursor-pointer">
               <svg className="h-4.5 w-4.5 flex-shrink-0 fill-current" viewBox="0 0 24 24">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.2.67-2.92 1.5-.63.73-1.18 1.87-1.03 2.98 1.1.09 2.22-.53 2.96-1.42"/>
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.2.67-2.92 1.5-.63.73-1.18 1.87-1.03 2.98 1.1.09 2.22-.53 2.96-1.42" />
               </svg>
               Apple
             </button>
@@ -205,7 +206,7 @@ export default function LoginPage() {
       <div className="hidden md:flex flex-col justify-center items-center p-12 bg-[#FAF8F8] relative overflow-hidden border-l border-slate-100/50 h-full">
         {/* Floating background blobs */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-rose-400/5 blur-[80px] rounded-full pointer-events-none" />
-        
+
         {/* Top-Right Decorative Floating Badge Buttons */}
         <div className="absolute top-8 right-8 flex gap-3">
           <div className="w-10 h-10 bg-white border border-slate-100 rounded-xl flex items-center justify-center text-[#FF5A5F] shadow-sm">
@@ -260,22 +261,7 @@ export default function LoginPage() {
           </div>
         </motion.div>
       </div>
-      
+
     </div>
   );
 }
-=======
-export default function LoginPage() {
-  return (
-    <section className="placeholder-page">
-      <div className="placeholder-content">
-        <div className="placeholder-icon">🔑</div>
-        <h1 className="placeholder-title">Login</h1>
-        <p className="placeholder-subtitle">
-          Sign in to your Rajseba account. Coming soon.
-        </p>
-      </div>
-    </section>
-  );
-}
->>>>>>> origin/shohan
