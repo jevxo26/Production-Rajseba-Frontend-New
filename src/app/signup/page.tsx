@@ -61,7 +61,7 @@ export default function RegisterPage() {
       setIsOtpSent(true)
       setTimeLeft(300)
       setOtp(["", "", "", ""])
-      
+
       // If the backend returns credentials here, we can set them, otherwise we do it on verifyOtp
       if (response.access_token || response.token) {
         const token = response.access_token || response.token;
@@ -97,30 +97,25 @@ export default function RegisterPage() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     const enteredOtp = otp.join("")
-<<<<<<< HEAD
-    if (enteredOtp.length < 6) {
-      toast.warning("Please enter a valid 6-digit OTP code.")
-=======
     if (enteredOtp.length < 4) {
       alert("Please enter a valid 4-digit OTP code.")
->>>>>>> 436a2bd (update login)
       return
     }
 
     try {
       const response = await verifyOtp({ phone: formData.phone, otpCode: enteredOtp }).unwrap()
       console.log("OTP Verified successfully:", enteredOtp)
-      
+
       const token = response?.data?.accessToken || response?.accessToken || response?.data?.token || response?.token;
       if (token) {
         localStorage.setItem('token', token);
       }
-      
+
       const user = response?.data?.user || response?.user;
       if (user) {
         dispatch(setUser(user));
       }
-      
+
       router.push("/dashbord/overview")
     } catch (err: any) {
       console.error("OTP verification failed:", err)
@@ -131,15 +126,9 @@ export default function RegisterPage() {
   const handleResendOtp = async () => {
     try {
       await resendOtp({ phone: formData.phone }).unwrap()
-<<<<<<< HEAD
-      setTimeLeft(59)
-      setOtp(["", "", "", "", "", ""])
-      toast.success("Verification code has been resent to " + formData.phone)
-=======
       setTimeLeft(300)
       setOtp(["", "", "", ""])
       alert("Verification code has been resent to " + formData.phone)
->>>>>>> 436a2bd (update login)
     } catch (err: any) {
       console.error("Failed to resend OTP:", err)
       toast.error(err.data?.message || "Failed to resend OTP.")
