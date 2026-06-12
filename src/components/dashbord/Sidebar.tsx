@@ -47,13 +47,6 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: BarChart3, label: "System Analytics", href: "/dashbord/analytics" },
           { icon: Settings, label: "System Settings", href: "/dashbord/settings" },
         ];
-      case "operator":
-        return [
-          { icon: LayoutGrid, label: "Operator Desk", href: "/dashbord" },
-          { icon: Users, label: "Verify Providers", href: "/dashbord/users" },
-          { icon: BarChart3, label: "Dispatch Analytics", href: "/dashbord/analytics" },
-          { icon: Settings, label: "Desk Settings", href: "/dashbord/settings" },
-        ];
       case "agent":
         return [
           { icon: LayoutGrid, label: "Agent Overview", href: "/dashbord" },
@@ -107,9 +100,9 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           <div className="absolute inset-0 bg-repeat" style={{ backgroundImage: "url('/Group1.png')", backgroundSize: "800px 800px" }} />
           <div className="absolute inset-0 bg-repeat mix-blend-multiply" style={{ backgroundImage: "url('/Group2.png')", backgroundSize: "800px 800px", backgroundPosition: "400px 400px" }} />
         </div>
-      
-      {/* Brand Header */}
-      <div className="p-6 flex items-center justify-between border-b border-slate-100">
+
+        {/* Brand Header */}
+        <div className="p-6 flex items-center justify-between border-b border-slate-100">
         <Link href="/" className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-[#FF5B60] to-[#FF464C] rounded-xl flex items-center justify-center font-bold text-white text-lg shadow-md shadow-rose-500/20">
             R

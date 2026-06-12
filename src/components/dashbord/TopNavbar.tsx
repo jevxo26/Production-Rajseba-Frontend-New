@@ -1,19 +1,28 @@
 "use client";
 
-import { Bell, Search, User, ChevronDown, Check, Shield, UserCheck, HardHat, CircleUser, Briefcase, Menu } from "lucide-react";
+import { Bell, Search, User, ChevronDown, Check, Shield, HardHat, CircleUser, Briefcase, Menu, LogOut, Settings } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRole, UserRole } from "@/context/RoleContext";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { role, setRole, roleName } = useRole();
+  const { logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on click outside
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setProfileDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -22,7 +31,6 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
   const rolesList: { value: UserRole; label: string; desc: string; icon: React.ComponentType<any>; color: string }[] = [
     { value: "superadmin", label: "Super Admin", desc: "System control", icon: Shield, color: "text-rose-500 bg-rose-50" },
-    { value: "operator", label: "Operator", desc: "Job dispatches", icon: UserCheck, color: "text-amber-500 bg-amber-50" },
     { value: "agent", label: "Agent", desc: "Booking agent", icon: Briefcase, color: "text-emerald-500 bg-emerald-50" },
     { value: "provider", label: "Provider", desc: "Service professional", icon: HardHat, color: "text-teal-500 bg-teal-50" },
     { value: "customer", label: "Customer", desc: "Client profile", icon: CircleUser, color: "text-indigo-500 bg-indigo-50" },
@@ -33,8 +41,6 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
     switch (r) {
       case "superadmin":
         return { name: "Aftab Farhan", designation: "System Administrator", avatar: "AF" };
-      case "operator":
-        return { name: "Tanvir Rahman", designation: "Dispatch Coordinator", avatar: "TR" };
       case "agent":
         return { name: "Rezaul Karim", designation: "Booking Partner", avatar: "RK" };
       case "provider":
@@ -74,7 +80,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] text-sm font-medium"
           >
-            <activeRoleConfig.icon size={16} className={activeRoleConfig.value === "superadmin" ? "text-rose-500" : activeRoleConfig.value === "operator" ? "text-amber-500" : activeRoleConfig.value === "provider" ? "text-teal-500" : "text-indigo-500"} />
+            <activeRoleConfig.icon size={16} className={activeRoleConfig.value === "superadmin" ? "text-rose-500" : activeRoleConfig.value === "agent" ? "text-emerald-500" : activeRoleConfig.value === "provider" ? "text-teal-500" : "text-indigo-500"} />
             <span className="text-slate-700 hidden sm:inline">{roleName}</span>
             <ChevronDown size={14} className="text-slate-400" />
           </button>
@@ -123,15 +129,67 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
           <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
         </button>
 
-        {/* Profile Info */}
-        <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-slate-800 leading-none">{profile.name}</p>
-            <p className="text-[11px] text-slate-400 mt-1 leading-none">{profile.designation}</p>
-          </div>
-          <div className="w-10 h-10 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center shadow-inner select-none">
-            {profile.avatar}
-          </div>
+        {/* Profile Info & Dropdown */}
+        <div className="relative" ref={profileDropdownRef}>
+          <button
+            onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            className="flex items-center gap-3 pl-4 border-l border-slate-200 text-left hover:opacity-85 transition-opacity active:scale-[0.98] focus:outline-none"
+          >
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-semibold text-slate-800 leading-none">{profile.name}</p>
+              <p className="text-[11px] text-slate-400 mt-1 leading-none">{profile.designation}</p>
+            </div>
+            <div className="w-10 h-10 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center shadow-inner select-none transition-transform hover:scale-105">
+              {profile.avatar}
+            </div>
+          </button>
+
+          {profileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="px-4 py-2 border-b border-slate-100 sm:hidden">
+                <p className="text-sm font-bold text-slate-800 leading-none">{profile.name}</p>
+                <p className="text-[10px] text-slate-400 mt-1 leading-none">{profile.designation}</p>
+              </div>
+              <div className="p-1 space-y-0.5">
+                <Link
+                  href="/dashbord/profile"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-slate-50 transition-all"
+                >
+                  <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
+                    <User size={16} />
+                  </div>
+                  <span className="font-medium">My Profile</span>
+                </Link>
+
+                <Link
+                  href="/dashbord/settings"
+                  onClick={() => setProfileDropdownOpen(false)}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-slate-50 transition-all"
+                >
+                  <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
+                    <Settings size={16} />
+                  </div>
+                  <span className="font-medium">Settings</span>
+                </Link>
+
+                <div className="my-1 border-t border-slate-100" />
+
+                <button
+                  onClick={() => {
+                    setProfileDropdownOpen(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-rose-600 hover:bg-rose-50 transition-all"
+                >
+                  <div className="p-1.5 rounded-lg bg-rose-50 text-rose-500">
+                    <LogOut size={16} />
+                  </div>
+                  <span className="font-semibold">Sign Out</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

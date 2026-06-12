@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-export type UserRole = "superadmin" | "operator" | "agent" | "provider" | "customer";
+export type UserRole = "superadmin" | "agent" | "provider" | "customer";
 
 interface RoleContextType {
   role: UserRole;
@@ -17,7 +17,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const savedRole = localStorage.getItem("rajseba_user_role") as UserRole;
-    if (savedRole && ["superadmin", "operator", "agent", "provider", "customer"].includes(savedRole)) {
+    if (savedRole && ["superadmin", "agent", "provider", "customer"].includes(savedRole)) {
       setRoleState(savedRole);
     }
   }, []);
@@ -31,8 +31,6 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     switch (r) {
       case "superadmin":
         return "Super Admin";
-      case "operator":
-        return "Operator";
       case "agent":
         return "Agent";
       case "provider":
