@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { useState, useEffect } from "react";
 import {
   User,
@@ -22,7 +23,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
-  const { role, roleName } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const roleName = getRoleName(role);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("personal");
   const [successMsg, setSuccessMsg] = useState(false);

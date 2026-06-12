@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRole } from "@/context/RoleContext"
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   ShieldAlert,
   Plus,
@@ -32,7 +33,7 @@ interface Transaction {
 }
 
 export default function WalletPage() {
-  const { role } = useRole()
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [copied, setCopied] = React.useState(false)
   const [autoRecharge, setAutoRecharge] = React.useState(true)
 

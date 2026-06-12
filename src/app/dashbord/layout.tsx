@@ -2,7 +2,6 @@
 
 import { Sidebar } from "@/components/dashbord/Sidebar";
 import { TopNavbar } from "@/components/dashbord/TopNavbar";
-import { RoleProvider } from "@/context/RoleContext";
 import { useState } from "react";
 
 export default function DashboardLayout({
@@ -13,8 +12,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <RoleProvider>
-      <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 relative">
+    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 relative">
         {/* Tiled watermark backgrounds */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.16] z-0">
           <div className="absolute inset-0 bg-repeat" style={{ backgroundImage: "url('/Group1.png')", backgroundSize: "800px 800px" }} />
@@ -35,6 +33,5 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
-    </RoleProvider>
   );
 }

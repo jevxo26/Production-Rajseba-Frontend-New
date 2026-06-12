@@ -1,4 +1,8 @@
-"use client"
+const fs = require('fs');
+
+const loginPath = 'src/app/login/page.tsx';
+
+const content = `"use client"
 
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
@@ -355,7 +359,7 @@ export default function LoginPage() {
               {/* Timer Countdown */}
               <div className="text-xs text-rose-500 font-extrabold tracking-wide">
                 {timeLeft > 0 ? (
-                  `Resend code in 00:${timeLeft < 10 ? "0" + timeLeft : timeLeft}`
+                  \`Resend code in 00:\${timeLeft < 10 ? "0" + timeLeft : timeLeft}\`
                 ) : (
                   <button
                     type="button"
@@ -395,3 +399,7 @@ export default function LoginPage() {
     </div>
   )
 }
+`;
+
+fs.writeFileSync(loginPath, content);
+console.log('done');

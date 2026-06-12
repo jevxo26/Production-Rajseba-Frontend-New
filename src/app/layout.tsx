@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Bai_Jamjuree } from "next/font/google";
-import { AuthProvider } from "@/context/AuthContext";
+import { StoreProvider } from "@/redux/StoreProvider";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/home/LayoutWrapper";
 
@@ -28,11 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${baiJamjuree.variable} antialiased`}>
       <body className="min-h-screen flex flex-col bg-slate-50 font-sans">
-        <AuthProvider>
+        <StoreProvider>
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
-        </AuthProvider>
+        </StoreProvider>
       </body>
     </html>
   );

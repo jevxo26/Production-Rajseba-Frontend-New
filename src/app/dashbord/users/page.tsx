@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, ShieldCheck, XCircle, Check } from "lucide-react";
 import { useState } from "react";
 import { CustomTable } from "@/components/ui/table";
@@ -16,7 +17,7 @@ interface UserItem {
 }
 
 export default function UsersPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   // Mock Users data
   const initialUsers: UserItem[] = [

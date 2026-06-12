@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   TrendingUp,
   Users,
@@ -25,7 +26,7 @@ import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
 
 export default function DashboardPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const router = useRouter();
 
   useEffect(() => {

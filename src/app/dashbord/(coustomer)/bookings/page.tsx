@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRole } from "@/context/RoleContext"
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   ShieldAlert,
   Calendar,
@@ -26,7 +27,7 @@ interface Booking {
 }
 
 export default function BookingsPage() {
-  const { role } = useRole()
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [filter, setFilter] = React.useState<"Active" | "Scheduled" | "Completed" | "Cancelled">("Active")
 
   const bookingsList: Booking[] = [

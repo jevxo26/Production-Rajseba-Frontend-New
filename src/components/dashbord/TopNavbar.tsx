@@ -2,13 +2,18 @@
 
 import { Bell, Search, User, ChevronDown, Check, Shield, HardHat, CircleUser, Briefcase, Menu, LogOut, Settings } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { useRole, UserRole } from "@/context/RoleContext";
-import { useAuth } from "@/context/AuthContext";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { UserRole, setRole as setAuthRole, getRoleName } from "@/redux/features/auth/authSlice";
+import { logout as authLogout } from "@/redux/features/auth/authSlice";
+// Note: useAppSelector and useAppDispatch should be imported from @/redux/hooks
 import Link from "next/link";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
-  const { role, setRole, roleName } = useRole();
-  const { logout } = useAuth();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const dispatch = useAppDispatch();
+  const setRole = (r: UserRole) => dispatch(setAuthRole(r));
+  const roleName = getRoleName(role);
+  const logout = () => dispatch(authLogout());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

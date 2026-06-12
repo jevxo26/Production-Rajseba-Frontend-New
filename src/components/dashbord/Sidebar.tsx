@@ -23,7 +23,8 @@ import {
   Gift
 } from "lucide-react";
 import { useState } from "react";
-import { useRole, UserRole } from "@/context/RoleContext";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { UserRole, setRole as setAuthRole, getRoleName } from "@/redux/features/auth/authSlice";
 
 interface MenuItem {
   icon: React.ComponentType<any>;
@@ -35,7 +36,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
-  const { role, roleName } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const roleName = getRoleName(role);
 
   // Dynamic menu items based on role
   const getMenuItems = (userRole: UserRole): MenuItem[] => {

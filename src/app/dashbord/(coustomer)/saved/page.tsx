@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRole } from "@/context/RoleContext"
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   ShieldAlert,
   Heart,
@@ -14,7 +15,7 @@ import {
 import Link from "next/link"
 
 export default function SavedServicesPage() {
-  const { role } = useRole()
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   const [savedServices, setSavedServices] = React.useState([
     {

@@ -3,7 +3,10 @@
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, User, Phone, Briefcase, Check, ShieldCheck, PenTool } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Phone, Briefcase, Check, ShieldCheck, PenTool, Loader2 } from "lucide-react"
+import { useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/redux/features/auth/authApi"
+import { useAppDispatch } from "@/redux/hooks"
+import { setUser } from "@/redux/features/auth/authSlice"
 import Link from "next/link"
 
 export default function RegisterPage() {
@@ -39,16 +42,36 @@ export default function RegisterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const dispatch = useAppDispatch()
+  const [register, { isLoading, error }] = useRegisterMutation()
+  const [verifyOtp, { isLoading: isVerifying }] = useVerifyOtpMutation()
+  const [resendOtp] = useResendOtpMutation()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!agreeTerms) {
       alert("Please agree to the Terms of Use and Privacy Policy.")
       return
     }
-    // Transition to OTP screen
-    setIsOtpSent(true)
-    setTimeLeft(59)
-    setOtp(["", "", "", "", "", ""])
+
+    try {
+      const response = await register(formData).unwrap()
+      // Transition to OTP screen on success
+      setIsOtpSent(true)
+      setTimeLeft(59)
+      setOtp(["", "", "", "", "", ""])
+      
+      // If the backend returns credentials here, we can set them, otherwise we do it on verifyOtp
+      if (response.access_token || response.token) {
+        const token = response.access_token || response.token;
+        if (token) localStorage.setItem('token', token);
+        const user = response.user || response;
+        dispatch(setUser(user))
+      }
+    } catch (err: any) {
+      console.error("Registration failed:", err)
+      alert(err.data?.message || "Registration failed. Please try again.")
+    }
   }
 
   const handleOtpChange = (val: string, index: number) => {
@@ -70,7 +93,7 @@ export default function RegisterPage() {
     }
   }
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     const enteredOtp = otp.join("")
     if (enteredOtp.length < 6) {
@@ -78,19 +101,35 @@ export default function RegisterPage() {
       return
     }
 
-    // Developer API connection point:
-    // ==========================================
-    // const response = await fetch('/api/verify', { method: 'POST', body: JSON.stringify({ phone: formData.phone, code: enteredOtp }) });
-    // ==========================================
-
-    console.log("OTP Verified successfully:", enteredOtp)
-    router.push("/dashbord/overview")
+    try {
+      const response = await verifyOtp({ phone: formData.phone, otp: enteredOtp }).unwrap()
+      console.log("OTP Verified successfully:", enteredOtp)
+      
+      // If credentials are only provided after OTP verify
+      if (response.access_token || response.token) {
+        const token = response.access_token || response.token;
+        if (token) localStorage.setItem('token', token);
+        const user = response.user || response;
+        dispatch(setUser(user))
+      }
+      
+      router.push("/dashbord/overview")
+    } catch (err: any) {
+      console.error("OTP verification failed:", err)
+      alert(err.data?.message || "Invalid OTP code.")
+    }
   }
 
-  const handleResendOtp = () => {
-    setTimeLeft(59)
-    setOtp(["", "", "", "", "", ""])
-    alert("Verification code has been resent to " + formData.phone)
+  const handleResendOtp = async () => {
+    try {
+      await resendOtp({ phone: formData.phone }).unwrap()
+      setTimeLeft(59)
+      setOtp(["", "", "", "", "", ""])
+      alert("Verification code has been resent to " + formData.phone)
+    } catch (err: any) {
+      console.error("Failed to resend OTP:", err)
+      alert(err.data?.message || "Failed to resend OTP.")
+    }
   }
 
   return (
@@ -236,9 +275,10 @@ export default function RegisterPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-[#FF565C] hover:bg-[#FF464C] text-white text-sm font-bold py-3.5 rounded-[14px] shadow-sm shadow-[#FF565C]/10 transition-all focus:outline-none mt-2"
+                  disabled={isLoading}
+                  className="w-full bg-[#FF565C] hover:bg-[#FF464C] disabled:bg-[#FF565C]/70 text-white text-sm font-bold py-3.5 rounded-[14px] shadow-sm shadow-[#FF565C]/10 transition-all focus:outline-none mt-2 flex justify-center items-center"
                 >
-                  Create Account
+                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : "Create Account"}
                 </button>
               </form>
 
@@ -385,9 +425,10 @@ export default function RegisterPage() {
               {/* Verify & Proceed Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#FF565C] hover:bg-[#FF464C] text-[#ffffff] text-xs font-black py-4 rounded-[14px] shadow-sm shadow-[#FF565C]/10 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
+                disabled={isVerifying}
+                className="w-full bg-[#FF565C] hover:bg-[#FF464C] disabled:bg-[#FF565C]/70 text-[#ffffff] text-xs font-black py-4 rounded-[14px] shadow-sm shadow-[#FF565C]/10 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
               >
-                VERIFY & PROCEED <span className="text-sm font-extrabold">→</span>
+                {isVerifying ? <Loader2 size={18} className="animate-spin" /> : <>VERIFY & PROCEED <span className="text-sm font-extrabold">→</span></>}
               </button>
             </form>
 

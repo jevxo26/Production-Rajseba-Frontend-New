@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, Search, Calendar, User, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 
@@ -19,7 +20,7 @@ interface AgentOrder {
 import { CustomTable } from "@/components/ui/table";
 
 export default function AgentOrdersPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   const initialOrders: AgentOrder[] = [
     { id: "RS-9310", customerName: "Sayed Karim", customerPhone: "+880 1711 223344", service: "AC Leak Repair", provider: "Kabir AC Repair", price: "৳1,800", commission: "৳270", status: "Assigned", date: "Today, June 12" },

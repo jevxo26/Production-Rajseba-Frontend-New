@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, DollarSign, Wallet, ArrowDownRight, Check, Send } from "lucide-react";
 import { useState } from "react";
 import { CustomTable } from "@/components/ui/table";
@@ -16,7 +17,7 @@ interface PayoutLog {
 }
 
 export default function CommissionPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [payoutBalance, setPayoutBalance] = useState(3200);
   const [success, setSuccess] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState("");

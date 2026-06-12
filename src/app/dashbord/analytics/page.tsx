@@ -1,10 +1,11 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, BarChart3, TrendingUp, Sparkles, MapPin, Star, AlertCircle } from "lucide-react";
 
 export default function AnalyticsPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   // Access check
   if (role !== "superadmin") {

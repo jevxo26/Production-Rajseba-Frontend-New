@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRole } from "@/context/RoleContext"
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   ShieldAlert,
   Calendar as CalendarIcon,
@@ -25,7 +26,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 export default function BookingTrackWizard() {
-  const { role } = useRole()
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const router = useRouter()
   
   // Stepper State (1 to 5)

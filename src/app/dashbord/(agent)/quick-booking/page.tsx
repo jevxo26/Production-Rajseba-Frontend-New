@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, Zap, User, Phone, MapPin, Calendar, Check, Save } from "lucide-react";
 import { useState } from "react";
 
@@ -9,7 +10,7 @@ import { CustomCalendar } from "@/components/ui/calendar";
 import dayjs from "dayjs";
 
 export default function AgentQuickBookingPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [success, setSuccess] = useState(false);
   const [bookingDetails, setBookingDetails] = useState({
     clientName: "",

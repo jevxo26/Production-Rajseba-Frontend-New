@@ -1,6 +1,7 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, MessageCircle, AlertCircle, Check, Send } from "lucide-react";
 import { useState } from "react";
 
@@ -14,7 +15,7 @@ interface Ticket {
 }
 
 export default function AgentSupportPage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [success, setSuccess] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([
     { id: "TCK-482", subject: "Commission calculation error on RS-9240", category: "Commission & Payout", status: "In Progress", date: "Today", lastReply: "We are auditing the invoice." },

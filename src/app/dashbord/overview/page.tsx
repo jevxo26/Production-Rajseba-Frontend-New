@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRole } from "@/context/RoleContext"
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import {
   Sparkles,
   Plus,
@@ -27,7 +28,7 @@ import Link from "next/link"
 import { CustomTable } from "@/components/ui/table"
 
 export default function UnifiedOverviewPage() {
-  const { role } = useRole()
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   if (role === "agent") {
     return <AgentOverview />

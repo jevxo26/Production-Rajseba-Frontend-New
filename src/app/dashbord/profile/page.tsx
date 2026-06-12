@@ -1,11 +1,12 @@
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { ShieldAlert, User, Phone, MapPin, Mail, Check, Save } from "lucide-react";
 import { useState } from "react";
 
 export default function ProfilePage() {
-  const { role } = useRole();
+  const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const [success, setSuccess] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
