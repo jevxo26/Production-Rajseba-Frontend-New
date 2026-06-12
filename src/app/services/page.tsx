@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const serviceCategories = [
   { id: "cleaning", label: "Cleaning", icon: "🧹" },
@@ -150,9 +151,9 @@ export default function ServicesPage() {
                 Highly requested by residents in Dhaka this month
               </p>
             </div>
-            <a href="#" className="trending-view-all">
+            <Link href="/services/trending" className="trending-view-all">
               View all →
-            </a>
+            </Link>
           </div>
 
           {/* Service Cards */}
