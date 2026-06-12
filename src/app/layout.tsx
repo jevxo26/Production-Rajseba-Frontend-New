@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Bai_Jamjuree } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
-import { Navbar } from "@/components/home/Navbar";
-import Footer from "@/components/home/Footer";
+import { LayoutWrapper } from "@/components/home/LayoutWrapper";
 
 const baiJamjuree = Bai_Jamjuree({
   subsets: ["latin", "latin-ext", "thai"],
@@ -30,11 +29,9 @@ export default function RootLayout({
     <html lang="en" className={`${baiJamjuree.variable} antialiased`}>
       <body className="min-h-screen flex flex-col bg-slate-50 font-sans">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-grow">
+          <LayoutWrapper>
             {children}
-          </main>
-          <Footer />
+          </LayoutWrapper>
         </AuthProvider>
       </body>
     </html>
