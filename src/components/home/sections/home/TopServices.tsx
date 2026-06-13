@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Star, Heart } from "lucide-react";
+import { Star, Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Clean Data Architecture - Dynamic Services configs
@@ -80,16 +80,17 @@ export default function TopServices() {
   };
 
   return (
-    <div className="bg-transparent py-12 md:py-16 lg:py-20 overflow-hidden">
+    <div className="bg-transparent py-8 md:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         
         {/* Header Block */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-12 md:mb-16">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-wide">
+            <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
+              <Sparkles className="w-8 h-8 text-[#FF5A5F]" />
               {SERVICES_CONTENT.title}
             </h2>
-            <p className="text-slate-500 mt-2 text-sm md:text-base">
+            <p className="text-slate-500 text-sm">
               {SERVICES_CONTENT.subtitle}
             </p>
           </div>

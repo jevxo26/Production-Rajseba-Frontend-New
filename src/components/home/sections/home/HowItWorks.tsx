@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { Compass } from "lucide-react";
 
 // Clean Data Architecture - Dynamic timeline step configurations
 const HOW_IT_WORKS_CONTENT = {
@@ -56,17 +57,18 @@ const nodeVariants = {
 
 const HowItWorks = () => {
   return (
-    <div className="bg-transparent border-y border-slate-100 py-12 md:py-16 lg:py-20 overflow-hidden relative">
+    <div className="bg-transparent border-y border-slate-100 py-8 md:py-12 overflow-hidden relative">
       {/* Decorative light blurs */}
       <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF5A5F]/5 blur-[90px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         {/* Header Block */}
-        <div className="text-center mb-16 lg:mb-20">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-wide">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+            <Compass className="w-8 h-8 text-[#FF5A5F]" />
             {HOW_IT_WORKS_CONTENT.title}
           </h2>
-          <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             {HOW_IT_WORKS_CONTENT.subtitle}
           </p>
         </div>

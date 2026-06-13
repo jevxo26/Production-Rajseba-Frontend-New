@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, Award, Headset } from "lucide-react";
+import { ShieldCheck, CreditCard, Award, Headset, ThumbsUp } from "lucide-react";
 
 const WHY_CHOOSE_US_CONTENT = {
   title: "Why Choose Us",
@@ -54,14 +54,15 @@ const itemVariants = {
 
 export default function WhyChooseUs() {
   return (
-    <div className="bg-transparent py-12 md:py-16 lg:py-20 overflow-hidden">
+    <div className="bg-transparent py-8 md:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Title block */}
-        <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-wide">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+            <ThumbsUp className="w-8 h-8 text-[#FF5A5F]" />
             {WHY_CHOOSE_US_CONTENT.title}
           </h2>
-          <p className="text-sm md:text-base text-slate-500 max-w-md mx-auto">
+          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             {WHY_CHOOSE_US_CONTENT.subtitle}
           </p>
         </div>

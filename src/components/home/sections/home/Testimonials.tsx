@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { Star, MessageSquare } from "lucide-react";
 
 // Expanded mock reviews (10 total)
 const TESTIMONIALS_CONTENT = {
+  title: "Real Happy Customers, Real Stories",
+  subtitle: "See what our lovely clients say about our professional services",
   testimonials: [
     {
       name: "Adnan Sami",
@@ -113,17 +115,18 @@ const Testimonials = () => {
   }, [maxIndex]);
 
   return (
-    <div className="bg-slate-50 py-12 md:py-16 lg:py-20 overflow-hidden relative">
+    <div className="bg-slate-50 py-8 md:py-12 overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         
         {/* Header Block */}
         <div className="mb-8 px-2">
-          <span className="text-sm font-medium tracking-widest uppercase text-[#FF5A5F] block mb-2">
-            SOME HAPPY FACES
-          </span>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl text-slate-800 tracking-tight">
-            Real Happy Customers, Real Stories
+          <h2 className="text-3xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+            <MessageSquare className="w-8 h-8 text-[#FF5A5F]" />
+            {TESTIMONIALS_CONTENT.title}
           </h2>
+          <p className="text-slate-500 text-sm">
+            {TESTIMONIALS_CONTENT.subtitle}
+          </p>
         </div>
 
         {/* Testimonial slider wrapper */}

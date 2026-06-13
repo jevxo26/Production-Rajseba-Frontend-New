@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
 import { Button } from "@/components/ui/button";
+import { LayoutGrid } from "lucide-react";
 
 export const CATEGORIES_CONTENT = {
   title: "Explore Categories",
@@ -63,14 +64,15 @@ const ExploreCategories = () => {
   const hasMore = CATEGORIES_CONTENT.categories.length > VISIBLE_COUNT;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-20 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-end mb-10 md:mb-14">
+      <div className="flex justify-between items-end mb-8 md:mb-10">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide mb-1">
+          <h2 className="text-3xl font-bold text-slate-800 tracking-wide mb-2 flex items-center gap-2">
+            <LayoutGrid className="w-8 h-8 text-[#FF5A5F]" />
             {CATEGORIES_CONTENT.title}
           </h2>
-          <p className="text-slate-500 text-xs md:text-sm">
+          <p className="text-slate-500 text-sm">
             {CATEGORIES_CONTENT.subtitle}
           </p>
         </div>
