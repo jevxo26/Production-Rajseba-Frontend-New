@@ -39,11 +39,19 @@ export const authSlice = createSlice({
         state.role = roleString as UserRole;
         if (typeof window !== "undefined") {
           localStorage.setItem("rajseba_user_role", roleString);
+          const date = new Date();
+          date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const expires = "; expires=" + date.toUTCString();
+          document.cookie = `rajseba_user_role=${roleString}${expires}; path=/; SameSite=Lax`;
         }
       } else {
         state.role = "client";
         if (typeof window !== "undefined") {
           localStorage.setItem("rajseba_user_role", "client");
+          const date = new Date();
+          date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const expires = "; expires=" + date.toUTCString();
+          document.cookie = `rajseba_user_role=client${expires}; path=/; SameSite=Lax`;
         }
       }
     },
@@ -51,6 +59,10 @@ export const authSlice = createSlice({
       state.role = action.payload;
       if (typeof window !== "undefined") {
         localStorage.setItem("rajseba_user_role", action.payload);
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const expires = "; expires=" + date.toUTCString();
+        document.cookie = `rajseba_user_role=${action.payload}${expires}; path=/; SameSite=Lax`;
       }
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -62,6 +74,14 @@ export const authSlice = createSlice({
       state.role = null;
       if (typeof window !== "undefined") {
         localStorage.removeItem("rajseba_user_role");
+        localStorage.removeItem("token");
+        localStorage.removeItem("rajseba_access_token");
+        localStorage.removeItem("rajseba_refresh_token");
+        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie = "rajseba_access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie = "rajseba_refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie = "rajseba_user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        window.location.href = "/";
       }
     },
   },

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Mail, Lock, User, Phone, Briefcase, Check, ShieldCheck, PenTool, Loader2 } from "lucide-react"
 import { useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/redux/features/auth/authApi"
 import { useAppDispatch } from "@/redux/hooks"
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams ? searchParams.get("redirect") : null
   const [showPassword, setShowPassword] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [isOtpSent, setIsOtpSent] = useState(false)
@@ -64,7 +66,14 @@ export default function RegisterPage() {
       // If the backend returns credentials here, we can set them, otherwise we do it on verifyOtp
       if (response.access_token || response.token) {
         const token = response.access_token || response.token;
-        if (token) localStorage.setItem('token', token);
+        if (token) {
+          localStorage.setItem('token', token);
+          const date = new Date();
+          date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const expires = "; expires=" + date.toUTCString();
+          document.cookie = `token=${token}${expires}; path=/; SameSite=Lax`;
+          document.cookie = `rajseba_access_token=${token}${expires}; path=/; SameSite=Lax`;
+        }
         const user = response.user || response;
         dispatch(setUser(user))
       }
@@ -108,6 +117,11 @@ export default function RegisterPage() {
       const token = response?.data?.accessToken || response?.accessToken || response?.data?.token || response?.token;
       if (token) {
         localStorage.setItem('token', token);
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const expires = "; expires=" + date.toUTCString();
+        document.cookie = `token=${token}${expires}; path=/; SameSite=Lax`;
+        document.cookie = `rajseba_access_token=${token}${expires}; path=/; SameSite=Lax`;
       }
 
       const user = response?.data?.user || response?.user;
@@ -116,13 +130,26 @@ export default function RegisterPage() {
         
         // Redirect based on role
         const userRole = (typeof user.role === 'object' && user.role) ? user.role.name : (user.role || 'client');
-        if (userRole === "client") {
+        const roleString = typeof userRole === 'string' ? userRole.toLowerCase().replace(/\s+/g, '') : "client";
+
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const expires = "; expires=" + date.toUTCString();
+        document.cookie = `rajseba_user_role=${roleString}${expires}; path=/; SameSite=Lax`;
+
+        if (redirectUrl) {
+          router.push(redirectUrl)
+        } else if (roleString === "client") {
           router.push("/dashbord/overview")
         } else {
           router.push("/dashbord")
         }
       } else {
-        router.push("/dashbord/overview")
+        if (redirectUrl) {
+          router.push(redirectUrl)
+        } else {
+          router.push("/dashbord/overview")
+        }
       }
     } catch (err: any) {
       console.error("OTP verification failed:", err)

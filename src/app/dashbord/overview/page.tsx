@@ -29,6 +29,18 @@ import { CustomTable } from "@/components/ui/table"
 
 export default function UnifiedOverviewPage() {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return <OverviewSkeleton />;
+  }
 
   if (role === "agent") {
     return <AgentOverview />
@@ -519,4 +531,58 @@ function AgentOverview() {
 
     </div>
   )
+}
+
+function OverviewSkeleton() {
+  return (
+    <div className="relative min-h-screen p-1 sm:p-6 overflow-hidden animate-pulse">
+      <div className="w-full space-y-8 relative z-10">
+        {/* Header Title & Top Counters */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="h-10 w-48 bg-slate-200 rounded-xl" />
+            <div className="h-4 w-64 bg-slate-100 rounded-lg" />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="h-16 w-24 bg-slate-100 rounded-2xl" />
+            <div className="h-16 w-24 bg-slate-100 rounded-2xl" />
+          </div>
+        </div>
+
+        {/* Action Banners Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="h-20 w-full bg-slate-200 rounded-[28px]" />
+          <div className="h-20 w-full bg-slate-100 rounded-[28px]" />
+        </div>
+
+        {/* Active Bookings Tracker */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="h-6 w-36 bg-slate-200 rounded-lg" />
+            <div className="h-4 w-16 bg-slate-100 rounded-md" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm h-[200px]" />
+            <div className="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm h-[200px]" />
+          </div>
+        </div>
+
+        {/* Recommended Services Grid */}
+        <div className="space-y-4">
+          <div className="h-6 w-44 bg-slate-200 rounded-lg" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm h-[320px] p-5 flex flex-col justify-between">
+                <div className="w-full h-36 bg-slate-100 rounded-2xl" />
+                <div className="space-y-2 pt-4">
+                  <div className="h-5 w-3/4 bg-slate-200 rounded-lg" />
+                  <div className="h-4 w-1/2 bg-slate-100 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

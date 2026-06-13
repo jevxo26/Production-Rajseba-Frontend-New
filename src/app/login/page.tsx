@@ -7,11 +7,13 @@ import { Phone, ArrowRight, Star, Briefcase, ShieldCheck, Loader2 } from "lucide
 import { useSendOtpMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/redux/features/auth/authApi"
 import { useAppDispatch } from "@/redux/hooks"
 import { setUser } from "@/redux/features/auth/authSlice"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectUrl = searchParams ? searchParams.get("redirect") : null
   const dispatch = useAppDispatch()
 
   const [phone, setPhone] = useState("")
@@ -85,21 +87,38 @@ export default function LoginPage() {
       const token = response?.data?.accessToken || response?.accessToken || response?.data?.token || response?.token;
       if (token) {
         localStorage.setItem('token', token);
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const expires = "; expires=" + date.toUTCString();
+        document.cookie = `token=${token}${expires}; path=/; SameSite=Lax`;
+        document.cookie = `rajseba_access_token=${token}${expires}; path=/; SameSite=Lax`;
       }
 
       const user = response?.data?.user || response?.user;
       if (user) {
         const userRole = (typeof user.role === 'object' && user.role) ? user.role.name : (user.role || 'client');
+        const roleString = typeof userRole === 'string' ? userRole.toLowerCase().replace(/\s+/g, '') : "client";
         dispatch(setUser(user));
 
-        // Redirect based on role
-        if (userRole === "client") {
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const expires = "; expires=" + date.toUTCString();
+        document.cookie = `rajseba_user_role=${roleString}${expires}; path=/; SameSite=Lax`;
+
+        // Redirect based on query parameter or role
+        if (redirectUrl) {
+          router.push(redirectUrl)
+        } else if (roleString === "client") {
           router.push("/dashbord/overview")
         } else {
           router.push("/dashbord")
         }
       } else {
-        router.push("/dashbord/overview")
+        if (redirectUrl) {
+          router.push(redirectUrl)
+        } else {
+          router.push("/dashbord/overview")
+        }
       }
     } catch (err: any) {
       console.error("OTP verification failed:", err)
