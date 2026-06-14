@@ -56,26 +56,23 @@ export default function WhyChooseUs() {
   return (
     <div className="bg-transparent mt-15 py-8 md:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        {/* Title block */}
-        {/* Title block */}
-        <div className="mb-10 md:mb-12 text-center md:text-left">
-          <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center justify-center md:justify-start gap-2">
-            <ThumbsUp className="w-8 h-8 text-[#FF5A5F]" />
+        <div className="mb-10 md:mb-12 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+            <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
             {WHY_CHOOSE_US_CONTENT.title}
           </h2>
 
-          <p className="text-slate-500 text-sm max-w-md mx-auto md:mx-0 leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             {WHY_CHOOSE_US_CONTENT.subtitle}
           </p>
         </div>
-
         {/* Features Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-10"
+          className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-10"
         >
           {WHY_CHOOSE_US_CONTENT.features.map((feature, i) => {
             const IconComponent = feature.icon;

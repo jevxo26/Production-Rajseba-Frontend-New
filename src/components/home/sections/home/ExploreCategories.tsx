@@ -66,35 +66,41 @@ const ExploreCategories = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-end mb-8 md:mb-10">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-800 tracking-wide mb-2 flex items-center gap-2">
-            <LayoutGrid className="w-8 h-8 text-[#FF5A5F]" />
+      <div className="space-y-4 mb-8 md:mb-10">
+        <div className="text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
+            <LayoutGrid className="w-6 h-6 text-[#FF5A5F]" />
             {CATEGORIES_CONTENT.title}
           </h2>
-          <p className="text-slate-500 text-sm">
+
+          <p className="text-slate-500 text-sm max-w-md mx-auto">
             {CATEGORIES_CONTENT.subtitle}
           </p>
         </div>
 
         {hasMore && (
-          <Button
-            variant="outline"
-            onClick={() => setShowAll((prev) => !prev)}
-            className="
-              bg-white hover:bg-[#FFF0F1] hover:text-[#FF5A5F]
-              text-slate-700 font-semibold px-5 py-2 h-auto rounded-xl
-              transition-all duration-200 cursor-pointer active:scale-95
-              shadow-[0_2px_8px_rgba(0,0,0,0.06)]
-              border border-slate-200
-              text-xs md:text-sm
-            "
-          >
-            {showAll ? "Show Less" : "View All"}
-          </Button>
+          <div className="flex justify-center md:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setShowAll((prev) => !prev)}
+              className="
+          rounded-xl
+          flex items-center gap-2
+          px-5 py-2
+          bg-white
+          hover:bg-[#FFF0F1]
+          hover:text-[#FF5A5F]
+          border border-slate-200
+          shadow-sm
+        "
+            >
+              {/* <Eye className="w-4 h-4" /> */}
+
+              {showAll ? "Show Less" : "View All"}
+            </Button>
+          </div>
         )}
       </div>
-
       {/* Grid */}
       <motion.div
         layout

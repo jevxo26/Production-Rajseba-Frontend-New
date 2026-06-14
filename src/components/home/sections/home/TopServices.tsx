@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Sparkles, Star } from "lucide-react";
+import { Heart, Sparkles, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -112,20 +112,35 @@ export default function TopServices() {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-              <Sparkles className="w-8 h-8 text-[#FF5A5F]" />
+        <div className="space-y-4 mb-8 md:mb-10">
+          <div className="text-center">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
               {SERVICES_CONTENT.title}
             </h2>
-            <p className="text-slate-500 text-sm">{SERVICES_CONTENT.subtitle}</p>
+
+            <p className="text-slate-500 text-sm max-w-md mx-auto">
+              {SERVICES_CONTENT.subtitle}
+            </p>
           </div>
-          <Link
-            href={SERVICES_CONTENT.viewAllHref}
-            className="text-[#FF5A5F] font-bold hover:text-[#FF4449] transition-colors text-sm md:text-base"
-          >
-            {SERVICES_CONTENT.viewAllText}
-          </Link>
+
+          <div className="flex justify-center md:justify-end">
+            <Link
+              href={SERVICES_CONTENT.viewAllHref}
+              className="
+          rounded-xl
+          flex items-center gap-2
+          px-5 py-2
+          bg-white
+          hover:bg-[#FFF0F1]
+          hover:text-[#FF5A5F]
+          border border-slate-200
+          shadow-sm
+        "
+            >
+              {SERVICES_CONTENT.viewAllText}
+            </Link>
+          </div>
         </div>
 
         {/* ── Cards grid ── */}

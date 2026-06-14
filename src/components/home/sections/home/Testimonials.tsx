@@ -119,16 +119,23 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Header Block */}
-        <div className="mb-8 px-2">
-          <h2 className="text-3xl font-bold text-slate-800 mb-2 flex items-center gap-2">
-            <MessageSquare className="w-8 h-8 text-[#FF5A5F]" />
-            {TESTIMONIALS_CONTENT.title}
-          </h2>
-          <p className="text-slate-500 text-sm">
+        <div className="mb-8 px-2 text-center">
+
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="p-2 rounded-full bg-rose-50 shadow-sm">
+              <MessageSquare className="w-6 h-6 text-[#FF5A5F]" />
+            </div>
+
+            <h2 className="text-3xl font-bold text-slate-800">
+              {TESTIMONIALS_CONTENT.title}
+            </h2>
+          </div>
+
+          <p className="text-slate-500 text-sm max-w-md mx-auto">
             {TESTIMONIALS_CONTENT.subtitle}
           </p>
-        </div>
 
+        </div>
         {/* Testimonial slider wrapper */}
         <div className="relative overflow-hidden w-full py-4">
           <div

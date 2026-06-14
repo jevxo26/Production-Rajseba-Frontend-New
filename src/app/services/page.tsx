@@ -402,7 +402,7 @@ function ServicesContent() {
 
           {/* Heading */}
           <div className="text-center lg:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-3xl font-black text-[#1a1a1a] leading-tight mb-4 tracking-tight max-w-4xl">
+            <h1 className="text-3xl md:text-4xl font-black text-[#1a1a1a] leading-tight mb-4 tracking-tight max-w-4xl">
               Find the Best Home Services for Your Lifestyle
             </h1>
 

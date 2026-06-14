@@ -209,12 +209,7 @@ export default function RegisterPage() {
 
             {/* Brand Header with Premium Icon */}
             <div className="relative z-10">
-              <Link href="/" className="inline-flex items-center gap-2 group">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/25 group-hover:shadow-rose-500/40 transition-all">
-                  <Sparkles size={20} className="text-white" strokeWidth={2.5} />
-                </div>
-                <span className="font-extrabold text-[#FF565C] text-4xl tracking-tight">Rajseba</span>
-              </Link>
+
               <p className="text-sm text-gray-500 font-medium mt-2 leading-relaxed">
                 Create your account to access premium home services<br />instantly.
               </p>

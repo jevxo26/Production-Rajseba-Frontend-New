@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { Users, Wrench, Star, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Users, Wrench, Star, ShieldCheck, TrendingUp, BarChart3 } from 'lucide-react';
 
 const stats = [
   { id: 1, label: 'Happy Customers', value: 50000, suffix: '+', display: '50,000+', icon: Users },
@@ -83,17 +83,16 @@ export default function Stats() {
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Title */}
-        <div className="mb-10 md:mb-12 text-center md:text-left">
-          <h2 className="text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center md:justify-start gap-2">
-            <TrendingUp className="w-8 h-8 text-[#FF5A5F]" />
+        <div className="mb-10 md:mb-12 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
+            <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
             Our Platform Impact
           </h2>
 
-          <p className="text-slate-500 text-sm max-w-md mx-auto md:mx-0 leading-relaxed">
+          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             Providing top-notch home services with trust and excellence
           </p>
         </div>
-
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
           {stats.map((stat) => (
             <StatCard key={stat.id} stat={stat} triggered={triggered} />
