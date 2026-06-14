@@ -475,8 +475,9 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          <span className="text-[10px] text-slate-400 font-extrabold mt-6 block text-center relative z-10">
-            🔒 Your connection is secure and encrypted
+          <span className="text-[10px] text-slate-400 font-extrabold mt-6 flex items-center justify-center gap-1 relative z-10">
+            <ShieldCheck size={12} className="text-green-500" />
+            Your connection is secure and encrypted
           </span>
         </div>
       )}

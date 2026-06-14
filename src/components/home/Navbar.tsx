@@ -22,7 +22,9 @@ import {
   LogOut,
   Settings,
   LogIn,
-  UserPlus
+  UserPlus,
+  PhoneCall,
+  MapPin
 } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { CATEGORIES_CONTENT } from "./sections/home/ExploreCategories";
@@ -43,9 +45,9 @@ const LEFT_NAV_LINKS: NavLink[] = [
 ];
 
 const RIGHT_NAV_LINKS: NavLink[] = [
-  { label: "Map", href: "/map", icon: MapIcon },
+  { label: "Map", href: "/map", icon: MapPin },
   { label: "About Us", href: "/about", icon: Info },
-  { label: "Contact", href: "/contact", icon: Phone },
+  { label: "Contact", href: "/contact", icon: PhoneCall },
   { label: "Booking", href: "/bookings", icon: Calendar },
 ];
 
@@ -55,7 +57,7 @@ const MOBILE_BOTTOM_LINKS: NavLink[] = [
   { label: "Home", href: "/", icon: HomeIcon },
   { label: "Menu", href: "#menu", icon: LayoutGrid, hasDropdown: true },
   { label: "Services", href: "/services", icon: Briefcase },
-  { label: "Map", href: "/map", icon: MapIcon },
+  { label: "Map", href: "/map", icon: MapPin },
   { label: "Booking", href: "/bookings", icon: Calendar },
   { label: "Login", href: "/login", icon: User },
 ];
