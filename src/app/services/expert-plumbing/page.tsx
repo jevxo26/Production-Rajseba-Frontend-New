@@ -9,13 +9,7 @@ export default function ExpertPlumbingPage() {
       <div className="max-w-[1300px] mx-auto px-6 pt-8">
         <section className="relative w-full h-[450px] rounded-[2.5rem] overflow-hidden shadow-sm flex items-center">
           <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/service/plumbing service-1.png"
-              alt="Premium Plumbing Solutions"
-              fill
-              style={{ objectFit: "cover", objectPosition: "center" }}
-              priority
-            />
+            <Image src="/images/service/plumbing service-1.png" alt="Premium Plumbing Solutions" fill priority className="object-cover object-center" />
             {/* Dark gradient overlay on the left for text readability */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
           </div>
@@ -31,15 +25,15 @@ export default function ExpertPlumbingPage() {
               <p className="text-white/90 text-[1.1rem] leading-relaxed mb-10 max-w-[550px] font-medium">
                 Expert assistance for leak repair, pipe installation, and all your plumbing needs. Professional service guaranteed.
               </p>
-              
+
               {/* Search Bar */}
               <div className="relative bg-white/95 backdrop-blur-sm rounded-full p-2 flex items-center shadow-lg max-w-[500px]">
                 <div className="pl-4 pr-2 text-[#d93838]">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Search specific plumbing task..." 
+                <input
+                  type="text"
+                  placeholder="Search specific plumbing task..."
                   className="flex-1 bg-transparent border-none text-[#1a1a1a] text-[0.95rem] font-medium placeholder:text-[#9ca3af] focus:outline-none px-2"
                 />
                 <button className="bg-[#b92b2b] hover:bg-[#a02222] text-white px-6 py-3 rounded-full text-[0.95rem] font-bold transition-colors shadow-sm">
@@ -89,14 +83,14 @@ export default function ExpertPlumbingPage() {
               </div>
             </div>
             <div className="w-full md:w-[320px] h-[300px] relative rounded-[1.5rem] overflow-hidden shrink-0 shadow-sm border border-[#f3f4f6]">
-              <Image src="/images/service/plumbing Leak Repair.png" alt="Leak Repair" fill style={{ objectFit: "cover" }} className="transition-transform duration-500 group-hover:scale-105" />
+              <Image src="/images/service/plumbing Leak Repair.png" alt="Leak Repair" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
             </div>
           </div>
 
           {/* Smaller Card: Pipe Installation */}
           <div className="bg-white rounded-[2rem] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6] flex flex-col group cursor-pointer hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1">
             <div className="w-full h-[200px] relative rounded-[1.2rem] overflow-hidden mb-6 shadow-sm border border-[#f3f4f6]">
-              <Image src="/images/service/plumbing Pipe Installation.png" alt="Pipe Installation" fill style={{ objectFit: "cover" }} className="transition-transform duration-500 group-hover:scale-105" />
+              <Image src="/images/service/plumbing Pipe Installation.png" alt="Pipe Installation" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
             </div>
             <h3 className="text-[1.4rem] font-bold text-[#1a1a1a] mb-3">Pipe Installation</h3>
             <p className="text-[#6b7280] text-[1rem] leading-relaxed mb-8">
@@ -117,7 +111,7 @@ export default function ExpertPlumbingPage() {
           {/* Smaller Card: Sanitary Fitting */}
           <div className="bg-white rounded-[2rem] p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6] flex flex-col group cursor-pointer hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1">
             <div className="w-full h-[200px] relative rounded-[1.2rem] overflow-hidden mb-6 shadow-sm border border-[#f3f4f6]">
-              <Image src="/images/service/plumbing Sanitary Fitting.png" alt="Sanitary Fitting" fill style={{ objectFit: "cover" }} className="transition-transform duration-500 group-hover:scale-105" />
+              <Image src="/images/service/plumbing Sanitary Fitting.png" alt="Sanitary Fitting" fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
             </div>
             <h3 className="text-[1.4rem] font-bold text-[#1a1a1a] mb-3">Sanitary Fitting</h3>
             <p className="text-[#6b7280] text-[1rem] leading-relaxed mb-8">
@@ -139,7 +133,7 @@ export default function ExpertPlumbingPage() {
           <div className="lg:col-span-2 bg-[#251818] rounded-[2rem] p-8 lg:p-12 shadow-[0_8px_30px_rgba(42,27,27,0.3)] flex flex-col sm:flex-row justify-between items-center group relative overflow-hidden h-full">
             {/* Red Glow Overlay */}
             <div className="absolute top-[-40%] right-[-10%] w-[500px] h-[500px] bg-[#ff5a5f] rounded-full mix-blend-screen filter blur-[120px] opacity-20 pointer-events-none"></div>
-            
+
             <div className="relative z-10 max-w-[400px]">
               <h3 className="text-[2.2rem] font-bold text-white mb-3 tracking-tight">Plumbing Emergency?</h3>
               <p className="text-white/80 text-[1.05rem] leading-relaxed mb-8">
@@ -169,7 +163,7 @@ export default function ExpertPlumbingPage() {
             {/* Plumber 1 */}
             <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6]">
               <div className="w-full h-[240px] relative rounded-[1.5rem] overflow-hidden mb-5 bg-[#f8fafc]">
-                <Image src="/images/service/plumbing Pro 1.png" alt="Arif Ahmed" fill style={{ objectFit: "cover", objectPosition: "top" }} />
+                <Image src="/images/service/plumbing Pro 1.png" alt="Arif Ahmed" fill className="object-cover object-top" />
                 <div className="absolute bottom-3 left-3 bg-white px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <span className="text-[#f59e0b] text-[0.9rem]">★</span>
                   <span className="text-[0.85rem] font-bold text-[#1a1a1a]">4.9</span>
@@ -190,11 +184,11 @@ export default function ExpertPlumbingPage() {
                 <button className="text-[#d93838] text-[0.85rem] font-bold hover:underline">Profile</button>
               </div>
             </div>
-            
+
             {/* Plumber 2 */}
             <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6]">
               <div className="w-full h-[240px] relative rounded-[1.5rem] overflow-hidden mb-5 bg-[#f8fafc]">
-                <Image src="/images/service/plumbing  Pro 2.png" alt="Kamrul Islam" fill style={{ objectFit: "cover", objectPosition: "top" }} />
+                <Image src="/images/service/plumbing  Pro 2.png" alt="Kamrul Islam" fill className="object-cover object-top" />
                 <div className="absolute bottom-3 left-3 bg-white px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <span className="text-[#f59e0b] text-[0.9rem]">★</span>
                   <span className="text-[0.85rem] font-bold text-[#1a1a1a]">4.8</span>
@@ -219,7 +213,7 @@ export default function ExpertPlumbingPage() {
             {/* Plumber 3 */}
             <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6]">
               <div className="w-full h-[240px] relative rounded-[1.5rem] overflow-hidden mb-5 bg-[#f8fafc]">
-                <Image src="/images/service/plumbing  Pro 3.png" alt="Sajib Hossain" fill style={{ objectFit: "cover", objectPosition: "top" }} />
+                <Image src="/images/service/plumbing  Pro 3.png" alt="Sajib Hossain" fill className="object-cover object-top" />
                 <div className="absolute bottom-3 left-3 bg-white px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <span className="text-[#f59e0b] text-[0.9rem]">★</span>
                   <span className="text-[0.85rem] font-bold text-[#1a1a1a]">5.0</span>
@@ -244,7 +238,7 @@ export default function ExpertPlumbingPage() {
             {/* Plumber 4 */}
             <div className="bg-white rounded-[2rem] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#f3f4f6]">
               <div className="w-full h-[240px] relative rounded-[1.5rem] overflow-hidden mb-5 bg-[#f8fafc]">
-                <Image src="/images/service/plumbing  Pro 4.png" alt="Mehedi Hasan" fill style={{ objectFit: "cover", objectPosition: "top" }} />
+                <Image src="/images/service/plumbing  Pro 4.png" alt="Mehedi Hasan" fill className="object-cover object-top" />
                 <div className="absolute bottom-3 left-3 bg-white px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <span className="text-[#f59e0b] text-[0.9rem]">★</span>
                   <span className="text-[0.85rem] font-bold text-[#1a1a1a]">4.7</span>
@@ -270,34 +264,34 @@ export default function ExpertPlumbingPage() {
 
         {/* Features Row */}
         <div className="mt-16 py-10 px-8 border border-[#bfdbfe] border-dashed rounded-[2.5rem] bg-white shadow-sm">
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
-              {/* Feature 1 */}
-              <div className="flex flex-col items-center">
-                 <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
-                 </div>
-                 <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Service Warranty</h4>
-                 <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">Enjoy peace of mind with our 7-day post-service warranty on all repairs.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+            {/* Feature 1 */}
+            <div className="flex flex-col items-center">
+              <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
               </div>
-              
-              {/* Feature 2 */}
-              <div className="flex flex-col items-center">
-                 <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
-                 </div>
-                 <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Safety First</h4>
-                 <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">All our plumbers go through rigorous background checks and training.</p>
-              </div>
+              <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Service Warranty</h4>
+              <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">Enjoy peace of mind with our 7-day post-service warranty on all repairs.</p>
+            </div>
 
-              {/* Feature 3 */}
-              <div className="flex flex-col items-center">
-                 <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                 </div>
-                 <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Fair Pricing</h4>
-                 <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">No hidden costs. Pay through our secure platform after job completion.</p>
+            {/* Feature 2 */}
+            <div className="flex flex-col items-center">
+              <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
               </div>
-           </div>
+              <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Safety First</h4>
+              <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">All our plumbers go through rigorous background checks and training.</p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex flex-col items-center">
+              <div className="w-14 h-14 rounded-full bg-[#fff0ef] text-[#d93838] flex items-center justify-center mb-5 shadow-sm">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+              </div>
+              <h4 className="text-[1.2rem] font-bold text-[#1a1a1a] mb-2">Fair Pricing</h4>
+              <p className="text-[#6b7280] text-[0.95rem] leading-relaxed max-w-[250px]">No hidden costs. Pay through our secure platform after job completion.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
