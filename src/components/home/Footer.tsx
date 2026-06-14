@@ -10,6 +10,10 @@ import {
   Phone,
   Mail,
   MapPin,
+  // Facebook,
+  // Twitter,
+  // Instagram,
+  // Linkedin,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -36,13 +40,34 @@ const QUICK_LINKS = [
   { label: "Careers", href: "/careers" },
 ];
 
-const SOCIALS = [ /* Paste your full SOCIALS array here */];
-
 const CONTACT_INFO = [
   { icon: Phone, label: "+880 1XXX-XXXXXX", href: "tel:+8801XXXXXXXXX" },
   { icon: Mail, label: "support@rajseba.com", href: "mailto:support@rajseba.com" },
   { icon: MapPin, label: "Dhaka, Bangladesh", href: "#" },
 ];
+
+// const SOCIALS = [
+//   {
+//     icon: <Facebook size={16} />,
+//     label: "Facebook",
+//     href: "https://facebook.com/rajseba"
+//   },
+//   {
+//     icon: <Twitter size={16} />,
+//     label: "Twitter",
+//     href: "https://twitter.com/rajseba"
+//   },
+//   {
+//     icon: <Instagram size={16} />,
+//     label: "Instagram",
+//     href: "https://instagram.com/rajseba"
+//   },
+//   {
+//     icon: <Linkedin size={16} />,
+//     label: "LinkedIn",
+//     href: "https://linkedin.com/company/rajseba"
+//   },
+// ];
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -94,19 +119,20 @@ export default function Footer() {
               ))}
             </ul>
 
-            <div className="flex items-center gap-3 flex-wrap">
+            {/* <div className="flex items-center gap-3 flex-wrap">
               {SOCIALS.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={s.label}
                   className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#FF5A5F] hover:border-[#FF5A5F] transition-all"
                 >
                   {s.icon}
                 </a>
               ))}
-            </div>
+            </div> */}
           </div>
 
           {/* Services + Quick Links - 2 Columns on Mobile */}
@@ -167,13 +193,38 @@ export default function Footer() {
               )}
             </div>
 
-            {/* App Download Buttons - Paste your original buttons here */}
-            <div className="space-y-3">
+            {/* App Download Buttons */}
+            {/* <div className="space-y-3">
               <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase">Download App</h3>
               <div className="flex flex-col gap-3">
-                {/* Your Google Play and App Store buttons go here */}
+                <Link
+                  href="https://play.google.com/store/apps/details?id=com.rajseba"
+                  target="_blank"
+                  className="w-full"
+                >
+                  <Image
+                    src="/google-play-badge.png"
+                    alt="Get it on Google Play"
+                    width={140}
+                    height={42}
+                    className="h-10 w-auto"
+                  />
+                </Link>
+                <Link
+                  href="https://apps.apple.com/app/rajseba"
+                  target="_blank"
+                  className="w-full"
+                >
+                  <Image
+                    src="/app-store-badge.png"
+                    alt="Download on App Store"
+                    width={140}
+                    height={42}
+                    className="h-10 w-auto"
+                  />
+                </Link>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -192,7 +243,7 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
-            <a href="https://rajseba.com" target="_blank" className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center hover:text-[#FF5A5F]">
+            <a href="https://rajseba.com" target="_blank" aria-label="Visit website" className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center hover:text-[#FF5A5F]">
               <Globe size={16} />
             </a>
             <Button
@@ -206,10 +257,11 @@ export default function Footer() {
                 }
               }}
               className="w-9 h-9 p-0 bg-slate-100 hover:bg-slate-200 rounded-full hover:text-[#FF5A5F]"
+              aria-label="Share"
             >
               <Share2 size={16} />
             </Button>
-            <Link href="/dashboard/support" className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center hover:text-[#FF5A5F]">
+            <Link href="/dashboard/support" aria-label="Support chat" className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center hover:text-[#FF5A5F]">
               <MessageSquare size={16} />
             </Link>
           </div>

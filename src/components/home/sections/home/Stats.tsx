@@ -79,7 +79,7 @@ export default function Stats() {
   }, []);
 
   return (
-    <div className="py-8 md:py-12 bg-white relative" ref={ref}>
+    <div className="py-8 md:py-12 mt-15 bg-white relative" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Title */}

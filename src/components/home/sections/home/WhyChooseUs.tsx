@@ -54,7 +54,7 @@ const itemVariants = {
 
 export default function WhyChooseUs() {
   return (
-    <div className="bg-transparent py-8 md:py-12 overflow-hidden">
+    <div className="bg-transparent mt-15 py-8 md:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Title block */}
         {/* Title block */}

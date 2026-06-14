@@ -3,7 +3,25 @@
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, User, Phone, Briefcase, Check, ShieldCheck, PenTool, Loader2 } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Briefcase,
+  Check,
+  ShieldCheck,
+  PenTool,
+  Loader2,
+  Sparkles,
+  ArrowRight,
+  Home,
+  Star,
+  Users,
+  Award
+} from "lucide-react"
 import { useRegisterMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/redux/features/auth/authApi"
 import { useAppDispatch } from "@/redux/hooks"
 import { setUser } from "@/redux/features/auth/authSlice"
@@ -127,7 +145,7 @@ export default function RegisterPage() {
       const user = response?.data?.user || response?.user;
       if (user) {
         dispatch(setUser(user));
-        
+
         // Redirect based on role
         const userRole = (typeof user.role === 'object' && user.role) ? user.role.name : (user.role || 'client');
         const roleString = typeof userRole === 'string' ? userRole.toLowerCase().replace(/\s+/g, '') : "client";
@@ -189,9 +207,12 @@ export default function RegisterPage() {
               }}
             />
 
-            {/* Brand Header */}
+            {/* Brand Header with Premium Icon */}
             <div className="relative z-10">
-              <Link href="/" className="inline-block">
+              <Link href="/" className="inline-flex items-center gap-2 group">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/25 group-hover:shadow-rose-500/40 transition-all">
+                  <Sparkles size={20} className="text-white" strokeWidth={2.5} />
+                </div>
                 <span className="font-extrabold text-[#FF565C] text-4xl tracking-tight">Rajseba</span>
               </Link>
               <p className="text-sm text-gray-500 font-medium mt-2 leading-relaxed">
@@ -208,15 +229,17 @@ export default function RegisterPage() {
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Full Name
                   </label>
-                  <div className="relative">
-                    <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                      <User size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                    </div>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="John Doe"
-                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border border-transparent focus:bg-white focus:border-gray-305 focus:ring-2 focus:ring-[#FF565C]/15 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-450"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border-2 border-transparent focus:bg-white focus:border-[#FF565C]/30 focus:ring-4 focus:ring-[#FF565C]/10 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-450 shadow-sm"
                       required
                     />
                   </div>
@@ -227,15 +250,17 @@ export default function RegisterPage() {
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Email Address
                   </label>
-                  <div className="relative">
-                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                      <Mail size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                    </div>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="name@company.com"
-                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border border-transparent focus:bg-white focus:border-gray-305 focus:ring-2 focus:ring-[#FF565C]/15 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-455"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border-2 border-transparent focus:bg-white focus:border-[#FF565C]/30 focus:ring-4 focus:ring-[#FF565C]/10 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-450 shadow-sm"
                       required
                     />
                   </div>
@@ -246,21 +271,21 @@ export default function RegisterPage() {
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Phone Number
                   </label>
-                  <div className="relative">
-                    <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                      <Phone size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                    </div>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="+1(555) 000-0000"
-                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border border-transparent focus:bg-white focus:border-gray-305 focus:ring-2 focus:ring-[#FF565C]/15 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-455"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-[14px] bg-[#F3F4F6] border-2 border-transparent focus:bg-white focus:border-[#FF565C]/30 focus:ring-4 focus:ring-[#FF565C]/10 focus:outline-none transition-all text-sm text-gray-800 placeholder-gray-450 shadow-sm"
                       required
                     />
                   </div>
                 </div>
-
-
 
                 {/* Terms Agreement */}
                 <div className="flex items-center gap-3 pt-2">
@@ -269,7 +294,7 @@ export default function RegisterPage() {
                     id="agreeTerms"
                     checked={agreeTerms}
                     onChange={(e) => setAgreeTerms(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-350 text-[#FF565C] focus:ring-[#FF565C]/30 focus:ring-2 accent-[#FF565C] cursor-pointer"
+                    className="w-4 h-4 rounded border-2 border-gray-300 text-[#FF565C] focus:ring-[#FF565C]/30 focus:ring-2 accent-[#FF565C] cursor-pointer"
                     required
                   />
                   <label htmlFor="agreeTerms" className="text-xs text-gray-500 font-medium select-none cursor-pointer">
@@ -289,39 +314,18 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[#FF565C] hover:bg-[#FF464C] disabled:bg-[#FF565C]/70 text-white text-sm font-bold py-3.5 rounded-[14px] shadow-sm shadow-[#FF565C]/10 transition-all focus:outline-none mt-2 flex justify-center items-center"
+                  className="w-full bg-gradient-to-r from-[#FF565C] to-rose-600 hover:from-[#FF464C] hover:to-rose-700 disabled:from-[#FF565C]/70 disabled:to-rose-600/70 text-white text-sm font-bold py-3.5 rounded-[14px] shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 transition-all focus:outline-none mt-2 flex justify-center items-center gap-2 active:scale-[0.99]"
                 >
-                  {isLoading ? <Loader2 size={18} className="animate-spin" /> : "Create Account"}
+                  {isLoading ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      Create Account
+                      <ArrowRight size={18} strokeWidth={2.5} />
+                    </>
+                  )}
                 </button>
               </form>
-
-              {/* Social Login */}
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center justify-center gap-3">
-                  <div className="h-[1px] bg-gray-200/80 flex-1" />
-                  <span className="text-[10px] text-gray-455 font-bold tracking-wider uppercase">Or Sign Up With</span>
-                  <div className="h-[1px] bg-gray-200/80 flex-1" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] border border-gray-205 hover:bg-gray-50 transition-colors text-xs font-bold text-gray-700 focus:outline-none">
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                      alt="google"
-                      className="w-4 h-4"
-                    />
-                    GOOGLE
-                  </button>
-                  <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-[14px] border border-gray-205 hover:bg-gray-50 transition-colors text-xs font-bold text-gray-700 focus:outline-none">
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
-                      alt="apple"
-                      className="w-4 h-4"
-                    />
-                    APPLE
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* Footer Login Info */}
@@ -347,8 +351,8 @@ export default function RegisterPage() {
               <div className="bg-white/90 backdrop-blur-md p-6 rounded-[32px] border border-white/20 shadow-xl space-y-6">
 
                 <div className="flex gap-4 items-center">
-                  <div className="w-14 h-14 bg-[#FF565C] rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-[#FF565C]/25">
-                    <Briefcase size={22} className="stroke-[2.5]" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/25">
+                    <Home size={22} className="stroke-[2.5]" />
                   </div>
                   <div>
                     <h4 className="font-extrabold text-slate-800 text-lg">Your Trusted Home Partner</h4>
@@ -358,16 +362,25 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-3 gap-2 pt-4 border-t border-slate-200/60 text-center">
                   <div>
-                    <span className="text-2xl font-black text-slate-800 block">50k+</span>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Users size={16} className="text-[#FF565C]" />
+                      <span className="text-2xl font-black text-slate-800">50k+</span>
+                    </div>
                     <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Active Users</span>
                   </div>
                   <div className="border-x border-slate-200/60">
-                    <span className="text-2xl font-black text-slate-800 block">4.9/5</span>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Star size={16} className="text-[#FF565C]" />
+                      <span className="text-2xl font-black text-slate-800">4.9/5</span>
+                    </div>
                     <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Avg Rating</span>
                   </div>
                   <div>
-                    <span className="text-2xl font-black text-slate-800 block">120+</span>
-                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block leading-normal">Expert Categories</span>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      <Award size={16} className="text-[#FF565C]" />
+                      <span className="text-2xl font-black text-slate-800">120+</span>
+                    </div>
+                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Expert Categories</span>
                   </div>
                 </div>
 
@@ -414,7 +427,7 @@ export default function RegisterPage() {
                     ref={(el) => { otpInputsRef.current[idx] = el }}
                     onChange={(e) => handleOtpChange(e.target.value, idx)}
                     onKeyDown={(e) => handleOtpKeyDown(e.key, idx)}
-                    className="w-12 h-12 rounded-xl border border-slate-150 bg-slate-50/60 focus:bg-white text-center text-lg font-black focus:outline-none focus:border-rose-450 focus:ring-4 focus:ring-rose-500/5 outline-none transition-all text-slate-800"
+                    className="w-12 h-12 rounded-xl border-2 border-slate-200 bg-slate-50/60 focus:bg-white text-center text-lg font-black focus:outline-none focus:border-[#FF565C]/50 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all text-slate-800 shadow-sm"
                     required
                   />
                 ))}
@@ -439,9 +452,16 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isVerifying}
-                className="w-full bg-[#FF565C] hover:bg-[#FF464C] disabled:bg-[#FF565C]/70 text-[#ffffff] text-xs font-black py-4 rounded-[14px] shadow-sm shadow-[#FF565C]/10 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
+                className="w-full bg-gradient-to-r from-[#FF565C] to-rose-600 hover:from-[#FF464C] hover:to-rose-700 disabled:from-[#FF565C]/70 disabled:to-rose-600/70 text-white text-sm font-black py-4 rounded-[14px] shadow-lg shadow-rose-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
               >
-                {isVerifying ? <Loader2 size={18} className="animate-spin" /> : <>VERIFY & PROCEED <span className="text-sm font-extrabold">→</span></>}
+                {isVerifying ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <>
+                    VERIFY & PROCEED
+                    <ArrowRight size={18} className="font-extrabold" strokeWidth={2.5} />
+                  </>
+                )}
               </button>
             </form>
 
@@ -449,7 +469,7 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setIsOtpSent(false)}
-              className="text-xs text-slate-500 hover:text-slate-855 hover:underline font-bold flex items-center justify-center gap-1 mx-auto focus:outline-none"
+              className="text-xs text-slate-500 hover:text-slate-800 hover:underline font-bold flex items-center justify-center gap-1 mx-auto focus:outline-none"
             >
               Change Phone Number
             </button>
