@@ -53,8 +53,10 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
           { icon: Users, label: "Manage Users", href: "/dashbord/users" },
+          { icon: Briefcase, label: "Role Management", href: "/dashbord/role" },
           { icon: BarChart3, label: "System Analytics", href: "/dashbord/analytics" },
-          { icon: Settings, label: "System Settings", href: "/dashbord/settings" },
+          { icon: User, label: "My Profile", href: "/dashbord/profile" },
+          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
       case "agent":
         return [
@@ -62,13 +64,15 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: Zap, label: "Quick Booking", href: "/dashbord/quick-booking" },
           { icon: ShoppingBag, label: "Recent Orders", href: "/dashbord/orders" },
           { icon: Percent, label: "Commission Tracking", href: "/dashbord/commissions" },
-          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
           { icon: HelpCircle, label: "Support Desk", href: "/dashbord/support" },
+          { icon: User, label: "My Profile", href: "/dashbord/profile" },
+          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
       case "vendor":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
-          { icon: Settings, label: "Service Profile", href: "/dashbord/settings" },
+          { icon: User, label: "My Profile", href: "/dashbord/profile" },
+          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
       case "client":
         return [
@@ -77,6 +81,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: Calendar, label: "My Bookings", href: "/dashbord/bookings" },
           { icon: Wallet, label: "Wallet", href: "/dashbord/wallet" },
           { icon: HelpCircle, label: "Help", href: "/dashbord/help" },
+          { icon: User, label: "My Profile", href: "/dashbord/profile" },
+          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
       default:
         return [];

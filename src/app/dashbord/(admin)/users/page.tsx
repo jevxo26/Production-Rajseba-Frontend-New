@@ -5,7 +5,6 @@ import { ShieldAlert, ShieldCheck, XCircle, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation } from "@/redux/features/admin/user";
-import { useGetAllRolesQuery } from "@/redux/features/admin/role";
 
 interface UserItem {
   id: string;
@@ -24,7 +23,6 @@ export default function UsersPage() {
 
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading } = useGetAllUsersQuery();
-  const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
   const [updateUserMut] = useUpdateUserMutation();
 
   useEffect(() => {

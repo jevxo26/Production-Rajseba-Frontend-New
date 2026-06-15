@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useGetUserProfileQuery } from "@/redux/features/auth/authApi";
+import { useUpdateUserMutation } from "@/redux/features/admin/user";
+import { useAppSelector } from "@/redux/hooks";
+import { getRoleName } from "@/redux/features/auth/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,87 +28,21 @@ import {
   Plus
 } from "lucide-react";
 
-// Mock customer profile data
+// Placeholder profile data
 const INITIAL_PROFILE = {
-  name: "Ashfaqur Rahman",
-  email: "ashfaqur@example.com",
-  phone: "+880 1712-345678",
-  address: "House 24, Road 12, Banani, Dhaka",
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
   avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
   coverImage: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1200&auto=format&fit=crop",
   memberSince: "October 2024",
-  tier: "Gold Member",
-  tierColor: "from-amber-400 to-yellow-600"
+  tier: "Client",
+  tierColor: "from-slate-400 to-slate-600"
 };
 
-const MOCK_BOOKINGS = [
-  {
-    id: "B001",
-    serviceName: "AC Maintenance Service",
-    provider: "Dhaka Cool Experts",
-    date: "June 18, 2026",
-    time: "10:00 AM - 12:00 PM",
-    price: "৳750",
-    status: "Scheduled",
-    statusColor: "bg-blue-50 text-blue-600 border-blue-100",
-    icon: Clock
-  },
-  {
-    id: "B002",
-    serviceName: "Full Home Deep Cleaning",
-    provider: "Sparkle Home Care",
-    date: "May 20, 2026",
-    time: "09:00 AM - 01:00 PM",
-    price: "৳1,200",
-    status: "Completed",
-    statusColor: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    icon: CheckCircle
-  },
-  {
-    id: "B003",
-    serviceName: "Electric Panel Repairs",
-    provider: "VoltGuard Solutions",
-    date: "April 10, 2026",
-    time: "03:00 PM - 05:00 PM",
-    price: "৳850",
-    status: "Completed",
-    statusColor: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    icon: CheckCircle
-  }
-];
-
-const MOCK_SAVED_EXPERTS = [
-  {
-    id: "E001",
-    name: "Jahangir Alam",
-    role: "Senior Electrician",
-    rating: 4.8,
-    jobs: 142,
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-    available: true,
-    distance: "1.2 km away"
-  },
-  {
-    id: "E002",
-    name: "Rashedul Islam",
-    role: "Expert Plumber",
-    rating: 4.9,
-    jobs: 98,
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-    available: false,
-    distance: "2.5 km away"
-  },
-  {
-    id: "E003",
-    name: "Asma Begum",
-    role: "Home Cleaning Pro",
-    rating: 5.0,
-    jobs: 210,
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-    available: true,
-    distance: "0.8 km away"
-  }
-];
+const MOCK_BOOKINGS: any[] = [];
+const MOCK_SAVED_EXPERTS: any[] = [];
 
 type TabType = "personal" | "bookings" | "saved" | "settings";
 
@@ -115,6 +53,10 @@ const tabVariants = {
 };
 
 export default function ProfilePage() {
+  const role = useAppSelector((state) => state.auth.role) || "client";
+  const { data: userRes, isLoading } = useGetUserProfileQuery();
+  const [updateUserMut] = useUpdateUserMutation();
+
   const [activeTab, setActiveTab] = useState<TabType>("personal");
   const [profile, setProfile] = useState(INITIAL_PROFILE);
   const [editMode, setEditMode] = useState(false);
@@ -124,6 +66,29 @@ export default function ProfilePage() {
     phone: profile.phone,
     address: profile.address
   });
+
+  useEffect(() => {
+    if (userRes) {
+      const user = userRes?.data?.user || userRes?.data || userRes || {};
+      const name = user.name || (user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : null) || "Unknown User";
+      const newProfile = {
+        ...INITIAL_PROFILE,
+        name,
+        email: user.email || "No Email",
+        phone: user.phoneNumber || user.phone || "No Phone",
+        address: user.address || "No Address Provided",
+        tier: getRoleName(role),
+        tierColor: role === "superadmin" ? "from-rose-400 to-rose-600" : "from-emerald-400 to-emerald-600"
+      };
+      setProfile(newProfile);
+      setFormData({
+        name: newProfile.name,
+        email: newProfile.email,
+        phone: newProfile.phone,
+        address: newProfile.address,
+      });
+    }
+  }, [userRes]);
 
   const [notificationSettings, setNotificationSettings] = useState({
     emailAlerts: true,
@@ -146,14 +111,22 @@ export default function ProfilePage() {
     }
   };
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setProfile(prev => ({
-      ...prev,
-      ...formData
-    }));
-    setEditMode(false);
-    showToast("Profile information updated successfully!");
+    try {
+      const user = userRes?.data?.user || userRes?.data || userRes || {};
+      if (user.id || user._id) {
+        await updateUserMut({ id: user.id || user._id, data: { name: formData.name, phoneNumber: formData.phone, address: formData.address } }).unwrap();
+        setProfile(prev => ({ ...prev, ...formData }));
+        setEditMode(false);
+        showToast("Profile information updated successfully!");
+      } else {
+        toast.error("User ID not found! Cannot update.");
+      }
+    } catch (err) {
+      toast.error("Failed to update profile");
+      console.error(err);
+    }
   };
 
   const handlePasswordUpdate = (e: React.FormEvent) => {
@@ -483,69 +456,78 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="space-y-6">
-                    {MOCK_BOOKINGS.map((booking) => {
-                      const StatusIcon = booking.icon;
-                      return (
-                        <div 
-                          key={booking.id}
-                          className="border border-slate-100 hover:border-slate-200 rounded-2xl p-5 hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.02)] transition-all duration-300 bg-white"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                            <div>
-                              <span className="text-[10px] font-black text-[#FF5A5F] uppercase tracking-wider block mb-0.5">Booking ID: {booking.id}</span>
-                              <h4 className="font-extrabold text-slate-800 text-base">{booking.serviceName}</h4>
+                    {MOCK_BOOKINGS.length === 0 ? (
+                      <div className="text-center py-12 px-4 bg-slate-50 border border-slate-100 border-dashed rounded-2xl">
+                        <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                        <h4 className="text-sm font-bold text-slate-700">No Bookings Found</h4>
+                        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">You haven't scheduled any services yet. Book a new service to see it here.</p>
+                        <Button className="mt-4 bg-[#FF5A5F] hover:bg-[#FF4449] text-white text-xs font-extrabold px-5 py-2.5 h-auto rounded-xl border-none shadow-xs">Book a Service</Button>
+                      </div>
+                    ) : (
+                      MOCK_BOOKINGS.map((booking) => {
+                        const StatusIcon = booking.icon;
+                        return (
+                          <div 
+                            key={booking.id}
+                            className="border border-slate-100 hover:border-slate-200 rounded-2xl p-5 hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.02)] transition-all duration-300 bg-white"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                              <div>
+                                <span className="text-[10px] font-black text-[#FF5A5F] uppercase tracking-wider block mb-0.5">Booking ID: {booking.id}</span>
+                                <h4 className="font-extrabold text-slate-800 text-base">{booking.serviceName}</h4>
+                              </div>
+                              <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-semibold border ${booking.statusColor} flex items-center gap-1.5`}>
+                                <StatusIcon className="w-3.5 h-3.5" />
+                                {booking.status}
+                              </span>
                             </div>
-                            <span className={`self-start sm:self-center px-3 py-1 rounded-full text-xs font-semibold border ${booking.statusColor} flex items-center gap-1.5`}>
-                              <StatusIcon className="w-3.5 h-3.5" />
-                              {booking.status}
-                            </span>
-                          </div>
 
-                          <div className="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4 text-xs font-semibold text-slate-500">
-                            <div>
-                              <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Service Vendor</span>
-                              <span className="text-slate-700">{booking.provider}</span>
+                            <div className="grid sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4 text-xs font-semibold text-slate-500">
+                              <div>
+                                <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Service Vendor</span>
+                                <span className="text-slate-700">{booking.provider}</span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Scheduled Date & Time</span>
+                                <span className="text-slate-700">{booking.date} at {booking.time.split(" ")[0]}</span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Total Fare Charged</span>
+                                <span className="text-[#FF5A5F] font-extrabold text-sm">{booking.price}</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Scheduled Date & Time</span>
-                              <span className="text-slate-700">{booking.date} at {booking.time.split(" ")[0]}</span>
-                            </div>
-                            <div>
-                              <span className="text-[9px] font-black uppercase text-slate-400 block mb-0.5">Total Fare Charged</span>
-                              <span className="text-[#FF5A5F] font-extrabold text-sm">{booking.price}</span>
-                            </div>
-                          </div>
 
-                          <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-50/50">
-                            {booking.status === "Scheduled" ? (
-                              <>
+                            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-50/50">
+                              {booking.status === "Scheduled" ? (
+                                <>
+                                  <Button 
+                                    variant="outline"
+                                    onClick={() => showToast("Reschedule request submitted successfully.")}
+                                    className="bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-4 py-2 h-auto rounded-lg border border-slate-200 transition-all cursor-pointer active:scale-95"
+                                  >
+                                    Reschedule
+                                  </Button>
+                                  <Button 
+                                    onClick={() => showToast("Cancellation request submitted.")}
+                                    className="bg-rose-50 hover:bg-[#FFF0F1] text-[#FF5A5F] hover:text-[#FF5A5F] text-xs font-extrabold px-4 py-2 h-auto rounded-lg border-none transition-all cursor-pointer active:scale-95"
+                                  >
+                                    Cancel Booking
+                                  </Button>
+                                </>
+                              ) : (
                                 <Button 
                                   variant="outline"
-                                  onClick={() => showToast("Reschedule request submitted successfully.")}
+                                  onClick={() => showToast("Support details request submitted.")}
                                   className="bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-4 py-2 h-auto rounded-lg border border-slate-200 transition-all cursor-pointer active:scale-95"
                                 >
-                                  Reschedule
+                                  View Details / Invoice
                                 </Button>
-                                <Button 
-                                  onClick={() => showToast("Cancellation request submitted.")}
-                                  className="bg-rose-50 hover:bg-[#FFF0F1] text-[#FF5A5F] hover:text-[#FF5A5F] text-xs font-extrabold px-4 py-2 h-auto rounded-lg border-none transition-all cursor-pointer active:scale-95"
-                                >
-                                  Cancel Booking
-                                </Button>
-                              </>
-                            ) : (
-                              <Button 
-                                variant="outline"
-                                onClick={() => showToast("Support details request submitted.")}
-                                className="bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-4 py-2 h-auto rounded-lg border border-slate-200 transition-all cursor-pointer active:scale-95"
-                              >
-                                View Details / Invoice
-                              </Button>
-                            )}
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -566,55 +548,63 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="grid md:grid-cols-2 gap-5">
-                    {MOCK_SAVED_EXPERTS.map((expert) => (
-                      <div 
-                        key={expert.id}
-                        className="border border-slate-100 rounded-2xl p-5 hover:shadow-[0_12px_24px_-4px_rgba(0,0,0,0.03)] hover:border-[#FF5A5F]/20 transition-all duration-300 bg-white flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center gap-4.5 mb-4">
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 relative border border-slate-150">
-                              <Image
-                                src={expert.avatar}
-                                alt={expert.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <div>
-                              <h4 className="font-extrabold text-slate-800 text-sm leading-tight">{expert.name}</h4>
-                              <p className="text-xs font-semibold text-slate-400">{expert.role}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-2 border-t border-b border-slate-50 py-3 my-3 text-xs font-semibold text-slate-500">
-                            <div className="flex items-center gap-1">
-                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span className="text-slate-800 font-bold">{expert.rating.toFixed(1)}</span>
-                              <span className="text-slate-400">({expert.jobs} jobs)</span>
-                            </div>
-                            <div className="text-right text-slate-400">
-                              {expert.distance}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-3 mt-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className={`w-2 h-2 rounded-full ${expert.available ? "bg-emerald-500" : "bg-amber-400"}`} />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                              {expert.available ? "Available" : "Busy"}
-                            </span>
-                          </div>
-                          <Button 
-                            onClick={() => showToast(`Initiating direct book link for ${expert.name}`)}
-                            className="bg-rose-50 hover:bg-[#FFF0F1] text-[#FF5A5F] hover:text-[#FF5A5F] text-xs font-extrabold px-3 py-1.5 h-auto rounded-xl border-none transition-all shadow-xs cursor-pointer active:scale-95"
-                          >
-                            Book Now
-                          </Button>
-                        </div>
+                    {MOCK_SAVED_EXPERTS.length === 0 ? (
+                      <div className="md:col-span-2 text-center py-12 px-4 bg-slate-50 border border-slate-100 border-dashed rounded-2xl">
+                        <Heart className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                        <h4 className="text-sm font-bold text-slate-700">No Saved Experts</h4>
+                        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">You haven't favorited any technicians yet. Browse services and save your favorite experts.</p>
                       </div>
-                    ))}
+                    ) : (
+                      MOCK_SAVED_EXPERTS.map((expert) => (
+                        <div 
+                          key={expert.id}
+                          className="border border-slate-100 rounded-2xl p-5 hover:shadow-[0_12px_24px_-4px_rgba(0,0,0,0.03)] hover:border-[#FF5A5F]/20 transition-all duration-300 bg-white flex flex-col justify-between"
+                        >
+                          <div>
+                            <div className="flex items-center gap-4.5 mb-4">
+                              <div className="w-12 h-12 rounded-full overflow-hidden bg-slate-100 relative border border-slate-150">
+                                <Image
+                                  src={expert.avatar}
+                                  alt={expert.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div>
+                                <h4 className="font-extrabold text-slate-800 text-sm leading-tight">{expert.name}</h4>
+                                <p className="text-xs font-semibold text-slate-400">{expert.role}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2 border-t border-b border-slate-50 py-3 my-3 text-xs font-semibold text-slate-500">
+                              <div className="flex items-center gap-1">
+                                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                <span className="text-slate-800 font-bold">{expert.rating.toFixed(1)}</span>
+                                <span className="text-slate-400">({expert.jobs} jobs)</span>
+                              </div>
+                              <div className="text-right text-slate-400">
+                                {expert.distance}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 mt-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`w-2 h-2 rounded-full ${expert.available ? "bg-emerald-500" : "bg-amber-400"}`} />
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                {expert.available ? "Available" : "Busy"}
+                              </span>
+                            </div>
+                            <Button 
+                              onClick={() => showToast(`Initiating direct book link for ${expert.name}`)}
+                              className="bg-rose-50 hover:bg-[#FFF0F1] text-[#FF5A5F] hover:text-[#FF5A5F] text-xs font-extrabold px-3 py-1.5 h-auto rounded-xl border-none transition-all shadow-xs cursor-pointer active:scale-95"
+                            >
+                              Book Now
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </motion.div>
               )}
