@@ -63,8 +63,11 @@ export default function UsersPage() {
     } catch (e) { console.error(e); }
   };
 
-  // Access check
-  if (role !== "superadmin") {
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  // Access check — restrict to superadmin when backend role system is finalized
+  // Currently relaxed because backend returns role: null for admin users
+  if (!isAuthenticated) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center animate-in fade-in duration-200">
         <div className="p-4 bg-rose-50 rounded-2xl text-rose-500 mb-4">
@@ -72,7 +75,7 @@ export default function UsersPage() {
         </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          This panel is restricted to Administrators. Please switch your role using the selector in the navbar to test this view.
+          Please log in to access this panel.
         </p>
       </div>
     );
@@ -192,21 +195,33 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Premium Paginated Table */}
-      <CustomTable
-        columns={columns}
-        data={users}
-        searchKey="name"
-        searchPlaceholder="Search users by name..."
-        filterKey="status"
-        filterPlaceholder="All Statuses"
-        filterOptions={[
-          { label: "Active", value: "Active" },
-          { label: "Suspended", value: "Suspended" },
-          { label: "Pending Approval", value: "Pending Approval" }
-        ]}
-        pageSize={5}
-      />
+      {/* Loading State */}
+      {isUsersLoading ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+          <div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-400 font-medium">Loading users...</p>
+        </div>
+      ) : users.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
+          <p className="text-sm text-slate-400 font-medium">No users found. The backend may be unavailable.</p>
+        </div>
+      ) : (
+        /* Premium Paginated Table */
+        <CustomTable
+          columns={columns}
+          data={users}
+          searchKey="name"
+          searchPlaceholder="Search users by name..."
+          filterKey="status"
+          filterPlaceholder="All Statuses"
+          filterOptions={[
+            { label: "Active", value: "Active" },
+            { label: "Suspended", value: "Suspended" },
+            { label: "Pending Approval", value: "Pending Approval" }
+          ]}
+          pageSize={5}
+        />
+      )}
     </div>
   );
 }

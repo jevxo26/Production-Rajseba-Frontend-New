@@ -5,11 +5,11 @@ import { useState, useRef, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { UserRole, setRole as setAuthRole, getRoleName } from "@/redux/features/auth/authSlice";
 import { logout as authLogout } from "@/redux/features/auth/authSlice";
-// Note: useAppSelector and useAppDispatch should be imported from @/redux/hooks
 import Link from "next/link";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
-  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const authUser = useAppSelector((state) => state.auth.user);
+  const role = useAppSelector((state) => state.auth.role) || "client";
   const dispatch = useAppDispatch();
   const roleName = getRoleName(role);
   const logout = () => dispatch(authLogout());
@@ -40,30 +40,11 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
     { value: "client", label: "Client", desc: "Client profile", icon: CircleUser, color: "text-indigo-500 bg-indigo-50" },
   ];
 
-  // Dynamic user data for navbar display
-  const getProfileData = (r: UserRole) => {
-    switch (r) {
-      case "superadmin":
-        return { name: "Aftab Farhan", designation: "System Administrator", avatar: "AF" };
-      case "agent":
-        return { name: "Rezaul Karim", designation: "Booking Partner", avatar: "RK" };
-      case "vendor":
-        return { name: "Kabir AC Repair", designation: "Verified Technician", avatar: "KR" };
-      case "client":
-        return { name: "Sharmin Akter", designation: "Premium Client", avatar: "SA" };
-      default:
-        return { name: "John Doe", designation: "User", avatar: "JD" };
-    }
-  };
-
-  const user = useAppSelector((state) => state.auth.user);
-
-  const profile = user ? {
-    name: user.name || "User",
-    designation: roleName || "Client",
-    avatar: (user.name || "U").substring(0, 2).toUpperCase()
-  } : getProfileData(role);
-  const activeRoleConfig = rolesList.find((x) => x.value === role) || rolesList[0];
+  // Derive display profile from real user data in Redux
+  const name = authUser?.name || "User";
+  const email = authUser?.email || authUser?.phone || "";
+  const avatar = name.substring(0, 2).toUpperCase();
+  const activeRoleConfig = rolesList.find((x) => x.value === role) || rolesList[3];
 
   return (
     <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex items-center justify-between z-30 shadow-sm">
@@ -85,7 +66,6 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
       {/* Right Navbar Controls */}
       <div className="flex items-center gap-4">
 
-
         {/* Notifications Button */}
         <button className="p-2.5 hover:bg-slate-100 rounded-xl relative text-slate-600 hover:text-slate-900 transition-colors">
           <Bell size={18} />
@@ -99,20 +79,35 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
             className="flex items-center gap-3 pl-4 border-l border-slate-200 text-left hover:opacity-85 transition-opacity active:scale-[0.98] focus:outline-none"
           >
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-slate-800 leading-none">{profile.name}</p>
-              <p className="text-[11px] text-slate-400 mt-1 leading-none">{profile.designation}</p>
+              <p className="text-sm font-semibold text-slate-800 leading-none">{name}</p>
+              <p className="text-[11px] text-slate-400 mt-1 leading-none">{roleName}</p>
             </div>
             <div className="w-10 h-10 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center shadow-inner select-none transition-transform hover:scale-105">
-              {profile.avatar}
+              {avatar}
             </div>
           </button>
 
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="px-4 py-2 border-b border-slate-100 sm:hidden">
-                <p className="text-sm font-bold text-slate-800 leading-none">{profile.name}</p>
-                <p className="text-[10px] text-slate-400 mt-1 leading-none">{profile.designation}</p>
+            <div className="absolute right-0 mt-3 w-64 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+
+              {/* User Info Header */}
+              <div className="px-4 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center select-none shrink-0">
+                    {avatar}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-slate-800 truncate leading-none">{name}</p>
+                    {email && (
+                      <p className="text-xs text-slate-400 mt-1 truncate leading-none">{email}</p>
+                    )}
+                    <span className={`inline-block mt-1.5 px-2 py-0.5 text-[10px] font-bold rounded-full ${activeRoleConfig.color}`}>
+                      {roleName}
+                    </span>
+                  </div>
+                </div>
               </div>
+
               <div className="p-1 space-y-0.5">
                 <Link
                   href="/dashbord/profile"
