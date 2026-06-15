@@ -204,7 +204,7 @@ export function Navbar() {
               <Image
                 src="/logo.png"
                 alt="Rajseba"
-                width={140}
+                width={40}
                 height={40}
                 className="h-9 sm:h-10 w-auto object-contain"
                 priority
