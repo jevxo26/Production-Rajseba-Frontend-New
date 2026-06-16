@@ -60,6 +60,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: ClipboardList, label: "Manage Categories", href: "/dashbord/category" },
           { icon: Wrench, label: "Manage Services", href: "/dashbord/services" },
           { icon: Layers, label: "Nested Services", href: "/dashbord/nested-services" },
+          { icon: Package, label: "Manage Packages", href: "/dashbord/packages" },
           { icon: BarChart3, label: "System Analytics", href: "/dashbord/analytics" },
           { icon: Wallet, label: "Withdraw Requests", href: "/dashbord/withdraw" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },

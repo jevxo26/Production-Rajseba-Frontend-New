@@ -35,14 +35,12 @@ import {
 } from "@/redux/features/admin/service";
 import { toast } from "sonner";
 
-export default function PackagesManagementPage() {
+export default function AdminPackagesManagementPage() {
   const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
   const role =
     typeof rawRole === "string"
       ? rawRole.toLowerCase().replace(/\s+/g, "")
       : "client";
-  const currentUser = useAppSelector((state) => state.auth.user);
-  const currentUserId = currentUser?.id || currentUser?._id || "";
 
   // APIs
   const {
@@ -70,7 +68,7 @@ export default function PackagesManagementPage() {
   const [serviceId, setServiceId] = useState("NONE");
   const [selectedNestedIds, setSelectedNestedIds] = useState<number[]>([]);
 
-  // All services for the dropdown
+  // All services
   const allServices: Service[] =
     apiServicesRes?.data || (Array.isArray(apiServicesRes) ? apiServicesRes : []);
 
@@ -78,23 +76,15 @@ export default function PackagesManagementPage() {
   const allNestedServices: NestedService[] =
     apiNestedRes?.data || (Array.isArray(apiNestedRes) ? apiNestedRes : []);
 
-  // Filter services for vendor — only their own
-  const serviceOptions = (() => {
-    const base =
-      role === "vendor"
-        ? allServices.filter(
-            (s) => String(s.vendor_id) === String(currentUserId)
-          )
-        : allServices;
-    return [
-      { value: "NONE", label: "Select a Parent Service" },
-      ...base.map((s) => ({
-        value: String(s.id),
-        label: s.name,
-        desc: s.subtitle || s.slug,
-      })),
-    ];
-  })();
+  // Admin sees ALL services
+  const serviceOptions = [
+    { value: "NONE", label: "Select a Parent Service" },
+    ...allServices.map((s) => ({
+      value: String(s.id),
+      label: s.name,
+      desc: s.subtitle || s.slug,
+    })),
+  ];
 
   // Filter nested services based on selected parent service
   const availableNestedServices =
@@ -104,22 +94,12 @@ export default function PackagesManagementPage() {
         )
       : [];
 
-  // Filter packages for vendor
+  // Load all packages (no vendor filter for admin)
   useEffect(() => {
     const all: Package[] =
       apiPackagesRes?.data || (Array.isArray(apiPackagesRes) ? apiPackagesRes : []);
-
-    if (role === "vendor") {
-      const vendorServiceIds = allServices
-        .filter((s) => String(s.vendor_id) === String(currentUserId))
-        .map((s) => s.id);
-      setPackages(
-        all.filter((pkg) => pkg.service && vendorServiceIds.includes(pkg.service.id))
-      );
-    } else {
-      setPackages(all);
-    }
-  }, [apiPackagesRes, allServices, role, currentUserId]);
+    setPackages(all);
+  }, [apiPackagesRes]);
 
   const resetForm = () => {
     setName("");
@@ -218,7 +198,7 @@ export default function PackagesManagementPage() {
     }
   };
 
-  if (role !== "superadmin" && role !== "vendor") {
+  if (role !== "superadmin") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center animate-in fade-in duration-200">
         <div className="p-4 bg-rose-50 rounded-2xl text-rose-500 mb-4">
@@ -226,7 +206,7 @@ export default function PackagesManagementPage() {
         </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          This panel is restricted to Administrators and Registered Vendors.
+          This panel is restricted to Administrators only.
         </p>
       </div>
     );
@@ -319,12 +299,10 @@ export default function PackagesManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
-            {role === "vendor" ? "My Packages" : "Package Directory"}
+            Package Directory
           </h1>
           <p className="text-slate-500 mt-1">
-            {role === "vendor"
-              ? "Bundle your sub-services into packages and offer them to clients."
-              : "Manage service packages across all vendors."}
+            Manage service packages across all vendors.
           </p>
         </div>
         <div className="flex gap-2">
@@ -351,7 +329,7 @@ export default function PackagesManagementPage() {
             No Packages Found
           </h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-            Create your first package by bundling sub-services together.
+            No packages have been created yet across any vendor.
           </p>
           <button
             onClick={openCreateModal}
@@ -405,7 +383,7 @@ export default function PackagesManagementPage() {
                     value={serviceId}
                     onChange={(val) => {
                       setServiceId(val);
-                      setSelectedNestedIds([]); // Reset selections when service changes
+                      setSelectedNestedIds([]);
                     }}
                   />
                 </div>
