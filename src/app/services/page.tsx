@@ -90,18 +90,18 @@ const PRICE_CEIL = 5000;
 const PER_PAGE = 6;
 
 const categories = [
-  { id:"ac-repair", label: "AC Repair", slug: "ac-repair", icon: TbAirConditioning },
-  { id:"plumbing", label: "Plumbing", slug: "plumbing", icon: FaFaucet },
-  { id:"cleaning", label: "Cleaning", slug: "cleaning", icon: MdOutlineCleaningServices },
-  { id:"electrical", label: "Electrical", slug: "electrical", icon: FaBolt },
-  { id:"shifting", label: "Shifting", slug: "shifting", icon: TbTruck },
-  { id:"cctv", label: "CCTV", slug: "cctv", icon: MdOutlineSecurity },
-  { id:"appliance-repair", label: "Appliance Repair", slug: "appliance-repair", icon: FaTv },
-  { id:"painting", label: "Painting", slug: "painting", icon: FaPaintRoller },
-  { id:"gardening", label: "Gardening", slug: "gardening", icon: FaLeaf },
-  { id:"pest-control", label: "Pest Control", slug: "pest-control", icon: FaBug },
-  { id:"home-salon", label: "Home Salon", slug: "home-salon", icon: TbScissors },
-  { id:"carpentry", label: "Carpentry", slug: "carpentry", icon: FaHammer },
+  { id: "ac-repair", label: "AC Repair", slug: "ac-repair", icon: TbAirConditioning },
+  { id: "plumbing", label: "Plumbing", slug: "plumbing", icon: FaFaucet },
+  { id: "cleaning", label: "Cleaning", slug: "cleaning", icon: MdOutlineCleaningServices },
+  { id: "electrical", label: "Electrical", slug: "electrical", icon: FaBolt },
+  { id: "shifting", label: "Shifting", slug: "shifting", icon: TbTruck },
+  { id: "cctv", label: "CCTV", slug: "cctv", icon: MdOutlineSecurity },
+  { id: "appliance-repair", label: "Appliance Repair", slug: "appliance-repair", icon: FaTv },
+  { id: "painting", label: "Painting", slug: "painting", icon: FaPaintRoller },
+  { id: "gardening", label: "Gardening", slug: "gardening", icon: FaLeaf },
+  { id: "pest-control", label: "Pest Control", slug: "pest-control", icon: FaBug },
+  { id: "home-salon", label: "Home Salon", slug: "home-salon", icon: TbScissors },
+  { id: "carpentry", label: "Carpentry", slug: "carpentry", icon: FaHammer },
 ];
 
 const FILTER_CATEGORIES = [
@@ -1381,7 +1381,7 @@ function ServicesContent() {
                 href={`categories/service/${cat.id}`}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-full border font-semibold text-xs transition-all duration-200 hover:-translate-y-0.5 no-underline border-[#e5e7eb] text-[#4b5563] bg-white hover:border-[#ff5a5f] hover:text-[#ff5a5f] hover:shadow-sm"
               >
-                <span>{cat.icon}</span>
+                {/* <span>{cat.icon}</span> */}
                 {cat.label}
               </Link>
             ))}
