@@ -79,9 +79,9 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "vendor":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
-          { icon: Wrench, label: "My Services", href: "/dashbord/services" },
+          { icon: Wrench, label: "My Services", href: "/dashbord/vendor-services" },
           { icon: Layers, label: "My Sub-Services", href: "/dashbord/nested-services" },
-          { icon: Package, label: "My Packages", href: "/dashbord/packages" },
+          { icon: Package, label: "My Packages", href: "/dashbord/vendor-packages" },
           { icon: Wallet, label: "Withdraw Money", href: "/dashbord/withdraw" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },
