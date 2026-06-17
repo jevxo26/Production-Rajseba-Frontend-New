@@ -1,4 +1,6 @@
+"use client"
 import { ArrowRight, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -61,7 +63,12 @@ const TRENDING_SERVICES: TrendingService[] = [
 const TrendingServices = () => {
 
     return (
-      <section className="py-14 bg-[#FFF0EF]">
+      <section className="py-14 bg-[#FFF0EF] relative overflow-hidden">
+        <motion.div
+          className="pointer-events-none z-0 absolute -right-10 -top-10 w-50 h-50 rounded-full bg-primary/10"
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-end justify-between mb-7">
             <div>
@@ -137,7 +144,7 @@ const TrendingServices = () => {
             {TRENDING_SERVICES.filter((s) => !s.featured).map((service) => (
               <div
                 key={service.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                className="bg-white z-10 rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="relative h-44 overflow-hidden">
                   <Image

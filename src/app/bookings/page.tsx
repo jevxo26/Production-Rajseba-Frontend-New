@@ -172,9 +172,12 @@ export default function BookingsPage() {
   });
 
   return (
-    <section className="min-h-screen bg-[var(--background)] px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-
+    <section className="min-h-screen bg-[var(--background)] px-4 py-8 sm:px-6 lg:px-8 relative">
+      <div
+        className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
+        style={{ backgroundSize: "auto" }}
+      />
+      <div className="mx-auto max-w-4xl relative z-10">
         {/* Header */}
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
@@ -185,9 +188,7 @@ export default function BookingsPage() {
               June 2026 — {BOOKINGS.length} bookings total
             </p>
           </div>
-          <button
-            className="flex shrink-0 items-center gap-2 rounded-xl bg-[#FF5A5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#D6363B] active:scale-[0.98]"
-          >
+          <button className="flex shrink-0 items-center gap-2 rounded-xl bg-[#FF5A5F] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#D6363B] active:scale-[0.98]">
             <span className="text-base leading-none">+</span>
             New booking
           </button>
@@ -196,10 +197,7 @@ export default function BookingsPage() {
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl bg-[#FFF0F1] px-4 py-3"
-            >
+            <div key={stat.label} className="rounded-xl bg-[#FFF0F1] px-4 py-3">
               <p className="text-xs font-medium uppercase tracking-wide text-[#D6363B] opacity-70">
                 {stat.label}
               </p>
@@ -217,10 +215,11 @@ export default function BookingsPage() {
             <button
               key={f.value}
               onClick={() => setActiveFilter(f.value)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${activeFilter === f.value
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                activeFilter === f.value
                   ? "bg-[#FF5A5F] text-white shadow-sm"
                   : "bg-[#FFF0F1] text-[#D6363B] hover:bg-[#FFE4E6]"
-                }`}
+              }`}
             >
               {f.label}
             </button>
@@ -254,8 +253,18 @@ export default function BookingsPage() {
               onClick={() => setSearch("")}
               className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
@@ -277,7 +286,11 @@ export default function BookingsPage() {
                 <div
                   key={booking.id}
                   className={`flex items-center gap-4 rounded-r-xl border border-l-4 bg-white px-4 py-4 transition-shadow hover:shadow-md ${cfg.borderColor}`}
-                  style={{ borderTopColor: "#e5e7eb", borderRightColor: "#e5e7eb", borderBottomColor: "#e5e7eb" }}
+                  style={{
+                    borderTopColor: "#e5e7eb",
+                    borderRightColor: "#e5e7eb",
+                    borderBottomColor: "#e5e7eb",
+                  }}
                 >
                   {/* Icon */}
                   <div
@@ -292,7 +305,9 @@ export default function BookingsPage() {
                       {booking.service}
                     </p>
                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-[var(--text-secondary)]">
-                      <span>📅 {booking.date}, {booking.time}</span>
+                      <span>
+                        📅 {booking.date}, {booking.time}
+                      </span>
                       <span>👤 {booking.provider}</span>
                     </div>
                   </div>
@@ -308,7 +323,11 @@ export default function BookingsPage() {
                       {booking.price}
                     </span>
                     <button className="rounded-lg border border-[var(--border-light)] px-3 py-1 text-xs text-[var(--text-secondary)] transition-colors hover:border-[#FF5A5F] hover:text-[#FF5A5F]">
-                      {booking.status === "completed" ? "Review" : booking.status === "cancelled" ? "Rebook" : "Details"}
+                      {booking.status === "completed"
+                        ? "Review"
+                        : booking.status === "cancelled"
+                          ? "Rebook"
+                          : "Details"}
                     </button>
                   </div>
                 </div>
@@ -316,7 +335,6 @@ export default function BookingsPage() {
             })
           )}
         </div>
-
       </div>
     </section>
   );

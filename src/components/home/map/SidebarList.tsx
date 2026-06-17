@@ -1,7 +1,16 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { Search, SlidersHorizontal, Map as MapIcon, List as ListIcon, Star, CheckCircle2, MapPin, Info } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  Map as MapIcon,
+  List as ListIcon,
+  Star,
+  CheckCircle2,
+  MapPin,
+  Info,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Expert } from "./types";
 
@@ -31,7 +40,7 @@ const CATEGORIES = [
   "Gardening",
   "Pest Control",
   "Home Salon",
-  "Carpentry"
+  "Carpentry",
 ];
 
 export default function SidebarList({
@@ -44,10 +53,11 @@ export default function SidebarList({
   filteredExperts,
   selectedExpertId,
   setSelectedExpertId,
-  onOpenFilters
+  onOpenFilters,
 }: SidebarListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Horizontal scroll for category chips
   useEffect(() => {
     const el = scrollRef.current;
     if (el) {
@@ -63,9 +73,11 @@ export default function SidebarList({
   }, []);
 
   return (
-    <div className="w-full md:w-[380px] bg-white border border-slate-200 rounded-3xl flex flex-col h-[60vh] md:h-full z-10 shadow-md overflow-hidden">
+    <div className="w-full h-[45vh] min-h-0 md:w-[380px] md:h-[650px] lg:h-[666px] bg-white border border-slate-200 rounded-3xl flex flex-col shadow-md overflow-hidden">
+      {" "}
+      {/* Fixed height as per your requirement */}
       {/* Sidebar Header Filters */}
-      <div className="p-4 border-b border-slate-100 space-y-4">
+      <div className="p-4 border-b border-slate-100 space-y-4 flex-shrink-0">
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -79,7 +91,7 @@ export default function SidebarList({
         </div>
 
         {/* Horizontal category scroll chips */}
-        <div 
+        <div
           ref={scrollRef}
           className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none"
         >
@@ -96,9 +108,10 @@ export default function SidebarList({
             >
               {cat}
             </Button>
-          ))}        </div>
+          ))}
+        </div>
 
-        {/* Tab switcher and filters trigger */}
+        {/* Tab switcher + Filters */}
         <div className="flex items-center justify-between">
           <div className="bg-slate-100 p-1 rounded-full flex items-center w-40">
             <Button
@@ -133,10 +146,9 @@ export default function SidebarList({
           </Button>
         </div>
       </div>
-
-      {/* Sidebar List Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
-        <h3 className="text-sm font-extrabold text-slate-800 tracking-wide uppercase px-1">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
+        <h3 className="text-sm font-extrabold text-slate-800 tracking-wide px-1 sticky -top-5 bg-white py-2 z-10">
           Nearby Professionals ({filteredExperts.length})
         </h3>
 
@@ -144,7 +156,9 @@ export default function SidebarList({
           <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 p-6">
             <Info className="w-8 h-8 text-slate-300 mx-auto mb-2" />
             <p className="text-sm font-bold text-slate-800">No experts found</p>
-            <p className="text-xs text-slate-400 mt-1">Try resetting search queries or matching filter ranges.</p>
+            <p className="text-xs text-slate-400 mt-1">
+              Try resetting search queries or matching filter ranges.
+            </p>
           </div>
         ) : (
           filteredExperts.map((expert) => {
@@ -159,18 +173,16 @@ export default function SidebarList({
                     : "border-slate-100 hover:border-slate-300 shadow-sm"
                 }`}
               >
-                {/* Rating floating badge */}
                 <div className="absolute top-4 right-4 bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5 flex items-center gap-1 text-[11px] font-extrabold text-amber-700">
                   <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
                   {expert.rating}
                 </div>
 
-                {/* Top: Header Metadata */}
                 <div>
                   <span className="text-[10px] font-extrabold tracking-wider bg-rose-50 border border-rose-100 text-[#FF5A5F] px-2.5 py-0.5 rounded-full inline-block mb-2 uppercase">
                     {expert.category}
                   </span>
-                  
+
                   <h4 className="font-extrabold text-slate-900 text-base flex items-center gap-1.5">
                     {expert.name}
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-50" />
@@ -181,16 +193,21 @@ export default function SidebarList({
                   </p>
                 </div>
 
-                {/* Bottom: Location & Pricing */}
                 <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-1 text-slate-400 font-semibold">
                     <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
-                    <span className="truncate max-w-[150px]">{expert.location} ({expert.distance})</span>
+                    <span className="truncate max-w-[150px]">
+                      {expert.location} ({expert.distance})
+                    </span>
                   </div>
-                  
+
                   <div className="font-black text-slate-900 text-right">
-                    <span className="text-[10px] text-slate-400 font-bold block">STARTING AT</span>
-                    <span className="text-[#FF5A5F] text-sm font-black">৳{expert.price}+</span>
+                    <span className="text-[10px] text-slate-400 font-bold block">
+                      STARTING AT
+                    </span>
+                    <span className="text-[#FF5A5F] text-sm font-black">
+                      ৳{expert.price}+
+                    </span>
                   </div>
                 </div>
               </div>

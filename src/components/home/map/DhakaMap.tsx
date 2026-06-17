@@ -91,7 +91,7 @@ export default function DhakaMap({
   };
 
   return (
-    <div 
+    <div
       ref={mapContainerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -100,16 +100,20 @@ export default function DhakaMap({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleMouseUp}
-      className="flex-1 h-[50vh] md:h-full bg-[#FFF5F2] rounded-3xl border border-slate-200 shadow-md relative overflow-hidden select-none outline-none"
+      className="flex-1 min-h-0 md:h-full bg-[#FFF5F2] rounded-3xl border border-slate-200 shadow-md relative overflow-hidden select-none outline-none"
     >
       {/* SVG-based Stylized Dhaka Map Canvas */}
       <motion.div
         animate={{
           x: pan.x,
           y: pan.y,
-          scale: zoom
+          scale: zoom,
         }}
-        transition={isDragging ? { duration: 0 } : { type: "spring", stiffness: 100, damping: 20 }}
+        transition={
+          isDragging
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 100, damping: 20 }
+        }
         className="w-full h-full min-w-[800px] min-h-[600px] relative origin-center"
         style={{ cursor: isDragging ? "grabbing" : "grab" }}
       >
@@ -123,62 +127,174 @@ export default function DhakaMap({
 
           {/* Water / Lakes Grid */}
           {/* Banani Lake */}
-          <path 
-            d="M 320 50 Q 380 250 340 450 T 380 750" 
-            fill="none" 
-            stroke="#D6ECFF" 
-            strokeWidth="32" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
+          <path
+            d="M 320 50 Q 380 250 340 450 T 380 750"
+            fill="none"
+            stroke="#D6ECFF"
+            strokeWidth="32"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           {/* Gulshan Lake */}
-          <path 
-            d="M 520 80 Q 560 300 510 520 T 580 780" 
-            fill="none" 
-            stroke="#D6ECFF" 
-            strokeWidth="36" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
+          <path
+            d="M 520 80 Q 560 300 510 520 T 580 780"
+            fill="none"
+            stroke="#D6ECFF"
+            strokeWidth="36"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
           {/* Dhanmondi Lake */}
-          <path 
-            d="M 120 450 C 140 500, 80 580, 160 680 S 130 750, 150 800" 
-            fill="none" 
-            stroke="#D6ECFF" 
-            strokeWidth="24" 
-            strokeLinecap="round" 
+          <path
+            d="M 120 450 C 140 500, 80 580, 160 680 S 130 750, 150 800"
+            fill="none"
+            stroke="#D6ECFF"
+            strokeWidth="24"
+            strokeLinecap="round"
           />
 
           {/* Sector Accents */}
-          <path d="M 50 50 L 300 50 L 300 400 L 50 400 Z" fill="#FFFFFF" fillOpacity="0.15" />
-          <path d="M 360 80 L 500 80 L 500 500 L 360 500 Z" fill="#FFFFFF" fillOpacity="0.1" />
+          <path
+            d="M 50 50 L 300 50 L 300 400 L 50 400 Z"
+            fill="#FFFFFF"
+            fillOpacity="0.15"
+          />
+          <path
+            d="M 360 80 L 500 80 L 500 500 L 360 500 Z"
+            fill="#FFFFFF"
+            fillOpacity="0.1"
+          />
 
           {/* Major Roads Grid */}
           {/* Kemal Ataturk Avenue */}
-          <line x1="100" y1="220" x2="520" y2="220" stroke="#FFFFFF" strokeWidth="10" strokeLinecap="round" />
-          <line x1="100" y1="220" x2="520" y2="220" stroke="#F1E3DF" strokeWidth="2" strokeLinecap="round" />
-          
+          <line
+            x1="100"
+            y1="220"
+            x2="520"
+            y2="220"
+            stroke="#FFFFFF"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
+          <line
+            x1="100"
+            y1="220"
+            x2="520"
+            y2="220"
+            stroke="#F1E3DF"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+
           {/* Gulshan Avenue */}
-          <line x1="440" y1="100" x2="440" y2="600" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
-          <line x1="440" y1="100" x2="440" y2="600" stroke="#F1E3DF" strokeWidth="2" strokeLinecap="round" />
+          <line
+            x1="440"
+            y1="100"
+            x2="440"
+            y2="600"
+            stroke="#FFFFFF"
+            strokeWidth="12"
+            strokeLinecap="round"
+          />
+          <line
+            x1="440"
+            y1="100"
+            x2="440"
+            y2="600"
+            stroke="#F1E3DF"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
 
           {/* Banani Road 11 */}
-          <line x1="330" y1="310" x2="440" y2="310" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" />
+          <line
+            x1="330"
+            y1="310"
+            x2="440"
+            y2="310"
+            stroke="#FFFFFF"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
 
           {/* Mirpur Road */}
-          <line x1="80" y1="300" x2="260" y2="780" stroke="#FFFFFF" strokeWidth="14" strokeLinecap="round" />
+          <line
+            x1="80"
+            y1="300"
+            x2="260"
+            y2="780"
+            stroke="#FFFFFF"
+            strokeWidth="14"
+            strokeLinecap="round"
+          />
 
           {/* Satmasjid Road */}
-          <line x1="140" y1="380" x2="140" y2="750" stroke="#FFFFFF" strokeWidth="10" strokeLinecap="round" />
+          <line
+            x1="140"
+            y1="380"
+            x2="140"
+            y2="750"
+            stroke="#FFFFFF"
+            strokeWidth="10"
+            strokeLinecap="round"
+          />
 
           {/* Pragati Sarani */}
-          <line x1="680" y1="80" x2="720" y2="720" stroke="#FFFFFF" strokeWidth="16" strokeLinecap="round" />
+          <line
+            x1="680"
+            y1="80"
+            x2="720"
+            y2="720"
+            stroke="#FFFFFF"
+            strokeWidth="16"
+            strokeLinecap="round"
+          />
 
           {/* District Labels */}
-          <text x="210" y="160" fill="#EAD4CD" fontSize="18" fontWeight="900" letterSpacing="0.2em" textAnchor="middle">BANANI</text>
-          <text x="440" y="150" fill="#EAD4CD" fontSize="18" fontWeight="900" letterSpacing="0.2em" textAnchor="middle">GULSHAN 2</text>
-          <text x="630" y="120" fill="#EAD4CD" fontSize="18" fontWeight="900" letterSpacing="0.2em" textAnchor="middle">BARIDHARA</text>
-          <text x="180" y="550" fill="#EAD4CD" fontSize="18" fontWeight="900" letterSpacing="0.2em" textAnchor="middle">DHANMONDI</text>
+          <text
+            x="210"
+            y="160"
+            fill="#EAD4CD"
+            fontSize="18"
+            fontWeight="900"
+            letterSpacing="0.2em"
+            textAnchor="middle"
+          >
+            BANANI
+          </text>
+          <text
+            x="440"
+            y="150"
+            fill="#EAD4CD"
+            fontSize="18"
+            fontWeight="900"
+            letterSpacing="0.2em"
+            textAnchor="middle"
+          >
+            GULSHAN 2
+          </text>
+          <text
+            x="630"
+            y="120"
+            fill="#EAD4CD"
+            fontSize="18"
+            fontWeight="900"
+            letterSpacing="0.2em"
+            textAnchor="middle"
+          >
+            BARIDHARA
+          </text>
+          <text
+            x="180"
+            y="550"
+            fill="#EAD4CD"
+            fontSize="18"
+            fontWeight="900"
+            letterSpacing="0.2em"
+            textAnchor="middle"
+          >
+            DHANMONDI
+          </text>
 
           {/* Landscaping Parks */}
           <circle cx="440" cy="310" r="14" fill="#E1F3E2" />
@@ -193,7 +309,7 @@ export default function DhakaMap({
               key={expert.id}
               style={{
                 left: `${expert.coords.x}%`,
-                top: `${expert.coords.y}%`
+                top: `${expert.coords.y}%`,
               }}
               className="absolute -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer"
               onClick={(e) => {
@@ -228,7 +344,7 @@ export default function DhakaMap({
                 }`}
               >
                 {renderCategoryIcon(expert.icon, "w-4.5 h-4.5")}
-                
+
                 {/* Selected Pin Bottom Stem Line */}
                 {isSelected && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-2 bg-[#FF5A5F]" />

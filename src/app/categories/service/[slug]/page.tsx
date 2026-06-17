@@ -5,6 +5,7 @@ import { SpecializedServices } from '@/components/home/categorizedServices/Speci
 import { Packages } from '@/components/home/categorizedServices/Packages';
 import { Experts } from '@/components/home/categorizedServices/Experts';
 import { Commitments } from '@/components/home/categorizedServices/Commitments';
+import CustomerFeedback from '@/components/home/categorizedServices/Feedbacks';
 
 // // Slug mapping to display names
 // const SLUG_TO_NAME: Record<string, string> = {
@@ -46,7 +47,7 @@ export default function CategoryDetailPage({
         <Packages />
         <Experts />
         <Commitments />
-
+        <CustomerFeedback />
     </div>
   );
 }

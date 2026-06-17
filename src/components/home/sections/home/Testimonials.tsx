@@ -151,9 +151,9 @@ const Testimonials = () => {
             {testimonials.map((test, idx) => (
               <div
                 key={idx}
-                className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-3"
+                className="w-full sm:w-1/2 lg:w-1/3 shrink-0 px-3"
               >
-                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm flex flex-col h-[280px] md:h-[300px] hover:shadow-md transition-all duration-300">
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm flex flex-col mb-4 hover:shadow-md transition-all duration-300">
                   <div className="flex items-center gap-4 mb-6">
                     <img
                       src={test.avatar}
