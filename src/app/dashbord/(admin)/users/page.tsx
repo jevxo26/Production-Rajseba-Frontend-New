@@ -5,6 +5,7 @@ import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2 } f
 import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
+import { useGetAllRolesQuery } from "@/redux/features/admin/role";
 import { toast } from "sonner";
 
 interface UserItem {
@@ -28,6 +29,7 @@ export default function UsersPage() {
 
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
+  const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
   const [updateUserMut] = useUpdateUserMutation();
   const [createUserMut, { isLoading: isCreating }] = useCreateUserMutation();
   const [deleteUserMut] = useDeleteUserMutation();
@@ -56,6 +58,7 @@ export default function UsersPage() {
       name: formData.get("name"),
       email: formData.get("email"),
       phone: formData.get("phone"),
+      roleId: Number(formData.get("role")),
     };
     try {
       await createUserMut(data).unwrap();
@@ -312,6 +315,19 @@ export default function UsersPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
                 <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Role</label>
+                <select name="role" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                  <option value="" disabled>Select a role</option>
+                  {isRolesLoading ? (
+                    <option value="" disabled>Loading roles...</option>
+                  ) : (
+                    (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : [])).map((r: any) => (
+                      <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
+                    ))
+                  )}
+                </select>
               </div>
               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
