@@ -147,42 +147,70 @@ export default function ServiceDetailsPage() {
             )}
           </div>
 
-          {/* Packages & Nested Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <Package size={18} className="text-brand-primary" /> Packages
-              </h3>
-              {service.packages && service.packages.length > 0 ? (
-                <ul className="space-y-2">
-                  {service.packages.map((pkg: any) => (
-                    <li key={pkg.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                      <span className="text-sm font-semibold text-slate-700">{pkg.name}</span>
-                      <span className="text-xs font-bold bg-white px-2 py-1 rounded-lg border border-slate-200 text-brand-primary">৳{pkg.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-slate-400 italic">No packages available.</p>
-              )}
-            </div>
+          {/* Packages Grid */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Package size={18} className="text-brand-primary" /> Available Packages
+            </h3>
+            {service.packages && service.packages.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {service.packages.map((pkg: any) => (
+                  <div key={pkg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 hover:border-brand-primary/30 transition-all hover:shadow-md group">
+                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-brand-primary mb-4 group-hover:scale-110 transition-transform">
+                      <Package size={18} />
+                    </div>
+                    <h4 className="text-sm font-bold text-slate-800 mb-1">{pkg.name}</h4>
+                    {pkg.description && <p className="text-xs text-slate-500 mb-4 line-clamp-2">{pkg.description}</p>}
+                    <div className="mt-auto pt-4 border-t border-slate-200/60">
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1">Price</span>
+                      <span className="text-lg font-black text-brand-primary">৳{pkg.price}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-2xl border-dashed">
+                <p className="text-sm text-slate-400 font-medium italic">No packages available.</p>
+              </div>
+            )}
+          </div>
 
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <Briefcase size={18} className="text-brand-primary" /> Nested Services
-              </h3>
-              {service.nestedServices && service.nestedServices.length > 0 ? (
-                <ul className="space-y-2">
-                  {service.nestedServices.map((ns: any) => (
-                    <li key={ns.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                      <span className="text-sm font-semibold text-slate-700">{ns.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-slate-400 italic">No nested services.</p>
-              )}
-            </div>
+          {/* Nested Services Grid */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
+            <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Briefcase size={18} className="text-brand-primary" /> Included Services
+            </h3>
+            {service.nestedServices && service.nestedServices.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {service.nestedServices.map((ns: any) => (
+                  <div key={ns.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:border-brand-primary/30 group flex flex-col">
+                    <div className="h-32 w-full bg-slate-100 relative overflow-hidden">
+                      {ns.image ? (
+                        <img src={ns.image} alt={ns.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                          <Briefcase size={32} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4 flex flex-col flex-grow">
+                      <h4 className="text-sm font-bold text-slate-800 leading-tight mb-1">{ns.name}</h4>
+                      {ns.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2 mb-3">{ns.description}</p>}
+                      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Base Price</span>
+                        <span className="text-sm font-black text-brand-primary">
+                          {ns.price ? `৳${ns.price}` : "Variable"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-2xl border-dashed">
+                <p className="text-sm text-slate-400 font-medium italic">No nested services included.</p>
+              </div>
+            )}
           </div>
 
         </div>

@@ -56,6 +56,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "superadmin":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
+          { icon: Calendar, label: "Manage Bookings", href: "/dashbord/manage-bookings" },
           { icon: Users, label: "Manage Users", href: "/dashbord/users" },
           { icon: Briefcase, label: "Manage Vendors", href: "/dashbord/vendors" },
           { icon: Zap, label: "Manage Agents", href: "/dashbord/agents" },
@@ -73,6 +74,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "agent":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
+          { icon: Calendar, label: "Manage Bookings", href: "/dashbord/manage-bookings" },
           { icon: Zap, label: "Quick Booking", href: "/dashbord/quick-booking" },
           { icon: ShoppingBag, label: "Recent Orders", href: "/dashbord/orders" },
           { icon: Percent, label: "Commission Tracking", href: "/dashbord/commissions" },
@@ -83,6 +85,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "vendor":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
+          { icon: Calendar, label: "Manage Bookings", href: "/dashbord/manage-bookings" },
           { icon: Wrench, label: "My Services", href: "/dashbord/vendor-services" },
           { icon: Layers, label: "My Sub-Services", href: "/dashbord/nested-services" },
           { icon: Package, label: "My Packages", href: "/dashbord/vendor-packages" },

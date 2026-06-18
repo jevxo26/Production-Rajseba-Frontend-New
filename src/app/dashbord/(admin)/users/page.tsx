@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
 import { useGetAllRolesQuery } from "@/redux/features/admin/role";
+import { useCreateProfileMutation } from "@/redux/features/admin/profile";
+import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { toast } from "sonner";
 
 interface UserItem {
@@ -27,12 +29,20 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
+  const [step, setStep] = useState<1 | 2>(1);
+  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
+
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
+  const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
+
   const [updateUserMut] = useUpdateUserMutation();
-  const [createUserMut, { isLoading: isCreating }] = useCreateUserMutation();
+  const [createUserMut, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [deleteUserMut] = useDeleteUserMutation();
+  const [createProfileMut, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
+
+  const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
 
   useEffect(() => {
     const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
@@ -61,14 +71,54 @@ export default function UsersPage() {
       roleId: Number(formData.get("role")),
     };
     try {
-      await createUserMut(data).unwrap();
-      toast.success("User created successfully!");
-      setIsAddModalOpen(false);
-      refetch();
+      const userRes = await createUserMut(data).unwrap();
+      const newUserId = userRes.data?.id || userRes.id;
+      
+      setCreatedUserId(newUserId);
+      toast.success("User created successfully! Now complete the profile.");
+      setStep(2);
     } catch (err: any) {
       console.error(err);
       toast.error(err.data?.message || "Failed to create user.");
     }
+  };
+
+  const handleCreateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!createdUserId) {
+      toast.error("User ID missing. Start over.");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const categoryIdStr = formData.get("category_id")?.toString();
+
+    const profileData = {
+      user_id: createdUserId,
+      category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
+      type: formData.get("type")?.toString() || "personal",
+      location: formData.get("location")?.toString() || "",
+      description: formData.get("description")?.toString() || "",
+      company_name: formData.get("company_name")?.toString() || "",
+      min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
+      google_map_link: formData.get("google_map_link")?.toString() || "",
+    };
+
+    try {
+      await createProfileMut(profileData).unwrap();
+      toast.success("Profile created successfully!");
+      closeModal();
+      refetch();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.data?.message || err.message || "Failed to create profile.");
+    }
+  };
+
+  const closeModal = () => {
+    setIsAddModalOpen(false);
+    setStep(1);
+    setCreatedUserId(null);
   };
 
   // Verification and Status update actions
@@ -291,53 +341,106 @@ export default function UsersPage() {
           ]}
           pageSize={5}
         />
-      )}
-
-      {/* Add User Modal */}
+      )}      {/* Add User Modal (2 Steps) */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Add New User</h2>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
+              <h2 className="text-xl font-bold text-slate-800">
+                {step === 1 ? "Step 1: User Account" : "Step 2: User Profile"}
+              </h2>
+              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
                 <XCircle size={24} />
               </button>
             </div>
-            <form onSubmit={handleCreateUser} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
-                <input name="name" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="John Doe" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
-                <input name="email" type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="john@example.com" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
-                <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Role</label>
-                <select name="role" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                  <option value="" disabled>Select a role</option>
-                  {isRolesLoading ? (
-                    <option value="" disabled>Loading roles...</option>
-                  ) : (
-                    (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : [])).map((r: any) => (
-                      <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-                  Cancel
-                </button>
-                <button type="submit" disabled={isCreating} className="px-5 py-2.5 text-sm font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl transition-all disabled:opacity-50">
-                  {isCreating ? "Saving..." : "Save User"}
-                </button>
-              </div>
-            </form>
+
+            {step === 1 ? (
+              <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+                  <input name="name" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="John Doe" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+                  <input name="email" type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="john@example.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+                  <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Role</label>
+                  <select name="role" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                    <option value="" disabled>Select a role</option>
+                    {isRolesLoading ? (
+                      <option value="" disabled>Loading roles...</option>
+                    ) : (
+                      (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : [])).map((r: any) => (
+                        <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                  <button type="button" onClick={closeModal} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={isCreatingUser} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
+                    {isCreatingUser ? "Saving..." : "Next Step"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleCreateProfile} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile Type</label>
+                  <select name="type" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                    <option value="personal">Personal / Freelancer</option>
+                    <option value="company">Company / Agency</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
+                  <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                    <option value="" disabled>Select a category</option>
+                    {isCategoriesLoading ? (
+                      <option value="" disabled>Loading categories...</option>
+                    ) : (
+                      allCategories.map((c: any) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Company / Business Name (Optional)</label>
+                  <input name="company_name" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Acme Services Ltd." />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
+                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+                  <textarea name="description" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all resize-none" placeholder="Briefly describe the user's services..."></textarea>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                    <input name="min_starting_price" type="number" step="0.01" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="0.00" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                    <input name="google_map_link" type="url" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="https://maps.google.com/..." />
+                  </div>
+                </div>
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                  <button type="submit" disabled={isCreatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
+                    {isCreatingProfile ? "Saving..." : "Complete Profile"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

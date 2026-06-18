@@ -1,0 +1,95 @@
+import { baseApi } from '@/redux/api/baseApi';
+
+export interface Booking {
+  id: number;
+  user?: any;
+  vendor?: any;
+  employee?: any;
+  nestedService?: any;
+  pkg?: any;
+  date: string;
+  location: string;
+  notes?: string;
+  status: 'pending' | 'assigned' | 'completed' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BookingApiResponse<T> {
+  statusCode: number;
+  message: string;
+  data: T;
+}
+
+export const bookingApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getAllBookings: builder.query<BookingApiResponse<Booking[]>, void>({
+      query: () => '/bookings',
+      providesTags: ['Booking'],
+    }),
+    getBookingById: builder.query<BookingApiResponse<Booking>, string | number>({
+      query: (id) => `/bookings/${id}`,
+      providesTags: ['Booking'],
+    }),
+    getBookingsByVendor: builder.query<BookingApiResponse<Booking[]>, string | number>({
+      query: (vendorId) => `/bookings/vendor/${vendorId}`,
+      providesTags: ['Booking'],
+    }),
+    getBookingsByUser: builder.query<BookingApiResponse<Booking[]>, string | number>({
+      query: (userId) => `/bookings/user/${userId}`,
+      providesTags: ['Booking'],
+    }),
+    createBooking: builder.mutation<BookingApiResponse<Booking>, any>({
+      query: (data) => ({
+        url: '/bookings',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    updateBooking: builder.mutation<BookingApiResponse<Booking>, { id: string | number; data: any }>({
+      query: ({ id, data }) => ({
+        url: `/bookings/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    assignEmployeeToBooking: builder.mutation<BookingApiResponse<Booking>, { id: string | number; employee_id: number }>({
+      query: ({ id, employee_id }) => ({
+        url: `/bookings/${id}/assign`,
+        method: 'POST',
+        body: { employee_id },
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    updateBookingStatus: builder.mutation<BookingApiResponse<Booking>, { id: string | number; status: string }>({
+      query: ({ id, status }) => ({
+        url: `/bookings/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+    deleteBooking: builder.mutation<BookingApiResponse<void>, string | number>({
+      query: (id) => ({
+        url: `/bookings/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Booking'],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const {
+  useGetAllBookingsQuery,
+  useGetBookingByIdQuery,
+  useGetBookingsByVendorQuery,
+  useGetBookingsByUserQuery,
+  useCreateBookingMutation,
+  useUpdateBookingMutation,
+  useAssignEmployeeToBookingMutation,
+  useUpdateBookingStatusMutation,
+  useDeleteBookingMutation,
+} = bookingApi;

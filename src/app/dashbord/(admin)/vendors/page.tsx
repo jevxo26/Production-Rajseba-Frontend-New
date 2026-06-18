@@ -3,6 +3,7 @@
 import { useAppSelector } from "@/redux/hooks";
 import { ShieldAlert, ShieldCheck, XCircle, Eye, MoreVertical, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
 import { useGetAllRolesQuery } from "@/redux/features/admin/role";
@@ -21,7 +22,8 @@ interface VendorItem {
   categoryName?: string;
 }
 
-export default function VendorsPage() {
+export default function VendorsManagementPage() {
+  const router = useRouter();
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
   const [vendors, setVendors] = useState<VendorItem[]>([]);
@@ -112,11 +114,12 @@ export default function VendorsPage() {
     const profileData = {
       user_id: createdUserId,
       category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
-      nid: formData.get("nid")?.toString() || "",
-      present_address: formData.get("present_address")?.toString() || "",
-      permanent_address: formData.get("permanent_address")?.toString() || "",
-      gender: formData.get("gender")?.toString() || "male",
-      type: "vendor",
+      type: formData.get("type")?.toString() || "personal",
+      location: formData.get("location")?.toString() || "",
+      description: formData.get("description")?.toString() || "",
+      company_name: formData.get("company_name")?.toString() || "",
+      min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
+      google_map_link: formData.get("google_map_link")?.toString() || "",
     };
 
     try {
@@ -232,7 +235,7 @@ export default function VendorsPage() {
               <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
               <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
                 <button
-                  onClick={() => { setSelectedUser(user); setOpenDropdownId(null); }}
+                  onClick={() => { router.push(`/dashbord/vendors/${user.id}`); setOpenDropdownId(null); }}
                   className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                 >
                   <Eye size={14} className="text-slate-400" /> View Details
@@ -363,6 +366,13 @@ export default function VendorsPage() {
             ) : (
               <form onSubmit={handleCreateProfile} className="space-y-4">
                 <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile Type</label>
+                  <select name="type" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                    <option value="personal">Personal / Freelancer</option>
+                    <option value="company">Company / Agency</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
                   <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
                     <option value="" disabled>Select a category</option>
@@ -376,20 +386,26 @@ export default function VendorsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">NID Number</label>
-                  <input name="nid" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="National ID" />
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Company / Business Name (Optional)</label>
+                  <input name="company_name" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Acme Services Ltd." />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Present Address</label>
-                  <input name="present_address" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Present Address" />
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
+                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Gender</label>
-                  <select name="gender" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+                  <textarea name="description" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all resize-none" placeholder="Briefly describe the vendor's services..."></textarea>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                    <input name="min_starting_price" type="number" step="0.01" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="0.00" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                    <input name="google_map_link" type="url" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="https://maps.google.com/..." />
+                  </div>
                 </div>
                 <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                   <button type="submit" disabled={isCreatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
