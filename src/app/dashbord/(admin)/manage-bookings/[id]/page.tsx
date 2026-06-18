@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useGetBookingByIdQuery, useUpdateBookingStatusMutation, useDeleteBookingMutation, useAssignEmployeeToBookingMutation } from "@/redux/features/admin/booking";
+import { useGetEmployeesByVendorQuery } from "@/redux/features/admin/user";
 import { Calendar, User, Package as PkgIcon, MapPin, Briefcase, ShieldCheck, Trash2, ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -234,10 +235,10 @@ export default function BookingDetailsPage() {
                     <p className="text-xs text-slate-400 font-medium mb-0.5">Assigned Vendor / Agency</p>
                     {booking.vendor ? (
                     <>
-                      <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                      <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">V</div>
                         {booking.vendor.name}
-                      </p>
+                      </div>
                       
                       <div className="pt-4 mt-2 border-t border-slate-200">
                         <p className="text-xs text-slate-400 font-medium mb-1.5">Assign / Update Professionals</p>
