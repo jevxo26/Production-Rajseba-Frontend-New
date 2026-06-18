@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "framer-motion";
 import { Droplet, Phone } from "lucide-react";
 import Link from "next/link";
@@ -53,12 +54,32 @@ const specializedServices: SpecializedService[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export function SpecializedServices() {
   return (
-    <section className="">
+    <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
+        {/* Header with Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-10"
+        >
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-wide">
               Our Specialized Services
@@ -74,41 +95,44 @@ export function SpecializedServices() {
             View All Services{" "}
             <span className="group-hover:translate-x-1 transition">→</span>
           </Link>
-        </div>
+        </motion.div>
 
         {/* Dynamic Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-12 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
           {specializedServices.map((service, index) => {
             if (service.type === "emergency") {
               return (
-                <div key={service.id} className="md:col-span-8">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="bg-[#261817] text-white rounded-3xl p-8 md:p-12 flex flex-col relative overflow-hidden h-full"
-                  >
+                <motion.div
+                  key={service.id}
+                  variants={itemVariants}
+                  className="md:col-span-8"
+                >
+                  <div className="bg-[#261817] text-white rounded-3xl p-8 md:p-12 flex flex-col relative overflow-hidden h-full">
                     <h3 className="text-3xl font-bold mb-4">{service.title}</h3>
                     <p className="text-slate-300 leading-relaxed mb-8 flex-1">
                       {service.description} Arrival in under 60 minutes.
                     </p>
 
-                    {/* Subtle Glow Effects */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
                       <div className="absolute top-0 right-10 w-50 h-50 bg-[#FF5A5F]/33 rounded-full blur-[66px]" />
                     </div>
 
-                    <div className="flex flex-wrap gap-3 mt-auto">
-                      <button className="bg-[#FF5A5F] hover:bg-[#e04a4f] px-8 py-3.5 rounded-full font-semibold flex items-center gap-2 transition">
+                    <div className="flex flex-col md:flex-row gap-3 mt-auto">
+                      <button className="bg-[#FF5A5F] hover:bg-[#e04a4f] px-8 py-3.5 rounded-full font-semibold flex items-center gap-2 max-w-[200px] transition">
                         <Phone className="w-5 h-5" />
                         {service.ctaText || "Call Hotline"}
                       </button>
-                      <button className="border border-white/40 hover:bg-white/10 px-8 py-3.5 rounded-full font-semibold transition">
+                      <button className="border border-white/40 max-w-[180px] hover:bg-white/10 px-8 py-3.5 rounded-full font-semibold transition">
                         Chat Now
                       </button>
                     </div>
 
-                    {/* 60 Minute Badge */}
                     <div className="absolute bottom-8 right-8 text-right">
                       <div className="text-7xl font-bold text-[#FF5A5F] leading-none">
                         60
@@ -117,18 +141,15 @@ export function SpecializedServices() {
                         MINUTE ARRIVAL
                       </div>
                     </div>
-                  </motion.div>
-                </div>
+                  </div>
+                </motion.div>
               );
             }
 
-            // Normal Service Cards
             return (
               <motion.div
                 key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                variants={itemVariants}
                 className={`bg-white z-10 border border-slate-100 rounded-3xl p-4 md:p-6 hover:shadow-xl transition-all group ${
                   index === 0 ? "md:col-span-8" : "md:col-span-4"
                 }`}
@@ -157,7 +178,6 @@ export function SpecializedServices() {
                       </span>
                     </div>
                   )}
-
                   <button className="bg-[#FF5A5F] hover:bg-[#e04a4f] text-white px-6 py-2.5 rounded-full text-sm font-semibold transition">
                     Book Now
                   </button>
@@ -165,7 +185,7 @@ export function SpecializedServices() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

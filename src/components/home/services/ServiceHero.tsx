@@ -71,7 +71,6 @@ const ServiceHero = () => {
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const router = useRouter();
-  
 
   const categoryOptions = categories.map((cat) => ({
     value: cat.slug,
@@ -92,7 +91,6 @@ const ServiceHero = () => {
   } as const;
 
   const { scrollY } = useScroll();
-  // Visual scroll-driven handoff to the header search bar
   const searchOpacity = useTransform(scrollY, [0, 200], [1, 0]);
   const searchScale = useTransform(scrollY, [0, 200], [1, 0.85]);
   const searchY = useTransform(scrollY, [0, 200], [0, -60]);
@@ -105,9 +103,7 @@ const ServiceHero = () => {
       if (location) params.push(`location=${encodeURIComponent(location)}`);
       if (selectedDate)
         params.push(`date=${selectedDate.format("YYYY-MM-DD")}`);
-      if (params.length > 0) {
-        url += `?${params.join("&")}`;
-      }
+      if (params.length > 0) url += `?${params.join("&")}`;
       router.push(url);
     } else {
       router.push("/categories/ac-repair");
@@ -118,16 +114,24 @@ const ServiceHero = () => {
     <section className="bg-gradient-to-br from-[#fff0ef] via-white to-[#fff7f7] py-10 md:py-16 px-4 sm:px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Badge */}
-        <div className="flex justify-center mb-5">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex justify-center mb-5"
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#ffe1e2] shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a5f]" />
             <span className="text-xs font-semibold text-[#ff5a5f]">
               Trusted Home Services in Bangladesh
             </span>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="text-center max-w-lg mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-lg mx-auto"
+        >
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#1a1a1a] leading-tight mb-3 max-w-3xl mx-auto lg:mx-0">
             Find the Best Home <span className="text-primary"> Services </span>{" "}
             for Your Lifestyle
@@ -136,11 +140,13 @@ const ServiceHero = () => {
             Premium, reliable, and effortless home service solutions across
             Bangladesh.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Animated Floating Search Bar Card with Handoff Scroll Control */}
+        {/* Animated Floating Search Bar Card */}
         <motion.form
           variants={itemVariants}
+          initial="hidden"
+          animate="visible"
           style={{
             opacity: searchOpacity,
             scale: searchScale,
@@ -149,7 +155,6 @@ const ServiceHero = () => {
           onSubmit={handleSearch}
           className="w-full max-w-3xl mx-auto bg-white rounded-2xl md:rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 p-3 flex flex-col md:flex-row items-center gap-3 md:gap-0"
         >
-          {/* Category Dropdown Select */}
           <div className="flex items-center gap-3 flex-1 w-full px-4 py-2 md:py-1 relative">
             <Search className="text-slate-400 w-5 h-5 flex-shrink-0" />
             <CustomSelect
@@ -162,10 +167,8 @@ const ServiceHero = () => {
             />
           </div>
 
-          {/* Vertical Separator */}
           <div className="hidden md:block h-8 w-px bg-slate-200" />
 
-          {/* Location Text Input */}
           <div className="flex items-center gap-3 flex-1 w-full px-4 py-2 md:py-1">
             <MapPin className="text-slate-400 w-5 h-5 flex-shrink-0" />
             <input
@@ -177,10 +180,8 @@ const ServiceHero = () => {
             />
           </div>
 
-          {/* Vertical Separator */}
           <div className="hidden md:block h-8 w-px bg-slate-200" />
 
-          {/* Date Picker Popover Trigger */}
           <div className="flex items-center gap-3 flex-1 w-full px-4 py-2 md:py-1 relative">
             <div
               onClick={() => setShowCalendar(!showCalendar)}
@@ -213,7 +214,6 @@ const ServiceHero = () => {
               </>
             )}
           </div>
-          {/* Book Now Action Button */}
           <Button
             type="submit"
             className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white font-bold px-8 py-3.5 h-auto rounded-xl md:rounded-full transition-all duration-200 shadow-sm active:scale-95 text-base flex-shrink-0 cursor-pointer"
@@ -223,7 +223,12 @@ const ServiceHero = () => {
         </motion.form>
 
         {/* Trust badges */}
-        <div className="flex flex-wrap justify-center items-center gap-4 my-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-wrap justify-center items-center gap-4 my-8"
+        >
           {[
             ["⭐", "4.9 Customer Rating"],
             ["👨‍🔧", "500+ Professionals"],
@@ -236,10 +241,15 @@ const ServiceHero = () => {
               </span>
             </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Quick-nav category pills */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap justify-center gap-2"
+        >
           {categories.map((cat, i) => (
             <Link
               key={i}
@@ -249,7 +259,7 @@ const ServiceHero = () => {
               {cat.label}
             </Link>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,6 +1,5 @@
-import {
-  Check,
-} from "lucide-react";
+"use client";
+import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 const packages = [
@@ -51,26 +50,49 @@ const packages = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.15 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export function Packages() {
   return (
-    <section className="py-16">
+    <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="text-center mb-12">
+        {/* Animated Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
           <h2 className="text-4xl font-bold text-slate-900">
             Exclusive Home Security Packages
           </h2>
           <p className="text-slate-600 mt-2">
             Save more with our bundled security solutions.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Animated Grid */}
+        <motion.div
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
           {packages.map((pkg, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              variants={itemVariants}
               className={`rounded-3xl p-8 relative flex flex-col h-full transition-all hover:-translate-y-1 ${
                 pkg.variant === "popular"
                   ? "border-2 border-[#FF5A5F] bg-rose-50/50 shadow-xl"
@@ -142,7 +164,7 @@ export function Packages() {
               </button>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

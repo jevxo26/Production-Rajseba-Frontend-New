@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, SlidersHorizontal, Map as MapIcon, List as ListIcon, Info, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {AnimatePresence, motion} from "framer-motion"
 
 // Component imports
 import DhakaMap from "@/components/home/map/DhakaMap";
@@ -192,12 +193,15 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Services");
   const [selectedExpertId, setSelectedExpertId] = useState<string>("zaman-ac");
-  
+
   // Filters State
   const [sortBy, setSortBy] = useState("Recommended");
   const [priceRange, setPriceRange] = useState({ min: 500, max: 10000 });
   const [minRating, setMinRating] = useState<number | null>(4.0);
-  const [tempPriceRange, setTempPriceRange] = useState({ min: 500, max: 10000 });
+  const [tempPriceRange, setTempPriceRange] = useState({
+    min: 500,
+    max: 10000,
+  });
   const [tempMinRating, setTempMinRating] = useState<number | null>(4.0);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
 
@@ -232,7 +236,10 @@ export default function MapPage() {
   // Filter & Sort Logic
   const getFilteredExperts = () => {
     return EXPERTS_DATA.filter((expert) => {
-      if (selectedCategory !== "All Services" && expert.category !== selectedCategory) {
+      if (
+        selectedCategory !== "All Services" &&
+        expert.category !== selectedCategory
+      ) {
         return false;
       }
       if (searchQuery) {
@@ -265,12 +272,55 @@ export default function MapPage() {
     if (selectedExpert && mapContainerRef.current) {
       const containerWidth = mapContainerRef.current.clientWidth;
       const containerHeight = mapContainerRef.current.clientHeight;
-      const targetX = -(selectedExpert.coords.x - 50) * (containerWidth / 100) * zoom;
-      const targetY = -(selectedExpert.coords.y - 50) * (containerHeight / 100) * zoom;
+      const targetX =
+        -(selectedExpert.coords.x - 50) * (containerWidth / 100) * zoom;
+      const targetY =
+        -(selectedExpert.coords.y - 50) * (containerHeight / 100) * zoom;
       setPan({ x: targetX, y: targetY });
     }
   }, [selectedExpertId, zoom]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut" as const, // This tells TS that the string is a valid Easing type
+      },
+    },
+  };
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15, // This creates the "one by one" delay
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut" as const,
+    },
+  },
+};
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
       <div className="flex-1 flex flex-col relative">
@@ -313,18 +363,30 @@ export default function MapPage() {
         {activeTab === "list" && (
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 lg:py-20 flex-1 w-full">
             {/* Header Layout Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-10">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-wide">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 md:mb-10"
+            >
+              <div className="flex flex-col overflow-hidden">
+                <motion.h1
+                  variants={itemVariants}
+                  className="text-2xl md:text-3xl font-bold text-foreground mb-4 tracking-wide"
+                >
                   Available Experts
-                </h1>
-                <p className="text-slate-500 mt-2 text-sm md:text-base">
+                </motion.h1>
+
+                <motion.p
+                  variants={itemVariants}
+                  className="text-slate-500 text-sm md:text-base"
+                >
                   Discover top-rated professionals in Dhaka for your home needs.
-                </p>
+                </motion.p>
               </div>
 
               {/* View Switcher Toggle */}
-              <div className="bg-slate-100 p-1 rounded-full flex items-center w-40 self-start md:self-auto border border-slate-200/50 shadow-xs">
+              <div className="bg-slate-100 p-1 rounded-full flex items-center w-40 self-end md:self-auto border border-slate-200/50 shadow-sm">
                 <Button
                   variant="ghost"
                   onClick={() => setActiveTab("map")}
@@ -341,7 +403,7 @@ export default function MapPage() {
                   List
                 </Button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Split layout grid */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
@@ -379,47 +441,75 @@ export default function MapPage() {
               </div>
 
               {/* Experts cards list wrapper */}
-              <div className="col-span-1 lg:col-span-3 space-y-6">
+              <motion.div
+                variants={listVariants}
+                initial="hidden"
+                animate="visible"
+                className="col-span-1 lg:col-span-3 space-y-6"
+              >
                 {filteredExperts.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+                  <motion.div
+                    key="no-experts"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    className="text-center py-20 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm"
+                  >
                     <Info className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                     <h3 className="text-lg font-bold text-slate-800">
                       No available experts
                     </h3>
                     <p className="text-sm text-slate-500 mt-2">
-                      Adjust your price values or minimum rating thresholds to
-                      discover results.
+                      Adjust your filters to discover results.
                     </p>
                     <Button
                       onClick={handleClearFilters}
-                      className="mt-6 px-6 py-2.5 h-auto bg-[#FF5A5F] text-white font-bold rounded-xl text-sm shadow-xs hover:bg-[#FF4449] transition-colors cursor-pointer"
+                      className="mt-6 bg-[#FF5A5F] hover:bg-[#FF4449] text-white font-bold rounded-xl"
                     >
                       Clear Filters
                     </Button>
-                  </div>
+                  </motion.div>
                 ) : (
-                  filteredExperts.map((expert) => (
-                    <ExpertCard
-                      key={expert.id}
-                      expert={expert}
-                      onViewDetails={() => setDetailExpert(expert)}
-                    />
-                  ))
+                  <AnimatePresence mode="popLayout">
+                    {filteredExperts.map((expert) => (
+                      <motion.div
+                        key={expert.id}
+                        variants={cardVariants}
+                        layout
+                        initial="hidden"
+                        animate="visible"
+                        exit={{
+                          opacity: 0,
+                          y: 20,
+                          transition: { duration: 0.2 },
+                        }}
+                      >
+                        <ExpertCard
+                          expert={expert}
+                          onViewDetails={() => setDetailExpert(expert)}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
 
                 {/* Load More Trigger */}
                 {filteredExperts.length > 0 && (
-                  <div className="flex justify-center pt-6">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-center pt-6"
+                  >
                     <Button
                       variant="outline"
-                      className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 font-bold text-sm border border-slate-200 rounded-full px-6 py-3 h-auto bg-white hover:bg-slate-50 transition-colors shadow-xs cursor-pointer"
+                      className="flex items-center gap-1.5 font-bold text-sm rounded-full px-6 py-3 h-auto"
                     >
                       Load More Experts
                       <ChevronRight className="w-4 h-4 rotate-90" />
                     </Button>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </div>
           </div>
         )}

@@ -2,7 +2,13 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, CreditCard, Award, Headset, ThumbsUp } from "lucide-react";
+import {
+  ShieldCheck,
+  CreditCard,
+  Award,
+  Headset,
+  ThumbsUp,
+} from "lucide-react";
 
 const WHY_CHOOSE_US_CONTENT = {
   title: "Why Choose Us",
@@ -35,20 +41,31 @@ const WHY_CHOOSE_US_CONTENT = {
   ],
 };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 },
-  },
-} as const;
-
-const itemVariants = {
+// Animation Variants
+const headerVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 70, damping: 14 },
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 75, damping: 14 },
   },
 } as const;
 
@@ -57,15 +74,23 @@ export default function WhyChooseUs() {
     <div className="bg-transparent mt-15 py-8 md:py-12 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="mb-10 md:mb-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-            <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
-            {WHY_CHOOSE_US_CONTENT.title}
-          </h2>
+          <motion.div
+            variants={headerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
+              <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
+              {WHY_CHOOSE_US_CONTENT.title}
+            </h2>
 
-          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
-            {WHY_CHOOSE_US_CONTENT.subtitle}
-          </p>
+            <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+              {WHY_CHOOSE_US_CONTENT.subtitle}
+            </p>
+          </motion.div>
         </div>
+
         {/* Features Grid */}
         <motion.div
           variants={containerVariants}
@@ -79,7 +104,7 @@ export default function WhyChooseUs() {
             return (
               <motion.div
                 key={feature.title}
-                variants={itemVariants}
+                variants={cardVariants}
                 whileHover={{ y: -8, scale: 1.025 }}
                 whileTap={{ scale: 0.97 }}
                 className="

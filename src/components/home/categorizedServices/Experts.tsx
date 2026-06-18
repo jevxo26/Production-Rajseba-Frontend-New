@@ -1,7 +1,5 @@
-import {
-  Star,
-  CheckCircle,
-} from "lucide-react";
+"use client";
+import { Star, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const experts = [
@@ -57,28 +55,32 @@ const experts = [
 
 export function Experts() {
   return (
-    <section className="py-16">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 overflow-hidden">
-        <div className="text-center mb-12">
+    <section className="py-8 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+        {/* Animated Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
           <h2 className="text-4xl font-bold text-slate-900">
             Meet Our Top Rated Experts
           </h2>
-        </div>
+        </motion.div>
 
         {/* Marquee Container */}
-        <div className="relative">
+        <div className="relative max-w-full overflow-hidden">
           <motion.div
             className="flex gap-6"
-            animate={{
-              x: [0, -50 * experts.length * 1.1], // Move left continuously
-            }}
+            animate={{ x: ["0%", "-50%"] }}
             transition={{
-              duration: 10, // Adjust speed here (higher = slower)
+              duration: 40,
               repeat: Infinity,
               ease: "linear",
             }}
           >
-            {[...experts, ...experts, ...experts].map((expert, index) => (
+            {[...experts, ...experts].map((expert, index) => (
               <div key={index} className="min-w-[280px] flex-shrink-0">
                 <div className="bg-[#fff9f8] rounded-3xl p-8 text-center hover:shadow-xl hover:scale-105 hover:-translate-y-2 transition-all duration-300 group h-full">
                   <div className="w-12 h-12 mx-auto mb-6 bg-green-100 rounded-2xl flex items-center justify-center">

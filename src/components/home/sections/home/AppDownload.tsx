@@ -44,7 +44,7 @@ export default function AppDownload() {
                 <motion.button
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-3 bg-white text-[#FF5A5F] hover:bg-slate-100 px-6 py-3.5 rounded-2xl transition-all shadow-lg"
+                  className="flex items-center z-10 gap-3 bg-white text-[#FF5A5F] hover:bg-slate-100 px-6 py-3.5 rounded-2xl transition-all shadow-lg"
                 >
                   <Smartphone className="w-6 h-6" />
                   <div className="text-left text-sm">
@@ -56,7 +56,7 @@ export default function AppDownload() {
                 <motion.button
                   whileHover={{ scale: 1.06 }}
                   whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-3 bg-primary text-white  px-6 py-3.5 rounded-2xl transition-all shadow-lg"
+                  className="flex items-center z-10 gap-3 bg-primary text-white  px-6 py-3.5 rounded-2xl transition-all shadow-lg"
                 >
                   <Download className="w-6 h-6" />
                   <div className="text-left text-sm">
@@ -75,7 +75,7 @@ export default function AppDownload() {
               whileInView={{ opacity: 1, y: 0, rotate: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
-              className="lg:w-5/12 flex justify-center"
+              className="lg:w-5/12 flex justify-center absolute top-50 right-0 md:top-25 lg:relative lg:top-0"
             >
               <div className="relative w-[200px] h-[400px] bg-slate-900 rounded-[2.8rem] border-[11px] border-slate-800 shadow-2xl overflow-hidden hover:-rotate-10 transition-transform duration-500">
                 {/* Notch */}

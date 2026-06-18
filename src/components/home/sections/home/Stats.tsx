@@ -1,15 +1,58 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
-import { Users, Wrench, Star, ShieldCheck, TrendingUp, BarChart3 } from 'lucide-react';
+
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Users,
+  Wrench,
+  Star,
+  ShieldCheck,
+  TrendingUp,
+  BarChart3,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 const stats = [
-  { id: 1, label: 'Happy Customers', value: 50000, suffix: '+', display: '50,000+', icon: Users },
-  { id: 2, label: 'Services Completed', value: 120000, suffix: '+', display: '120,000+', icon: Wrench },
-  { id: 3, label: 'Verified Experts', value: 2500, suffix: '+', display: '2,500+', icon: ShieldCheck },
-  { id: 4, label: 'Average Rating', value: 4.8, suffix: '/5', display: '4.8/5', icon: Star, isDecimal: true },
+  {
+    id: 1,
+    label: "Happy Customers",
+    value: 50000,
+    suffix: "+",
+    display: "50,000+",
+    icon: Users,
+  },
+  {
+    id: 2,
+    label: "Services Completed",
+    value: 120000,
+    suffix: "+",
+    display: "120,000+",
+    icon: Wrench,
+  },
+  {
+    id: 3,
+    label: "Verified Experts",
+    value: 2500,
+    suffix: "+",
+    display: "2,500+",
+    icon: ShieldCheck,
+  },
+  {
+    id: 4,
+    label: "Average Rating",
+    value: 4.8,
+    suffix: "/5",
+    display: "4.8/5",
+    icon: Star,
+    isDecimal: true,
+  },
 ];
 
-function useCountUp(target: number, duration: number = 2000, isDecimal = false, triggered = false) {
+function useCountUp(
+  target: number,
+  duration: number = 2000,
+  isDecimal = false,
+  triggered = false,
+) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -20,7 +63,6 @@ function useCountUp(target: number, duration: number = 2000, isDecimal = false, 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = isDecimal
         ? parseFloat((eased * target).toFixed(1))
@@ -35,24 +77,38 @@ function useCountUp(target: number, duration: number = 2000, isDecimal = false, 
   return count;
 }
 
-function StatCard({ stat, triggered }: { stat: typeof stats[0]; triggered: boolean }) {
+function StatCard({
+  stat,
+  triggered,
+}: {
+  stat: (typeof stats)[0];
+  triggered: boolean;
+}) {
   const count = useCountUp(stat.value, 2200, stat.isDecimal, triggered);
 
   const formatNumber = (n: number) => {
     if (stat.isDecimal) return n.toFixed(1);
-    return n.toLocaleString('en-US');
+    return n.toLocaleString("en-US");
   };
 
   return (
-    <div className="flex flex-col items-center group">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="flex flex-col items-center group"
+    >
       <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
         <stat.icon className="w-8 h-8 text-[#FF5A5F]" />
       </div>
       <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tabular-nums">
-        {triggered ? `${formatNumber(count)}${stat.suffix}` : '0'}
+        {triggered ? `${formatNumber(count)}${stat.suffix}` : "0"}
       </h3>
-      <p className="text-slate-500 font-medium text-sm md:text-base">{stat.label}</p>
-    </div>
+      <p className="text-slate-500 font-medium text-sm md:text-base">
+        {stat.label}
+      </p>
+    </motion.div>
   );
 }
 
@@ -71,7 +127,7 @@ export default function Stats() {
           observer.disconnect();
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.25 },
     );
 
     observer.observe(el);
@@ -81,9 +137,14 @@ export default function Stats() {
   return (
     <div className="py-8 md:py-12 mt-15 bg-transparent relative" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
-
         {/* Title */}
-        <div className="mb-10 md:mb-12 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-10 md:mb-12 text-center"
+        >
           <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
             <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
             Our Platform Impact
@@ -92,13 +153,23 @@ export default function Stats() {
           <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             Providing top-notch home services with trust and excellence
           </p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={{
+            visible: {
+              transition: { staggerChildren: 0.1 },
+            },
+          }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center"
+        >
           {stats.map((stat) => (
             <StatCard key={stat.id} stat={stat} triggered={triggered} />
           ))}
-        </div>
-
+        </motion.div>
       </div>
     </div>
   );

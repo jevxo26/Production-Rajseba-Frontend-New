@@ -42,12 +42,14 @@ export default function CategoryDetailPage({
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
+      <div className='space-y-12 md:space-y-16 lg:space-y-20'>
         <CategorizedHero/>
         <SpecializedServices />
         <Packages />
         <Experts />
         <Commitments />
         <CustomerFeedback />
+      </div>
     </div>
   );
 }

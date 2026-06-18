@@ -1,17 +1,19 @@
-import {
-  Zap,
-  ShieldCheck,
-} from "lucide-react";
+"use client";
+import { Zap, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
-
 
 export function CategorizedHero() {
   return (
-    <div className="py-12 md:py-16 relative overflow-hidden">
+    <div className="py-12 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col gap-8 md:flex-row justify-between items-center">
           {/* Left Content */}
-          <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
             {/* Urgent Badge */}
             <div className="inline-flex items-center gap-2 bg-[#fff0f0] text-[#ff5a5f] px-4 py-1.5 rounded-full text-sm font-semibold">
               <Zap className="w-4 h-4" />
@@ -50,15 +52,25 @@ export function CategorizedHero() {
                 View Rate Card
               </motion.button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Side - ISO Certified Card */}
-          <div className="relative">
-            <div className="bg-rose-100 w-55 h-55 md:w-77 md:h-77 lg:w-111 lg:h-111 rounded-2xl" />
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="relative"
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="bg-rose-100 w-55 h-55 md:w-77 md:h-77 lg:w-111 lg:h-111 rounded-2xl"
+            />
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
               className="bg-white absolute -bottom-5 left-1/2 -translate-x-1/2 md:left-22 lg:left-33 rounded-3xl shadow-xl p-6 md:p-8 w-full max-w-[340px] border border-slate-100"
             >
               <div className="flex items-center gap-4">
@@ -71,7 +83,7 @@ export function CategorizedHero() {
                 </div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

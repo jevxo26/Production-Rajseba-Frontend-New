@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Star, MessageSquare } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Expanded mock feedback (10 total)
 const CUSTOMER_FEEDBACK_CONTENT = {
   title: "Customer's Feedback",
   subtitle: "See what our lovely clients say about our professional services",
@@ -56,38 +56,6 @@ const CUSTOMER_FEEDBACK_CONTENT = {
       avatar:
         "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop",
     },
-    {
-      name: "Shahriar Kabir",
-      location: "Dhanmondi, Dhaka",
-      rating: 5,
-      text: '"My fridge stopped cooling suddenly. The technician arrived within an hour and fixed the compressor issue right away."',
-      avatar:
-        "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?q=80&w=150&auto=format&fit=crop",
-    },
-    {
-      name: "Lamia Sultana",
-      location: "Banani, Dhaka",
-      rating: 5,
-      text: '"Garden maintenance service was wonderful. They trimmed, replanted, and gave great tips on watering schedules."',
-      avatar:
-        "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?q=80&w=150&auto=format&fit=crop",
-    },
-    {
-      name: "Mahin Chowdhury",
-      location: "Mohakhali, Dhaka",
-      rating: 5,
-      text: '"Carpentry work for my new wardrobe was top notch. Clean finishing and delivered exactly on the promised date."',
-      avatar:
-        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop",
-    },
-    {
-      name: "Rumana Islam",
-      location: "Gulshan, Dhaka",
-      rating: 5,
-      text: '"Plumbing leak under the sink was fixed within 30 minutes. Polite technician and very fair pricing for the work done."',
-      avatar:
-        "https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=150&auto=format&fit=crop",
-    },
   ],
 };
 
@@ -108,10 +76,6 @@ const CustomerFeedback = () => {
   const maxIndex = N - cardsToShow;
 
   useEffect(() => {
-    if (activeIndex > maxIndex) setActiveIndex(maxIndex);
-  }, [cardsToShow, maxIndex]);
-
-  useEffect(() => {
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 5000);
@@ -119,12 +83,15 @@ const CustomerFeedback = () => {
   }, [maxIndex]);
 
   return (
-    <div className="py-12 md:py-16">
-      {" "}
-      {/* Removed overflow-hidden */}
+    <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        {/* Header */}
-        <div className="mb-10 text-center">
+        {/* Animated Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-12 text-center"
+        >
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="p-2 rounded-full bg-rose-50">
               <MessageSquare className="w-6 h-6 text-[#FF5A5F]" />
@@ -136,12 +103,15 @@ const CustomerFeedback = () => {
           <p className="text-slate-500 max-w-xl mx-auto">
             {CUSTOMER_FEEDBACK_CONTENT.subtitle}
           </p>
-        </div>
+        </motion.div>
 
-        {/* Carousel Container - Only overflow-hidden here */}
-        <div className="relative overflow-hidden rounded-3xl">
-          {" "}
-          {/* Keep only on the slider wrapper */}
+        {/* Carousel Container */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="relative overflow-hidden rounded-3xl"
+        >
           <div
             className="flex transition-transform duration-700 ease-out"
             style={{
@@ -150,7 +120,7 @@ const CustomerFeedback = () => {
           >
             {feedback.map((item, idx) => (
               <div key={idx} className="w-full sm:w-1/2 lg:w-1/3 shrink-0 px-3">
-                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm flex flex-col mb-4 hover:shadow-md transition-all duration-300">
+                <div className="bg-white rounded-3xl p-8 shadow-sm flex flex-col h-full border border-slate-100 hover:shadow-md transition-all duration-300">
                   <div className="flex items-center gap-4 mb-6">
                     <img
                       src={item.avatar}
@@ -172,17 +142,16 @@ const CustomerFeedback = () => {
                       </div>
                     </div>
                   </div>
-
-                  <p className="text-slate-600 leading-relaxed text-[15px]">
+                  <p className="text-slate-600 leading-relaxed text-[15px] italic">
                     {item.text}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
@@ -12,9 +12,17 @@ import {
   TrendingUp,
   X,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { FaBolt, FaBug, FaFaucet, FaLeaf, FaPaintRoller, FaTv } from "react-icons/fa";
+import {
+  FaBolt,
+  FaBug,
+  FaFaucet,
+  FaLeaf,
+  FaPaintRoller,
+  FaTv,
+} from "react-icons/fa";
 import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
 import { TbAirConditioning, TbScissors, TbTruck } from "react-icons/tb";
 
@@ -75,7 +83,12 @@ const categories = [
     slug: "home-salon",
     icon: TbScissors,
   },
-  { id: "carpentry", label: "Carpentry", slug: "carpentry", icon: FaPaintRoller },
+  {
+    id: "carpentry",
+    label: "Carpentry",
+    slug: "carpentry",
+    icon: FaPaintRoller,
+  },
 ];
 
 const RATING_OPTIONS = [
@@ -120,13 +133,14 @@ function ToggleSwitch({
       onClick={onChange}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${checked ? "bg-[#ff5a5f]" : "bg-[#e5e7eb]"}`}
     >
-      <span
+      <motion.span
+        layout
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
         className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${checked ? "translate-x-6" : "translate-x-1"}`}
       />
     </button>
   );
 }
-
 
 const PRICE_FLOOR = 500;
 const PRICE_CEIL = 5000;
@@ -186,16 +200,21 @@ export default function FilterPanel({
     });
   });
 
-
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
 
       <aside
         className={`
@@ -245,21 +264,28 @@ export default function FilterPanel({
         {/* Active chips */}
         {chips.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-5">
-            {chips.map((chip, i) => (
-              <span
-                key={i}
-                className="flex items-center gap-1 pl-3 pr-2 py-1 rounded-full bg-[#fff0ef] text-[#ff5a5f] text-xs font-semibold border border-[#ffd0d1]"
-              >
-                {chip.label}
-                <button
-                  type="button"
-                  onClick={chip.onRemove}
-                  className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#ff5a5f]/20 transition-colors"
+            <AnimatePresence initial={false}>
+              {chips.map((chip, i) => (
+                <motion.span
+                  key={chip.label}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center gap-1 pl-3 pr-2 py-1 rounded-full bg-[#fff0ef] text-[#ff5a5f] text-xs font-semibold border border-[#ffd0d1]"
                 >
-                  <X size={10} strokeWidth={3} />
-                </button>
-              </span>
-            ))}
+                  {chip.label}
+                  <button
+                    type="button"
+                    onClick={chip.onRemove}
+                    className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-[#ff5a5f]/20 transition-colors"
+                  >
+                    <X size={10} strokeWidth={3} />
+                  </button>
+                </motion.span>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 
@@ -273,9 +299,10 @@ export default function FilterPanel({
               const Icon = cat.icon;
               const isActive = activeCategory === cat.id;
               return (
-                <button
+                <motion.button
                   key={cat.id}
                   type="button"
+                  whileTap={{ scale: 0.95 }}
                   onClick={() =>
                     setFilters({
                       activeCategory: isActive ? "all" : cat.id,
@@ -286,7 +313,7 @@ export default function FilterPanel({
                 >
                   <Icon size={14} strokeWidth={2.5} className="shrink-0" />
                   <span className="truncate">{cat.label}</span>
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -303,9 +330,10 @@ export default function FilterPanel({
             </span>
           </div>
           <div className="relative h-1.5 bg-[#e5e7eb] rounded-full mb-3">
-            <div
+            <motion.div
               className="absolute h-full bg-[#ff5a5f] rounded-full"
-              style={{ width: `${fillPct}%` }}
+              animate={{ width: `${fillPct}%` }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             />
             <input
               type="range"
@@ -385,9 +413,10 @@ export default function FilterPanel({
               const Icon = opt.icon;
               const isActive = sortBy === opt.value;
               return (
-                <button
+                <motion.button
                   key={opt.value}
                   type="button"
+                  whileTap={{ scale: 0.97 }}
                   onClick={() =>
                     setFilters({ sortBy: opt.value, currentPage: 1 })
                   }
@@ -397,8 +426,16 @@ export default function FilterPanel({
                     <Icon size={14} strokeWidth={2.5} />
                     {opt.label}
                   </span>
-                  {isActive && <Check size={14} strokeWidth={3} />}
-                </button>
+                  {isActive && (
+                    <motion.span
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <Check size={14} strokeWidth={3} />
+                    </motion.span>
+                  )}
+                </motion.button>
               );
             })}
           </div>
@@ -443,13 +480,14 @@ export default function FilterPanel({
 
         {/* Mobile Apply button */}
         <div className="md:hidden sticky bottom-0 bg-white pt-4 mt-5 -mx-5 px-5 border-t border-[#f3f4f6]">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.95 }}
             onClick={onClose}
-            className="w-full py-3 rounded-xl bg-[#ff5a5f] text-white font-bold text-sm shadow-lg hover:bg-[#e04a4f] active:scale-95 transition-all"
+            className="w-full py-3 rounded-xl bg-[#ff5a5f] text-white font-bold text-sm shadow-lg hover:bg-[#e04a4f] transition-all"
           >
             Show {resultCount} result{resultCount !== 1 ? "s" : ""}
-          </button>
+          </motion.button>
         </div>
       </aside>
     </>

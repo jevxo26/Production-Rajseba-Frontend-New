@@ -35,17 +35,27 @@ export default function CustomQuote({
         className="bg-gradient-to-br from-primary/10 to-primary/30 rounded-3xl p-8 md:p-12 lg:p-16 flex flex-col md:flex-row items-center justify-between gap-8 border border-[#ffd0d1] shadow-sm"
       >
         {/* Left Content */}
-        <div className="flex-1 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="flex-1 space-y-4"
+        >
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#ff5a5f] leading-tight">
             {title}
           </h2>
           <p className="text-slate-600 leading-relaxed max-w-md text-[15px]">
             {description}
           </p>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto"
+        >
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -65,7 +75,7 @@ export default function CustomQuote({
             <Phone className="w-5 h-5" />
             {secondaryButtonText}
           </motion.button>
-        </div>
+        </motion.div>
       </motion.div>
     </section>
   );

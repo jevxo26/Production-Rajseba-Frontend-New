@@ -1,23 +1,28 @@
-"use client"
-import { ArrowRight, Star } from 'lucide-react';
-import { motion } from 'framer-motion';
+"use client";
+import { ArrowRight, Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <span className="flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
+    <span
+      className="flex items-center gap-0.5"
+      aria-label={`${rating} out of 5`}
+    >
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
           size={12}
           strokeWidth={0}
-          className={i <= Math.round(rating) ? 'fill-[#f59e0b]' : 'fill-[#e5e7eb]'}
+          className={
+            i <= Math.round(rating) ? "fill-[#f59e0b]" : "fill-[#e5e7eb]"
+          }
         />
       ))}
     </span>
   );
 }
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 interface TrendingService {
   id: string;
@@ -61,130 +66,140 @@ const TRENDING_SERVICES: TrendingService[] = [
 ];
 
 const TrendingServices = () => {
-
-    return (
-      <section className="py-14 bg-[#FFF0EF] relative overflow-hidden">
+  return (
+    <section className="py-14 bg-[#FFF0EF] relative overflow-hidden">
+      <motion.div
+        className="pointer-events-none z-0 absolute -right-10 -top-10 w-50 h-50 rounded-full bg-primary/10"
+        animate={{ scale: [1, 1.08, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         <motion.div
-          className="pointer-events-none z-0 absolute -right-10 -top-10 w-50 h-50 rounded-full bg-primary/10"
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-end justify-between mb-7">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold text-[#1a1a1a] border-b-2 border-[#ff5a5f] pb-1.5 inline-block">
-                Trending Services
-              </h2>
-              <p className="text-sm text-[#6b7280] mt-1">
-                Highly requested in Dhaka this month
-              </p>
-            </div>
-            <Link
-              href="#"
-              className="text-sm font-bold text-[#ff5a5f] no-underline hover:underline"
-            >
-              View all →
-            </Link>
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex items-end justify-between mb-7"
+        >
+          <div>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-[#1a1a1a] border-b-2 border-[#ff5a5f] pb-1.5 inline-block">
+              Trending Services
+            </h2>
+            <p className="text-sm text-[#6b7280] mt-1">
+              Highly requested in Dhaka this month
+            </p>
           </div>
+          <Link
+            href="#"
+            className="text-sm font-bold text-[#ff5a5f] no-underline hover:underline"
+          >
+            View all →
+          </Link>
+        </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-6">
-            {/* Featured card */}
-            {TRENDING_SERVICES.filter((s) => s.featured).map((service) => (
-              <div
-                key={service.id}
-                className="grid grid-cols-1 sm:grid-cols-2 bg-white rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <div className="relative min-h-[260px] sm:min-h-[auto] overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                  {service.badge && (
-                    <span className="absolute top-3 left-3 py-1.5 px-3 bg-[#8b1a1a] text-white text-[10px] font-bold tracking-wider rounded-lg uppercase">
-                      {service.badge}
-                    </span>
-                  )}
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-6">
+          {/* Featured card */}
+          {TRENDING_SERVICES.filter((s) => s.featured).map((service) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 bg-white rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            >
+              <div className="relative min-h-[260px] sm:min-h-[auto] overflow-hidden">
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+                {service.badge && (
+                  <span className="absolute top-3 left-3 py-1.5 px-3 bg-[#8b1a1a] text-white text-[10px] font-bold tracking-wider rounded-lg uppercase">
+                    {service.badge}
+                  </span>
+                )}
+              </div>
+              <div className="p-6 flex flex-col justify-center gap-3">
+                <div className="flex items-center gap-2">
+                  <StarRating rating={service.rating} />
+                  <span className="text-xs text-[#6b7280] font-semibold">
+                    ({service.rating} • {service.reviews} reviews)
+                  </span>
                 </div>
-                <div className="p-6 flex flex-col justify-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <StarRating rating={service.rating} />
-                    <span className="text-xs text-[#6b7280] font-semibold">
-                      ({service.rating} • {service.reviews} reviews)
-                    </span>
+                <h3 className="text-xl font-extrabold text-[#1a1a1a] m-0 leading-snug">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-[#6b7280] leading-relaxed m-0">
+                  {service.description}
+                </p>
+                <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#f3f4f6]">
+                  <div>
+                    <p className="text-[10px] font-bold text-[#9ca3af] tracking-widest uppercase mb-0.5">
+                      Starting from
+                    </p>
+                    <p className="text-xl text-primary font-extrabold text-[#1a1a1a] m-0">
+                      ৳{service.price.toLocaleString()}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-extrabold text-[#1a1a1a] m-0 leading-snug">
+                  <Link
+                    href={`/services/${service.id}`}
+                    className="px-5 py-2.5 bg-[#ff5a5f] text-white text-xs font-bold rounded-full no-underline hover:bg-[#e04a4f] transition-all shadow-md"
+                  >
+                    Book Now
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+
+          {/* Secondary cards */}
+          {TRENDING_SERVICES.filter((s) => !s.featured).map((service) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-white z-10 rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            >
+              <div className="relative h-44 overflow-hidden">
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+              <div className="p-5 flex flex-col flex-1 gap-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-base font-bold text-[#1a1a1a] m-0 leading-snug">
                     {service.title}
                   </h3>
-                  <p className="text-sm text-[#6b7280] leading-relaxed m-0">
-                    {service.description}
-                  </p>
-                  <div className="flex items-end justify-between mt-auto pt-4 border-t border-[#f3f4f6]">
-                    <div>
-                      <p className="text-[10px] font-bold text-[#9ca3af] tracking-widest uppercase mb-0.5">
-                        Starting from
-                      </p>
-                      <p className="text-xl text-primary font-extrabold text-[#1a1a1a] m-0">
-                        ৳{service.price.toLocaleString()}
-                      </p>
-                    </div>
-                    <Link
-                      href={`/services/${service.id}`}
-                      className="px-5 py-2.5 bg-[#ff5a5f] text-white text-xs font-bold rounded-full no-underline hover:bg-[#e04a4f] transition-all shadow-md"
-                    >
-                      Book Now
-                    </Link>
-                  </div>
+                  <span className="bg-[#fff8e1] text-[#b45309] px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap">
+                    ★ {service.rating}
+                  </span>
+                </div>
+                <p className="text-xs text-[#6b7280] leading-relaxed m-0 flex-1">
+                  {service.description}
+                </p>
+                <div className="flex items-center justify-between pt-3 border-t border-[#f3f4f6]">
+                  <span className="text-primary font-extrabold">
+                    ৳{service.price.toLocaleString()}
+                  </span>
+                  <Link
+                    href={`/services/${service.id}`}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f3f4f6] border-2 border-gray-300 text-[#4b5563] no-underline hover:bg-[#ff5a5f] hover:text-white transition-all text-base font-bold"
+                    aria-label={`View ${service.title}`}
+                  >
+                    <ArrowRight size={16} strokeWidth={3} />
+                  </Link>
                 </div>
               </div>
-            ))}
-
-            {/* Secondary cards */}
-            {TRENDING_SERVICES.filter((s) => !s.featured).map((service) => (
-              <div
-                key={service.id}
-                className="bg-white z-10 rounded-2xl overflow-hidden shadow-md border border-[#f3f4f6] flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <div className="relative h-44 overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-                <div className="p-5 flex flex-col flex-1 gap-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-base font-bold text-[#1a1a1a] m-0 leading-snug">
-                      {service.title}
-                    </h3>
-                    <span className="bg-[#fff8e1] text-[#b45309] px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap">
-                      ★ {service.rating}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#6b7280] leading-relaxed m-0 flex-1">
-                    {service.description}
-                  </p>
-                  <div className="flex items-center justify-between pt-3 border-t border-[#f3f4f6]">
-                    <span className="text-primary font-extrabold">
-                      ৳{service.price.toLocaleString()}
-                    </span>
-                    <Link
-                      href={`/services/${service.id}`}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-[#f3f4f6] border-2 border-gray-300 text-[#4b5563] no-underline hover:bg-[#ff5a5f] hover:text-white transition-all text-base font-bold"
-                      aria-label={`View ${service.title}`}
-                    >
-                      <ArrowRight size={16} strokeWidth={3} />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </div>
-      </section>
-    );
+      </div>
+    </section>
+  );
 };
 
 export default TrendingServices;

@@ -1,5 +1,7 @@
+"use client";
 import { ArrowLeft, ArrowRight, SlidersHorizontal } from "lucide-react";
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 import FilterPanel from "./FilterPanel";
 import ServiceCard from "./ServiceCard";
 
@@ -138,7 +140,7 @@ const SERVICE_LISTINGS: ServiceListing[] = [
 
 const PER_PAGE = 9;
 const PRICE_CEIL = 5000;
-
+const GRID_COLS = 3; // matches xl:grid-cols-3 (the widest breakpoint) for row grouping
 
 export default function ServiceListing({
   filters,
@@ -249,21 +251,31 @@ export default function ServiceListing({
     return n;
   }, [activeCategory, selectedRating, priceMax, selectedAvailability]);
 
+  // Row-based stagger timing: each row's cards animate together,
+  // and the next row only starts after the previous row's animation completes.
+  const CARD_DURATION = 0.45;
+  const ROW_GAP = 0.08; // small buffer between rows so they read as sequential, not abrupt
+
   return (
     <section className="">
-      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row gap-8">
-        <FilterPanel
-          isOpen={isFilterOpen}
-          onClose={() => setIsFilterOpen(false)}
-          filters={filters}
-          setFilters={setFilters}
-          ratingCounts={ratingCounts}
-          resultCount={filteredListings.length}
-          onClearAll={onClearAll}
-        />
+      <div className="flex flex-col md:flex-row gap-8">
+        <motion.div
+          initial={{ x: -60, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <FilterPanel
+            isOpen={isFilterOpen}
+            onClose={() => setIsFilterOpen(false)}
+            filters={filters}
+            setFilters={setFilters}
+            ratingCounts={ratingCounts}
+            resultCount={filteredListings.length}
+            onClearAll={onClearAll}
+          />
+        </motion.div>
 
         <div className="flex-1 min-w-0">
-          {/* Mobile filter trigger + result count */}
           <div className="flex items-center justify-between mb-5 md:hidden">
             <button
               type="button"
@@ -288,7 +300,6 @@ export default function ServiceListing({
             </span>
           </div>
 
-          {/* Desktop result count */}
           <div className="hidden md:flex items-center justify-between mb-5">
             <h2 className="text-2xl font-bold text-[#1a1a1a]">
               All Services
@@ -298,16 +309,38 @@ export default function ServiceListing({
             </h2>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {pagedItems.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
+          <motion.div
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"
+          >
+            {pagedItems.map((service, index) => {
+              const rowIndex = Math.floor(index / GRID_COLS);
+              const rowDelay = rowIndex * (CARD_DURATION + ROW_GAP);
+              return (
+                <motion.div
+                  key={service.id}
+                  layout
+                  initial={{ opacity: 0, x: 80 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 80 }}
+                  transition={{
+                    duration: CARD_DURATION,
+                    delay: rowDelay,
+                    ease: "easeOut",
+                  }}
+                >
+                  <ServiceCard service={service} />
+                </motion.div>
+              );
+            })}
+          </motion.div>
 
-          {/* Empty state */}
           {pagedItems.length === 0 && (
-            <div className="flex flex-col items-center justify-center text-center py-20 px-6 bg-white rounded-2xl border border-[#e5e7eb]">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center text-center py-20 px-6 bg-white rounded-2xl border border-[#e5e7eb]"
+            >
               <div className="w-12 h-12 rounded-full bg-[#fff0ef] flex items-center justify-center text-[#ff5a5f] mb-4">
                 <SlidersHorizontal size={20} strokeWidth={2.5} />
               </div>
@@ -324,10 +357,9 @@ export default function ServiceListing({
               >
                 Clear filters
               </button>
-            </div>
+            </motion.div>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-10">
               <button

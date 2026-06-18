@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Star, MessageSquare } from "lucide-react";
+import { motion } from "framer-motion";
 
 // Expanded mock reviews (10 total)
 const TESTIMONIALS_CONTENT = {
@@ -91,6 +92,25 @@ const TESTIMONIALS_CONTENT = {
   ],
 };
 
+const headerVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+} as const;
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring", stiffness: 70, damping: 14 },
+  },
+} as const;
+
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(1024);
@@ -120,11 +140,15 @@ const Testimonials = () => {
 
   return (
     <div className="py-12 md:py-16 mt-8">
-      {" "}
-      {/* Removed overflow-hidden */}
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Header */}
-        <div className="mb-10 text-center">
+        <motion.div
+          variants={headerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-10 text-center"
+        >
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="p-2 rounded-full bg-rose-50">
               <MessageSquare className="w-6 h-6 text-[#FF5A5F]" />
@@ -136,21 +160,23 @@ const Testimonials = () => {
           <p className="text-slate-500 max-w-md mx-auto">
             {TESTIMONIALS_CONTENT.subtitle}
           </p>
-        </div>
+        </motion.div>
 
-        {/* Carousel Container - Only overflow-hidden here */}
+        {/* Carousel Container */}
         <div className="relative overflow-hidden rounded-3xl">
-          {" "}
-          {/* Keep only on the slider wrapper */}
-          <div
+          <motion.div
             className="flex transition-transform duration-700 ease-out"
             style={{
               transform: `translateX(-${activeIndex * (100 / cardsToShow)}%)`,
             }}
           >
             {testimonials.map((test, idx) => (
-              <div
+              <motion.div
                 key={idx}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
                 className="w-full sm:w-1/2 lg:w-1/3 shrink-0 px-3"
               >
                 <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm flex flex-col mb-4 hover:shadow-md transition-all duration-300">
@@ -180,9 +206,9 @@ const Testimonials = () => {
                     {test.text}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

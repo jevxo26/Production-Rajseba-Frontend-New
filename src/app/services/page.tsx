@@ -1,6 +1,6 @@
 import CustomQuote from '@/components/home/services/CustomQuote';
 import ServiceHero from '@/components/home/services/ServiceHero';
-import ServiceLists from '@/components/home/services/ServiceLists';
+import ServiceLists from '@/components/home/services/AllServices';
 import TrendingServices from '@/components/home/services/TrendingServices';
 
 const Services = () => {
@@ -11,7 +11,7 @@ const Services = () => {
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
-      <div className="relative z-10 space-y-16 md:space-y-24 lg:space-y-32">
+      <div className="relative z-10 space-y-16 md:space-y-24 lg:space-y-30">
         <TrendingServices />
         <ServiceLists />
         <CustomQuote />

@@ -12,34 +12,47 @@ const HOW_IT_WORKS_CONTENT = {
     {
       stepNumber: "01",
       title: "Select Service",
-      description: "Choose from our wide range of premium, verified home services",
+      description:
+        "Choose from our wide range of premium, verified home services",
     },
     {
       stepNumber: "02",
       title: "Schedule",
-      description: "Pick a convenient date and time that fits perfectly in your schedule",
+      description:
+        "Pick a convenient date and time that fits perfectly in your schedule",
     },
     {
       stepNumber: "03",
       title: "Get Service",
-      description: "Relax while our certified expert takes care of everything professionally",
+      description:
+        "Relax while our certified expert takes care of everything professionally",
     },
     {
       stepNumber: "04",
       title: "Pay & Relax",
       description: "Pay securely after the service is done and leave a review",
-    }
-  ]
+    },
+  ],
 };
+
+// Animation Variants
+const headerVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+} as const;
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2
-    }
-  }
+      staggerChildren: 0.2,
+    },
+  },
 } as const;
 
 const nodeVariants = {
@@ -50,9 +63,9 @@ const nodeVariants = {
     transition: {
       type: "spring",
       stiffness: 80,
-      damping: 14
-    }
-  }
+      damping: 14,
+    },
+  },
 } as const;
 
 const HowItWorks = () => {
@@ -63,7 +76,13 @@ const HowItWorks = () => {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         {/* Header Block */}
-        <div className="mb-10 md:mb-12 text-center">
+        <motion.div
+          variants={headerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-10 md:mb-12 text-center"
+        >
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
             <Workflow className="w-6 h-6 md:w-8 md:h-8 text-[#FF5A5F]" />
             {HOW_IT_WORKS_CONTENT.title}
@@ -72,7 +91,7 @@ const HowItWorks = () => {
           <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
             {HOW_IT_WORKS_CONTENT.subtitle}
           </p>
-        </div>
+        </motion.div>
 
         {/* Timeline Path container */}
         <div className="relative">

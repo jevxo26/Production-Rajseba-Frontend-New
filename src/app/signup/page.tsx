@@ -189,36 +189,35 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen w-full overflow-hidden bg-white">
-
       {!isOtpSent ? (
         /* Step 1: Split-screen Signup Form */
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
           {/* Left Column: Form */}
           <div className="flex flex-col justify-between p-6 sm:p-12 min-h-screen relative overflow-hidden">
-
             {/* Background Watermark Pattern */}
             <div
-              className="absolute inset-0 pointer-events-none opacity-[0.14]"
-              style={{
-                backgroundImage: "url('/Group1.png')",
-                backgroundPosition: "center",
-                backgroundRepeat: "repeat",
-                backgroundSize: "850px"
-              }}
+              className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
+              style={{ backgroundSize: "auto" }}
             />
 
             {/* Brand Header with Premium Icon */}
             <div className="relative z-10">
-
-              <p className="text-sm text-gray-500 font-medium mt-2 leading-relaxed">
-                Create your account to access premium home services<br />instantly.
+              <Link href="/" className="inline-flex items-center gap-2.5 group">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/25 group-hover:shadow-rose-500/40 transition-all">
+                  <Sparkles size={20} className="stroke-[2.5]" />
+                </div>
+                <span className="font-extrabold text-[#FF565C] text-4xl tracking-tight">
+                  Rajseba
+                </span>
+              </Link>
+              <p className="text-sm text-gray-500 font-medium mt-4 leading-relaxed">
+                Create your account to access premium home services instantly.
               </p>
             </div>
 
             {/* Form */}
             <div className="w-full max-w-[420px] mx-auto py-10 relative z-10">
               <form onSubmit={handleSubmit} className="space-y-5">
-
                 {/* Full Name */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -226,7 +225,10 @@ export default function RegisterPage() {
                   </label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                      <User size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                      <User
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors"
+                      />
                     </div>
                     <input
                       type="text"
@@ -247,7 +249,10 @@ export default function RegisterPage() {
                   </label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                      <Mail size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                      <Mail
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors"
+                      />
                     </div>
                     <input
                       type="email"
@@ -268,7 +273,10 @@ export default function RegisterPage() {
                   </label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                      <Phone size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                      <Phone
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors"
+                      />
                     </div>
                     <input
                       type="tel"
@@ -292,13 +300,22 @@ export default function RegisterPage() {
                     className="w-4 h-4 rounded border-2 border-gray-300 text-[#FF565C] focus:ring-[#FF565C]/30 focus:ring-2 accent-[#FF565C] cursor-pointer"
                     required
                   />
-                  <label htmlFor="agreeTerms" className="text-xs text-gray-500 font-medium select-none cursor-pointer">
+                  <label
+                    htmlFor="agreeTerms"
+                    className="text-xs text-gray-500 font-medium select-none cursor-pointer"
+                  >
                     I agree to the{" "}
-                    <Link href="#" className="text-[#FF565C] hover:underline font-semibold">
+                    <Link
+                      href="#"
+                      className="text-[#FF565C] hover:underline font-semibold"
+                    >
                       Terms of Use
                     </Link>{" "}
                     and{" "}
-                    <Link href="#" className="text-[#FF565C] hover:underline font-semibold">
+                    <Link
+                      href="#"
+                      className="text-[#FF565C] hover:underline font-semibold"
+                    >
                       Privacy Policy
                     </Link>
                     .
@@ -326,11 +343,13 @@ export default function RegisterPage() {
             {/* Footer Login Info */}
             <div className="text-center text-sm text-gray-500 font-medium relative z-10 pt-4">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#FF565C] hover:underline font-bold ml-1">
+              <Link
+                href="/login"
+                className="text-[#FF565C] hover:underline font-bold ml-1"
+              >
                 Login
               </Link>
             </div>
-
           </div>
 
           {/* Right Column: Hero Cover (Desktop Only) */}
@@ -344,14 +363,17 @@ export default function RegisterPage() {
             {/* Trust Floating Card */}
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-[480px] px-6">
               <div className="bg-white/90 backdrop-blur-md p-6 rounded-[32px] border border-white/20 shadow-xl space-y-6">
-
                 <div className="flex gap-4 items-center">
                   <div className="w-14 h-14 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/25">
                     <Home size={22} className="stroke-[2.5]" />
                   </div>
                   <div>
-                    <h4 className="font-extrabold text-slate-800 text-lg">Your Trusted Home Partner</h4>
-                    <p className="text-xs text-slate-500 font-semibold mt-0.5">Professional services at your doorstep.</p>
+                    <h4 className="font-extrabold text-slate-800 text-lg">
+                      Your Trusted Home Partner
+                    </h4>
+                    <p className="text-xs text-slate-500 font-semibold mt-0.5">
+                      Professional services at your doorstep.
+                    </p>
                   </div>
                 </div>
 
@@ -359,26 +381,37 @@ export default function RegisterPage() {
                   <div>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Users size={16} className="text-[#FF565C]" />
-                      <span className="text-2xl font-black text-slate-800">50k+</span>
+                      <span className="text-2xl font-black text-slate-800">
+                        50k+
+                      </span>
                     </div>
-                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Active Users</span>
+                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">
+                      Active Users
+                    </span>
                   </div>
                   <div className="border-x border-slate-200/60">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Star size={16} className="text-[#FF565C]" />
-                      <span className="text-2xl font-black text-slate-800">4.9/5</span>
+                      <span className="text-2xl font-black text-slate-800">
+                        4.9/5
+                      </span>
                     </div>
-                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Avg Rating</span>
+                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">
+                      Avg Rating
+                    </span>
                   </div>
                   <div>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Award size={16} className="text-[#FF565C]" />
-                      <span className="text-2xl font-black text-slate-800">120+</span>
+                      <span className="text-2xl font-black text-slate-800">
+                        120+
+                      </span>
                     </div>
-                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">Expert Categories</span>
+                    <span className="text-[9px] text-slate-450 font-extrabold uppercase tracking-widest mt-1.5 block">
+                      Expert Categories
+                    </span>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -386,7 +419,6 @@ export default function RegisterPage() {
       ) : (
         /* Step 2: Verification Screen (OTP Modal view matching mockup) */
         <div className="min-h-screen bg-slate-50/20 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-
           {/* Background Watermark Pattern */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.14]"
@@ -394,7 +426,7 @@ export default function RegisterPage() {
               backgroundImage: "url('/Group1.png')",
               backgroundPosition: "center",
               backgroundRepeat: "repeat",
-              backgroundSize: "850px"
+              backgroundSize: "850px",
             }}
           />
 
@@ -404,9 +436,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2.5">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Verify Your Number</h2>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+                Verify Your Number
+              </h2>
               <p className="text-xs text-slate-450 font-semibold leading-relaxed px-4">
-                We've sent a 4-digit code to <strong className="text-slate-800">{formData.phone || "+880 1712-XXXXXX"}</strong>
+                We've sent a 4-digit code to{" "}
+                <strong className="text-slate-800">
+                  {formData.phone || "+880 1712-XXXXXX"}
+                </strong>
               </p>
             </div>
 
@@ -419,7 +456,9 @@ export default function RegisterPage() {
                     type="text"
                     maxLength={1}
                     value={digit}
-                    ref={(el) => { otpInputsRef.current[idx] = el }}
+                    ref={(el) => {
+                      otpInputsRef.current[idx] = el;
+                    }}
                     onChange={(e) => handleOtpChange(e.target.value, idx)}
                     onKeyDown={(e) => handleOtpKeyDown(e.key, idx)}
                     className="w-12 h-12 rounded-xl border-2 border-slate-200 bg-slate-50/60 focus:bg-white text-center text-lg font-black focus:outline-none focus:border-[#FF565C]/50 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all text-slate-800 shadow-sm"
@@ -454,7 +493,11 @@ export default function RegisterPage() {
                 ) : (
                   <>
                     VERIFY & PROCEED
-                    <ArrowRight size={18} className="font-extrabold" strokeWidth={2.5} />
+                    <ArrowRight
+                      size={18}
+                      className="font-extrabold"
+                      strokeWidth={2.5}
+                    />
                   </>
                 )}
               </button>
@@ -477,5 +520,5 @@ export default function RegisterPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

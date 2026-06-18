@@ -138,16 +138,10 @@ export default function LoginPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
           {/* Left Column: Form */}
           <div className="flex flex-col justify-between p-6 sm:p-12 min-h-screen relative overflow-hidden">
-
             {/* Background Watermark Pattern */}
             <div
-              className="absolute inset-0 pointer-events-none opacity-[0.14]"
-              style={{
-                backgroundImage: "url('/Group1.png')",
-                backgroundPosition: "center",
-                backgroundRepeat: "repeat",
-                backgroundSize: "850px"
-              }}
+              className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
+              style={{ backgroundSize: "auto" }}
             />
 
             {/* Brand Header with Premium Icon */}
@@ -156,7 +150,9 @@ export default function LoginPage() {
                 <div className="w-10 h-10 bg-gradient-to-br from-[#FF565C] to-rose-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-rose-500/25 group-hover:shadow-rose-500/40 transition-all">
                   <Sparkles size={20} className="stroke-[2.5]" />
                 </div>
-                <span className="font-extrabold text-[#FF565C] text-4xl tracking-tight">Rajseba</span>
+                <span className="font-extrabold text-[#FF565C] text-4xl tracking-tight">
+                  Rajseba
+                </span>
               </Link>
               <p className="text-sm text-gray-500 font-medium mt-2 leading-relaxed">
                 Premium home services at your fingertips.
@@ -182,7 +178,6 @@ export default function LoginPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-
                 {/* Phone Number */}
                 <div className="space-y-2">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -190,7 +185,10 @@ export default function LoginPage() {
                   </label>
                   <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                      <Smartphone size={18} className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors" />
+                      <Smartphone
+                        size={18}
+                        className="text-gray-400 group-focus-within:text-[#FF565C] transition-colors"
+                      />
                     </div>
                     <input
                       type="tel"
@@ -237,7 +235,10 @@ export default function LoginPage() {
               {/* Footer Navigation */}
               <div className="text-center text-sm text-gray-500 font-medium mt-6">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-[#FF565C] hover:underline font-bold ml-1">
+                <Link
+                  href="/signup"
+                  className="text-[#FF565C] hover:underline font-bold ml-1"
+                >
                   Sign up
                 </Link>
               </div>
@@ -247,7 +248,6 @@ export default function LoginPage() {
             <div className="text-left text-xs text-gray-400 relative z-10 pt-4">
               © 2024 Rajseba Services. All rights reserved.
             </div>
-
           </div>
 
           {/* Right Column: Hero Cover */}
@@ -259,7 +259,7 @@ export default function LoginPage() {
             />
 
             {/* Floating Badges */}
-            <div className="absolute top-8 right-8 flex gap-3 z-10">
+            <div className="absolute top-12 right-12 flex gap-3 z-10">
               <div className="w-11 h-11 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#FF565C] shadow-md border border-white/20">
                 <ShieldCheck className="w-5 h-5 stroke-[2.5]" />
               </div>
@@ -275,10 +275,15 @@ export default function LoginPage() {
                 <div className="flex items-center gap-1.5">
                   <div className="flex gap-0.5 text-amber-400">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        className="w-5 h-5 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </div>
-                  <span className="text-xs font-bold text-slate-500 pt-0.5 ml-1">5.0 RATING</span>
+                  <span className="text-xs font-bold text-slate-500 pt-0.5 ml-1">
+                    5.0 RATING
+                  </span>
                 </div>
 
                 {/* Title */}
@@ -288,7 +293,8 @@ export default function LoginPage() {
 
                 {/* Quote */}
                 <p className="text-sm text-slate-500 leading-relaxed italic">
-                  "Rajseba has completely transformed how I manage my home repairs. Fast, reliable, and always premium quality."
+                  "Rajseba has completely transformed how I manage my home
+                  repairs. Fast, reliable, and always premium quality."
                 </p>
 
                 {/* Author Info */}
@@ -309,16 +315,13 @@ export default function LoginPage() {
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
-
         </div>
       ) : (
         /* Step 2: Verification Screen */
         <div className="min-h-screen bg-slate-50/20 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-
           {/* Background Watermark Pattern */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.14]"
@@ -326,7 +329,7 @@ export default function LoginPage() {
               backgroundImage: "url('/Group1.png')",
               backgroundPosition: "center",
               backgroundRepeat: "repeat",
-              backgroundSize: "850px"
+              backgroundSize: "850px",
             }}
           />
 
@@ -336,9 +339,14 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2.5">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Verify Your Number</h2>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+                Verify Your Number
+              </h2>
               <p className="text-xs text-slate-450 font-semibold leading-relaxed px-4">
-                We've sent a 4-digit code to <strong className="text-slate-800">{phone || "+880 1712-XXXXXX"}</strong>
+                We've sent a 4-digit code to{" "}
+                <strong className="text-slate-800">
+                  {phone || "+880 1712-XXXXXX"}
+                </strong>
               </p>
             </div>
 
@@ -351,7 +359,9 @@ export default function LoginPage() {
                     type="text"
                     maxLength={1}
                     value={digit}
-                    ref={(el) => { otpInputsRef.current[idx] = el }}
+                    ref={(el) => {
+                      otpInputsRef.current[idx] = el;
+                    }}
                     onChange={(e) => handleOtpChange(e.target.value, idx)}
                     onKeyDown={(e) => handleOtpKeyDown(e.key, idx)}
                     className="w-12 h-12 rounded-xl border-2 border-slate-200 bg-slate-50/60 focus:bg-white text-center text-lg font-black focus:outline-none focus:border-[#FF565C]/50 focus:ring-4 focus:ring-rose-500/10 outline-none transition-all text-slate-800 shadow-sm"
@@ -409,5 +419,5 @@ export default function LoginPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

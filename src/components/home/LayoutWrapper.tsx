@@ -7,23 +7,21 @@ import Footer from "./Footer";
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const cleanPath = pathname?.replace(/\/$/, "") || "";
-
-  // Hide the global home page navbar and footer on dashboard pages
-  const isDashboard = cleanPath.startsWith("/dashbord");
-  const hideLayout = isDashboard;
+  const hideLayout =
+    pathname?.startsWith("/dashboard") ||
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/register";
 
   return (
-    <>
-      <body className="antialiased">
-        {!hideLayout && <Navbar />}
-        <main
-          className={`grow ${hideLayout ? "" : "md:pb-0"}`}
-        >
-          {children}
-        </main>
-        {!hideLayout && <Footer />}
-      </body>
-    </>
+    <body className="antialiased min-h-screen bg-white">
+      {!hideLayout && <Navbar />}
+
+      <main className={`min-h-screen ${hideLayout ? "pt-0" : "pb-20 md:pb-0"}`}>
+        {children}
+      </main>
+
+      {!hideLayout && <Footer />}
+    </body>
   );
 }
