@@ -57,7 +57,7 @@ export default function BookingDetailsPage() {
     );
   }
 
-  if (isError || !response?.data) {
+  if (isError || !booking) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-slate-500">
         <p className="text-lg font-medium">Booking not found or an error occurred.</p>

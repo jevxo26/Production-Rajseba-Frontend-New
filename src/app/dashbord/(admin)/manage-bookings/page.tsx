@@ -120,6 +120,7 @@ export default function BookingsManagementPage() {
 
   const columns = [
     {
+      key: "id",
       header: "ID & Date",
       accessorKey: "id",
       render: (item: any) => (
@@ -132,6 +133,7 @@ export default function BookingsManagementPage() {
       )
     },
     {
+      key: "user",
       header: "Client & Location",
       accessorKey: "user",
       render: (item: any) => (
@@ -148,6 +150,7 @@ export default function BookingsManagementPage() {
       )
     },
     {
+      key: "service",
       header: "Service Details",
       accessorKey: "service",
       render: (item: any) => (
@@ -167,6 +170,7 @@ export default function BookingsManagementPage() {
       )
     },
     {
+      key: "vendor",
       header: "Vendor & Employee",
       accessorKey: "vendor",
       render: (item: any) => (
@@ -175,14 +179,19 @@ export default function BookingsManagementPage() {
             <span className="font-bold text-slate-400">V:</span> 
             <span className="text-slate-700 font-medium">{item.vendor?.name || "Unassigned"}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-slate-400">E:</span> 
-            <span className="text-slate-700 font-medium">{item.employee?.name || "Unassigned"}</span>
+          <div className="flex items-start gap-1.5 mt-0.5">
+            <span className="font-bold text-slate-400 mt-0.5">E:</span> 
+            <div className="text-slate-700 font-medium flex flex-col gap-0.5">
+              {item.employees && item.employees.length > 0 
+                ? item.employees.map((emp: any) => <span key={emp.id}>{emp.name}</span>)
+                : <span>Unassigned</span>}
+            </div>
           </div>
         </div>
       )
     },
     {
+      key: "status",
       header: "Status",
       accessorKey: "status",
       render: (item: any) => (
@@ -192,6 +201,7 @@ export default function BookingsManagementPage() {
       )
     },
     {
+      key: "actions",
       header: "Actions",
       accessorKey: "actions",
       render: (item: any) => (

@@ -363,7 +363,7 @@ export default function AdminServicesManagementPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
                 <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
-                  {employeeOptions.length > 0 ? employeeOptions.map(emp => (
+                  {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
                     <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
                       <input 
                         type="checkbox" 

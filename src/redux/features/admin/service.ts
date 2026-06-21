@@ -14,6 +14,11 @@ export interface Service {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
+  nestedServices?: any[];
+  packages?: any[];
+  employees?: any[];
+  vendor?: any;
+  category?: any;
 }
 
 export interface NestedService {
