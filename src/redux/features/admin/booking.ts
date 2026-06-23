@@ -6,7 +6,10 @@ export interface Booking {
   vendor?: any;
   employees?: any[];
   subServices?: any[];
+  nestedService?: any;
   pkg?: any;
+  service?: any;
+  agent?: any;
   package_id?: number;
   date: string;
   time?: string;

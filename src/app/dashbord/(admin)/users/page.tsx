@@ -11,6 +11,7 @@ import { useGetAllRolesQuery } from "@/redux/features/admin/role";
 import { useCreateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { toast } from "sonner";
+import { LocationCascader } from "@/components/ui/LocationCascader";
 
 interface UserItem {
   id: string;
@@ -36,6 +37,10 @@ export default function UsersPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
@@ -50,17 +55,18 @@ export default function UsersPage() {
 
   useEffect(() => {
     let apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
-    
+
     // Filter to ONLY show Clients
     apiUsers = apiUsers.filter((u: any) => {
       const uRole = (u.role?.name || u.role || "").toLowerCase();
       return uRole === "client" || uRole === "customer" || uRole === "user";
     });
 
-    // Vendor only sees their own clients
-    if (role === "vendor") {
-      apiUsers = apiUsers.filter((u: any) => 
-        u.vendor?.id?.toString() === currentUser?.id?.toString() || u.vendor_id?.toString() === currentUser?.id?.toString()
+    // Vendor/Agent only sees their own clients
+    if (role === "vendor" || role === "agent") {
+      apiUsers = apiUsers.filter((u: any) =>
+        u.vendor?.id?.toString() === currentUser?.id?.toString() || u.vendor_id?.toString() === currentUser?.id?.toString() ||
+        u.agent?.id?.toString() === currentUser?.id?.toString() || u.agent_id?.toString() === currentUser?.id?.toString()
       );
     }
 
@@ -92,11 +98,13 @@ export default function UsersPage() {
     };
     if (role === "vendor") {
       data.vendor_id = Number(currentUser?.id);
+    } else if (role === "agent") {
+      data.agent_id = Number(currentUser?.id);
     }
     try {
       const userRes = await createUserMut(data).unwrap();
       const newUserId = userRes.data?.id || userRes.id;
-      
+
       setCreatedUserId(newUserId);
       toast.success("User created successfully! Now complete the profile.");
       setStep(2);
@@ -121,6 +129,9 @@ export default function UsersPage() {
       category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: formData.get("type")?.toString() || "personal",
       location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
       description: formData.get("description")?.toString() || "",
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
@@ -142,6 +153,9 @@ export default function UsersPage() {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
+    setSelectedDevision("");
+    setSelectedDistrict("");
+    setSelectedArea("");
   };
 
   // Verification and Status update actions
@@ -304,14 +318,17 @@ export default function UsersPage() {
                   </button>
                 )}
 
-                <div className="h-px bg-slate-100 my-1 mx-2" />
-
-                <button
-                  onClick={() => { handleDelete(user.id); setOpenDropdownId(null); }}
-                  className="w-full text-left px-4 py-2 text-sm text-[#E5675D] hover:bg-[#FFF8F7] flex items-center gap-2 font-medium"
-                >
-                  <Trash2 size={14} /> Delete User
-                </button>
+                {role !== "agent" && (
+                  <>
+                    <div className="h-px bg-slate-100 my-1 mx-2" />
+                    <button
+                      onClick={() => { handleDelete(user.id); setOpenDropdownId(null); }}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E5675D] hover:bg-[#FFF8F7] flex items-center gap-2 font-medium"
+                    >
+                      <Trash2 size={14} /> Delete User
+                    </button>
+                  </>
+                )}
               </div>
             </>
           )}
@@ -399,7 +416,7 @@ export default function UsersPage() {
                       <option value="" disabled>Loading roles...</option>
                     ) : (
                       (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []))
-                        .filter((r: any) => role !== "vendor" || r.name === "Client")
+                        .filter((r: any) => (role !== "vendor" && role !== "agent") || r.name === "Client")
                         .map((r: any) => (
                           <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
                         ))
@@ -441,8 +458,18 @@ export default function UsersPage() {
                   <input name="company_name" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Acme Services Ltd." />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
-                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                  <LocationCascader
+                    selectedDevisionId={selectedDevision}
+                    selectedDistrictId={selectedDistrict}
+                    selectedAreaId={selectedArea}
+                    onDevisionChange={setSelectedDevision}
+                    onDistrictChange={setSelectedDistrict}
+                    onAreaChange={setSelectedArea}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Location (Optional)</label>
+                  <input name="location" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="House 12, Road 4" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>

@@ -7,6 +7,7 @@ import { useGetEmployeesByVendorQuery } from "@/redux/features/admin/user";
 import { Calendar, User, Package as PkgIcon, MapPin, Briefcase, ShieldCheck, Trash2, ArrowLeft, Clock, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -103,6 +104,8 @@ export default function BookingDetailsPage() {
     }
   };
 
+  const rawRole = useAppSelector((state: any) => state.auth?.role);
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200 pb-12">
       {/* Header Area */}
@@ -141,7 +144,7 @@ export default function BookingDetailsPage() {
             <select 
               value={booking.status}
               onChange={(e) => handleStatusChange(e.target.value)}
-              disabled={isUpdating}
+              disabled={isUpdating || (typeof rawRole === 'string' && rawRole.toLowerCase() === 'agent')}
               className="bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 px-4 py-2 focus:ring-2 focus:ring-brand-primary/20 outline-none shadow-sm min-w-[140px] cursor-pointer disabled:opacity-50"
             >
               <option value="pending">Pending</option>
@@ -324,16 +327,18 @@ export default function BookingDetailsPage() {
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
-          <button 
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-[#E5675D] bg-white border border-[#FF7C71]/30 hover:bg-[#FFF8F7] hover:border-[#FF7C71]/40 rounded-xl transition-all shadow-sm disabled:opacity-50"
-          >
-            <Trash2 size={16} /> 
-            {isDeleting ? "Deleting..." : "Delete Booking Record"}
-          </button>
-        </div>
+        {!(typeof rawRole === 'string' && rawRole.toLowerCase() === 'agent') && (
+          <div className="bg-slate-50 border-t border-slate-100 p-6 flex justify-end">
+            <button 
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-[#E5675D] bg-white border border-[#FF7C71]/30 hover:bg-[#FFF8F7] hover:border-[#FF7C71]/40 rounded-xl transition-all shadow-sm disabled:opacity-50"
+            >
+              <Trash2 size={16} /> 
+              {isDeleting ? "Deleting..." : "Delete Booking Record"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

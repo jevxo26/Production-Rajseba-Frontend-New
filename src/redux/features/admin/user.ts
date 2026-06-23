@@ -37,6 +37,17 @@ export const userApi = baseApi.injectEndpoints({
       query: (vendorId) => `/users/employees/vendor/${vendorId}`,
       providesTags: ['Admin'],
     }),
+    getSavedServices: builder.query<any, void>({
+      query: () => '/users/me/saved-services',
+      providesTags: ['Admin'],
+    }),
+    toggleSavedService: builder.mutation<any, string | number>({
+      query: (serviceId) => ({
+        url: `/users/me/saved-services/${serviceId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Admin'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -48,4 +59,6 @@ export const {
   useUpdateUserMutation,
   useDeleteUserMutation,
   useGetEmployeesByVendorQuery,
+  useGetSavedServicesQuery,
+  useToggleSavedServiceMutation,
 } = userApi;

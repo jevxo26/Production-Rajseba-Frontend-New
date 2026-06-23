@@ -16,7 +16,7 @@ export interface Service {
   vendor_id?: number;
   createdAt?: string;
   updatedAt?: string;
-  deletedAt?: string | null;
+  agent_commission_percentage?: number;
   nestedServices?: any[];
   packages?: any[];
   employees?: any[];
@@ -80,6 +80,7 @@ export interface CreateServiceRequest {
   employee_ids?: number[];
   category_id?: number;
   vendor_id?: number;
+  agent_commission_percentage?: number;
 }
 
 export interface UpdateServiceRequest {
@@ -95,6 +96,7 @@ export interface UpdateServiceRequest {
   employee_ids?: number[];
   category_id?: number;
   vendor_id?: number;
+  agent_commission_percentage?: number;
 }
 
 export const serviceApi = baseApi.injectEndpoints({
@@ -201,3 +203,67 @@ export const {
   useUpdateNestedServiceMutation,
   useDeleteNestedServiceMutation,
 } = nestedServiceApi;
+
+/* ==========================================================================
+   SUB SERVICE API
+   ========================================================================== */
+
+export interface CreateSubServiceRequest {
+  nested_service_id: number;
+  name: string;
+  price: number;
+}
+
+export interface UpdateSubServiceRequest {
+  nested_service_id?: number;
+  name?: string;
+  price?: number;
+}
+
+export const subServiceApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getAllSubServices: builder.query<ServiceApiResponse<SubService[]>, void>({
+      query: () => '/sub-services',
+      providesTags: ['SubService'],
+    }),
+    getSubServiceById: builder.query<ServiceApiResponse<SubService>, string | number>({
+      query: (id) => `/sub-services/${id}`,
+      providesTags: ['SubService'],
+    }),
+    createSubService: builder.mutation<ServiceApiResponse<SubService>, CreateSubServiceRequest>({
+      query: (data) => ({
+        url: '/sub-services',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['SubService', 'NestedService'],
+    }),
+    updateSubService: builder.mutation<
+      ServiceApiResponse<SubService>,
+      { id: string | number; data: UpdateSubServiceRequest }
+    >({
+      query: ({ id, data }) => ({
+        url: `/sub-services/${id}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['SubService', 'NestedService'],
+    }),
+    deleteSubService: builder.mutation<ServiceApiResponse<void>, string | number>({
+      query: (id) => ({
+        url: `/sub-services/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['SubService', 'NestedService'],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const {
+  useGetAllSubServicesQuery,
+  useGetSubServiceByIdQuery,
+  useCreateSubServiceMutation,
+  useUpdateSubServiceMutation,
+  useDeleteSubServiceMutation,
+} = subServiceApi;

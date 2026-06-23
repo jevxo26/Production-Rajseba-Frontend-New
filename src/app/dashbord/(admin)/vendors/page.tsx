@@ -10,6 +10,7 @@ import { useGetAllRolesQuery } from "@/redux/features/admin/role";
 import { useCreateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { toast } from "sonner";
+import { LocationCascader } from "@/components/ui/LocationCascader";
 
 interface VendorItem {
   id: string;
@@ -21,6 +22,8 @@ interface VendorItem {
   phone?: string;
   categoryName?: string;
   profile?: any;
+  commission_percentage: number;
+  wallet_balance: number;
 }
 
 export default function VendorsManagementPage() {
@@ -35,11 +38,15 @@ export default function VendorsManagementPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes } = useGetAllRolesQuery();
   const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-  
+
   const [updateUserMut] = useUpdateUserMutation();
   const [createUserMut, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [deleteUserMut] = useDeleteUserMutation();
@@ -51,7 +58,7 @@ export default function VendorsManagementPage() {
     const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
     if (apiUsers && apiUsers.length > 0) {
       // Filter only vendors
-      const vendorUsers = apiUsers.filter((u: any) => 
+      const vendorUsers = apiUsers.filter((u: any) =>
         u.role?.name === "Vendor" || u.role === "Vendor"
       );
 
@@ -65,6 +72,8 @@ export default function VendorsManagementPage() {
         joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown',
         categoryName: u.profile?.category?.name || 'Unassigned',
         profile: u.profile,
+        commission_percentage: u.commission_percentage || 0,
+        wallet_balance: u.wallet_balance || 0,
       }));
       setVendors(mappedUsers);
     } else {
@@ -89,6 +98,7 @@ export default function VendorsManagementPage() {
       email: formData.get("email"),
       phone: formData.get("phone"),
       roleId: Number(vendorRole.id || vendorRole._id),
+      commission_percentage: Number(formData.get("commission_percentage")) || 0,
     };
 
     try {
@@ -118,6 +128,9 @@ export default function VendorsManagementPage() {
       category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: formData.get("type")?.toString() || "personal",
       location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
       description: formData.get("description")?.toString() || "",
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
@@ -139,6 +152,9 @@ export default function VendorsManagementPage() {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
+    setSelectedDevision("");
+    setSelectedDistrict("");
+    setSelectedArea("");
   };
 
   // Actions
@@ -213,6 +229,16 @@ export default function VendorsManagementPage() {
           ) : (
             <span className="text-slate-400 italic font-normal text-xs">{vendor.categoryName}</span>
           )}
+        </div>
+      )
+    },
+    {
+      key: "wallet",
+      header: "Wallet & Comm.",
+      render: (vendor: VendorItem) => (
+        <div>
+          <p className="font-bold text-slate-900 text-sm">৳{(vendor.wallet_balance || 0).toLocaleString()}</p>
+          <p className="text-xs text-slate-500 font-medium">{vendor.commission_percentage || 0}% Comm.</p>
         </div>
       )
     },
@@ -366,6 +392,10 @@ export default function VendorsManagementPage() {
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
                   <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
                 </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Commission Percentage (%)</label>
+                  <input name="commission_percentage" type="number" min="0" max="100" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="e.g. 80" />
+                </div>
                 <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
                   <button type="button" onClick={closeModal} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
                     Cancel
@@ -401,8 +431,18 @@ export default function VendorsManagementPage() {
                   <input name="company_name" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Acme Services Ltd." />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
-                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                  <LocationCascader
+                    selectedDevisionId={selectedDevision}
+                    selectedDistrictId={selectedDistrict}
+                    selectedAreaId={selectedArea}
+                    onDevisionChange={setSelectedDevision}
+                    onDistrictChange={setSelectedDistrict}
+                    onAreaChange={setSelectedArea}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Location (Optional)</label>
+                  <input name="location" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
@@ -454,6 +494,14 @@ export default function VendorsManagementPage() {
               <div className="flex justify-between items-center py-2 border-b border-slate-50">
                 <span className="text-sm text-slate-500 font-medium">Category</span>
                 <span className="text-sm font-bold text-slate-900">{selectedUser.categoryName}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                <span className="text-sm text-slate-500 font-medium">Commission</span>
+                <span className="text-sm font-bold text-slate-900">{selectedUser.commission_percentage}%</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-slate-50">
+                <span className="text-sm text-slate-500 font-medium">Wallet Balance</span>
+                <span className="text-sm font-bold text-emerald-600">৳{(selectedUser.wallet_balance || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-50">
                 <span className="text-sm text-slate-500 font-medium">Status</span>

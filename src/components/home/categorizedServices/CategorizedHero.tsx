@@ -1,13 +1,32 @@
 import {
   Zap,
   ShieldCheck,
+  Heart,
+  Loader2
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useGetSavedServicesQuery, useToggleSavedServiceMutation } from "@/redux/features/admin/user";
+import { useAppSelector } from "@/redux/hooks";
 
-
-export function CategorizedHero({ name, description }: { name?: string; description?: string }) {
+export function CategorizedHero({ id, name, description }: { id?: number; name?: string; description?: string }) {
   const displayName = name || "Certified Electrical Experts in Dhaka";
   const displayDesc = description || "From flickering lights to full-house wiring, our certified technicians ensure your home's safety with premium electrical solutions.";
+
+  const authUser = useAppSelector((state) => state.auth.user);
+  const { data: savedServicesRes, isLoading: isLoadingSaved } = useGetSavedServicesQuery(undefined, { skip: !authUser });
+  const [toggleSavedService, { isLoading: isToggling }] = useToggleSavedServiceMutation();
+
+  const savedServices = savedServicesRes?.data || [];
+  const isSaved = id ? savedServices.some((s: any) => s.id === id) : false;
+
+  const handleToggleSave = async () => {
+    if (!authUser || !id) return;
+    try {
+      await toggleSavedService(id).unwrap();
+    } catch (err) {
+      console.error("Failed to toggle save", err);
+    }
+  };
 
   return (
     <div className="py-12 md:py-16 relative overflow-hidden">
@@ -22,9 +41,27 @@ export function CategorizedHero({ name, description }: { name?: string; descript
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-3xl md:text-5xl max-w-xl font-bold leading-tight">
-              {displayName}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-3xl md:text-5xl max-w-xl font-bold leading-tight">
+                {displayName}
+              </h1>
+              
+              {authUser && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={handleToggleSave}
+                  disabled={isToggling || isLoadingSaved}
+                  className="p-3 bg-white rounded-full border border-slate-100 shadow-sm flex-shrink-0 focus:outline-none"
+                >
+                  {isToggling ? (
+                    <Loader2 size={24} className="animate-spin text-slate-400" />
+                  ) : (
+                    <Heart size={24} className={isSaved ? "fill-[#FF7C71] text-[#FF7C71]" : "text-slate-400"} />
+                  )}
+                </motion.button>
+              )}
+            </div>
 
             {/* Description */}
             <p className="text-lg text-slate-600 max-w-lg leading-relaxed">

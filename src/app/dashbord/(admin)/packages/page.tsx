@@ -255,7 +255,7 @@ export default function AdminPackagesManagementPage() {
         return (
           <span className="inline-flex items-center gap-1.5 bg-indigo-50/70 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-indigo-100/50">
             <Layers size={12} />
-            {count} sub-service{count !== 1 ? "s" : ""}
+            {count} nested service{count !== 1 ? "s" : ""}
           </span>
         );
       },
@@ -453,7 +453,7 @@ export default function AdminPackagesManagementPage() {
               {(serviceId !== "NONE" || editingItem) && (
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Include Sub-Services ({selectedNestedIds.length} selected)
+                    Include Nested Services ({selectedNestedIds.length} selected)
                   </label>
                   {availableNestedServices.length === 0 && !editingItem ? (
                     <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4 text-center">
@@ -462,7 +462,7 @@ export default function AdminPackagesManagementPage() {
                         size={24}
                       />
                       <p className="text-xs text-slate-400 font-medium">
-                        No sub-services found for this service.
+                        No nested services found for this service.
                       </p>
                     </div>
                   ) : (

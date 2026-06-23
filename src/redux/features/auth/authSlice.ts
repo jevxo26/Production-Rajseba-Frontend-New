@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type UserRole = "superadmin" | "agent" | "vendor" | "client";
+export type UserRole = "superadmin" | "agent" | "vendor" | "client" | "employee";
 
 export interface User {
   id: string;
@@ -125,6 +125,8 @@ export const getRoleName = (r: UserRole | null): string => {
       return "Vendor";
     case "client":
       return "Client";
+    case "employee":
+      return "Employee";
     default:
       return "User";
   }

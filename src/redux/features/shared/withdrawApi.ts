@@ -13,6 +13,11 @@ export interface Withdraw {
     email: string;
     role?: string;
   };
+  booking?: {
+    id: number;
+    total_price: number;
+    date?: string;
+  };
 }
 
 export interface WithdrawApiResponse<T> {
@@ -22,7 +27,9 @@ export interface WithdrawApiResponse<T> {
 }
 
 export interface CreateWithdrawRequest {
-  amount: number;
+  amount?: number;
+  bookingId?: number;
+  vendorId?: number;
 }
 
 export interface UpdateWithdrawStatusRequest {

@@ -23,6 +23,7 @@ import {
   Globe,
   FileText,
   Plus,
+  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -34,10 +35,11 @@ import {
   useUpdateProfileMutation,
 } from "@/redux/features/shared/profileApi";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
+import { useGetAllBookingsQuery, useUpdateBookingStatusMutation } from "@/redux/features/admin/booking";
 import { toast } from "sonner";
 
 export default function DashboardPage() {
-  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
+  const rawRole = useAppSelector((state) => state.auth.role) || "client";
   const role = typeof rawRole === 'string' ? rawRole.toLowerCase().replace(/\s+/g, '') : "client";
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -87,26 +89,43 @@ export default function DashboardPage() {
    ========================================================================== */
 function SuperAdminDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
-  
+  const { data: bookingsRes, isLoading: isBookingsLoading } = useGetAllBookingsQuery(undefined);
+  const { data: profilesRes, isLoading: isProfilesLoading } = useGetAllProfilesQuery(undefined);
+
+  const allBookings = bookingsRes?.data || [];
+  const allProfiles = profilesRes?.data || [];
+
+  const completedBookings = allBookings.filter((b: any) => b.status === "completed");
+  const activeBookingsList = allBookings.filter((b: any) => b.status !== "completed" && b.status !== "cancelled");
+  const totalRevenue = completedBookings.reduce((sum: number, b: any) => sum + Number(b.total_price || 0), 0);
+
+  const providerProfiles = allProfiles.filter((p: any) => p.type === "company" || p.category_id);
+
   const stats = [
-    { label: "Total Revenue", value: "৳1,245,600", desc: "+12.5% this month", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Verified Providers", value: "842", desc: "18 pending approval", icon: HardHat, color: "text-teal-600 bg-teal-50" },
-    { label: "Active Bookings", value: "156", desc: "45 in progress", icon: Briefcase, color: "text-indigo-600 bg-indigo-50" },
-    { label: "Platform Rating", value: "4.92 / 5", desc: "Based on 12k reviews", icon: Star, color: "text-amber-600 bg-amber-50" },
+    { label: "Total Revenue", value: `৳${totalRevenue.toLocaleString()}`, desc: "From completed bookings", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Providers", value: providerProfiles.length.toString(), desc: "Registered business profiles", icon: HardHat, color: "text-teal-600 bg-teal-50" },
+    { label: "Active Bookings", value: activeBookingsList.length.toString(), desc: "In progress/pending", icon: Briefcase, color: "text-indigo-600 bg-indigo-50" },
+    { label: "Platform Rating", value: "4.92 / 5", desc: "Based on platform reviews", icon: Star, color: "text-amber-600 bg-amber-50" },
   ];
 
-  const recentBookings = [
-    { id: "RS-9284", customer: "Ahmad Jalal", service: "Expert AC Repair", provider: "Rana AC Service", amount: "৳1,400", status: "In Progress", date: "Today, 11:30 AM" },
-    { id: "RS-9283", customer: "Maria Kazi", service: "Premium Painting", provider: "Dhaka Decorators", amount: "৳12,000", status: "Completed", date: "Today, 10:15 AM" },
-    { id: "RS-9282", customer: "Asif Zaman", service: "Sparkle Home Clean", provider: "Clean & Bright", amount: "৳2,200", status: "Pending", date: "Today, 09:00 AM" },
-    { id: "RS-9281", customer: "Nusrat Jahan", service: "Emergency Plumbing", provider: "Rahim Plumbing", amount: "৳850", status: "Completed", date: "Yesterday" },
-  ];
+  const recentBookings = [...allBookings]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 5)
+    .map(b => ({
+      id: String(b.id),
+      customer: b.user?.name || "Unknown Customer",
+      service: b.nestedService?.name || b.pkg?.name || "Service",
+      provider: b.vendor?.name || b.vendor?.email || "Unassigned",
+      amount: `৳${Number(b.total_price || 0).toLocaleString()}`,
+      status: b.status,
+      date: new Date(b.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    }));
 
   const adminColumns = [
     {
       key: "id",
       header: "Booking ID",
-      render: (b: any) => <span className="font-bold text-brand-primary">{b.id}</span>
+      render: (b: any) => <span className="font-bold text-brand-primary">#{b.id}</span>
     },
     {
       key: "customer",
@@ -122,27 +141,33 @@ function SuperAdminDashboard() {
     },
     {
       key: "amount",
-      header: "Amount"
+      header: "Amount",
+      render: (b: any) => <span className="font-semibold text-slate-700">{b.amount}</span>
     },
     {
       key: "status",
       header: "Status",
       render: (b: any) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${b.status === "Completed"
-              ? "bg-emerald-50 text-emerald-700"
-              : b.status === "In Progress"
-                ? "bg-indigo-50 text-indigo-700"
-                : "bg-amber-50 text-amber-700"
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold ${b.status === "completed"
+            ? "bg-emerald-50 text-emerald-700"
+            : b.status === "on_the_way"
+              ? "bg-indigo-50 text-indigo-700"
+              : b.status === "assigned"
+                ? "bg-amber-50 text-amber-700"
+                : b.status === "cancelled"
+                  ? "bg-red-50 text-red-700"
+                  : "bg-slate-50 text-slate-700"
             }`}
         >
-          {b.status}
+          {b.status.replace(/_/g, " ")}
         </span>
       )
     },
     {
       key: "date",
-      header: "Date"
+      header: "Date",
+      render: (b: any) => <span className="text-xs text-slate-500 font-medium">{b.date}</span>
     }
   ];
 
@@ -220,21 +245,20 @@ function SuperAdminDashboard() {
           </div>
 
           <div className="space-y-4">
-            {[
-              { name: "Rafiq AC Services", experience: "5 Yrs Exp", skill: "AC Maintenance", rating: "4.8" },
-              { name: "Zaman Cleaners", experience: "3 Yrs Exp", skill: "Deep Cleaning", rating: "New" },
-              { name: "Mamun Electricians", experience: "8 Yrs Exp", skill: "Wiring Specialist", rating: "4.9" },
-            ].map((p, i) => (
+            {providerProfiles.slice(0, 3).map((p: any, i: number) => (
               <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-colors">
                 <div>
-                  <h5 className="text-sm font-semibold text-slate-800">{p.name}</h5>
-                  <span className="text-xs text-slate-400">{p.skill} • {p.experience}</span>
+                  <h5 className="text-sm font-semibold text-slate-800">{p.company_name || p.user?.name || "Provider"}</h5>
+                  <span className="text-xs text-slate-400">{p.category?.name || "Service Provider"} • {p.location || "Dhaka"}</span>
                 </div>
                 <button className="text-xs font-semibold bg-[#FF7C71] hover:bg-[#E5675D] text-white px-3 py-1.5 rounded-lg transition-all active:scale-[0.97]">
                   Verify
                 </button>
               </div>
             ))}
+            {providerProfiles.length === 0 && (
+              <div className="text-xs text-slate-400 text-center py-4">No pending approvals</div>
+            )}
           </div>
         </div>
       </div>
@@ -266,38 +290,69 @@ function ProviderDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { data: profilesRes, isLoading: isProfilesLoading } = useGetAllProfilesQuery();
   const { data: categoriesRes } = useGetAllCategoriesQuery();
-  
+
   const [createProfileMut, { isLoading: isCreating }] = useCreateProfileMutation();
   const [updateProfileMut, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState(false);
-  
+
   // Find vendor's profile by user ID (matching string or number)
   const myProfile = profilesRes?.data?.find(
     (p: any) => p.user?.id === authUser?.id || p.user?.id === Number(authUser?.id) || p.user_id === authUser?.id || p.user_id === Number(authUser?.id)
   );
 
+  const [updateBookingStatus] = useUpdateBookingStatusMutation();
+  const { data: bookingsRes, isLoading: isBookingsLoading } = useGetAllBookingsQuery(undefined);
+  const myBookings = bookingsRes?.data?.filter((b: any) =>
+    b.vendor?.id === authUser?.id || b.vendor?._id === authUser?.id
+  ) || [];
+
+  const completedBookings = myBookings.filter(b => b.status === "completed");
+  const todayEarnings = completedBookings.reduce((sum, b) => {
+    // Only count if it was completed today
+    const completedDate = new Date(b.updatedAt).toDateString();
+    const today = new Date().toDateString();
+    if (completedDate === today) {
+      return sum + Number(b.total_price || 0);
+    }
+    return sum;
+  }, 0);
+
   const stats = [
-    { label: "Today's Earnings", value: "৳2,450", desc: "+৳1,200 yesterday", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Projects completed", value: myProfile?.total_projects !== undefined ? `${myProfile.total_projects}` : "0", desc: "Total projects completed", icon: CheckCircle2, color: "text-teal-600 bg-teal-50" },
+    { label: "Today's Earnings", value: `৳${todayEarnings.toLocaleString()}`, desc: "From completed bookings", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Projects completed", value: completedBookings.length.toString(), desc: "Total projects completed", icon: CheckCircle2, color: "text-teal-600 bg-teal-50" },
     { label: "Starting Price", value: myProfile?.min_starting_price !== undefined ? `৳${myProfile.min_starting_price}` : "N/A", desc: "Minimum starting price", icon: Calendar, color: "text-indigo-600 bg-indigo-50" },
     { label: "My Rating", value: myProfile?.rating !== undefined ? `${myProfile.rating} / 5` : "New", desc: myProfile?.company_name || "Professional Profile", icon: Star, color: "text-amber-600 bg-amber-50" },
   ];
 
-  const providerJobs = [
-    { id: "RS-9284", customer: "Asif Zaman", phone: "+880 1712 345678", address: "House 24, Road 4, Mirpur 12", service: "AC Gas Refill", time: "Today, 03:00 PM", amount: "৳1,400", status: "Assigned" },
-    { id: "RS-9278", customer: "Imran Khan", phone: "+880 1819 876543", address: "Sector 3, Uttara", service: "AC Servicing (2 Units)", time: "Completed (Today)", amount: "৳1,800", status: "Completed" },
-  ];
+  const providerJobs = myBookings.map(b => ({
+    id: String(b.id),
+    customer: b.user?.name || "Unknown Customer",
+    phone: b.user?.phone || "N/A",
+    address: b.location || "N/A",
+    service: b.nestedService?.name || b.pkg?.name || "Service",
+    time: `${b.date || ''} ${b.time || ''}`,
+    amount: `৳${Number(b.total_price || 0).toLocaleString()}`,
+    status: b.status,
+  }));
 
-  const [jobStatuses, setJobStatuses] = useState<Record<string, string>>({
-    "RS-9284": "Assigned",
-  });
+  const [activeJob, setActiveJob] = useState<string | null>(null);
 
-  const [activeJob, setActiveJob] = useState("RS-9284");
+  // Automatically select first active job
+  useEffect(() => {
+    if (!activeJob && providerJobs.length > 0) {
+      setActiveJob(providerJobs[0].id);
+    }
+  }, [providerJobs, activeJob]);
 
-  const updateJobStatus = (id: string, newStatus: string) => {
-    setJobStatuses({ ...jobStatuses, [id]: newStatus });
+  const updateJobStatus = async (id: string, newStatus: string) => {
+    try {
+      await updateBookingStatus({ id, status: newStatus.toLowerCase().replace(/\s+/g, '_') }).unwrap();
+      toast.success(`Booking ${id} status updated to ${newStatus}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update status");
+    }
   };
 
   const activeJobDetails = providerJobs.find((j) => j.id === activeJob);
@@ -378,7 +433,7 @@ function ProviderDashboard() {
 
           <div className="space-y-4">
             {providerJobs.map((job) => {
-              const currentStatus = jobStatuses[job.id] || job.status;
+              const currentStatus = job.status;
               return (
                 <div
                   key={job.id}
@@ -388,14 +443,18 @@ function ProviderDashboard() {
                 >
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[#FF7C71]">{job.id}</span>
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${currentStatus === "Completed"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : currentStatus === "In Progress"
-                            ? "bg-indigo-50 text-indigo-700"
-                            : "bg-amber-50 text-amber-700"
+                      <span className="text-sm font-bold text-[#FF7C71]">#{job.id}</span>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${currentStatus === "completed"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : currentStatus === "on_the_way"
+                          ? "bg-indigo-50 text-indigo-700"
+                          : currentStatus === "assigned"
+                            ? "bg-amber-50 text-amber-700"
+                            : currentStatus === "cancelled"
+                              ? "bg-red-50 text-red-700"
+                              : "bg-slate-50 text-slate-700"
                         }`}>
-                        {currentStatus}
+                        {currentStatus.replace(/_/g, " ")}
                       </span>
                     </div>
                     <h4 className="text-base font-bold text-slate-800">{job.service}</h4>
@@ -438,31 +497,28 @@ function ProviderDashboard() {
 
                 <div className="space-y-2 pt-2">
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Update Status</p>
-                  {activeJobDetails.status !== "Completed" ? (
+                  {activeJobDetails.status !== "completed" && activeJobDetails.status !== "cancelled" ? (
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={() => updateJobStatus(activeJobDetails.id, "On The Way")}
-                        className={`w-full py-2.5 rounded-xl text-xs font-semibold border transition-all ${(jobStatuses[activeJobDetails.id] || activeJobDetails.status) === "On The Way"
-                            ? "bg-amber-500 border-amber-500 text-white"
-                            : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                        className={`w-full py-2.5 rounded-xl text-xs font-semibold border transition-all ${activeJobDetails.status === "on_the_way"
+                          ? "bg-amber-500 border-amber-500 text-white"
+                          : "border-slate-200 hover:bg-slate-50 text-slate-700"
                           }`}
                       >
                         On The Way
                       </button>
                       <button
-                        onClick={() => updateJobStatus(activeJobDetails.id, "In Progress")}
-                        className={`w-full py-2.5 rounded-xl text-xs font-semibold border transition-all ${(jobStatuses[activeJobDetails.id] || activeJobDetails.status) === "In Progress"
-                            ? "bg-indigo-600 border-indigo-600 text-white"
-                            : "border-slate-200 hover:bg-slate-50 text-slate-700"
-                          }`}
+                        onClick={() => updateJobStatus(activeJobDetails.id, "Completed")}
+                        className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all border-slate-200 hover:bg-emerald-50 hover:text-emerald-600 text-slate-700"
                       >
-                        In Progress
+                        Mark as Completed
                       </button>
                       <button
-                        onClick={() => updateJobStatus(activeJobDetails.id, "Completed")}
-                        className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-[0.98]"
+                        onClick={() => updateJobStatus(activeJobDetails.id, "Cancelled")}
+                        className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all border-slate-200 hover:bg-red-50 hover:text-red-600 text-red-500"
                       >
-                        Mark Completed
+                        Cancel Booking
                       </button>
                     </div>
                   ) : (
@@ -702,19 +758,31 @@ function ProviderDashboard() {
    ========================================================================== */
 function CustomerDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
-  
+  const router = useRouter();
+
+  const { data: bookingsRes, isLoading } = useGetAllBookingsQuery();
+  const myBookings = bookingsRes?.data || [];
+
+  const activeBookings = myBookings.filter((b: any) => b.status === "assigned" || b.status === "on_the_way" || b.status === "pending");
+  const completedBookings = myBookings.filter((b: any) => b.status === "completed");
+  const totalSpent = completedBookings.reduce((sum: number, b: any) => sum + Number(b.total_price || 0), 0);
+
   const stats = [
-    { label: "Active Orders", value: "1 Service", desc: "Provider is arriving today", icon: Clock, color: "text-amber-600 bg-amber-50" },
-    { label: "Completed Bookings", value: "14 Services", desc: "Expert home care received", icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Total Spent", value: "৳24,500", desc: "৳3,400 spent this month", icon: DollarSign, color: "text-teal-600 bg-teal-50" },
+    { label: "Active Orders", value: `${activeBookings.length} Service(s)`, desc: activeBookings.length > 0 ? "Provider is assigned" : "No active orders", icon: Clock, color: "text-amber-600 bg-amber-50" },
+    { label: "Completed Bookings", value: `${completedBookings.length} Service(s)`, desc: "Expert home care received", icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Total Spent", value: `৳${totalSpent.toLocaleString()}`, desc: "Lifetime expenditure", icon: DollarSign, color: "text-teal-600 bg-teal-50" },
     { label: "Active Promos", value: "3 Available", desc: "Up to 20% off next booking", icon: Sparkles, color: "text-[#E5675D] bg-[#FFF8F7]" },
   ];
 
-  const customerBookings = [
-    { id: "RS-9284", service: "Expert AC Gas Refill", provider: "Kabir AC Repair", amount: "৳1,400", date: "Today, 03:00 PM", status: "Assigned" },
-    { id: "RS-9128", service: "Deep Sofa Cleaning", provider: "Clean & Bright", amount: "৳2,500", date: "May 20, 2026", status: "Completed" },
-    { id: "RS-9014", service: "Full Apartment Painting", provider: "Dhaka Decorators", amount: "৳15,000", date: "Apr 12, 2026", status: "Completed" },
-  ];
+  const customerBookings = [...myBookings].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(b => ({
+    id: `RS-${b.id}`,
+    service: b.service?.name || "Custom Service",
+    provider: b.vendor?.name || "Pending Assignment",
+    amount: `৳${b.total_price || 0}`,
+    date: new Date(b.createdAt).toLocaleDateString(),
+    status: b.status,
+    vendorId: b.vendor?.id
+  }));
 
   const customerColumns = [
     {
@@ -724,8 +792,7 @@ function CustomerDashboard() {
     },
     {
       key: "service",
-      header: "Service",
-      render: (b: any) => <span className="font-semibold text-slate-900">{b.service}</span>
+      header: "Service Booked"
     },
     {
       key: "provider",
@@ -740,18 +807,32 @@ function CustomerDashboard() {
       header: "Status",
       render: (b: any) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${b.status === "Completed"
-              ? "bg-emerald-50 text-emerald-700"
-              : "bg-amber-50 text-amber-700"
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${b.status === "completed"
+            ? "bg-emerald-50 text-emerald-700"
+            : b.status === "cancelled" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"
             }`}
         >
-          {b.status}
+          {b.status.replace('_', ' ')}
         </span>
       )
     },
     {
       key: "date",
       header: "Date Completed"
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (b: any) => (
+        b.vendorId ? (
+          <button
+            onClick={() => router.push(`/dashbord/live-chat?receiverId=${b.vendorId}`)}
+            className="text-xs bg-[#FFF8F7] text-[#FF7C71] px-3 py-1.5 rounded-lg font-bold hover:bg-[#FFEBE9] transition-colors"
+          >
+            Chat Provider
+          </button>
+        ) : <span className="text-xs text-slate-400">Waiting for provider</span>
+      )
     }
   ];
 
@@ -793,55 +874,72 @@ function CustomerDashboard() {
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2 space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-slate-900">Active Service Tracker</h3>
-            <span className="text-xs text-[#FF7C71] font-semibold bg-[#FFF8F7] px-2.5 py-1 rounded-lg">Arriving Today</span>
+            <span className="text-xs text-[#FF7C71] font-semibold bg-[#FFF8F7] px-2.5 py-1 rounded-lg">Real-time update</span>
           </div>
 
-          <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between gap-4 border-b border-slate-200 pb-4">
-              <div>
-                <span className="text-xs text-slate-400 font-bold uppercase">Booking ID</span>
-                <p className="text-base font-bold text-[#FF7C71]">RS-9284</p>
+          {activeBookings.length > 0 ? activeBookings.map((activeBooking: any) => (
+            <div key={activeBooking.id} className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                  <span className="text-xs text-slate-400 font-bold uppercase">Booking ID</span>
+                  <p className="text-base font-bold text-[#FF7C71]">RS-{activeBooking.id}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 font-bold uppercase">Service Category</span>
+                  <p className="text-base font-bold text-slate-800">{activeBooking.service?.name || "Service"}</p>
+                </div>
+                <div>
+                  <span className="text-xs text-slate-400 font-bold uppercase">Provider</span>
+                  <p className="text-base font-bold text-slate-800">{activeBooking.vendor?.name || "Pending..."}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-xs text-slate-400 font-bold uppercase">Service Category</span>
-                <p className="text-base font-bold text-slate-800">Expert AC Gas Refill</p>
-              </div>
-              <div>
-                <span className="text-xs text-slate-400 font-bold uppercase">Technician</span>
-                <p className="text-base font-bold text-slate-800">Kabir AC Repair</p>
-              </div>
-            </div>
 
-            {/* Tracker Step Bar */}
-            <div className="space-y-4">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Service Timeline</p>
-              <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#FFEBE9]">
-                {[
-                  { title: "Booking Confirmed", desc: "Your booking was accepted by Kabir AC Repair", done: true, current: false },
-                  { title: "Expert Assigned", desc: "Kabir has been assigned to your service location", done: true, current: true },
-                  { title: "En Route / Travelling", desc: "Technician will start journey to your address", done: false, current: false },
-                  { title: "Service Complete", desc: "Final verification and payment completion", done: false, current: false },
-                ].map((step, i) => (
-                  <div key={i} className="relative">
-                    <span
-                      className={`absolute -left-[22px] top-1.5 w-3 h-3 rounded-full border-2 ring-4 ring-white ${step.done
+              {/* Tracker Step Bar */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Service Timeline</p>
+                  {activeBooking.vendor?.id && (
+                    <button
+                      onClick={() => router.push(`/dashbord/live-chat?receiverId=${activeBooking.vendor.id}`)}
+                      className="bg-[#FF7C71] hover:bg-[#E5675D] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+                    >
+                      <MessageCircle size={14} /> Chat with Provider
+                    </button>
+                  )}
+                </div>
+                <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#FFEBE9]">
+                  {[
+                    { title: "Booking Confirmed", desc: "Your booking was accepted.", done: true, current: activeBooking.status === "pending" },
+                    { title: "Expert Assigned", desc: "A provider has been assigned.", done: activeBooking.status === "assigned" || activeBooking.status === "on_the_way", current: activeBooking.status === "assigned" },
+                    { title: "En Route / Travelling", desc: "Technician will start journey to your address", done: activeBooking.status === "on_the_way", current: activeBooking.status === "on_the_way" },
+                    { title: "Service Complete", desc: "Final verification and payment completion", done: false, current: false },
+                  ].map((step, i) => (
+                    <div key={i} className="relative">
+                      <span
+                        className={`absolute -left-[22px] top-1.5 w-3 h-3 rounded-full border-2 ring-4 ring-white ${step.done
                           ? "bg-[#FF7C71] border-[#FF7C71]"
                           : step.current
                             ? "bg-[#FF7C71] border-[#FF7C71] animate-pulse"
                             : "bg-slate-200 border-slate-200"
-                        }`}
-                    />
-                    <div>
-                      <h5 className={`text-sm font-semibold ${step.done || step.current ? "text-slate-800" : "text-slate-400"}`}>
-                        {step.title}
-                      </h5>
-                      <p className={`text-xs ${step.done || step.current ? "text-slate-500" : "text-slate-400"}`}>{step.desc}</p>
+                          }`}
+                      />
+                      <div>
+                        <h5 className={`text-sm font-semibold ${step.done || step.current ? "text-slate-800" : "text-slate-400"}`}>
+                          {step.title}
+                        </h5>
+                        <p className={`text-xs ${step.done || step.current ? "text-slate-500" : "text-slate-400"}`}>{step.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          )) : (
+            <div className="p-8 bg-slate-50 border border-slate-100 rounded-2xl text-center space-y-2">
+              <p className="text-sm font-bold text-slate-500">No active bookings right now</p>
+              <p className="text-xs text-slate-400">Book a new service and track its real-time progress here.</p>
+            </div>
+          )}
         </div>
 
         {/* Promo Code Banners (Right 1 column) */}
@@ -890,18 +988,40 @@ function CustomerDashboard() {
 function AgentDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
 
+  const { data: bookingsRes, isLoading } = useGetAllBookingsQuery();
+
+  const myBookings = bookingsRes?.data?.filter((b: any) =>
+    b.agent?.id === authUser?.id || b.user?.agent?.id === authUser?.id
+  ) || [];
+
+  const totalBookings = myBookings.length;
+  const thisWeekBookings = myBookings.filter((b: any) => {
+    const bookingDate = new Date(b.createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - bookingDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 7;
+  }).length;
+
+  const totalOrderVolume = myBookings.reduce((sum: number, b: any) => sum + Number(b.total_price || 0), 0);
+  const totalCommission = myBookings.reduce((sum: number, b: any) => sum + ((Number(b.total_price || 0) * Number(b.service?.agent_commission_percentage || authUser?.commission_percentage || 0)) / 100), 0);
+
   const stats = [
-    { label: "Bookings Placed", value: "124 Orders", desc: "18 active this week", icon: Briefcase, color: "text-[#E5675D] bg-[#FFF8F7]" },
-    { label: "Today's Bookings", value: "12", desc: "৳15,400 order volume", icon: Zap, color: "text-amber-600 bg-amber-50" },
-    { label: "Commission Earned", value: "৳14,500", desc: "৳2,450 this week", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Pending Payout", value: "৳3,200", desc: "Auto payout on June 15", icon: Clock, color: "text-indigo-600 bg-indigo-50" },
+    { label: "Bookings Placed", value: `${totalBookings} Orders`, desc: `${thisWeekBookings} active this week`, icon: Briefcase, color: "text-[#E5675D] bg-[#FFF8F7]" },
+    { label: "Total Order Volume", value: `৳${totalOrderVolume.toLocaleString()}`, desc: "Lifetime booking value", icon: Zap, color: "text-amber-600 bg-amber-50" },
+    { label: "Est. Commission", value: `৳${totalCommission.toLocaleString()}`, desc: "Total potential earnings", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
+    { label: "Wallet Balance", value: `৳${authUser?.wallet_balance || 0}`, desc: "Available for withdrawal", icon: Clock, color: "text-indigo-600 bg-indigo-50" },
   ];
 
-  const agentOrders = [
-    { id: "RS-9310", customer: "Sayed Karim", service: "AC Leak Repair", amount: "৳1,800", commission: "৳270", status: "Assigned", date: "Today, 12:00 PM" },
-    { id: "RS-9302", customer: "Salma Khatun", service: "Deep Sofa Clean", amount: "৳2,500", commission: "৳375", status: "Completed", date: "Yesterday" },
-    { id: "RS-9290", customer: "Rafiqul Islam", service: "Appliance Repair", amount: "৳1,200", commission: "৳180", status: "Completed", date: "June 08, 2026" },
-  ];
+  const agentOrders = [...myBookings].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 10).map(b => ({
+    id: `RS-${b.id}`,
+    customer: b.user?.name || "Unknown",
+    service: b.service?.name || "Custom Service",
+    amount: `৳${b.total_price}`,
+    commission: `৳${(Number(b.total_price || 0) * Number(b.service?.agent_commission_percentage || authUser?.commission_percentage || 0)) / 100}`,
+    status: b.status,
+    date: new Date(b.createdAt).toLocaleDateString(),
+  }));
 
   const agentColumns = [
     {
@@ -930,9 +1050,11 @@ function AgentDashboard() {
       key: "status",
       header: "Status",
       render: (o: any) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${o.status === "Completed" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${o.status === "completed" ? "bg-emerald-50 text-emerald-700" :
+            o.status === "cancelled" ? "bg-red-50 text-red-700" :
+              "bg-amber-50 text-amber-700"
           }`}>
-          {o.status}
+          {o.status.replace('_', ' ')}
         </span>
       )
     }
@@ -999,8 +1121,8 @@ function AgentDashboard() {
 
           <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-4">
             <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase">
-              <span>Current Rate</span>
-              <span className="text-[#FF7C71] text-sm">15% Commission</span>
+              <span>Current Default Rate</span>
+              <span className="text-[#FF7C71] text-sm">{authUser?.commission_percentage || 0}% Commission</span>
             </div>
             <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
               <div className="h-full bg-[#FF7C71] rounded-full w-3/4" />

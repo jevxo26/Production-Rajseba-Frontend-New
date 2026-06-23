@@ -38,6 +38,7 @@ export default function BookingsManagementPage() {
     user_id: "",
     vendor_id: "",
     service_id: "",
+    nested_service_id: "",
     selection_type: "nested", // 'nested' or 'package'
     sub_service_ids: [] as string[],
     package_id: "",
@@ -56,12 +57,12 @@ export default function BookingsManagementPage() {
   // Filtering dependent dropdowns
   const selectedVendorServices = services.filter((s: any) => s.vendor?.id?.toString() === newBooking.vendor_id);
   const selectedService = services.find((s: any) => s.id?.toString() === newBooking.service_id);
+  const selectedNestedService = selectedService?.nestedServices?.find((ns: any) => ns.id?.toString() === newBooking.nested_service_id);
 
   // Calculate estimated total
   let estimatedTotalPrice = 0;
   if (newBooking.selection_type === 'nested') {
-    const allNested = selectedService ? selectedService.nestedServices || [] : selectedVendorServices.flatMap((s: any) => s.nestedServices || []);
-    const allSubServices = allNested.flatMap((n: any) => n.subServices || []);
+    const allSubServices = selectedNestedService?.subServices || [];
     estimatedTotalPrice = newBooking.sub_service_ids.reduce((sum: number, id: string) => {
       const match = allSubServices.find((s: any) => s.id?.toString() === id);
       return sum + (match ? Number(match.price || 0) : 0);
@@ -118,7 +119,7 @@ export default function BookingsManagementPage() {
       await createBooking(payload).unwrap();
       toast.success("Booking created successfully!");
       setIsAddModalOpen(false);
-      setNewBooking({ user_id: "", vendor_id: roleName === "vendor" ? String(currentUser?.id || "") : "", service_id: "", selection_type: "nested", sub_service_ids: [], package_id: "", date: "", time: "", location: "", notes: "" });
+      setNewBooking({ user_id: "", vendor_id: roleName === "vendor" ? String(currentUser?.id || "") : "", service_id: "", nested_service_id: "", selection_type: "nested", sub_service_ids: [], package_id: "", date: "", time: "", location: "", notes: "" });
     } catch (error: any) {
       toast.error(error.data?.message || "Failed to create booking");
     }
@@ -413,39 +414,58 @@ export default function BookingsManagementPage() {
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
                   <h3 className="font-bold text-slate-700 text-sm mb-2">Service Details (Optional)</h3>
                   
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Filter By Service</label>
-                    <select
-                      value={newBooking.service_id}
-                      onChange={(e) => setNewBooking({...newBooking, service_id: e.target.value, nested_service_id: "", package_id: ""})}
-                      className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all"
-                    >
-                      <option value="">-- All Vendor Services --</option>
-                      {selectedVendorServices.map((s: any) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
-                    </select>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Service</label>
+                      <select
+                        value={newBooking.service_id}
+                        onChange={(e) => setNewBooking({...newBooking, service_id: e.target.value, nested_service_id: "", sub_service_ids: [], package_id: ""})}
+                        className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all"
+                      >
+                        <option value="">-- Choose a Service --</option>
+                        {selectedVendorServices.map((s: any) => (
+                          <option key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {newBooking.service_id && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Nested Service</label>
+                        <select
+                          value={newBooking.nested_service_id}
+                          onChange={(e) => setNewBooking({...newBooking, nested_service_id: e.target.value, sub_service_ids: []})}
+                          className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all"
+                        >
+                          <option value="">-- Choose a Nested Service --</option>
+                          {selectedService?.nestedServices?.map((ns: any) => (
+                            <option key={ns.id} value={ns.id}>{ns.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                         <input type="radio" name="selection_type" value="nested" checked={newBooking.selection_type === 'nested'} onChange={(e) => setNewBooking({...newBooking, selection_type: e.target.value, package_id: ""})} />
-                        Sub-Services Options
+                        Sub-Services Options (Multi-select)
                       </label>
                       <select
                         multiple
-                        disabled={newBooking.selection_type !== 'nested'}
+                        disabled={newBooking.selection_type !== 'nested' || !newBooking.nested_service_id}
                         value={newBooking.sub_service_ids}
                         onChange={(e) => setNewBooking({...newBooking, sub_service_ids: Array.from(e.target.selectedOptions, option => option.value)})}
                         className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all disabled:opacity-50 min-h-[100px]"
                       >
-                        {selectedService ? selectedService.nestedServices?.flatMap((ns: any) => ns.subServices || []).map((ss: any) => (
-                          <option key={ss.id} value={ss.id}>{ss.name} - ৳{ss.price}</option>
-                        )) : selectedVendorServices.flatMap((s: any) => s.nestedServices || []).flatMap((ns: any) => ns.subServices || []).map((ss: any) => (
+                        {selectedNestedService?.subServices?.map((ss: any) => (
                           <option key={ss.id} value={ss.id}>{ss.name} - ৳{ss.price}</option>
                         ))}
                       </select>
+                      {!newBooking.nested_service_id && newBooking.selection_type === 'nested' && (
+                        <p className="text-[10px] text-amber-600 mt-1">Please select a Nested Service first.</p>
+                      )}
                     </div>
 
                     <div className="space-y-2">

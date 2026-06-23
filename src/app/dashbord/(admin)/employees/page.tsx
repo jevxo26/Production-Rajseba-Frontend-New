@@ -1,14 +1,15 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2 } from "lucide-react";
+import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2, Edit2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
 import { useGetAllRolesQuery } from "@/redux/features/admin/role";
-import { useCreateProfileMutation } from "@/redux/features/admin/profile";
+import { useCreateProfileMutation, useUpdateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { toast } from "sonner";
+import { LocationCascader } from "@/components/ui/LocationCascader";
 
 interface EmployeeItem {
   id: string;
@@ -20,6 +21,12 @@ interface EmployeeItem {
   phone?: string;
   rating?: string;
   categoryName?: string;
+  profileId?: number;
+  categoryIds?: number[];
+  location?: string;
+  description?: string;
+  min_starting_price?: number;
+  google_map_link?: string;
 }
 
 export default function EmployeesPage() {
@@ -33,16 +40,24 @@ export default function EmployeesPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
+  const [createdEmployeeId, setCreatedEmployeeId] = useState<number | null>(null);
+
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<EmployeeItem | null>(null);
 
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
   const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-  
+
   const [updateUserMut] = useUpdateUserMutation();
   const [createUserMut, { isLoading: isCreating }] = useCreateUserMutation();
   const [deleteUserMut] = useDeleteUserMutation();
   const [createProfileMut, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
+  const [updateProfileMut, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
 
   const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
 
@@ -50,7 +65,7 @@ export default function EmployeesPage() {
     const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
     if (apiUsers && apiUsers.length > 0) {
       // Filter only employees
-      const employeeUsers = apiUsers.filter((u: any) => 
+      const employeeUsers = apiUsers.filter((u: any) =>
         u.role?.name === "Employee" || u.role === "Employee"
       );
 
@@ -64,6 +79,12 @@ export default function EmployeesPage() {
         joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown',
         rating: u.profile?.rating || 'New',
         categoryName: u.profile?.categories?.length > 0 ? u.profile.categories.map((c: any) => c.name).join(', ') : 'Unassigned',
+        profileId: u.profile?.id,
+        categoryIds: u.profile?.categories?.map((c: any) => c.id) || [],
+        location: u.profile?.location || '',
+        description: u.profile?.description || '',
+        min_starting_price: u.profile?.min_starting_price || 0,
+        google_map_link: u.profile?.google_map_link || '',
       }));
       setEmployees(mappedUsers);
     } else {
@@ -104,8 +125,9 @@ export default function EmployeesPage() {
       // 1. Create User
       const userRes = await createUserMut(userData).unwrap();
       const newUserId = userRes.data?.id || userRes.id;
-      
+
       setCreatedUserId(newUserId);
+      setCreatedEmployeeId(newUserId);
       toast.success("Employee account created! Now complete their profile.");
       setStep(2);
     } catch (err: any) {
@@ -116,7 +138,7 @@ export default function EmployeesPage() {
 
   const handleCreateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!createdUserId) {
+    if (!createdEmployeeId) {
       toast.error("User ID missing. Start over.");
       return;
     }
@@ -125,11 +147,15 @@ export default function EmployeesPage() {
     const categoryIds = formData.getAll("category_ids").map(id => Number(id));
 
     const profileData = {
-      user_id: createdUserId,
+      user_id: createdEmployeeId,
       category_ids: categoryIds.length > 0 ? categoryIds : undefined,
-      type: "personal",
+      type: formData.get("type")?.toString() || "personal",
       location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
       description: formData.get("description")?.toString() || "",
+      company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
       google_map_link: formData.get("google_map_link")?.toString() || "",
     };
@@ -137,7 +163,7 @@ export default function EmployeesPage() {
     try {
       await createProfileMut(profileData).unwrap();
       toast.success("Employee profile completed successfully!");
-      closeModal();
+      closeCreateModal();
       refetch();
     } catch (err: any) {
       console.error(err);
@@ -145,10 +171,64 @@ export default function EmployeesPage() {
     }
   };
 
-  const closeModal = () => {
+  const handleEditEmployee = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingEmployee) return;
+
+    const formData = new FormData(e.currentTarget);
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
+
+    try {
+      // 1. Update User
+      await updateUserMut({
+        id: editingEmployee.id,
+        data: {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+        }
+      }).unwrap();
+
+      // 2. Update or Create Profile
+      const profileData = {
+        category_ids: categoryIds.length > 0 ? categoryIds : [],
+        location: formData.get("location")?.toString() || "",
+        description: formData.get("description")?.toString() || "",
+        min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
+        google_map_link: formData.get("google_map_link")?.toString() || "",
+      };
+
+      if (editingEmployee.profileId) {
+        await updateProfileMut({
+          id: editingEmployee.profileId,
+          data: profileData
+        }).unwrap();
+      } else {
+        await createProfileMut({
+          ...profileData,
+          user_id: Number(editingEmployee.id),
+          type: "personal"
+        }).unwrap();
+      }
+
+      toast.success("Employee updated successfully!");
+      setIsEditModalOpen(false);
+      setEditingEmployee(null);
+      refetch();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.data?.message || err.message || "Failed to update employee.");
+    }
+  };
+
+  const closeCreateModal = () => {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
+    setCreatedEmployeeId(null);
+    setSelectedDevision("");
+    setSelectedDistrict("");
+    setSelectedArea("");
   };
 
   // Verification and Status update actions
@@ -262,6 +342,13 @@ export default function EmployeesPage() {
                   <Eye size={14} className="text-slate-400" /> View Details
                 </button>
 
+                <button
+                  onClick={() => { setEditingEmployee(user); setIsEditModalOpen(true); setOpenDropdownId(null); }}
+                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
+                >
+                  <Edit2 size={14} className="text-slate-400" /> Edit Details
+                </button>
+
                 {user.status !== "active" && (
                   <button
                     onClick={() => { handleActivate(user.id); setOpenDropdownId(null); }}
@@ -362,7 +449,7 @@ export default function EmployeesPage() {
                 <XCircle size={24} />
               </button>
             </div>
-            
+
             {step === 1 ? (
               <form onSubmit={handleCreateUser} className="space-y-4">
                 <div>
@@ -416,8 +503,18 @@ export default function EmployeesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
-                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                  <LocationCascader
+                    selectedDevisionId={selectedDevision}
+                    selectedDistrictId={selectedDistrict}
+                    selectedAreaId={selectedArea}
+                    onDevisionChange={setSelectedDevision}
+                    onDistrictChange={setSelectedDistrict}
+                    onAreaChange={setSelectedArea}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Location (Optional)</label>
+                  <input name="location" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
@@ -440,6 +537,78 @@ export default function EmployeesPage() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Employee Modal */}
+      {isEditModalOpen && editingEmployee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-slate-800">
+                Edit Employee
+              </h2>
+              <button onClick={() => { setIsEditModalOpen(false); setEditingEmployee(null); }} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
+                <XCircle size={24} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditEmployee} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+              <h3 className="font-bold text-slate-700 border-b pb-2 mb-2">Account Details</h3>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+                <input name="name" type="text" defaultValue={editingEmployee.name} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+                <input name="email" type="email" defaultValue={editingEmployee.email} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+                <input name="phone" type="tel" defaultValue={editingEmployee.phone !== 'No Phone' ? editingEmployee.phone : ''} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+              </div>
+
+              <h3 className="font-bold text-slate-700 border-b pb-2 mb-2 mt-4">Profile Details</h3>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
+                <select multiple name="category_ids" defaultValue={editingEmployee.categoryIds?.map(String)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
+                  {isCategoriesLoading ? (
+                    <option value="" disabled>Loading categories...</option>
+                  ) : (
+                    allCategories.map((c: any) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
+                <input name="location" type="text" defaultValue={editingEmployee.location} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+                <textarea name="description" rows={3} defaultValue={editingEmployee.description} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all resize-none"></textarea>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                  <input name="min_starting_price" type="number" step="0.01" defaultValue={editingEmployee.min_starting_price} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                  <input name="google_map_link" type="url" defaultValue={editingEmployee.google_map_link} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
+                </div>
+              </div>
+              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                <button type="button" onClick={() => { setIsEditModalOpen(false); setEditingEmployee(null); }} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isUpdatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
+                  {isUpdatingProfile ? "Saving..." : "Update Employee"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

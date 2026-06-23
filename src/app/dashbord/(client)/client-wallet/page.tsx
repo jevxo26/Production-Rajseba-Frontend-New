@@ -20,48 +20,25 @@ import {
   Loader2
 } from "lucide-react"
 import { useGetUserProfileQuery } from "@/redux/features/auth/authApi"
+import { useGetAllBookingsQuery } from "@/redux/features/admin/booking"
 
 export default function WalletPage() {
-  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const rawRole = useAppSelector((state) => state.auth.role);
+  const role = typeof rawRole === "string" ? rawRole.toLowerCase().replace(/\s+/g, "") : "client";
   const [copied, setCopied] = React.useState(false)
   const [autoRecharge, setAutoRecharge] = React.useState(true)
 
-  const { data: profileData, isLoading } = useGetUserProfileQuery()
+  const { data: profileData, isLoading: isProfileLoading } = useGetUserProfileQuery()
+  const { data: bookingsRes, isLoading: isBookingsLoading } = useGetAllBookingsQuery(undefined)
+  const myCompletedBookings = bookingsRes?.data?.filter((b: any) => 
+    b.status === "completed" && (b.user?.id === profileData?.data?.id || b.user?._id === profileData?.data?._id)
+  ) || []
+
+  const totalExpense = myCompletedBookings.reduce((sum: number, b: any) => sum + Number(b.total_price || 0), 0)
 
   const walletBalance = (profileData as any)?.data?.wallet_balance ?? (profileData as any)?.wallet_balance ?? 0
 
-  const transactions = [
-    {
-      id: "1",
-      service: "Premium Home Cleaning",
-      orderId: "Order #RS-8823",
-      date: "May 12, 2024",
-      amount: "- ৳ 2,450.00",
-      type: "debited" as const,
-      status: "DEBITED",
-      icon: Sparkles,
-    },
-    {
-      id: "2",
-      service: "Wallet Top-up",
-      orderId: "via bKash",
-      date: "May 10, 2024",
-      amount: "+ ৳ 5,000.00",
-      type: "credited" as const,
-      status: "CREDITED",
-      icon: BadgeCent,
-    },
-    {
-      id: "3",
-      service: "Pipe Repair & Sanitization",
-      orderId: "Order #RS-8756",
-      date: "May 08, 2024",
-      amount: "- ৳ 1,200.00",
-      type: "debited" as const,
-      status: "DEBITED",
-      icon: Wrench,
-    },
-  ]
+  // We will map myCompletedBookings to transactions below
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText("RAJSEBA500")
@@ -69,11 +46,11 @@ export default function WalletPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (role !== "client") {
-    return <AccessDenied roleRequired="Customer" />
+  if (role !== "client" && role !== "agent") {
+    return <AccessDenied roleRequired="Customer or Agent" />
   }
 
-  if (isLoading) {
+  if (isProfileLoading || isBookingsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 size={32} className="animate-spin text-[#FF7C71]" />
@@ -90,9 +67,9 @@ export default function WalletPage() {
           {/* Balance Display Card */}
           <div className="lg:col-span-2 bg-gradient-to-br from-rose-50/70 to-orange-50/40 p-8 rounded-[32px] border border-[#FFEBE9]/60 shadow-sm flex flex-col justify-between min-h-[200px]">
             <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Balance</span>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Expense (Completed)</span>
               <h2 className="text-4xl sm:text-5xl font-black text-slate-800 mt-2">
-                ৳ {Number(walletBalance).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
+                ৳ {Number(totalExpense).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
               </h2>
             </div>
 
@@ -250,33 +227,36 @@ export default function WalletPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50/50">
-                  {transactions.map((txn) => {
-                    const Icon = txn.icon;
-                    return (
-                      <tr key={txn.id} className="hover:bg-slate-50/30 transition-colors">
+                  {myCompletedBookings.length > 0 ? myCompletedBookings.map((b: any) => (
+                      <tr key={b.id} className="hover:bg-slate-50/30 transition-colors">
                         <td className="p-4 pl-6 flex items-center gap-3">
-                          <div className={`p-2.5 rounded-xl shrink-0 ${txn.type === "credited" ? "bg-emerald-50 text-emerald-500" : "bg-[#FFF8F7] text-[#FF7C71]"}`}>
-                            <Icon size={16} />
+                          <div className="p-2.5 rounded-xl shrink-0 bg-[#FFF8F7] text-[#FF7C71]">
+                            <Sparkles size={16} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-850">{txn.service}</h4>
-                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">{txn.orderId}</span>
+                            <h4 className="text-xs font-bold text-slate-850">{b.nestedService?.name || b.pkg?.name || "Service Booking"}</h4>
+                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Order #{b.id}</span>
                           </div>
                         </td>
                         <td className="p-4 text-xs font-semibold text-slate-400">
-                          {txn.date}
+                          {new Date(b.createdAt).toLocaleDateString("en-BD", { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
-                        <td className={`p-4 text-xs font-extrabold ${txn.type === "credited" ? "text-emerald-500" : "text-[#FF7C71]"}`}>
-                          {txn.amount}
+                        <td className="p-4 text-xs font-extrabold text-[#FF7C71]">
+                          - ৳ {Number(b.total_price || 0).toLocaleString("en-BD")}
                         </td>
                         <td className="p-4 pr-6">
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-lg ${txn.type === "credited" ? "bg-emerald-50 text-emerald-500" : "bg-[#FFF8F7] text-[#FF7C71]"}`}>
-                            {txn.status}
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-lg bg-[#FFF8F7] text-[#FF7C71] uppercase">
+                            EXPENSE
                           </span>
                         </td>
                       </tr>
-                    )
-                  })}
+                    )) : (
+                      <tr>
+                        <td colSpan={4} className="p-6 text-center text-xs text-slate-400 font-semibold">
+                          No completed bookings found.
+                        </td>
+                      </tr>
+                    )}
                 </tbody>
               </table>
             </div>

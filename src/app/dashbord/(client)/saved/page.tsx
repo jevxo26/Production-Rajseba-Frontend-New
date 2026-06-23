@@ -13,36 +13,15 @@ import {
   ChevronRight
 } from "lucide-react"
 import Link from "next/link"
+import { useGetSavedServicesQuery, useToggleSavedServiceMutation } from "@/redux/features/admin/user";
 
 export default function SavedServicesPage() {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
 
-  const [savedServices, setSavedServices] = React.useState([
-    {
-      id: "1",
-      title: "Advanced AC Servicing",
-      rating: 4.9,
-      desc: "Deep cleaning, gas refill, and electrical inspection.",
-      price: "৳1,200",
-      image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=500&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "2",
-      title: "Home Deep Cleaning",
-      rating: 4.8,
-      desc: "Complete sanitation for 2-3 BHK apartments.",
-      price: "৳3,500",
-      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&auto=format&fit=crop&q=80",
-    },
-    {
-      id: "3",
-      title: "Master Plumbing",
-      rating: 4.7,
-      desc: "Leak detection, pipe repair, and fitting installation.",
-      price: "৳800",
-      image: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=500&auto=format&fit=crop&q=80",
-    },
-  ])
+  const { data: savedServicesRes, isLoading } = useGetSavedServicesQuery();
+  const [toggleSavedService] = useToggleSavedServiceMutation();
+
+  const savedServices = savedServicesRes?.data || [];
 
   const [recentlyViewed, setRecentlyViewed] = React.useState([
     {
@@ -61,8 +40,12 @@ export default function SavedServicesPage() {
     },
   ])
 
-  const handleUnsave = (id: string) => {
-    setSavedServices(savedServices.filter((item) => item.id !== id))
+  const handleUnsave = async (id: string | number) => {
+    try {
+      await toggleSavedService(id).unwrap();
+    } catch (err) {
+      console.error("Failed to unsave service", err);
+    }
   }
 
   const handleClearHistory = () => {
@@ -87,7 +70,16 @@ export default function SavedServicesPage() {
 
         {/* Services Grid (Saved list + Discover card) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {savedServices.map((service) => (
+          {isLoading ? (
+            <div className="col-span-full py-12 text-center text-slate-400">Loading saved services...</div>
+          ) : savedServices.length === 0 ? (
+            <div className="col-span-full bg-white p-8 rounded-[24px] border border-dashed border-slate-200 text-center shadow-sm">
+              <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mx-auto mb-3">
+                <Heart size={20} />
+              </div>
+              <p className="text-slate-400 text-sm font-semibold">You haven't saved any services yet.</p>
+            </div>
+          ) : savedServices.map((service: any) => (
             <div
               key={service.id}
               className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group relative"
@@ -95,8 +87,8 @@ export default function SavedServicesPage() {
               {/* Image with Filled Heart overlay */}
               <div className="relative aspect-[4/3] w-full bg-slate-50 overflow-hidden">
                 <img
-                  src={service.image}
-                  alt={service.title}
+                  src={service.image || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=500&auto=format&fit=crop&q=80"}
+                  alt={service.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <button
@@ -111,21 +103,23 @@ export default function SavedServicesPage() {
               <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-slate-800 text-sm">{service.title}</h3>
+                    <h3 className="font-extrabold text-slate-800 text-sm">{service.name}</h3>
                     <div className="flex items-center gap-0.5 text-amber-500 font-bold text-xs">
-                      <Star size={11} className="fill-current" /> {service.rating}
+                      <Star size={11} className="fill-current" /> 4.8
                     </div>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed font-semibold">{service.desc}</p>
+                  <p className="text-xs text-slate-400 leading-relaxed font-semibold line-clamp-2">{service.subtitle || service.description || "Top-rated service."}</p>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-                  <div>
-                    <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block">Starts From</span>
-                    <span className="text-sm font-black text-[#FF7C71]">{service.price}</span>
-                  </div>
                   <Link
-                    href="/dashbord/quick-booking"
+                    href={`/services/${service.slug}`}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm active:scale-[0.98]"
+                  >
+                    Details
+                  </Link>
+                  <Link
+                    href={`/services/${service.slug}`}
                     className="bg-[#FF7C71] hover:bg-[#FF7C71] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm shadow-[#FF7C71]/10 active:scale-[0.98]"
                   >
                     Book Now

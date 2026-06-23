@@ -9,6 +9,7 @@ import { useGetAllRolesQuery } from "@/redux/features/admin/role";
 import { useCreateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { toast } from "sonner";
+import { LocationCascader } from "@/components/ui/LocationCascader";
 
 interface AgentItem {
   id: string;
@@ -33,11 +34,15 @@ export default function AgentsPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
   const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-  
+
   const [updateUserMut] = useUpdateUserMutation();
   const [createUserMut, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [deleteUserMut] = useDeleteUserMutation();
@@ -49,7 +54,7 @@ export default function AgentsPage() {
     const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
     if (apiUsers && apiUsers.length > 0) {
       // Filter only agents
-      const agentUsers = apiUsers.filter((u: any) => 
+      const agentUsers = apiUsers.filter((u: any) =>
         u.role?.name === "Agent" || u.role === "Agent"
       );
 
@@ -92,7 +97,7 @@ export default function AgentsPage() {
     try {
       const userRes = await createUserMut(userData).unwrap();
       const newUserId = userRes.data?.id || userRes.id;
-      
+
       setCreatedUserId(newUserId);
       toast.success("Agent user created! Now complete the profile.");
       setStep(2);
@@ -117,6 +122,9 @@ export default function AgentsPage() {
       category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: "personal", // Default to personal for agents
       location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
       description: formData.get("description")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
       google_map_link: formData.get("google_map_link")?.toString() || "",
@@ -137,6 +145,9 @@ export default function AgentsPage() {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
+    setSelectedDevision("");
+    setSelectedDistrict("");
+    setSelectedArea("");
   };
 
   // Verification and Status update actions
@@ -389,8 +400,18 @@ export default function AgentsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
-                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF7C71]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                  <LocationCascader
+                    selectedDevisionId={selectedDevision}
+                    selectedDistrictId={selectedDistrict}
+                    selectedAreaId={selectedArea}
+                    onDevisionChange={setSelectedDevision}
+                    onDistrictChange={setSelectedDistrict}
+                    onAreaChange={setSelectedArea}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Location (Optional)</label>
+                  <input name="location" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>

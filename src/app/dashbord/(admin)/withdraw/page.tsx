@@ -116,6 +116,15 @@ export default function AdminWithdrawPage() {
       ),
     },
     {
+      key: "booking",
+      header: "Booking",
+      render: (item: Withdraw) => (
+        <span className="text-sm font-medium text-slate-700">
+          {item.booking?.id ? `#${item.booking.id}` : "Manual Request"}
+        </span>
+      ),
+    },
+    {
       key: "amount",
       header: "Amount",
       render: (item: Withdraw) => (
@@ -233,6 +242,7 @@ export default function AdminWithdrawPage() {
             <div className="p-6 space-y-4">
               {[
                 { label: "Request ID", value: `#${selectedItem.id}` },
+                { label: "Booking ID", value: selectedItem.booking?.id ? `#${selectedItem.booking.id}` : "—" },
                 { label: "Vendor", value: selectedItem.vendor?.name || "—" },
                 { label: "Email", value: selectedItem.vendor?.email || "—" },
                 { label: "Amount", value: `৳${(selectedItem.amount || 0).toLocaleString()}` },

@@ -25,7 +25,9 @@ import {
   Wrench,
   Layers,
   Package,
-  MapPin
+  MapPin,
+  History,
+  MessageSquare
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -67,6 +69,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: MapPin, label: "Manage Locations", href: "/dashbord/locations" },
           { icon: Wrench, label: "Manage Services", href: "/dashbord/services" },
           { icon: Layers, label: "Nested Services", href: "/dashbord/nested-services" },
+          { icon: Layers, label: "Sub Services", href: "/dashbord/sub-services" },
           { icon: Package, label: "Manage Packages", href: "/dashbord/packages" },
           { icon: BarChart3, label: "System Analytics", href: "/dashbord/analytics" },
           { icon: Wallet, label: "Withdraw Requests", href: "/dashbord/withdraw" },
@@ -76,11 +79,11 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "agent":
         return [
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
+          { icon: Users, label: "Manage Clients", href: "/dashbord/users" },
+          { icon: Wrench, label: "Services", href: "/dashbord/services" },
           { icon: Calendar, label: "Manage Bookings", href: "/dashbord/manage-bookings" },
-          { icon: Zap, label: "Quick Booking", href: "/dashbord/quick-booking" },
-          { icon: ShoppingBag, label: "Recent Orders", href: "/dashbord/orders" },
-          { icon: Percent, label: "Commission Tracking", href: "/dashbord/commissions" },
-          { icon: HelpCircle, label: "Support Desk", href: "/dashbord/support" },
+          { icon: Wallet, label: "Wallet", href: "/dashbord/client-wallet" },
+          { icon: HelpCircle, label: "Live Chat", href: "/dashbord/live-chat" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
@@ -89,11 +92,13 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
           { icon: Calendar, label: "Manage Bookings", href: "/dashbord/manage-bookings" },
           { icon: Wrench, label: "My Services", href: "/dashbord/vendor-services" },
-          { icon: Layers, label: "My Sub-Services", href: "/dashbord/nested-services" },
+          { icon: Layers, label: "My Nested Services", href: "/dashbord/nested-services" },
+          { icon: Layers, label: "My Sub-Services", href: "/dashbord/sub-services" },
           { icon: Package, label: "My Packages", href: "/dashbord/vendor-packages" },
           { icon: UserPlus, label: "My Employees", href: "/dashbord/employees" },
           { icon: Users, label: "My Clients", href: "/dashbord/users" },
-          { icon: Wallet, label: "Withdraw Money", href: "/dashbord/withdraw" },
+          { icon: MessageSquare, label: "Live Chat", href: "/dashbord/live-chat" },
+          { icon: Wallet, label: "Wallet & Earnings", href: "/dashbord/vendor-wallet" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];
@@ -102,8 +107,17 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: LayoutGrid, label: "Overview", href: "/dashbord/overview" },
           { icon: Heart, label: "Saved Services", href: "/dashbord/saved" },
           { icon: Calendar, label: "My Bookings", href: "/dashbord/bookings" },
-          { icon: Wallet, label: "Wallet", href: "/dashbord/wallet" },
+          { icon: Wallet, label: "Wallet", href: "/dashbord/client-wallet" },
           { icon: HelpCircle, label: "Help", href: "/dashbord/help" },
+          { icon: User, label: "My Profile", href: "/dashbord/profile" },
+          { icon: Settings, label: "Settings", href: "/dashbord/settings" },
+        ];
+      case "employee":
+        return [
+          { icon: LayoutGrid, label: "Overview", href: "/dashbord" },
+          { icon: ClipboardList, label: "My Tasks", href: "/dashbord/employee-tasks" },
+          { icon: History, label: "Task History", href: "/dashbord/employee-history" },
+          { icon: MessageSquare, label: "Live Chat", href: "/dashbord/live-chat" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },
         ];

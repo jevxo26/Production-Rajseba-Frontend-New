@@ -11,6 +11,7 @@ import {
   Loader2
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useGetAllBookingsQuery } from "@/redux/features/admin/booking"
 
 type BookingStatus = "Active" | "Scheduled" | "Completed" | "Cancelled"
@@ -34,6 +35,7 @@ const STATUS_TEXT: Record<string, string> = {
 export default function BookingsPage() {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const authUser = useAppSelector((state) => state.auth.user);
+  const router = useRouter();
   const [filter, setFilter] = React.useState<BookingStatus>("Active")
 
   const { data: bookingsRes, isLoading } = useGetAllBookingsQuery()
@@ -131,14 +133,44 @@ export default function BookingsPage() {
 
                 {/* Middle Row: Details */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
-                  {/* Column 1: Professional */}
+                  {/* Column 1: Assigned Personnel */}
                   <div>
-                    <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">Professional</span>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-[#FFEBE9] flex items-center justify-center text-[#E5675D] font-bold text-sm border border-[#FF7C71]/30">
-                        {booking.vendor?.name?.[0] || "V"}
-                      </div>
-                      <span className="text-xs font-bold text-slate-800">{booking.vendor?.name || "Assigned Vendor"}</span>
+                    <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">Assigned To</span>
+                    <div className="flex flex-col gap-2">
+                      {booking.vendor && (
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-[#FFEBE9] flex items-center justify-center text-[#E5675D] font-bold text-xs border border-[#FF7C71]/30">
+                            {booking.vendor?.name?.[0] || "V"}
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-slate-800 block">{booking.vendor?.name || "Assigned Vendor"}</span>
+                            <span className="text-[10px] text-slate-500 font-semibold">Service Provider</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {booking.employees && booking.employees.length > 0 && (
+                        booking.employees.map((emp: any) => (
+                          <div key={emp.id} className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xs border border-indigo-100">
+                              {emp.name?.[0] || "E"}
+                            </div>
+                            <div>
+                              <span className="text-xs font-bold text-slate-800 block">{emp.name}</span>
+                              <span className="text-[10px] text-slate-500 font-semibold">Technician</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+
+                      {!booking.vendor && (!booking.employees || booking.employees.length === 0) && (
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs border border-slate-200">
+                            ?
+                          </div>
+                          <span className="text-xs font-bold text-slate-400">Not assigned yet</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -169,10 +201,32 @@ export default function BookingsPage() {
 
                 {/* Bottom Row: Actions */}
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                  <button className="flex items-center gap-2 text-[#FF7C71] hover:text-[#E5675D] text-xs font-bold transition-colors focus:outline-none">
-                    <MessageCircle size={16} />
-                    <span>Contact Professional</span>
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {booking.vendor && (
+                      <button 
+                        onClick={() => router.push(`/dashbord/live-chat?receiverId=${booking.vendor.id}`)}
+                        className="flex items-center gap-1.5 text-[#FF7C71] bg-[#FFF8F7] hover:bg-[#FFEBE9] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"
+                      >
+                        <MessageCircle size={14} />
+                        <span>Chat Vendor</span>
+                      </button>
+                    )}
+                    {booking.employees?.map((emp: any) => (
+                      <button 
+                        key={emp.id}
+                        onClick={() => router.push(`/dashbord/live-chat?receiverId=${emp.id}`)}
+                        className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"
+                      >
+                        <MessageCircle size={14} />
+                        <span>Chat {emp.name?.split(' ')[0]}</span>
+                      </button>
+                    ))}
+                    {!booking.vendor && (!booking.employees || booking.employees.length === 0) && (
+                      <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
+                        <Loader2 size={14} className="animate-spin" /> Waiting for provider
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-3">
                     <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-6 rounded-2xl transition-colors active:scale-[0.98]">

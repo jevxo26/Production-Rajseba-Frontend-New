@@ -67,6 +67,7 @@ export default function ServiceDetailPage({
       />
       <div className="relative z-10">
         <CategorizedHero
+          id={service.id}
           name={service.name}
           description={service.description}
         />

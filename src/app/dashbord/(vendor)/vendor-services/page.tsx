@@ -83,9 +83,16 @@ export default function VendorServicesPage() {
 
   const allUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
 
-  const employeeOptions = allUsers
+  const employeeOptions = categoryId === "NONE" ? [] : allUsers
     .filter((u: any) => u.role?.name === "Employee" || u.role === "Employee")
     .filter((u: any) => String(u.vendor?.id || u.vendor) === String(currentUserId))
+    .filter((u: any) => {
+      const cats = u.profile?.categories;
+      if (Array.isArray(cats)) {
+        return cats.some((c: any) => String(c.id) === categoryId);
+      }
+      return false;
+    })
     .map((u: any) => ({
       id: Number(u.id || u._id),
       name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
@@ -299,31 +306,44 @@ export default function VendorServicesPage() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
-                <CustomSelect options={categoryOptions} value={categoryId} onChange={setCategoryId} />
+                <CustomSelect 
+                  options={categoryOptions} 
+                  value={categoryId} 
+                  onChange={(val) => {
+                    setCategoryId(val);
+                    setEmployeeIds([]); // Clear employees on category change
+                  }} 
+                />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
-                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
-                  {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
-                    <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
-                      <input 
-                        type="checkbox" 
-                        className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30"
-                        checked={employeeIds.includes(emp.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setEmployeeIds([...employeeIds, emp.id]);
-                          else setEmployeeIds(employeeIds.filter(id => id !== emp.id));
-                        }}
-                      />
-                      <span className="text-sm text-slate-700">{emp.name}</span>
-                    </label>
-                  )) : (
-                    <span className="text-xs text-slate-400">
-                      No employees found. Please add employees to your account first.
-                    </span>
-                  )}
+              {categoryId !== "NONE" ? (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
+                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
+                    {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
+                      <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
+                        <input 
+                          type="checkbox" 
+                          className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30"
+                          checked={employeeIds.includes(emp.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) setEmployeeIds([...employeeIds, emp.id]);
+                            else setEmployeeIds(employeeIds.filter(id => id !== emp.id));
+                          }}
+                        />
+                        <span className="text-sm text-slate-700">{emp.name}</span>
+                      </label>
+                    )) : (
+                      <span className="text-xs text-slate-400">
+                        No employees found for this category. Please add employees to your account first.
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-4 bg-slate-50 border border-slate-200 border-dashed rounded-xl text-center">
+                  <p className="text-xs font-medium text-slate-500">Please select a Category to assign employees.</p>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</label>
                 <Textarea placeholder="Describe this service..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2}
