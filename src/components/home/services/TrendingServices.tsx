@@ -28,11 +28,23 @@ const getHash = (str: string) => {
   return Math.abs(hash);
 };
 
+interface TrendingServiceItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  rating: number;
+  reviews: string;
+  price: number;
+  badge?: string;
+  slug: string;
+}
+
 export default function TrendingServices() {
   const { data: nestedRes, isLoading } = useGetPublicNestedServicesQuery();
   const allNestedServices = nestedRes?.data || (Array.isArray(nestedRes) ? nestedRes : []);
 
-  const trendingListings = useMemo(() => {
+  const trendingListings = useMemo<TrendingServiceItem[]>(() => {
     if (!allNestedServices.length) return [];
 
     const mapped = allNestedServices.map((item: any) => {
