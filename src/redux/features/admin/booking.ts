@@ -5,10 +5,13 @@ export interface Booking {
   user?: any;
   vendor?: any;
   employees?: any[];
-  nestedService?: any;
+  subServices?: any[];
   pkg?: any;
+  package_id?: number;
   date: string;
+  time?: string;
   location: string;
+  total_price?: number;
   notes?: string;
   status: 'pending' | 'assigned' | 'on_the_way' | 'completed' | 'cancelled';
   createdAt: string;

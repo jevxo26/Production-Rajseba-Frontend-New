@@ -68,6 +68,9 @@ export default function AdminServicesManagementPage() {
   const [subtitle, setSubtitle] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [overview, setOverview] = useState("");
+  const [details, setDetails] = useState("");
+  const [faq, setFaq] = useState<{question: string, answer: string}[]>([]);
   const [image, setImage] = useState("");
   const [categoryId, setCategoryId] = useState("NONE");
   const [vendorId, setVendorId] = useState("NONE");
@@ -125,7 +128,7 @@ export default function AdminServicesManagementPage() {
   };
 
   const resetForm = () => {
-    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setImage(""); setCategoryId("NONE"); setVendorId("NONE"); setEmployeeIds([]);
+    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setOverview(""); setDetails(""); setFaq([]); setImage(""); setCategoryId("NONE"); setVendorId("NONE"); setEmployeeIds([]);
   };
 
   const openCreateModal = () => {
@@ -140,6 +143,9 @@ export default function AdminServicesManagementPage() {
     setSubtitle(item.subtitle || "");
     setSlug(item.slug);
     setDescription(item.description || "");
+    setOverview(item.overview || "");
+    setDetails(item.details || "");
+    setFaq(item.faq || []);
     setImage(item.image || "");
     setCategoryId(item.category_id ? String(item.category_id) : "NONE");
     setVendorId(item.vendor ? String(item.vendor.id) : "NONE");
@@ -165,6 +171,9 @@ export default function AdminServicesManagementPage() {
             subtitle: subtitle.trim() || undefined,
             slug: slug.trim(),
             description: description.trim() || undefined,
+            overview: overview.trim() || undefined,
+            details: details.trim() || undefined,
+            faq: faq.length > 0 ? faq : undefined,
             image: image || undefined,
             category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
             vendor_id: vendorId !== "NONE" ? Number(vendorId) : undefined,
@@ -178,6 +187,9 @@ export default function AdminServicesManagementPage() {
           subtitle: subtitle.trim() || undefined,
           slug: slug.trim(),
           description: description.trim() || undefined,
+          overview: overview.trim() || undefined,
+          details: details.trim() || undefined,
+          faq: faq.length > 0 ? faq : undefined,
           image: image || undefined,
           category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
           vendor_id: vendorId !== "NONE" ? Number(vendorId) : undefined,
@@ -387,9 +399,58 @@ export default function AdminServicesManagementPage() {
                   placeholder="Describe this service..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 disabled:cursor-not-allowed disabled:opacity-50 transition-all w-full"
+                  rows={2}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Overview</label>
+                <Textarea
+                  placeholder="Service overview..."
+                  value={overview}
+                  onChange={(e) => setOverview(e.target.value)}
+                  rows={2}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Details</label>
+                <Textarea
+                  placeholder="Detailed information..."
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                  rows={3}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
+                />
+              </div>
+              
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">FAQs</label>
+                  <button type="button" onClick={() => setFaq([...faq, { question: '', answer: '' }])} className="text-xs text-brand-primary font-bold hover:underline flex items-center gap-1">
+                    <PlusCircle size={12} /> Add FAQ
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {faq.map((f, i) => (
+                    <div key={i} className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 relative">
+                      <button type="button" onClick={() => setFaq(faq.filter((_, idx) => idx !== i))} className="absolute -top-2 -right-2 bg-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white rounded-full p-1 transition-colors">
+                        <X size={12} />
+                      </button>
+                      <Input placeholder="Question" value={f.question} onChange={(e) => {
+                        const newFaq = [...faq];
+                        newFaq[i].question = e.target.value;
+                        setFaq(newFaq);
+                      }} />
+                      <Textarea placeholder="Answer" rows={2} value={f.answer} onChange={(e) => {
+                        const newFaq = [...faq];
+                        newFaq[i].answer = e.target.value;
+                        setFaq(newFaq);
+                      }} className="text-sm rounded-xl" />
+                    </div>
+                  ))}
+                  {faq.length === 0 && <p className="text-xs text-slate-400 italic">No FAQs added yet.</p>}
+                </div>
               </div>
               {/* Image Upload */}
               <div className="space-y-1.5">

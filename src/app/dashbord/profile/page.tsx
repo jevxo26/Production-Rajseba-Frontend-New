@@ -8,6 +8,9 @@ import { useGetUserProfileQuery } from "@/redux/features/auth/authApi";
 import { useUpdateUserMutation } from "@/redux/features/admin/user";
 import { useCreateProfileMutation, useUpdateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
+import { useState, useEffect } from "react";
+import { LocationCascader } from "@/components/ui/LocationCascader";
+import { CustomSelect } from "@/components/ui/select";
 
 export default function ProfilePage() {
   const role = useAppSelector((state) => state.auth.role) || "client";
@@ -17,8 +20,6 @@ export default function ProfilePage() {
   const [updateUserMut] = useUpdateUserMutation();
   const [createProfileMut, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
   const [updateProfileMut, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
-  const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-  
   const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
 
   // Prefer API response, fall back to Redux store (which is persisted from localStorage)
@@ -33,6 +34,27 @@ export default function ProfilePage() {
   const profile = apiUser?.profile;
   const hasProfile = !!profile;
 
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("personal");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (profile && !selectedDevision && !selectedDistrict && !selectedArea) {
+      if (profile.devision?.id) setSelectedDevision(profile.devision.id.toString());
+      if (profile.district?.id) setSelectedDistrict(profile.district.id.toString());
+      if (profile.area?.id) setSelectedArea(profile.area.id.toString());
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (profile) {
+      if (profile.type) setSelectedType(profile.type);
+      if (profile.categories?.length) setSelectedCategories(profile.categories.map((c: any) => c.id.toString()));
+    }
+  }, [profile]);
+
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,12 +65,16 @@ export default function ProfilePage() {
       address: formData.get("address") as string,
     };
     
-    const categoryIdStr = formData.get("category_id")?.toString();
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
+
     const profileData = {
       user_id: user.id || user._id,
-      category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
-      type: formData.get("type")?.toString() || "personal",
+      category_ids: selectedCategories.map(id => Number(id)),
+      type: selectedType,
       location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
       description: formData.get("description")?.toString() || "",
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
@@ -166,28 +192,42 @@ export default function ProfilePage() {
 
               <div className="sm:col-span-2 pt-6 pb-2">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Professional & Public Details</h4>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile Type</label>
-                <select name="type" required defaultValue={profile?.type || "personal"} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium">
-                  <option value="personal">Personal / Freelancer</option>
-                  <option value="company">Company / Agency</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Service Category</label>
-                <select name="category_id" required defaultValue={profile?.category?.id || profile?.categoryId || ""} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium">
-                  <option value="" disabled>Select a category</option>
-                  {isCategoriesLoading ? (
-                    <option value="" disabled>Loading...</option>
-                  ) : (
-                    allCategories.map((c: any) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
+                <div className="flex flex-wrap gap-1 mt-4">
+                  {profile?.categories?.length > 0 ? (
+                    profile.categories.map((cat: any) => (
+                      <span key={cat.id} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-sm">
+                        {cat.name}
+                      </span>
                     ))
+                  ) : (
+                    <span className="font-semibold text-slate-900">—</span>
                   )}
-                </select>
+                </div>
+              </div>
+
+              <div>
+                <CustomSelect
+                  label="Profile Type"
+                  options={[
+                    { value: "personal", label: "Personal / Freelancer" },
+                    { value: "company", label: "Company / Agency" }
+                  ]}
+                  value={selectedType}
+                  onChange={setSelectedType}
+                  placeholder="Select Type"
+                />
+              </div>
+
+              <div>
+                <CustomSelect
+                  label="Categories (Multiple)"
+                  options={allCategories.map((c: any) => ({ value: c.id.toString(), label: c.name }))}
+                  value={selectedCategories}
+                  onChange={setSelectedCategories}
+                  placeholder={isCategoriesLoading ? "Loading..." : "Select Categories"}
+                  isMulti={true}
+                  disabled={isCategoriesLoading}
+                />
               </div>
 
               <div className="sm:col-span-2">
@@ -202,14 +242,24 @@ export default function ProfilePage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Service Location / City</label>
+                <LocationCascader
+                  selectedDevisionId={selectedDevision}
+                  selectedDistrictId={selectedDistrict}
+                  selectedAreaId={selectedArea}
+                  onDevisionChange={setSelectedDevision}
+                  onDistrictChange={setSelectedDistrict}
+                  onAreaChange={setSelectedArea}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Address / Building (Optional)</label>
                 <input
                   name="location"
                   type="text"
-                  required
                   defaultValue={profile?.location || ""}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                  placeholder="e.g. Dhaka, Gulshan"
+                  placeholder="e.g. Block C, House 12"
                 />
               </div>
 

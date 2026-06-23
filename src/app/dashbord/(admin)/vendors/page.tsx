@@ -109,11 +109,11 @@ export default function VendorsManagementPage() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const categoryIdStr = formData.get("category_id")?.toString();
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
 
     const profileData = {
       user_id: createdUserId,
-      category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
+      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: formData.get("type")?.toString() || "personal",
       location: formData.get("location")?.toString() || "",
       description: formData.get("description")?.toString() || "",
@@ -199,9 +199,18 @@ export default function VendorsManagementPage() {
     },
     {
       key: "categoryName",
-      header: "Category",
-      render: (user: VendorItem) => (
-        <span className="font-bold text-slate-600 text-xs">{user.categoryName}</span>
+      render: (vendor: VendorItem) => (
+        <div className="flex flex-wrap gap-1">
+          {vendor.profile?.categories?.length > 0 ? (
+            vendor.profile.categories.map((cat: any) => (
+              <span key={cat.id} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                {cat.name}
+              </span>
+            ))
+          ) : (
+            <span className="text-slate-400 italic font-normal text-xs">{vendor.categoryName}</span>
+          )}
+        </div>
       )
     },
     {
@@ -373,9 +382,8 @@ export default function VendorsManagementPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
-                  <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                    <option value="" disabled>Select a category</option>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
+                  <select multiple name="category_ids" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
                     {isCategoriesLoading ? (
                       <option value="" disabled>Loading categories...</option>
                     ) : (

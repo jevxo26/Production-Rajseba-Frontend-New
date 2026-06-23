@@ -12,8 +12,10 @@ import {
   Sparkles,
   Tag,
   Globe,
+  Eye,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
 import type { TableAction } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -27,10 +29,12 @@ import {
   Service,
 } from "@/redux/features/admin/service";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
+import { useGetAllUsersQuery } from "@/redux/features/admin/user";
 import { toast } from "sonner";
 import { uploadImage } from "@/lib/upload";
 
 export default function VendorServicesPage() {
+  const router = useRouter();
   const rawRole = useAppSelector((state) => state.auth.role) || "vendor";
   const role =
     typeof rawRole === "string"
@@ -45,6 +49,7 @@ export default function VendorServicesPage() {
     refetch,
   } = useGetAllServicesQuery();
   const { data: apiCategoriesRes } = useGetAllCategoriesQuery();
+  const { data: apiUsersRes } = useGetAllUsersQuery();
 
   const [createMut, { isLoading: isCreating }] = useCreateServiceMutation();
   const [updateMut, { isLoading: isUpdating }] = useUpdateServiceMutation();
@@ -61,8 +66,12 @@ export default function VendorServicesPage() {
   const [subtitle, setSubtitle] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [overview, setOverview] = useState("");
+  const [details, setDetails] = useState("");
+  const [faq, setFaq] = useState<{question: string, answer: string}[]>([]);
   const [image, setImage] = useState("");
   const [categoryId, setCategoryId] = useState("NONE");
+  const [employeeIds, setEmployeeIds] = useState<number[]>([]);
 
   const allCategories =
     apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
@@ -72,16 +81,22 @@ export default function VendorServicesPage() {
     ...allCategories.map((c: any) => ({ value: String(c.id), label: c.name })),
   ];
 
-  // Filter — vendor sees only their own services
+  const allUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
+
+  const employeeOptions = allUsers
+    .filter((u: any) => u.role?.name === "Employee" || u.role === "Employee")
+    .filter((u: any) => String(u.vendor?.id || u.vendor) === String(currentUserId))
+    .map((u: any) => ({
+      id: Number(u.id || u._id),
+      name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
+    }));
+
+  // Backend API already filters services for the vendor based on authentication token
   useEffect(() => {
     const all: Service[] =
       apiServicesRes?.data || (Array.isArray(apiServicesRes) ? apiServicesRes : []);
-    if (role === "vendor") {
-      setServices(all.filter((s) => String(s.vendor_id) === String(currentUserId)));
-    } else {
-      setServices(all);
-    }
-  }, [apiServicesRes, role, currentUserId]);
+    setServices(all);
+  }, [apiServicesRes]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,7 +114,7 @@ export default function VendorServicesPage() {
   };
 
   const resetForm = () => {
-    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setImage(""); setCategoryId("NONE");
+    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setOverview(""); setDetails(""); setFaq([]); setImage(""); setCategoryId("NONE"); setEmployeeIds([]);
   };
 
   const openCreateModal = () => { setEditingItem(null); resetForm(); setIsModalOpen(true); };
@@ -110,8 +125,12 @@ export default function VendorServicesPage() {
     setSubtitle(item.subtitle || "");
     setSlug(item.slug);
     setDescription(item.description || "");
+    setOverview(item.overview || "");
+    setDetails(item.details || "");
+    setFaq(item.faq || []);
     setImage(item.image || "");
     setCategoryId(item.category_id ? String(item.category_id) : "NONE");
+    setEmployeeIds(item.employees ? item.employees.map((e: any) => Number(e.id)) : []);
     setIsModalOpen(true);
   };
 
@@ -130,8 +149,12 @@ export default function VendorServicesPage() {
             subtitle: subtitle.trim() || undefined,
             slug: slug.trim(),
             description: description.trim() || undefined,
+            overview: overview.trim() || undefined,
+            details: details.trim() || undefined,
+            faq: faq.length > 0 ? faq : undefined,
             image: image || undefined,
             category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
+            employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
           },
         }).unwrap();
         toast.success("Service updated successfully!");
@@ -141,9 +164,13 @@ export default function VendorServicesPage() {
           subtitle: subtitle.trim() || undefined,
           slug: slug.trim(),
           description: description.trim() || undefined,
+          overview: overview.trim() || undefined,
+          details: details.trim() || undefined,
+          faq: faq.length > 0 ? faq : undefined,
           image: image || undefined,
           category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
           vendor_id: Number(currentUserId),
+          employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
         }).unwrap();
         toast.success("Service created successfully!");
       }
@@ -214,6 +241,7 @@ export default function VendorServicesPage() {
   ];
 
   const tableActions: TableAction<Service>[] = [
+    { label: "View", icon: Eye, onClick: (item) => router.push(`/dashbord/vendor-services/${item.id}`), variant: "primary" },
     { label: "Edit", icon: Edit2, onClick: openEditModal, variant: "secondary" },
     { label: "Delete", icon: Trash2, onClick: openDeleteModal, variant: "destructive" },
   ];
@@ -274,9 +302,70 @@ export default function VendorServicesPage() {
                 <CustomSelect options={categoryOptions} value={categoryId} onChange={setCategoryId} />
               </div>
               <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
+                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
+                  {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
+                    <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30"
+                        checked={employeeIds.includes(emp.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) setEmployeeIds([...employeeIds, emp.id]);
+                          else setEmployeeIds(employeeIds.filter(id => id !== emp.id));
+                        }}
+                      />
+                      <span className="text-sm text-slate-700">{emp.name}</span>
+                    </label>
+                  )) : (
+                    <span className="text-xs text-slate-400">
+                      No employees found. Please add employees to your account first.
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</label>
-                <Textarea placeholder="Describe this service..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 disabled:cursor-not-allowed disabled:opacity-50 transition-all w-full" />
+                <Textarea placeholder="Describe this service..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Overview</label>
+                <Textarea placeholder="Service overview..." value={overview} onChange={(e) => setOverview(e.target.value)} rows={2}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Details</label>
+                <Textarea placeholder="Detailed information..." value={details} onChange={(e) => setDetails(e.target.value)} rows={3}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">FAQs</label>
+                  <button type="button" onClick={() => setFaq([...faq, { question: '', answer: '' }])} className="text-xs text-brand-primary font-bold hover:underline flex items-center gap-1">
+                    <PlusCircle size={12} /> Add FAQ
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {faq.map((f, i) => (
+                    <div key={i} className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 relative">
+                      <button type="button" onClick={() => setFaq(faq.filter((_, idx) => idx !== i))} className="absolute -top-2 -right-2 bg-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white rounded-full p-1 transition-colors">
+                        <X size={12} />
+                      </button>
+                      <Input placeholder="Question" value={f.question} onChange={(e) => {
+                        const newFaq = [...faq];
+                        newFaq[i].question = e.target.value;
+                        setFaq(newFaq);
+                      }} />
+                      <Textarea placeholder="Answer" rows={2} value={f.answer} onChange={(e) => {
+                        const newFaq = [...faq];
+                        newFaq[i].answer = e.target.value;
+                        setFaq(newFaq);
+                      }} className="text-sm rounded-xl" />
+                    </div>
+                  ))}
+                  {faq.length === 0 && <p className="text-xs text-slate-400 italic">No FAQs added yet.</p>}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Service Image</label>

@@ -24,7 +24,8 @@ import {
   Gift,
   Wrench,
   Layers,
-  Package
+  Package,
+  MapPin
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -63,6 +64,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: UserPlus, label: "Manage Employees", href: "/dashbord/employees" },
           { icon: Briefcase, label: "Role Management", href: "/dashbord/role" },
           { icon: ClipboardList, label: "Manage Categories", href: "/dashbord/category" },
+          { icon: MapPin, label: "Manage Locations", href: "/dashbord/locations" },
           { icon: Wrench, label: "Manage Services", href: "/dashbord/services" },
           { icon: Layers, label: "Nested Services", href: "/dashbord/nested-services" },
           { icon: Package, label: "Manage Packages", href: "/dashbord/packages" },
@@ -89,6 +91,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           { icon: Wrench, label: "My Services", href: "/dashbord/vendor-services" },
           { icon: Layers, label: "My Sub-Services", href: "/dashbord/nested-services" },
           { icon: Package, label: "My Packages", href: "/dashbord/vendor-packages" },
+          { icon: UserPlus, label: "My Employees", href: "/dashbord/employees" },
+          { icon: Users, label: "My Clients", href: "/dashbord/users" },
           { icon: Wallet, label: "Withdraw Money", href: "/dashbord/withdraw" },
           { icon: User, label: "My Profile", href: "/dashbord/profile" },
           { icon: Settings, label: "Settings", href: "/dashbord/settings" },

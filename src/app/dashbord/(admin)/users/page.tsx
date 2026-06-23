@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useAppSelector } from "@/redux/hooks";
 import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -22,7 +24,9 @@ interface UserItem {
 }
 
 export default function UsersPage() {
-  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const role = typeof rawRole === 'string' ? rawRole.toLowerCase() : (rawRole as any)?.name?.toLowerCase() || "superadmin";
 
   const [users, setUsers] = useState<UserItem[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -45,7 +49,21 @@ export default function UsersPage() {
   const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
 
   useEffect(() => {
-    const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
+    let apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
+    
+    // Filter to ONLY show Clients
+    apiUsers = apiUsers.filter((u: any) => {
+      const uRole = (u.role?.name || u.role || "").toLowerCase();
+      return uRole === "client" || uRole === "customer" || uRole === "user";
+    });
+
+    // Vendor only sees their own clients
+    if (role === "vendor") {
+      apiUsers = apiUsers.filter((u: any) => 
+        u.vendor?.id?.toString() === currentUser?.id?.toString() || u.vendor_id?.toString() === currentUser?.id?.toString()
+      );
+    }
+
     if (apiUsers && apiUsers.length > 0) {
       const mappedUsers = apiUsers.map((u: any) => ({
         id: u.id || u._id || `USR-${Math.floor(Math.random() * 1000)}`,
@@ -58,18 +76,23 @@ export default function UsersPage() {
         rating: u.rating || 'New',
       }));
       setUsers(mappedUsers);
+    } else {
+      setUsers([]);
     }
-  }, [apiUsersRes]);
+  }, [apiUsersRes, role, currentUser?.id]);
 
   const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = {
+    const data: any = {
       name: formData.get("name"),
       email: formData.get("email"),
       phone: formData.get("phone"),
       roleId: Number(formData.get("role")),
     };
+    if (role === "vendor") {
+      data.vendor_id = Number(currentUser?.id);
+    }
     try {
       const userRes = await createUserMut(data).unwrap();
       const newUserId = userRes.data?.id || userRes.id;
@@ -91,11 +114,11 @@ export default function UsersPage() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const categoryIdStr = formData.get("category_id")?.toString();
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
 
     const profileData = {
       user_id: createdUserId,
-      category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
+      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: formData.get("type")?.toString() || "personal",
       location: formData.get("location")?.toString() || "",
       description: formData.get("description")?.toString() || "",
@@ -247,12 +270,12 @@ export default function UsersPage() {
 
               {/* Dropdown Menu */}
               <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                <button
-                  onClick={() => { setSelectedUser(user); setOpenDropdownId(null); }}
+                <Link
+                  href={`/dashbord/users/${user.id}`}
                   className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                 >
                   <Eye size={14} className="text-slate-400" /> View Details
-                </button>
+                </Link>
 
                 {user.status !== "active" && (
                   <button
@@ -375,9 +398,11 @@ export default function UsersPage() {
                     {isRolesLoading ? (
                       <option value="" disabled>Loading roles...</option>
                     ) : (
-                      (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : [])).map((r: any) => (
-                        <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
-                      ))
+                      (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []))
+                        .filter((r: any) => role !== "vendor" || r.name === "Client")
+                        .map((r: any) => (
+                          <option key={r.id || r._id} value={r.id || r._id}>{r.name}</option>
+                        ))
                     )}
                   </select>
                 </div>
@@ -400,9 +425,8 @@ export default function UsersPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
-                  <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                    <option value="" disabled>Select a category</option>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
+                  <select multiple name="category_ids" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
                     {isCategoriesLoading ? (
                       <option value="" disabled>Loading categories...</option>
                     ) : (

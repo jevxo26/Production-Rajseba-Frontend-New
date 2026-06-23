@@ -23,12 +23,16 @@ interface EmployeeItem {
 }
 
 export default function EmployeesPage() {
-  const role = useAppSelector((state) => state.auth.role) || "superadmin";
+  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const role = typeof rawRole === 'string' ? rawRole.toLowerCase() : (rawRole as any)?.name?.toLowerCase() || "superadmin";
 
   const [employees, setEmployees] = useState<EmployeeItem[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<EmployeeItem | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
   // Connect APIs
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
@@ -59,7 +63,7 @@ export default function EmployeesPage() {
         status: u.status?.toLowerCase() || 'inactive',
         joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown',
         rating: u.profile?.rating || 'New',
-        categoryName: u.profile?.category?.name || 'Unassigned',
+        categoryName: u.profile?.categories?.length > 0 ? u.profile.categories.map((c: any) => c.name).join(', ') : 'Unassigned',
       }));
       setEmployees(mappedUsers);
     } else {
@@ -74,10 +78,9 @@ export default function EmployeesPage() {
       name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown Vendor',
     }));
 
-  const handleCreateEmployee = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const categoryIdStr = formData.get("category_id")?.toString();
 
     // Find Employee role ID
     const roles = rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []);
@@ -93,7 +96,7 @@ export default function EmployeesPage() {
       email: formData.get("email"),
       phone: formData.get("phone"),
       roleId: Number(employeeRole.id || employeeRole._id),
-      vendor_id: formData.get("vendor_id") ? Number(formData.get("vendor_id")) : undefined,
+      vendor_id: role === "vendor" ? Number(currentUser?.id) : (formData.get("vendor_id") ? Number(formData.get("vendor_id")) : undefined),
       vendor_unique_id: null,
     };
 
@@ -102,22 +105,50 @@ export default function EmployeesPage() {
       const userRes = await createUserMut(userData).unwrap();
       const newUserId = userRes.data?.id || userRes.id;
       
-      // 2. Create Profile
-      if (newUserId && categoryIdStr) {
-        await createProfileMut({
-          user_id: newUserId,
-          category_id: Number(categoryIdStr),
-          type: "personal"
-        }).unwrap();
-      }
+      setCreatedUserId(newUserId);
+      toast.success("Employee account created! Now complete their profile.");
+      setStep(2);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.data?.message || err.message || "Failed to create employee account.");
+    }
+  };
 
-      toast.success("Employee created successfully with profile!");
-      setIsAddModalOpen(false);
+  const handleCreateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!createdUserId) {
+      toast.error("User ID missing. Start over.");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
+
+    const profileData = {
+      user_id: createdUserId,
+      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
+      type: "personal",
+      location: formData.get("location")?.toString() || "",
+      description: formData.get("description")?.toString() || "",
+      min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
+      google_map_link: formData.get("google_map_link")?.toString() || "",
+    };
+
+    try {
+      await createProfileMut(profileData).unwrap();
+      toast.success("Employee profile completed successfully!");
+      closeModal();
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.data?.message || err.message || "Failed to create employee.");
+      toast.error(err.data?.message || err.message || "Failed to create profile.");
     }
+  };
+
+  const closeModal = () => {
+    setIsAddModalOpen(false);
+    setStep(1);
+    setCreatedUserId(null);
   };
 
   // Verification and Status update actions
@@ -321,62 +352,94 @@ export default function EmployeesPage() {
 
       {/* Add Employee Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Add New Employee</h2>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
+              <h2 className="text-xl font-bold text-slate-800">
+                {step === 1 ? "Step 1: Employee Account" : "Step 2: Employee Profile"}
+              </h2>
+              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
                 <XCircle size={24} />
               </button>
             </div>
-            <form onSubmit={handleCreateEmployee} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
-                <input name="name" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Jane Doe" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
-                <input name="email" type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="jane@example.com" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
-                <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Vendor</label>
-                <select name="vendor_id" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                  <option value="">No Vendor (Optional)</option>
-                  {isUsersLoading ? (
-                    <option value="" disabled>Loading vendors...</option>
-                  ) : (
-                    vendorOptions.map((v: any) => (
-                      <option key={v.id} value={v.id}>{v.name}</option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
-                <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                  <option value="" disabled>Select a category</option>
-                  {isCategoriesLoading ? (
-                    <option value="" disabled>Loading categories...</option>
-                  ) : (
-                    allCategories.map((c: any) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-                  Cancel
-                </button>
-                <button type="submit" disabled={isCreating || isCreatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
-                  {(isCreating || isCreatingProfile) ? "Saving..." : "Save Employee"}
-                </button>
-              </div>
-            </form>
+            
+            {step === 1 ? (
+              <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+                  <input name="name" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Jane Doe" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+                  <input name="email" type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="jane@example.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+                  <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
+                </div>
+                {role !== "vendor" && (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Vendor</label>
+                    <select name="vendor_id" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
+                      <option value="">No Vendor (Optional)</option>
+                      {isUsersLoading ? (
+                        <option value="" disabled>Loading vendors...</option>
+                      ) : (
+                        vendorOptions.map((v: any) => (
+                          <option key={v.id} value={v.id}>{v.name}</option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                )}
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                  <button type="button" onClick={closeModal} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={isCreating} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
+                    {isCreating ? "Saving..." : "Next Step"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleCreateProfile} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
+                  <select multiple name="category_ids" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
+                    {isCategoriesLoading ? (
+                      <option value="" disabled>Loading categories...</option>
+                    ) : (
+                      allCategories.map((c: any) => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
+                  <input name="location" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+                  <textarea name="description" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all resize-none" placeholder="Briefly describe the employee's skills..."></textarea>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                    <input name="min_starting_price" type="number" step="0.01" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="0.00" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                    <input name="google_map_link" type="url" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="https://maps.google.com/..." />
+                  </div>
+                </div>
+                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                  <button type="submit" disabled={isCreatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
+                    {isCreatingProfile ? "Saving..." : "Complete Profile"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

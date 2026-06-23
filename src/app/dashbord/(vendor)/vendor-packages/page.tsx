@@ -67,6 +67,7 @@ export default function PackagesManagementPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [featuresStr, setFeaturesStr] = useState("");
   const [serviceId, setServiceId] = useState("NONE");
   const [selectedNestedIds, setSelectedNestedIds] = useState<number[]>([]);
 
@@ -83,7 +84,7 @@ export default function PackagesManagementPage() {
     const base =
       role === "vendor"
         ? allServices.filter(
-            (s) => String(s.vendor_id) === String(currentUserId)
+            (s) => String(s.vendor?.id || s.vendor_id) === String(currentUserId)
           )
         : allServices;
     return [
@@ -111,7 +112,7 @@ export default function PackagesManagementPage() {
 
     if (role === "vendor") {
       const vendorServiceIds = allServices
-        .filter((s) => String(s.vendor_id) === String(currentUserId))
+        .filter((s) => String(s.vendor?.id || s.vendor_id) === String(currentUserId))
         .map((s) => s.id);
       setPackages(
         all.filter((pkg) => pkg.service && vendorServiceIds.includes(pkg.service.id))
@@ -125,6 +126,7 @@ export default function PackagesManagementPage() {
     setName("");
     setDescription("");
     setPrice("");
+    setFeaturesStr("");
     setServiceId("NONE");
     setSelectedNestedIds([]);
   };
@@ -140,6 +142,7 @@ export default function PackagesManagementPage() {
     setName(item.name);
     setDescription(item.description || "");
     setPrice(item.price != null ? String(item.price) : "");
+    setFeaturesStr(item.features ? item.features.join(", ") : "");
     setServiceId(item.service ? String(item.service.id) : "NONE");
     setSelectedNestedIds(
       item.items?.map((i) => i.nestedService?.id).filter(Boolean) as number[] || []
@@ -173,6 +176,7 @@ export default function PackagesManagementPage() {
             name: name.trim(),
             description: description.trim() || undefined,
             price: price !== "" ? Number(price) : undefined,
+            features: featuresStr.split(',').map(f => f.trim()).filter(Boolean),
             nested_service_ids:
               selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
           },
@@ -184,6 +188,7 @@ export default function PackagesManagementPage() {
           name: name.trim(),
           description: description.trim() || undefined,
           price: price !== "" ? Number(price) : undefined,
+          features: featuresStr.split(',').map(f => f.trim()).filter(Boolean),
           nested_service_ids:
             selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
         }).unwrap();
@@ -448,6 +453,20 @@ export default function PackagesManagementPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
+                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/10 focus-visible:border-violet-400/80 disabled:cursor-not-allowed disabled:opacity-50 transition-all w-full"
+                />
+              </div>
+
+              {/* Features */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                  Features (Comma Separated)
+                </label>
+                <Textarea
+                  placeholder="e.g. Free Checkup, 24/7 Support, Premium Parts"
+                  value={featuresStr}
+                  onChange={(e) => setFeaturesStr(e.target.value)}
+                  rows={2}
                   className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/10 focus-visible:border-violet-400/80 disabled:cursor-not-allowed disabled:opacity-50 transition-all w-full"
                 />
               </div>

@@ -15,6 +15,7 @@ export interface Package {
   name: string;
   description?: string;
   price?: number;
+  features?: string[];
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string | null;
@@ -27,6 +28,7 @@ export interface CreatePackageRequest {
   name: string;
   description?: string;
   price?: number;
+  features?: string[];
   nested_service_ids?: number[];
 }
 
@@ -34,6 +36,7 @@ export interface UpdatePackageRequest {
   name?: string;
   description?: string;
   price?: number;
+  features?: string[];
   nested_service_ids?: number[];
 }
 

@@ -205,12 +205,18 @@ export default function BookingDetailsPage() {
                   <Briefcase size={14}/> Service Details
                 </h3>
                 <div className="bg-brand-primary/5 rounded-2xl p-4 border border-brand-primary/10">
-                  {booking.nestedService ? (
+                  {booking.subServices && booking.subServices.length > 0 ? (
                     <div>
                       <span className="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-lg text-xs font-bold mb-2 uppercase tracking-wider">
-                        Nested Service
+                        Sub Services
                       </span>
-                      <p className="text-lg font-bold text-slate-800">{booking.nestedService.name}</p>
+                      <div className="space-y-1">
+                        {booking.subServices.map((sub: any) => (
+                          <p key={sub.id} className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <Briefcase size={16} /> {sub.name} - ৳{sub.price}
+                          </p>
+                        ))}
+                      </div>
                     </div>
                   ) : booking.pkg ? (
                     <div>

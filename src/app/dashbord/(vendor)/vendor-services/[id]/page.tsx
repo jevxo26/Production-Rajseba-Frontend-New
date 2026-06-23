@@ -33,7 +33,7 @@ export default function ServiceDetailsPage() {
           The service you are looking for does not exist or has been deleted.
         </p>
         <button
-          onClick={() => router.push("/dashbord/services")}
+          onClick={() => router.push("/dashbord/vendor-services")}
           className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2"
         >
           <ArrowLeft size={16} /> Go Back
@@ -47,7 +47,7 @@ export default function ServiceDetailsPage() {
       {/* Header Navigation */}
       <div className="flex items-center gap-4 border-b border-slate-100 pb-4">
         <button
-          onClick={() => router.push("/dashbord/services")}
+          onClick={() => router.push("/dashbord/vendor-services")}
           className="p-2 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-xl transition-all"
         >
           <ArrowLeft size={20} />

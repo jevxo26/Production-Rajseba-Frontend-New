@@ -17,7 +17,7 @@ export interface Profile {
   createdAt?: string;
   updatedAt?: string;
   user?: Record<string, any>;
-  category?: Record<string, any>;
+  categories?: Record<string, any>[];
 }
 
 export interface ProfileApiResponse<T> {
@@ -34,7 +34,7 @@ export interface CreateProfileRequest {
   min_starting_price?: number;
   google_map_link?: string;
   user_id?: number;
-  category_id?: number;
+  category_ids?: number[];
 }
 
 export interface UpdateProfileRequest {
@@ -46,7 +46,7 @@ export interface UpdateProfileRequest {
   company_name?: string;
   min_starting_price?: number;
   google_map_link?: string;
-  category_id?: number;
+  category_ids?: number[];
 }
 
 /* ==========================================================================

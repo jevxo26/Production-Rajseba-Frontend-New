@@ -61,6 +61,7 @@ export default function NestedServicesManagementPage() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [price, setPrice] = useState("");
+  const [subServices, setSubServices] = useState<{name: string, price: string}[]>([]);
   const [serviceId, setServiceId] = useState("NONE");
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -74,7 +75,7 @@ export default function NestedServicesManagementPage() {
     const base =
       role === "vendor"
         ? allServices.filter(
-          (s) => String(s.vendor_id) === String(currentUserId)
+          (s) => String(s.vendor?.id || s.vendor_id) === String(currentUserId)
         )
         : allServices;
     return [
@@ -94,7 +95,7 @@ export default function NestedServicesManagementPage() {
 
     if (role === "vendor") {
       const vendorServiceIds = allServices
-        .filter((s) => String(s.vendor_id) === String(currentUserId))
+        .filter((s) => String(s.vendor?.id || s.vendor_id) === String(currentUserId))
         .map((s) => s.id);
       setNestedServices(
         all.filter((ns) => ns.service && vendorServiceIds.includes(ns.service.id))
@@ -124,6 +125,7 @@ export default function NestedServicesManagementPage() {
     setDescription("");
     setImage("");
     setPrice("");
+    setSubServices([]);
     setServiceId("NONE");
   };
 
@@ -138,7 +140,8 @@ export default function NestedServicesManagementPage() {
     setName(item.name);
     setDescription(item.description || "");
     setImage(item.image || "");
-    setPrice(item.price != null ? String(item.price) : "");
+    setPrice(item.starting_price != null ? String(item.starting_price) : "");
+    setSubServices(item.subServices ? item.subServices.map(s => ({ name: s.name, price: String(s.price) })) : []);
     setServiceId(item.service ? String(item.service.id) : "NONE");
     setIsModalOpen(true);
   };
@@ -154,7 +157,11 @@ export default function NestedServicesManagementPage() {
       name: name.trim(),
       description: description.trim() || undefined,
       image: image.trim() || undefined,
-      price: price !== "" ? Number(price) : undefined,
+      starting_price: price !== "" ? Number(price) : undefined,
+      sub_services: subServices.filter(s => s.name.trim() !== "").map(s => ({
+        name: s.name.trim(),
+        price: Number(s.price || 0)
+      })),
       ...(editingItem ? {} : { service_id: serviceId === "NONE" ? 0 : Number(serviceId) }),
     };
 
@@ -171,7 +178,8 @@ export default function NestedServicesManagementPage() {
             name: payload.name,
             description: payload.description,
             image: payload.image,
-            price: payload.price,
+            starting_price: payload.starting_price,
+            sub_services: payload.sub_services,
           },
         }).unwrap();
         toast.success("Nested service updated successfully!");
@@ -181,7 +189,8 @@ export default function NestedServicesManagementPage() {
           name: payload.name,
           description: payload.description,
           image: payload.image,
-          price: payload.price,
+          starting_price: payload.starting_price,
+          sub_services: payload.sub_services,
         }).unwrap();
         toast.success("Nested service created successfully!");
       }
@@ -259,12 +268,12 @@ export default function NestedServicesManagementPage() {
       ),
     },
     {
-      key: "price",
-      header: "Price",
+      key: "starting_price",
+      header: "Starting Price",
       render: (item: NestedService) => (
         <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-emerald-100/50">
           <DollarSign size={12} />
-          {item.price != null ? `৳${item.price.toLocaleString()}` : "Free"}
+          {item.starting_price != null ? `৳${item.starting_price.toLocaleString()}` : "Variable"}
         </span>
       ),
     },
@@ -401,10 +410,10 @@ export default function NestedServicesManagementPage() {
                 />
               </div>
 
-              {/* Price */}
+              {/* Starting Price */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                  Price (৳)
+                  Starting Price (৳)
                 </label>
                 <Input
                   type="number"
@@ -413,6 +422,61 @@ export default function NestedServicesManagementPage() {
                   onChange={(e) => setPrice(e.target.value)}
                   min={0}
                 />
+              </div>
+
+              {/* Sub Services */}
+              <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/50">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    Options / Sub-Services
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setSubServices([...subServices, { name: "", price: "" }])}
+                    className="text-xs font-bold text-brand-primary flex items-center gap-1 hover:underline"
+                  >
+                    <PlusCircle size={14} /> Add Option
+                  </button>
+                </div>
+                {subServices.length === 0 ? (
+                  <p className="text-xs text-slate-400 italic">No options added yet. Click 'Add Option' above.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {subServices.map((sub, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <Input
+                          placeholder="Option Name (e.g. 1 Ton)"
+                          value={sub.name}
+                          onChange={(e) => {
+                            const newSubs = [...subServices];
+                            newSubs[idx].name = e.target.value;
+                            setSubServices(newSubs);
+                          }}
+                          className="flex-1 bg-white"
+                        />
+                        <Input
+                          type="number"
+                          placeholder="Price"
+                          value={sub.price}
+                          onChange={(e) => {
+                            const newSubs = [...subServices];
+                            newSubs[idx].price = e.target.value;
+                            setSubServices(newSubs);
+                          }}
+                          className="w-24 bg-white"
+                          min={0}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSubServices(subServices.filter((_, i) => i !== idx))}
+                          className="p-2 text-rose-500 hover:bg-rose-100 rounded-lg transition-all shrink-0"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Description */}

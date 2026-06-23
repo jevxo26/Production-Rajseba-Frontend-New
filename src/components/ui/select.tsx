@@ -4,6 +4,7 @@ import * as React from "react"
 import { Select as SelectPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
+import ReactSelect from "react-select"
 
 /* ==========================================================================
    1. RADIX SELECT PRIMITIVES (PREMIUM STYLED)
@@ -195,8 +196,8 @@ export interface SelectOption {
 
 export interface CustomSelectProps {
   options: SelectOption[];
-  value: string;
-  onChange: (value: string) => void;
+  value: string | string[];
+  onChange: (value: any) => void;
   placeholder?: string;
   label?: string;
   error?: string;
@@ -204,6 +205,7 @@ export interface CustomSelectProps {
   triggerClassName?: string;
   size?: "sm" | "default" | "lg";
   disabled?: boolean;
+  isMulti?: boolean;
 }
 
 export function CustomSelect({
@@ -217,8 +219,74 @@ export function CustomSelect({
   triggerClassName,
   size = "default",
   disabled = false,
+  isMulti = false,
 }: CustomSelectProps) {
-  const selectedOption = options.find((opt) => opt.value === value);
+  const selectedOption = isMulti 
+    ? options.filter((opt) => Array.isArray(value) && value.includes(opt.value))
+    : options.find((opt) => opt.value === value) || null;
+
+  const selectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      borderRadius: size === "sm" ? "0.5rem" : size === "lg" ? "1rem" : "0.75rem",
+      minHeight: size === "sm" ? "36px" : size === "lg" ? "48px" : "42px",
+      borderColor: state.isFocused ? "#fda4af" : "#e2e8f0",
+      backgroundColor: "#ffffff",
+      boxShadow: state.isFocused ? "0 0 0 2px #ffe4e6" : "none",
+      "&:hover": {
+        borderColor: state.isFocused ? "#fda4af" : "#cbd5e1"
+      }
+    }),
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: size === "sm" ? "0 8px" : size === "lg" ? "0 16px" : "0 12px",
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected ? "#f43f5e" : state.isFocused ? "#ffe4e6" : "white",
+      color: state.isSelected ? "white" : "#0f172a",
+      fontSize: "0.875rem",
+      "&:active": {
+        backgroundColor: "#e11d48",
+      }
+    })
+  };
+
+  const CustomOption = (props: any) => {
+    const { data, innerRef, innerProps, isSelected, isFocused } = props;
+    return (
+      <div 
+        ref={innerRef} 
+        {...innerProps} 
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors text-sm",
+          isSelected ? "bg-rose-500 text-white" : isFocused ? "bg-rose-50 text-slate-900" : "bg-white text-slate-700"
+        )}
+      >
+        {data.icon && (
+          <div className={cn("p-1 rounded", isSelected ? "bg-rose-600 text-white" : "bg-slate-50 text-slate-500")}>
+            <data.icon className="size-4" />
+          </div>
+        )}
+        <div>
+          <p className="font-semibold leading-tight">{data.label}</p>
+          {data.desc && (
+            <p className={cn("text-[10px] leading-tight mt-0.5", isSelected ? "text-rose-100" : "text-slate-400")}>{data.desc}</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const CustomSingleValue = (props: any) => {
+    const { data } = props;
+    return (
+      <div className="flex items-center gap-2 text-sm font-medium text-slate-800 absolute inset-0 pt-2 px-3">
+        {data.icon && <data.icon className="size-4 text-slate-400" />}
+        <span>{data.label}</span>
+      </div>
+    );
+  };
 
   return (
     <div className={cn("space-y-1.5 w-full", className)}>
@@ -228,42 +296,23 @@ export function CustomSelect({
         </label>
       )}
 
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
-        <SelectTrigger size={size} className={cn("text-left font-medium", triggerClassName)}>
-          <SelectValue placeholder={placeholder}>
-            {selectedOption && (
-              <div className="flex items-center gap-2">
-                {selectedOption.icon && (
-                  <selectedOption.icon className="size-4 text-slate-400" />
-                )}
-                <div className="flex flex-col">
-                  <span>{selectedOption.label}</span>
-                </div>
-              </div>
-            )}
-          </SelectValue>
-        </SelectTrigger>
-
-        <SelectContent>
-          {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value} className="py-2.5">
-              <div className="flex items-center gap-3">
-                {opt.icon && (
-                  <div className="p-1 bg-slate-50 rounded text-slate-500">
-                    <opt.icon className="size-4" />
-                  </div>
-                )}
-                <div>
-                  <p className="font-semibold text-sm leading-tight">{opt.label}</p>
-                  {opt.desc && (
-                    <p className="text-[10px] text-slate-400 leading-tight mt-0.5">{opt.desc}</p>
-                  )}
-                </div>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <ReactSelect
+        value={selectedOption}
+        onChange={(selected: any) => {
+          if (isMulti) {
+            onChange(selected ? selected.map((s: any) => s.value) : []);
+          } else {
+            onChange(selected ? selected.value : "");
+          }
+        }}
+        options={options}
+        placeholder={placeholder}
+        isDisabled={disabled}
+        isMulti={isMulti}
+        isClearable={isMulti}
+        styles={selectStyles}
+        components={isMulti ? { Option: CustomOption } : { Option: CustomOption, SingleValue: CustomSingleValue }}
+      />
 
       {error && (
         <p className="text-xs text-rose-500 font-semibold animate-in fade-in duration-150">

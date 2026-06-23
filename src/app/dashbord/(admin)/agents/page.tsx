@@ -110,11 +110,11 @@ export default function AgentsPage() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const categoryIdStr = formData.get("category_id")?.toString();
+    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
 
     const profileData = {
       user_id: createdUserId,
-      category_id: categoryIdStr ? Number(categoryIdStr) : undefined,
+      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: "personal", // Default to personal for agents
       location: formData.get("location")?.toString() || "",
       description: formData.get("description")?.toString() || "",
@@ -377,9 +377,8 @@ export default function AgentsPage() {
             ) : (
               <form onSubmit={handleCreateProfile} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Category</label>
-                  <select name="category_id" required defaultValue="" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all">
-                    <option value="" disabled>Select a category</option>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
+                  <select multiple name="category_ids" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
                     {isCategoriesLoading ? (
                       <option value="" disabled>Loading categories...</option>
                     ) : (

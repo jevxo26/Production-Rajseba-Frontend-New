@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
 import { CustomTable } from "@/components/ui/table";
 import { Calendar, User, Package as PkgIcon, MapPin, Search, ChevronDown, CheckCircle, XCircle, Clock, Trash2, ShieldCheck, Briefcase } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +20,11 @@ export default function BookingsManagementPage() {
   const { data: servicesRes } = useGetAllServicesQuery();
   const { data: usersRes } = useGetAllUsersQuery();
   
+  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
+  const currentUser = useAppSelector((state) => state.auth.user);
+  
+  const roleName = typeof rawRole === 'string' ? rawRole.toLowerCase() : (rawRole as any)?.name?.toLowerCase() || "superadmin";
+  
   const [updateStatus] = useUpdateBookingStatusMutation();
   const [deleteBooking] = useDeleteBookingMutation();
   const [createBooking, { isLoading: isCreating }] = useCreateBookingMutation();
@@ -33,9 +39,10 @@ export default function BookingsManagementPage() {
     vendor_id: "",
     service_id: "",
     selection_type: "nested", // 'nested' or 'package'
-    nested_service_id: "",
+    sub_service_ids: [] as string[],
     package_id: "",
     date: "",
+    time: "",
     location: "",
     notes: ""
   });
@@ -49,6 +56,21 @@ export default function BookingsManagementPage() {
   // Filtering dependent dropdowns
   const selectedVendorServices = services.filter((s: any) => s.vendor?.id?.toString() === newBooking.vendor_id);
   const selectedService = services.find((s: any) => s.id?.toString() === newBooking.service_id);
+
+  // Calculate estimated total
+  let estimatedTotalPrice = 0;
+  if (newBooking.selection_type === 'nested') {
+    const allNested = selectedService ? selectedService.nestedServices || [] : selectedVendorServices.flatMap((s: any) => s.nestedServices || []);
+    const allSubServices = allNested.flatMap((n: any) => n.subServices || []);
+    estimatedTotalPrice = newBooking.sub_service_ids.reduce((sum: number, id: string) => {
+      const match = allSubServices.find((s: any) => s.id?.toString() === id);
+      return sum + (match ? Number(match.price || 0) : 0);
+    }, 0);
+  } else if (newBooking.selection_type === 'package' && newBooking.package_id) {
+    const allPackages = selectedService ? selectedService.packages || [] : selectedVendorServices.flatMap((s: any) => s.packages || []);
+    const match = allPackages.find((p: any) => p.id?.toString() === newBooking.package_id);
+    estimatedTotalPrice = match ? Number(match.price || 0) : 0;
+  }
 
   const handleStatusChange = async (id: number, status: string) => {
     try {
@@ -79,12 +101,14 @@ export default function BookingsManagementPage() {
     const payload: any = {
       user_id: Number(newBooking.user_id),
       vendor_id: Number(newBooking.vendor_id),
+      service_id: newBooking.service_id ? Number(newBooking.service_id) : undefined,
       date: newBooking.date,
+      time: newBooking.time || undefined,
       location: newBooking.location,
+      notes: newBooking.notes || undefined,
     };
-    if (newBooking.notes) payload.notes = newBooking.notes;
-    if (newBooking.selection_type === 'nested' && newBooking.nested_service_id) {
-      payload.nested_service_id = Number(newBooking.nested_service_id);
+    if (newBooking.selection_type === 'nested' && newBooking.sub_service_ids.length > 0) {
+      payload.sub_service_ids = newBooking.sub_service_ids.map(Number);
     }
     if (newBooking.selection_type === 'package' && newBooking.package_id) {
       payload.package_id = Number(newBooking.package_id);
@@ -94,13 +118,24 @@ export default function BookingsManagementPage() {
       await createBooking(payload).unwrap();
       toast.success("Booking created successfully!");
       setIsAddModalOpen(false);
-      setNewBooking({ user_id: "", vendor_id: "", service_id: "", selection_type: "nested", nested_service_id: "", package_id: "", date: "", location: "", notes: "" });
+      setNewBooking({ user_id: "", vendor_id: roleName === "vendor" ? String(currentUser?.id || "") : "", service_id: "", selection_type: "nested", sub_service_ids: [], package_id: "", date: "", time: "", location: "", notes: "" });
     } catch (error: any) {
       toast.error(error.data?.message || "Failed to create booking");
     }
   };
 
   const filteredBookings = bookings.filter((b: any) => {
+    // Role-based filtering
+    if (roleName === "vendor" || roleName === "Vendor") {
+      // Vendor only sees their own bookings
+      const vendorIdStr = b.vendor?.id?.toString() || b.vendor_id?.toString();
+      const currentUserIdStr = currentUser?.id?.toString();
+      
+      if (vendorIdStr !== currentUserIdStr) {
+        return false;
+      }
+    }
+
     const matchesSearch = b.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           b.location?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || b.status === filterStatus;
@@ -120,15 +155,19 @@ export default function BookingsManagementPage() {
 
   const columns = [
     {
-      key: "id",
-      header: "ID & Date",
-      accessorKey: "id",
+      key: "date",
+      header: "Schedule",
       render: (item: any) => (
         <div className="flex flex-col">
-          <span className="font-bold text-slate-800">#{item.id}</span>
-          <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-            <Calendar size={12} /> {item.date ? new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
+          <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-xs font-semibold whitespace-nowrap border border-slate-200/50">
+            <Calendar size={14} className="text-slate-400" />
+            {item.date ? new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
           </span>
+          {item.time && (
+            <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-0.5 rounded-lg text-[10px] font-bold mt-1 ml-1 border border-amber-100/50">
+              <Clock size={10} /> {item.time}
+            </span>
+          )}
         </div>
       )
     },
@@ -152,42 +191,34 @@ export default function BookingsManagementPage() {
     {
       key: "service",
       header: "Service Details",
-      accessorKey: "service",
       render: (item: any) => (
         <div className="flex flex-col gap-1">
-          {item.nestedService ? (
-            <span className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg text-xs font-semibold">
-              <Briefcase size={12} /> {item.nestedService.name}
-            </span>
+          {item.subServices && item.subServices.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {item.subServices.map((ss: any) => (
+                <span key={ss.id} className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg text-xs font-semibold">
+                  <Briefcase size={12} /> {ss.name}
+                </span>
+              ))}
+            </div>
           ) : item.pkg ? (
             <span className="inline-flex items-center gap-1.5 bg-brand-primary/10 text-brand-primary px-2 py-1 rounded-lg text-xs font-semibold">
               <PkgIcon size={12} /> {item.pkg.name}
             </span>
           ) : (
-            <span className="text-xs text-slate-400 italic">No Service</span>
+            <span className="text-slate-400 italic text-xs font-medium">No service selected</span>
           )}
         </div>
       )
     },
     {
-      key: "vendor",
-      header: "Vendor & Employee",
-      accessorKey: "vendor",
+      key: "price",
+      header: "Total Price",
+      accessorKey: "total_price",
       render: (item: any) => (
-        <div className="flex flex-col text-xs space-y-1">
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-slate-400">V:</span> 
-            <span className="text-slate-700 font-medium">{item.vendor?.name || "Unassigned"}</span>
-          </div>
-          <div className="flex items-start gap-1.5 mt-0.5">
-            <span className="font-bold text-slate-400 mt-0.5">E:</span> 
-            <div className="text-slate-700 font-medium flex flex-col gap-0.5">
-              {item.employees && item.employees.length > 0 
-                ? item.employees.map((emp: any) => <span key={emp.id}>{emp.name}</span>)
-                : <span>Unassigned</span>}
-            </div>
-          </div>
-        </div>
+        <span className="font-bold text-slate-800">
+          ৳{item.total_price || 0}
+        </span>
       )
     },
     {
@@ -224,7 +255,13 @@ export default function BookingsManagementPage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => {
+              setNewBooking({
+                ...newBooking,
+                vendor_id: roleName === "vendor" ? String(currentUser?.id || "") : "",
+              });
+              setIsAddModalOpen(true);
+            }}
             className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2"
           >
             <Calendar size={18} />
@@ -320,20 +357,22 @@ export default function BookingsManagementPage() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Vendor *</label>
-                  <select
-                    required
-                    value={newBooking.vendor_id}
-                    onChange={(e) => setNewBooking({...newBooking, vendor_id: e.target.value, service_id: "", nested_service_id: "", package_id: ""})}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-3 outline-none transition-all"
-                  >
-                    <option value="">-- Choose a Vendor --</option>
-                    {vendors.map((v: any) => (
-                      <option key={v.id} value={v.id}>{v.name}</option>
-                    ))}
-                  </select>
-                </div>
+                {roleName !== "vendor" && (
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Vendor *</label>
+                    <select
+                      required
+                      value={newBooking.vendor_id}
+                      onChange={(e) => setNewBooking({...newBooking, vendor_id: e.target.value, service_id: "", sub_service_ids: [], package_id: ""})}
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-3 outline-none transition-all"
+                    >
+                      <option value="">-- Choose a Vendor --</option>
+                      {vendors.map((v: any) => (
+                        <option key={v.id} value={v.id}>{v.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -344,6 +383,15 @@ export default function BookingsManagementPage() {
                     required
                     value={newBooking.date}
                     onChange={(e) => setNewBooking({...newBooking, date: e.target.value})}
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-3 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Booking Time</label>
+                  <input
+                    type="time"
+                    value={newBooking.time}
+                    onChange={(e) => setNewBooking({...newBooking, time: e.target.value})}
                     className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-3 outline-none transition-all"
                   />
                 </div>
@@ -383,26 +431,26 @@ export default function BookingsManagementPage() {
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                         <input type="radio" name="selection_type" value="nested" checked={newBooking.selection_type === 'nested'} onChange={(e) => setNewBooking({...newBooking, selection_type: e.target.value, package_id: ""})} />
-                        Nested Service
+                        Sub-Services Options
                       </label>
                       <select
+                        multiple
                         disabled={newBooking.selection_type !== 'nested'}
-                        value={newBooking.nested_service_id}
-                        onChange={(e) => setNewBooking({...newBooking, nested_service_id: e.target.value})}
-                        className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all disabled:opacity-50"
+                        value={newBooking.sub_service_ids}
+                        onChange={(e) => setNewBooking({...newBooking, sub_service_ids: Array.from(e.target.selectedOptions, option => option.value)})}
+                        className="w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block p-2.5 outline-none transition-all disabled:opacity-50 min-h-[100px]"
                       >
-                        <option value="">-- Choose Nested Service --</option>
-                        {selectedService ? selectedService.nestedServices?.map((ns: any) => (
-                          <option key={ns.id} value={ns.id}>{ns.name}</option>
-                        )) : selectedVendorServices.flatMap((s: any) => s.nestedServices || []).map((ns: any) => (
-                          <option key={ns.id} value={ns.id}>{ns.name}</option>
+                        {selectedService ? selectedService.nestedServices?.flatMap((ns: any) => ns.subServices || []).map((ss: any) => (
+                          <option key={ss.id} value={ss.id}>{ss.name} - ৳{ss.price}</option>
+                        )) : selectedVendorServices.flatMap((s: any) => s.nestedServices || []).flatMap((ns: any) => ns.subServices || []).map((ss: any) => (
+                          <option key={ss.id} value={ss.id}>{ss.name} - ৳{ss.price}</option>
                         ))}
                       </select>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-                        <input type="radio" name="selection_type" value="package" checked={newBooking.selection_type === 'package'} onChange={(e) => setNewBooking({...newBooking, selection_type: e.target.value, nested_service_id: ""})} />
+                        <input type="radio" name="selection_type" value="package" checked={newBooking.selection_type === 'package'} onChange={(e) => setNewBooking({...newBooking, selection_type: e.target.value, sub_service_ids: []})} />
                         Service Package
                       </label>
                       <select
@@ -413,11 +461,18 @@ export default function BookingsManagementPage() {
                       >
                         <option value="">-- Choose Package --</option>
                         {selectedService ? selectedService.packages?.map((p: any) => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
+                          <option key={p.id} value={p.id}>{p.name} - ৳{p.price}</option>
                         )) : selectedVendorServices.flatMap((s: any) => s.packages || []).map((p: any) => (
-                          <option key={p.id} value={p.id}>{p.name}</option>
+                          <option key={p.id} value={p.id}>{p.name} - ৳{p.price}</option>
                         ))}
                       </select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <div className="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-xl border border-emerald-200 flex items-center gap-2">
+                      <span className="font-bold text-sm">Estimated Total:</span>
+                      <span className="font-black text-lg">৳{estimatedTotalPrice}</span>
                     </div>
                   </div>
                 </div>

@@ -6,6 +6,9 @@ export interface Service {
   subtitle?: string;
   slug: string;
   description?: string;
+  overview?: string;
+  details?: string;
+  faq?: { question: string; answer: string }[];
   image?: string;
   banner?: string;
   employee_ids?: number[];
@@ -21,12 +24,20 @@ export interface Service {
   category?: any;
 }
 
+export interface SubService {
+  id: number;
+  name: string;
+  price: number;
+  nestedService?: NestedService;
+}
+
 export interface NestedService {
   id: number;
   name: string;
   description?: string;
   image?: string;
-  price?: number;
+  starting_price?: number;
+  subServices?: SubService[];
   service?: Service;
   createdAt?: string;
   updatedAt?: string;
@@ -38,14 +49,16 @@ export interface CreateNestedServiceRequest {
   name: string;
   description?: string;
   image?: string;
-  price?: number;
+  starting_price?: number;
+  sub_services?: { name: string; price: number }[];
 }
 
 export interface UpdateNestedServiceRequest {
   name?: string;
   description?: string;
   image?: string;
-  price?: number;
+  starting_price?: number;
+  sub_services?: { name: string; price: number }[];
 }
 
 export interface ServiceApiResponse<T> {
@@ -59,6 +72,9 @@ export interface CreateServiceRequest {
   subtitle?: string;
   slug: string;
   description?: string;
+  overview?: string;
+  details?: string;
+  faq?: { question: string; answer: string }[];
   image?: string;
   banner?: string;
   employee_ids?: number[];
@@ -71,6 +87,9 @@ export interface UpdateServiceRequest {
   subtitle?: string;
   slug?: string;
   description?: string;
+  overview?: string;
+  details?: string;
+  faq?: { question: string; answer: string }[];
   image?: string;
   banner?: string;
   employee_ids?: number[];
