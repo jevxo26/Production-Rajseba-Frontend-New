@@ -2,6 +2,7 @@ import CustomQuote from '@/components/home/services/CustomQuote';
 import ServiceHero from '@/components/home/services/ServiceHero';
 import ServiceLists from '@/components/home/services/ServiceLists';
 import TrendingServices from '@/components/home/services/TrendingServices';
+import CategorizedSections from '@/components/home/services/CategorizedSections';
 
 const Services = () => {
   return (
@@ -14,6 +15,7 @@ const Services = () => {
       <div className="relative z-10 space-y-16 md:space-y-24 lg:space-y-32">
         <TrendingServices />
         <ServiceLists />
+        <CategorizedSections />
         <CustomQuote />
       </div>
     </div>

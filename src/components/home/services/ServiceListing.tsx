@@ -280,49 +280,6 @@ export default function ServiceListing({
     <section className="py-6 bg-slate-50/30">
       <div className="max-w-[1400px] mx-auto px-4">
         
-        {/* Horizontal Category Bar (Airbnb-style) */}
-        <div className="border-b border-slate-100 bg-white -mx-4 px-4 mb-6 shadow-sm rounded-2xl">
-          <div className="flex items-center gap-6 overflow-x-auto py-3.5 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]">
-            <button
-              onClick={() => setFilters({ activeCategory: "all", currentPage: 1 })}
-              className={`flex flex-col items-center gap-1 pb-1.5 min-w-[75px] border-b-2 transition-all cursor-pointer shrink-0 text-center ${
-                activeCategory === "all"
-                  ? "border-[#ff5a5f] text-[#ff5a5f] font-extrabold"
-                  : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 font-semibold"
-              }`}
-            >
-              <LayoutGrid size={18} strokeWidth={2.5} />
-              <span className="text-[10px] tracking-wide uppercase mt-1">All Services</span>
-            </button>
-
-            {categories.map((cat: any) => {
-              const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
-              const name = cat.name || cat.label;
-              const Icon =
-                CATEGORY_ICON_MAP[name] ||
-                CATEGORY_ICON_MAP[Object.keys(CATEGORY_ICON_MAP).find((k) =>
-                  name?.toLowerCase().includes(k.toLowerCase())
-                ) || ""] ||
-                LayoutGrid;
-              const isActive = activeCategory === slug;
-
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setFilters({ activeCategory: isActive ? "all" : slug, currentPage: 1 })}
-                  className={`flex flex-col items-center gap-1 pb-1.5 min-w-[75px] border-b-2 transition-all cursor-pointer shrink-0 text-center ${
-                    isActive
-                      ? "border-[#ff5a5f] text-[#ff5a5f] font-extrabold"
-                      : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 font-semibold"
-                  }`}
-                >
-                  <Icon size={18} strokeWidth={2.5} />
-                  <span className="text-[10px] tracking-wide uppercase mt-1 truncate max-w-[85px]">{name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Top Search & Actions bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">

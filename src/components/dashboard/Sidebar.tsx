@@ -167,12 +167,12 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               <Link
                 key={index}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border ${isActive
-                  ? "bg-rose-50/70 border-rose-100/60 text-[#FF464C] font-bold shadow-sm shadow-rose-500/5"
-                  : "border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 group border ${isActive
+                  ? "bg-white border-slate-100/60 text-[#ff5a5f] font-extrabold shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] scale-[1.01]"
+                  : "border-transparent text-slate-500 hover:bg-slate-50/60 hover:text-slate-900"
                   }`}
               >
-                <item.icon size={20} className={isActive ? "text-[#FF464C]" : "text-slate-400 group-hover:text-slate-600 transition-colors"} />
+                <item.icon size={20} className={isActive ? "text-[#ff5a5f]" : "text-slate-400 group-hover:text-slate-600 transition-colors"} />
                 {!collapsed && <span className="text-sm">{item.label}</span>}
               </Link>
             );
