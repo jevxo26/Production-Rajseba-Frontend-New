@@ -62,6 +62,19 @@ export default function WalletPage() {
     <div className="w-full animate-in fade-in duration-200">
       <div className="w-full space-y-8 relative z-10">
 
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+              <CreditCard className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">My Wallet</h1>
+              <p className="text-xs text-slate-400 mt-0.5">Manage payment options, invoices, and promo coupons.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Top Balance & Quick Manage Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Balance Display Card */}

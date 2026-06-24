@@ -99,29 +99,34 @@ function CustomerOverview() {
       <div className="w-full space-y-8 relative z-10">
 
         {/* Header Title & Top Counters */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Hello, {authUser?.name || "Client"}</h1>
-            <p className="text-slate-500 mt-1 font-semibold text-sm">It's a great day to refresh your home.</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">Hello, {authUser?.name || "Client"}</h1>
+              <p className="text-xs text-slate-400 mt-0.5 font-semibold">It's a great day to refresh your home.</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="bg-white px-6 py-3.5 rounded-2xl border border-slate-100 shadow-sm text-center min-w-[110px]">
+            <div className="bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm text-center min-w-[90px]">
               {loadingBookings ? (
-                <Loader2 size={20} className="animate-spin text-[#FF7C71] mx-auto" />
+                <Loader2 size={16} className="animate-spin text-[#FF7C71] mx-auto" />
               ) : (
-                <span className="text-3xl font-black text-[#FF7C71] block leading-tight">{activeBookings.length.toString().padStart(2, "0")}</span>
+                <span className="text-xl font-black text-[#FF7C71] block leading-tight">{activeBookings.length.toString().padStart(2, "0")}</span>
               )}
-              <span className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase">Active</span>
+              <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase">Active</span>
             </div>
 
-            <div className="bg-white px-6 py-3.5 rounded-2xl border border-slate-100 shadow-sm text-center min-w-[110px]">
+            <div className="bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm text-center min-w-[90px]">
               {loadingBookings ? (
-                <Loader2 size={20} className="animate-spin text-[#FF7C71] mx-auto" />
+                <Loader2 size={16} className="animate-spin text-[#FF7C71] mx-auto" />
               ) : (
-                <span className="text-3xl font-black text-[#FF7C71] block leading-tight">{completedBookings.length}</span>
+                <span className="text-xl font-black text-[#FF7C71] block leading-tight">{completedBookings.length}</span>
               )}
-              <span className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase">Completed</span>
+              <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase">Completed</span>
             </div>
           </div>
         </div>
@@ -357,10 +362,15 @@ function AgentOverview() {
     <div className="space-y-8 animate-in fade-in duration-200">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Agent Overview</h1>
-          <p className="text-slate-500 mt-1">Hello, {authUser?.name || "Agent"}! Manage bookings and track activity.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Agent Overview</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Hello, {authUser?.name || "Agent"}! Manage bookings and track activity.</p>
+          </div>
         </div>
         <Link
           href="/dashbord/quick-booking"

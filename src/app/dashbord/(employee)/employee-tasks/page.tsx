@@ -54,11 +54,16 @@ export default function EmployeeTasksPage() {
       <div className="w-full space-y-8 relative z-10">
 
         {/* Title Header */}
-        <div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">My Tasks</h1>
-          <p className="text-slate-500 mt-2 font-semibold text-sm">
-            View and manage the service bookings assigned to you.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">My Tasks</h1>
+              <p className="text-xs text-slate-400 mt-0.5">View and manage the service bookings assigned to you.</p>
+            </div>
+          </div>
         </div>
 
         {/* Bookings List */}

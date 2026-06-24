@@ -69,11 +69,16 @@ export default function BookingsPage() {
       <div className="w-full space-y-8 relative z-10">
 
         {/* Title Header */}
-        <div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">My Bookings</h1>
-          <p className="text-slate-500 mt-2 font-semibold text-sm">
-            Manage and track your service requests at Rajseba.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">My Bookings</h1>
+              <p className="text-xs text-slate-400 mt-0.5">Manage and track your service requests at Rajseba.</p>
+            </div>
+          </div>
         </div>
 
         {/* Status Filter Tab Pill Bar */}
@@ -84,11 +89,10 @@ export default function BookingsPage() {
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-6 py-2 rounded-full text-xs font-bold transition-all focus:outline-none ${
-                  isActive
-                    ? "bg-[#FF7C71] text-white shadow-sm shadow-[#FF7C71]/10"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-50/50"
-                }`}
+                className={`px-6 py-2 rounded-full text-xs font-bold transition-all focus:outline-none ${isActive
+                  ? "bg-[#FF7C71] text-white shadow-sm shadow-[#FF7C71]/10"
+                  : "text-slate-500 hover:text-slate-800 hover:bg-slate-50/50"
+                  }`}
               >
                 {tab}
               </button>
@@ -148,7 +152,7 @@ export default function BookingsPage() {
                           </div>
                         </div>
                       )}
-                      
+
                       {booking.employees && booking.employees.length > 0 && (
                         booking.employees.map((emp: any) => (
                           <div key={emp.id} className="flex items-center gap-2.5">
@@ -203,7 +207,7 @@ export default function BookingsPage() {
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                   <div className="flex items-center gap-2 flex-wrap">
                     {booking.vendor && (
-                      <button 
+                      <button
                         onClick={() => router.push(`/dashbord/live-chat?receiverId=${booking.vendor.id}`)}
                         className="flex items-center gap-1.5 text-[#FF7C71] bg-[#FFF8F7] hover:bg-[#FFEBE9] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"
                       >
@@ -212,7 +216,7 @@ export default function BookingsPage() {
                       </button>
                     )}
                     {booking.employees?.map((emp: any) => (
-                      <button 
+                      <button
                         key={emp.id}
                         onClick={() => router.push(`/dashbord/live-chat?receiverId=${emp.id}`)}
                         className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"

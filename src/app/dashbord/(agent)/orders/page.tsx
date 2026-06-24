@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, Loader2 } from "lucide-react";
+import { ShieldAlert, Loader2, ShoppingCart } from "lucide-react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
 
@@ -74,9 +74,17 @@ export default function AgentOrdersPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">Recent Orders</h1>
-        <p className="text-slate-500 mt-1">Full transaction ledger of all bookings managed by your agent profile.</p>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <ShoppingCart className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Recent Orders</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Full transaction ledger of all bookings managed by your agent profile.</p>
+          </div>
+        </div>
       </div>
 
       {isLoading ? (

@@ -135,10 +135,15 @@ export default function VendorWalletPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Wallet & Earnings</h1>
-          <p className="text-slate-500 mt-1">Manage your commissions and withdrawal requests.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <Wallet className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Wallet & Earnings</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Manage your commissions and withdrawal requests.</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
@@ -149,7 +154,7 @@ export default function VendorWalletPage() {
           </button>
           <button
             onClick={() => setIsRequestModalOpen(true)}
-            className="flex items-center gap-2 bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-brand-primary/10"
+            className="flex items-center gap-2 bg-[#FF7C71] hover:bg-[#E5675D] text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md shadow-[#FF7C71]/10"
           >
             <Send size={16} /> Request Commission
           </button>
