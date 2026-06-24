@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, ArrowDownRight, Send, Loader2 } from "lucide-react";
+import { ShieldAlert, ArrowDownRight, Send, Loader2, Coins } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CustomTable } from "@/components/ui/table";

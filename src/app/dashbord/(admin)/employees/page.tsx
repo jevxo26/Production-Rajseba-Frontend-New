@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2, Edit2 } from "lucide-react";
+import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2, Edit2, Contact } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
@@ -395,10 +395,15 @@ export default function EmployeesPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Employee Management</h1>
-          <p className="text-slate-500 mt-1">Manage company employees, their profiles, and categories.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <Contact className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Employee Management</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Manage company employees, their profiles, and categories.</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button

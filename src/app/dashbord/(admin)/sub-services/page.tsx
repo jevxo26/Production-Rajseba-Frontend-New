@@ -7,7 +7,7 @@ import {
   PlusCircle,
   Edit2,
   X,
-  Layers,
+  Component,
   Image as ImageIcon,
   Sparkles,
   DollarSign,
@@ -210,7 +210,7 @@ export default function SubServicesManagementPage() {
       render: (item: SubService) => (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-indigo-50 text-indigo-500 font-bold rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-indigo-100/40">
-            <Layers size={20} />
+            <Component size={20} />
           </div>
           <div>
             <p className="font-bold text-slate-900 leading-none">{item.name}</p>
@@ -273,16 +273,21 @@ export default function SubServicesManagementPage() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            {role === "vendor" ? "My Sub-Services" : "Sub-Service Directory"}
-          </h1>
-          <p className="text-slate-500 mt-1">
-            {role === "vendor"
-              ? "Add and manage sub-services under your nested services."
-              : "Manage sub-services linked to nested services across all vendors."}
-          </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <Component className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">
+              {role === "vendor" ? "My Sub-Services" : "Sub-Service Directory"}
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {role === "vendor"
+                ? "Add and manage sub-services under your nested services."
+                : "Manage sub-services linked to nested services across all vendors."}
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
@@ -302,7 +307,7 @@ export default function SubServicesManagementPage() {
       ) : subServices.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center shadow-sm">
           <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
-            <Layers size={28} />
+            <Component size={28} />
           </div>
           <h3 className="text-base font-bold text-slate-800">No Sub-Services Found</h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
@@ -429,7 +434,7 @@ export default function SubServicesManagementPage() {
             <div className="p-6 space-y-6 text-center">
               <div className="flex flex-col items-center gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-100">
                 <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm">
-                  <Layers className="text-slate-400" size={28} />
+                  <Component className="text-slate-400" size={28} />
                 </div>
                 <div>
                   <span className="font-mono text-slate-400 font-bold text-xs">ID: {itemToDelete.id}</span>

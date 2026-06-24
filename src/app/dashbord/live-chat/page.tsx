@@ -127,9 +127,8 @@ function LiveChatContent() {
               <button
                 key={idx}
                 onClick={() => setActiveChatUser(item.user)}
-                className={`w-full text-left p-4 border-b border-slate-100 flex items-start gap-3 transition-colors ${
-                  activeChatUser?.id === item.user.id ? "bg-rose-50" : "hover:bg-white"
-                }`}
+                className={`w-full text-left p-4 border-b border-slate-100 flex items-start gap-3 transition-colors ${activeChatUser?.id === item.user.id ? "bg-rose-50" : "hover:bg-white"
+                  }`}
               >
                 <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 shrink-0">
                   <UserIcon size={18} />
@@ -179,11 +178,10 @@ function LiveChatContent() {
                   return (
                     <div key={idx} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                       <div
-                        className={`max-w-[70%] rounded-2xl px-5 py-3 ${
-                          isMe
-                            ? "bg-[#FF7C71] text-white rounded-br-sm shadow-md shadow-[#FF7C71]/20"
-                            : "bg-white text-slate-800 rounded-bl-sm border border-slate-100 shadow-sm"
-                        }`}
+                        className={`max-w-[70%] rounded-2xl px-5 py-3 ${isMe
+                          ? "bg-[#FF7C71] text-white rounded-br-sm shadow-md shadow-[#FF7C71]/20"
+                          : "bg-white text-slate-800 rounded-bl-sm border border-slate-100 shadow-sm"
+                          }`}
                       >
                         <p className="text-sm">{msg.content}</p>
                         <p className={`text-[10px] mt-1 text-right ${isMe ? "text-white/80" : "text-slate-400"}`}>

@@ -249,10 +249,15 @@ export default function BookingsManagementPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Manage Bookings</h1>
-          <p className="text-slate-500 mt-1">Track and manage all service bookings across the platform.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F7] text-[#FF7C71] rounded-2xl">
+            <Calendar className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Manage Bookings</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Track and manage all service bookings across the platform.</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
