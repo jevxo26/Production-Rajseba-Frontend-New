@@ -15,6 +15,11 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+const isProtectedRoute = (pathname: string): boolean => {
+  const cleanPath = pathname.replace(/\/$/, "");
+  return cleanPath === "/profile" || cleanPath.startsWith("/dashbord");
+};
+
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -49,15 +54,21 @@ const baseQueryWithReauth: BaseQueryFn<
           result = await baseQuery(args, api, extraOptions);
         } else {
           clearTokens();
-          if (typeof window !== 'undefined') window.location.href = '/login';
+          if (typeof window !== 'undefined' && isProtectedRoute(window.location.pathname)) {
+            window.location.href = '/login';
+          }
         }
       } else {
         clearTokens();
-        if (typeof window !== 'undefined') window.location.href = '/login';
+        if (typeof window !== 'undefined' && isProtectedRoute(window.location.pathname)) {
+          window.location.href = '/login';
+        }
       }
     } else {
       clearTokens();
-      if (typeof window !== 'undefined') window.location.href = '/login';
+      if (typeof window !== 'undefined' && isProtectedRoute(window.location.pathname)) {
+        window.location.href = '/login';
+      }
     }
   }
 
