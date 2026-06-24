@@ -171,6 +171,7 @@ function SuperAdminDashboard() {
     }
   ];
 
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* Header */}
@@ -1051,8 +1052,8 @@ function AgentDashboard() {
       header: "Status",
       render: (o: any) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${o.status === "completed" ? "bg-emerald-50 text-emerald-700" :
-            o.status === "cancelled" ? "bg-red-50 text-red-700" :
-              "bg-amber-50 text-amber-700"
+          o.status === "cancelled" ? "bg-red-50 text-red-700" :
+            "bg-amber-50 text-amber-700"
           }`}>
           {o.status.replace('_', ' ')}
         </span>

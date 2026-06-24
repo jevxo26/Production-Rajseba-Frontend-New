@@ -5,7 +5,7 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
 // import { RoleProvider } from "@/context/RoleContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DashboardLayout({
   children,
@@ -13,6 +13,41 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.classList.add("dashboard-html");
+
+    // Mutation observer to detect when a modal (custom or Radix UI) is open in the DOM
+    const checkModalState = () => {
+      const hasCustomModal = !!document.querySelector(".fixed.inset-0.z-50, .fixed.inset-0.z-\\[50\\]");
+      const hasRadixModal = document.body.hasAttribute("data-scroll-locked");
+      if (hasCustomModal || hasRadixModal) {
+        document.documentElement.classList.add("modal-open");
+        document.body.classList.add("modal-open");
+      } else {
+        document.documentElement.classList.remove("modal-open");
+        document.body.classList.remove("modal-open");
+      }
+    };
+
+    // Run once initially
+    checkModalState();
+
+    const observer = new MutationObserver(checkModalState);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-scroll-locked"],
+    });
+
+    return () => {
+      document.documentElement.classList.remove("dashboard-html");
+      document.documentElement.classList.remove("modal-open");
+      document.body.classList.remove("modal-open");
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FFF8F7] text-slate-900 relative">

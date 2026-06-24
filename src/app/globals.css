@@ -176,7 +176,7 @@ body {
 
   /* ✅ Webkit scrollbar — একবারই */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 2px;
     height: 6px;
   }
 
@@ -218,8 +218,8 @@ body {
 /* ✅ custom-scrollbar utility — specific scrollable divs এ manually use করো */
 @utility custom-scrollbar {
   &::-webkit-scrollbar {
-    height: 6px;
-    width: 6px;
+    height: 2px;
+    width: 2px;
   }
 
   &::-webkit-scrollbar-track {
@@ -236,18 +236,33 @@ body {
   }
 }
 
-/* ✅ Fix for Radix UI Select Layout Shift (lafa klafi) */
-body[data-scroll-locked] {
+/* ✅ Fix for Radix UI Select Layout Shift (lafa klafi) and custom modals */
+body[data-scroll-locked],
+html.modal-open,
+body.modal-open {
   padding-right: 0px !important;
   margin-right: 0px !important;
+  overflow: hidden !important;
 }
-html {
+
+body[data-scroll-locked] main,
+body[data-scroll-locked] nav,
+body.modal-open main,
+body.modal-open nav {
+  overflow: hidden !important;
+}
+
+html:not(.dashboard-html):not(.modal-open) {
   overflow-y: scroll !important;
+}
+html.dashboard-html {
+  overflow: hidden !important;
 }
 
 /* Premium Card Hover Effect */
 @utility hover-card-premium {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
   &:hover {
     transform: translateY(-5px) scale(1.015);
     box-shadow: 0 16px 28px -10px rgba(255, 124, 113, 0.25), 0 6px 16px rgba(0, 0, 0, 0.04);
