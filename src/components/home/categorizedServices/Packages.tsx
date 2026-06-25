@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 
 const packages = [
   {
+    id: "apartment-starter",
     title: "APARTMENT STARTER",
     price: "12,500",
+    image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80",
     features: [
       "2× 2MP Indoor Cameras",
       "4-Channel DVR",
@@ -17,9 +19,11 @@ const packages = [
     variant: "light",
   },
   {
+    id: "family-guard",
     title: "FAMILY GUARD",
     price: "28,900",
     badge: "POPULAR",
+    image: "https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80",
     features: [
       "4× 5MP All-weather Cams",
       "8-Channel DVR",
@@ -30,8 +34,10 @@ const packages = [
     variant: "popular",
   },
   {
+    id: "business-suite",
     title: "BUSINESS SUITE",
     price: "45,000",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80",
     features: [
       "8× IP Cameras (Night Vision)",
       "16-Channel NVR",
@@ -42,8 +48,10 @@ const packages = [
     variant: "light",
   },
   {
+    id: "custom-solution",
     title: "CUSTOM SOLUTION",
     price: null,
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
     description:
       "For large estates, multi-floor offices, or high-security data centers. We design to your specs.",
     buttonText: "Talk to Expert",
@@ -52,22 +60,25 @@ const packages = [
 ];
 
 export function Packages({ packages: inputPackages }: { packages?: any[] }) {
-  const displayPackages = inputPackages && inputPackages.length > 0
-    ? inputPackages.map((pkg, idx) => {
-        const variant = idx % 3 === 1 ? "popular" : idx % 3 === 2 ? "dark" : "light";
-        return {
-          title: pkg.name.toUpperCase(),
-          price: pkg.price ? Number(pkg.price).toLocaleString() : null,
-          features: pkg.items && pkg.items.length > 0
-            ? pkg.items.map((it: any) => it.nestedService?.name || "Premium item")
-            : ["Full Service", "Expert technician", "Quality check", "Support included"],
-          buttonText: "Select Package",
-          variant,
-          badge: variant === "popular" ? "POPULAR" : undefined,
-          description: pkg.description,
-        };
-      })
-    : packages;
+  if (!inputPackages || inputPackages.length === 0) {
+    return null;
+  }
+
+  const displayPackages = inputPackages.map((pkg, idx) => {
+    const variant = idx % 3 === 1 ? "popular" : idx % 3 === 2 ? "dark" : "light";
+    return {
+      title: pkg.name.toUpperCase(),
+      price: pkg.price ? Number(pkg.price).toLocaleString() : null,
+      image: pkg.image,
+      features: pkg.items && pkg.items.length > 0
+        ? pkg.items.map((it: any) => it.nestedService?.name || "Premium item")
+        : ["Full Service", "Expert technician", "Quality check", "Support included"],
+      buttonText: "Select Package",
+      variant,
+      badge: variant === "popular" ? "POPULAR" : undefined,
+      description: pkg.description,
+    };
+  });
 
   return (
     <section className="py-16">
@@ -98,8 +109,18 @@ export function Packages({ packages: inputPackages }: { packages?: any[] }) {
             >
               {/* Popular Badge */}
               {pkg.badge && (
-                <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full">
+                <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full z-10">
                   {pkg.badge}
+                </div>
+              )}
+
+              {pkg.image && (
+                <div className="relative h-44 -mx-8 -mt-8 mb-6 overflow-hidden rounded-t-[22px] border-b border-slate-100">
+                  <img
+                    src={pkg.image}
+                    alt={pkg.title}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
                 </div>
               )}
 

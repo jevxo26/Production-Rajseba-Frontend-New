@@ -552,6 +552,7 @@ export function FilterPanelDesktop({
                 [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-[#FF7C71]
                 [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
               aria-label="Maximum price"
+              suppressHydrationWarning
             />
           </div>
           <div className="flex justify-between text-[10px] text-slate-400 font-bold">

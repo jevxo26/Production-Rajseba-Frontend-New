@@ -3,7 +3,7 @@
 import React, { useMemo } from "react";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
-import { useGetPublicNestedServicesQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -42,93 +42,63 @@ interface TrendingServiceItem {
 }
 
 export default function TrendingServices() {
-  const { data: nestedRes, isLoading } = useGetPublicNestedServicesQuery();
-  const allNestedServices = nestedRes?.data || (Array.isArray(nestedRes) ? nestedRes : []);
+  const { data: servicesRes, isLoading } = useGetPublicServicesQuery();
+  const allServices = servicesRes?.data || (Array.isArray(servicesRes) ? servicesRes : []);
 
   // Map API services or use exact design match fallbacks
   const trendingListings = useMemo<TrendingServiceItem[]>(() => {
-    const fallbackItems: TrendingServiceItem[] = [
-      {
-        id: "1",
-        title: "Premium Deep Cleaning",
-        description:
-          "Full home sanitization using eco-friendly industrial equipment. Perfect for move-in or seasonal refreshes.",
-        image: "/images/service/service-1.png", // fallback path
-        rating: 4.9,
-        reviews: "1.2k",
-        price: 4500,
-        badge: "MOST BOOKED",
-        slug: "premium-deep-cleaning",
-      },
-      {
-        id: "2",
-        title: "Master AC Service",
-        description: "Comprehensive cleaning and gas top-up for all split brands.",
-        image: "/images/service/service-2.png", // fallback path
-        rating: 4.8,
-        reviews: "800+",
-        price: 1200,
-        badge: "HOT",
-        slug: "master-ac-service",
-      },
-    ];
+    if (!allServices.length) return [];
 
-    if (!allNestedServices.length) return [];
+    // Sort by most bookings and most reviews
+    const sortedServices = [...allServices].sort((a: any, b: any) => {
+      const aScore = (a.bookings?.length || 0) + (a.reviews?.length || 0);
+      const bScore = (b.bookings?.length || 0) + (b.reviews?.length || 0);
+      return bScore - aScore;
+    });
 
-    const mapped = allNestedServices.map((item: any, index: number) => {
+    const mapped = sortedServices.map((item: any, index: number) => {
       const id = String(item.id);
       const hash = getHash(id);
 
-      // Match the exact mock details from the image for first two items if possible
-      if (index === 0) {
-        return {
-          id,
-          title: item.name || "Premium Deep Cleaning",
-          description: item.description || "Full home sanitization using eco-friendly industrial equipment. Perfect for move-in or seasonal refreshes.",
-          image: item.image || "/images/service/service-1.png",
-          rating: 4.9,
-          reviews: "1.2k",
-          price: item.price ? Number(item.price) : 4500,
-          badge: "MOST BOOKED",
-          slug: item.service?.slug || "premium-deep-cleaning",
-        };
+      // Calculate real rating & reviews if available
+      const totalReviews = item.reviews?.length || 0;
+      let averageRating = 4.5 + (hash % 6) * 0.1; // fallback
+      
+      if (totalReviews > 0) {
+        const sumRating = item.reviews.reduce((acc: number, cur: any) => acc + (cur.rating || 0), 0);
+        averageRating = sumRating / totalReviews;
       }
 
-      if (index === 1) {
-        return {
-          id,
-          title: item.name || "Master AC Service",
-          description: item.description || "Comprehensive cleaning and gas top-up for all split brands.",
-          image: item.image || "/images/service/service-2.png",
-          rating: 4.8,
-          reviews: "800+",
-          price: item.price ? Number(item.price) : 1200,
-          badge: undefined,
-          slug: item.service?.slug || "master-ac-service",
-        };
-      }
+      // Format reviews count
+      const reviewsStr = totalReviews > 0 ? `${totalReviews}+` : `${(1.0 + (hash % 40) * 0.1).toFixed(1)}k`;
 
-      // General mapping for other items
-      const reviews = `${(1.0 + (hash % 40) * 0.1).toFixed(1)}k`;
-      const rating = parseFloat((4.5 + (hash % 6) * 0.1).toFixed(1));
-      const priceVal = item.price ? Number(item.price) : 1000;
+      // Get lowest price from nested services
+      let priceVal = 1000;
+      if (item.nestedServices && item.nestedServices.length > 0) {
+        const prices = item.nestedServices
+          .map((ns: any) => Number(ns.starting_price || 0))
+          .filter((p: number) => p > 0);
+        if (prices.length > 0) {
+          priceVal = Math.min(...prices);
+        }
+      }
 
       return {
         id,
         title: item.name || "",
-        description: item.description || "",
+        description: item.description || item.subtitle || "",
         image: item.image || "/images/service/service-1.png",
-        rating,
-        reviews,
+        rating: parseFloat(averageRating.toFixed(1)),
+        reviews: reviewsStr,
         price: priceVal,
-        badge: hash % 3 === 0 ? "POPULAR" : undefined,
-        slug: item.service?.slug || "",
+        badge: index === 0 ? "MOST BOOKED" : index === 1 ? "HOT" : hash % 3 === 0 ? "POPULAR" : undefined,
+        slug: item.slug || "",
       };
     });
 
-    // Return the top 2 items
-    return mapped.slice(0, 2);
-  }, [allNestedServices]);
+    // Return the top 6 items
+    return mapped.slice(0, 6);
+  }, [allServices]);
 
   if (isLoading) {
     return (
@@ -144,7 +114,7 @@ export default function TrendingServices() {
     );
   }
 
-  if (!allNestedServices.length) {
+  if (!allServices.length) {
     return (
       <section className="py-14 bg-[#FFF8F7] relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center py-12">

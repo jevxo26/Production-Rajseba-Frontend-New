@@ -6,6 +6,8 @@ import { SpecializedServices } from '@/components/home/categorizedServices/Speci
 import { Packages } from '@/components/home/categorizedServices/Packages';
 import { Experts } from '@/components/home/categorizedServices/Experts';
 import { Commitments } from '@/components/home/categorizedServices/Commitments';
+import { VendorProfile } from '@/components/home/categorizedServices/VendorProfile';
+import { ServiceReviews } from '@/components/home/categorizedServices/ServiceReviews';
 import { useGetPublicServiceByIdQuery } from "@/redux/features/landing/landingApi";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -54,6 +56,14 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
     );
   }
 
+  const reviews = service.reviews || [];
+  const bookings = service.bookings || [];
+  const reviewsCount = reviews.length;
+  const bookingsCount = bookings.length;
+  const rating = reviewsCount > 0
+    ? (reviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) / reviewsCount).toFixed(1)
+    : "0.0";
+
   return (
     <div className="min-h-screen bg-slate-50/50 relative">
       <div
@@ -63,9 +73,14 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
       <div className="relative z-10">
         <CategorizedHero
           id={service.id}
-          // iwejfi9je
           name={service.name}
           description={service.description}
+          image={service.image}
+          rating={rating}
+          bookingsCount={bookingsCount}
+          reviewsCount={reviewsCount}
+          categoryName={service.category?.name}
+          subtitle={service.subtitle}
         />
         <SpecializedServices
           nestedServices={service.nestedServices}
@@ -75,6 +90,13 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
         />
         <Experts
           employees={service.employees}
+        />
+        <VendorProfile
+          vendor={service.vendor}
+          serviceRating={rating}
+        />
+        <ServiceReviews
+          reviews={reviews}
         />
         <Commitments />
       </div>

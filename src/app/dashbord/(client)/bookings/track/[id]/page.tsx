@@ -225,7 +225,7 @@ export default function DynamicBookingTracker() {
               <h3 className="text-xl font-black text-slate-800">Professionals</h3>
             </div>
 
-            {!booking.service_provider && (!booking.employees || booking.employees.length === 0) ? (
+            {!booking.vendor && (!booking.employees || booking.employees.length === 0) ? (
               <div className="h-full flex flex-col items-center justify-center py-6 text-center">
                 <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-3">
                   <User size={20} />

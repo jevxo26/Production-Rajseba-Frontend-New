@@ -288,6 +288,8 @@ export function CustomSelect({
     );
   };
 
+  const id = React.useId();
+
   return (
     <div className={cn("space-y-1.5 w-full", className)}>
       {label && (
@@ -297,6 +299,7 @@ export function CustomSelect({
       )}
 
       <ReactSelect
+        instanceId={id}
         value={selectedOption}
         onChange={(selected: any) => {
           if (isMulti) {

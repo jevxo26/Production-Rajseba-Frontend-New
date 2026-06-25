@@ -200,7 +200,7 @@ export default function TopServices() {
                   {/* Wishlist heart */}
                   <Button
                     variant="ghost"
-                    onClick={(e) => { e.preventDefault(); toggleLike(service.id); }}
+                    onClick={(e) => toggleLike(service.id, e)}
                     className="absolute top-3 right-3 w-8 h-8 p-0 rounded-full bg-white/90 flex items-center justify-center shadow-sm border border-slate-100/60 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
                     aria-label="Add to wishlist"
                   >
@@ -244,9 +244,9 @@ export default function TopServices() {
                         <span className="text-xs text-slate-400 font-semibold">Contact for price</span>
                       )}
                     </div>
-                    <Link href={`/categories/service/${slug}`}>
+                    <Link href={`/services/${service.id}`}>
                       <Button className="bg-[#FF7C71] hover:bg-[#E5675D] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg">
-                        Book Now
+                        Details
                       </Button>
                     </Link>
                   </div>

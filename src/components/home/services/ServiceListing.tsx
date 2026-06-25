@@ -5,7 +5,7 @@ import ServiceCard from "./ServiceCard";
 import { CustomSelect } from "@/components/ui/select";
 import {
   useGetPublicCategoriesQuery,
-  useGetPublicNestedServicesQuery,
+  useGetPublicServicesQuery,
 } from "@/redux/features/landing/landingApi";
 import { FaBolt, FaBug, FaFaucet, FaLeaf, FaPaintRoller, FaTv, FaHammer } from "react-icons/fa";
 import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
@@ -117,17 +117,22 @@ export default function ServiceListing({
   const { data: categoriesRes, isLoading: isCategoriesLoading } = useGetPublicCategoriesQuery();
   const categories = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
 
-  const { data: nestedRes, isLoading: isServicesLoading } = useGetPublicNestedServicesQuery();
-  const allNestedServices = nestedRes?.data || (Array.isArray(nestedRes) ? nestedRes : []);
+  const { data: servicesRes, isLoading: isServicesLoading } = useGetPublicServicesQuery();
+  const allServices = servicesRes?.data || (Array.isArray(servicesRes) ? servicesRes : []);
 
   const mappedListings = useMemo(() => {
-    return allNestedServices.map((item: any) => {
+    return allServices.map((item: any) => {
       const id = String(item.id);
       const hash = getHash(id);
 
-      // Done options
-      const doneOptions = ["800+ done", "1.2k+ done", "2.1k+ done", "3k+ done", "4k+ done"];
-      const done = doneOptions[hash % doneOptions.length];
+      // Done options based on actual bookings if available, else fallback
+      let done = "";
+      if (item.bookings && item.bookings.length > 0) {
+        done = `${item.bookings.length}+ done`;
+      } else {
+        const doneOptions = ["80+ done", "120+ done", "210+ done", "300+ done", "400+ done"];
+        done = doneOptions[hash % doneOptions.length];
+      }
 
       // Availability options
       const availOptions = [
@@ -140,23 +145,36 @@ export default function ServiceListing({
       ];
       const availability = availOptions[hash % availOptions.length];
 
-      // Rating: 4.0 to 5.0 with one decimal place
-      const rating = parseFloat((4.0 + (hash % 11) * 0.1).toFixed(1));
+      // Rating based on actual reviews if available, else fallback
+      const totalReviews = item.reviews?.length || 0;
+      let rating = parseFloat((4.0 + (hash % 11) * 0.1).toFixed(1));
+      if (totalReviews > 0) {
+        const sumRating = item.reviews.reduce((acc: number, cur: any) => acc + (cur.rating || 0), 0);
+        rating = parseFloat((sumRating / totalReviews).toFixed(1));
+      }
 
       // Days ago
       const daysAgo = hash % 15;
 
-      const parentService = item.service || {};
-      const categoryObj = parentService.category || {};
+      const categoryObj = item.category || {};
       const catSlug = categoryObj.slug || categoryObj.name?.toLowerCase().replace(/\s+/g, "-") || "";
       const catLabel = categoryObj.name || "";
 
-      const priceVal = item.price ? Number(item.price) : 0;
+      // Price based on nested services minimum price
+      let priceVal = 1000;
+      if (item.nestedServices && item.nestedServices.length > 0) {
+        const prices = item.nestedServices
+          .map((ns: any) => Number(ns.starting_price || 0))
+          .filter((p: number) => p > 0);
+        if (prices.length > 0) {
+          priceVal = Math.min(...prices);
+        }
+      }
 
       return {
         id,
         title: item.name || "",
-        description: item.description || "",
+        description: item.description || item.subtitle || "",
         image: item.image || "/images/service/service-1.png",
         category: catSlug,
         categoryLabel: catLabel,
@@ -166,10 +184,10 @@ export default function ServiceListing({
         rating,
         availability,
         daysAgo,
-        slug: parentService.slug || "",
+        slug: item.slug || "",
       };
     });
-  }, [allNestedServices]);
+  }, [allServices]);
 
   const filteredListings = useMemo(() => {
     let list = [...mappedListings];
@@ -296,6 +314,7 @@ export default function ServiceListing({
                 value={searchQuery}
                 onChange={(e) => setFilters({ searchQuery: e.target.value, currentPage: 1 })}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-100 rounded-xl text-sm font-semibold placeholder-slate-400 text-slate-700 focus:outline-none focus:border-[#FF7C71] transition-all"
+                suppressHydrationWarning
               />
             </div>
 

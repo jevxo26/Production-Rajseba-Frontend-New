@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { Droplet, Phone } from "lucide-react";
 import Link from "next/link";
@@ -64,7 +65,8 @@ export function SpecializedServices({ nestedServices }: { nestedServices?: any[]
           description: ns.description || "Expert service technician ready to assist you.",
           price: (ns.starting_price || ns.price) ? `৳${ns.starting_price || ns.price}` : undefined,
           priceLabel: undefined as string | undefined,
-          type: isEmergency ? "emergency" as const : "normal" as const,
+          type: isEmergency ? ("emergency" as const) : ("normal" as const),
+          image: ns.image,
           icon: <Droplet className="w-7 h-7 text-[#FF7C71]" />,
           ctaText: isEmergency ? "Call Hotline" : undefined,
         };
@@ -95,7 +97,7 @@ export function SpecializedServices({ nestedServices }: { nestedServices?: any[]
 
         {/* Dynamic Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {displayServices.map((service, index) => {
+          {displayServices.map((service: any, index) => {
             if (service.type === "emergency") {
               return (
                 <div key={service.id} className="md:col-span-8">
@@ -116,11 +118,11 @@ export function SpecializedServices({ nestedServices }: { nestedServices?: any[]
                     </div>
 
                     <div className="flex flex-wrap gap-3 mt-auto">
-                      <button className="bg-[#FF7C71] hover:bg-[#E5675D] px-8 py-3.5 rounded-full font-semibold flex items-center gap-2 transition">
+                      <button className="bg-[#FF7C71] hover:bg-[#E5675D] px-8 py-3.5 rounded-full font-semibold flex items-center gap-2 transition cursor-pointer">
                         <Phone className="w-5 h-5" />
                         {service.ctaText || "Call Hotline"}
                       </button>
-                      <button className="border border-white/40 hover:bg-white/10 px-8 py-3.5 rounded-full font-semibold transition">
+                      <button className="border border-white/40 hover:bg-white/10 px-8 py-3.5 rounded-full font-semibold transition cursor-pointer">
                         Chat Now
                       </button>
                     </div>
@@ -146,11 +148,13 @@ export function SpecializedServices({ nestedServices }: { nestedServices?: any[]
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className={`bg-white z-10 border border-slate-100 rounded-3xl p-4 md:p-6 hover:shadow-xl transition-all group ${
+                className={`bg-white z-10 border border-slate-100 rounded-3xl p-4 md:p-6 hover:shadow-xl transition-all group flex flex-col ${
                   index === 0 ? "md:col-span-8" : "md:col-span-4"
                 }`}
               >
-                {service.icon ? (
+                {service.image ? (
+                  <img src={service.image} alt={service.title} className="w-16 h-16 rounded-2xl object-cover mb-6 shadow-sm border border-slate-50" />
+                ) : service.icon ? (
                   <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
                     {service.icon}
                   </div>
@@ -159,7 +163,7 @@ export function SpecializedServices({ nestedServices }: { nestedServices?: any[]
                 )}
 
                 <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
-                <p className="text-slate-600 leading-relaxed mb-8 flex-1">
+                <p className="text-slate-600 leading-relaxed mb-8 flex-1 whitespace-pre-line text-sm">
                   {service.description}
                 </p>
 

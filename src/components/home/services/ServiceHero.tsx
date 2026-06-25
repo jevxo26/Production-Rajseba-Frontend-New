@@ -93,6 +93,7 @@ const ServiceHero = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="What service do you need?"
               className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 outline-none w-full py-1.5"
+              suppressHydrationWarning
             />
           </div>
 
@@ -108,6 +109,7 @@ const ServiceHero = () => {
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Dhaka, BD"
               className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 outline-none w-full py-1.5"
+              suppressHydrationWarning
             />
           </div>
 

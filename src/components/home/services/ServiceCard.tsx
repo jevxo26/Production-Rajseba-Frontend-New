@@ -21,7 +21,7 @@ interface ServiceListing {
 export default function ServiceCard({ service }: { service: ServiceListing }) {
   return (
     <Link
-      href={`/categories/service/${service.slug || service.id}`}
+      href={`/services/${service.id}`}
       className="group bg-white border border-[#e5e7eb] rounded-2xl overflow-hidden shadow-sm no-underline flex flex-col hover-card-premium"
     >
       <div className="relative h-48 overflow-hidden">
