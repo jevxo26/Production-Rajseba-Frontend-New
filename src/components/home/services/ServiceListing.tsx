@@ -279,7 +279,7 @@ export default function ServiceListing({
   return (
     <section className="py-6 bg-slate-50/30">
       <div className="max-w-[1400px] mx-auto px-4">
-        
+
 
         {/* Top Search & Actions bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
@@ -349,7 +349,7 @@ export default function ServiceListing({
 
         {/* Main Split Layout */}
         <div className="flex flex-col md:flex-row gap-6 items-start">
-          
+
           {/* Desktop Left Sidebar Filters (hidden on mobile, block on md+) */}
           <div className="hidden md:block w-72 shrink-0">
             <FilterPanelDesktop
@@ -430,11 +430,10 @@ export default function ServiceListing({
                     <button
                       key={page}
                       onClick={() => setFilters({ currentPage: page })}
-                      className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition-all shadow-sm cursor-pointer ${
-                        currentPage === page
+                      className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition-all shadow-sm cursor-pointer ${currentPage === page
                           ? "bg-[#FF7C71] text-white border-[#FF7C71]"
                           : "border border-slate-100 bg-white text-slate-600 hover:border-[#FF7C71] hover:text-[#FF7C71]"
-                      }`}
+                        }`}
                     >
                       {page}
                     </button>

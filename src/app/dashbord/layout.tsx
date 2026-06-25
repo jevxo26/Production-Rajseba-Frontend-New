@@ -1,11 +1,54 @@
 "use client";
 
-
-
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
 // import { RoleProvider } from "@/context/RoleContext";
 import { useState, useEffect } from "react";
+import { useAppSelector } from "@/redux/hooks";
+
+/* ── Premium full-screen loading spinner ───────────────────────────────── */
+function DashboardLoader() {
+  return (
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#FFF8F7]">
+      {/* Soft background blobs */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-[#FF7C71]/10 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/3 w-[280px] h-[280px] rounded-full bg-rose-200/20 blur-[80px] pointer-events-none" />
+
+      {/* Spinner stack */}
+      <div className="relative flex items-center justify-center mb-8">
+        {/* Outer slow ring */}
+        <span
+          className="absolute w-24 h-24 rounded-full border-[3px] border-transparent"
+          style={{
+            borderTopColor: "#FF7C71",
+            borderRightColor: "#FF7C71",
+            animation: "spin 1.6s linear infinite",
+            opacity: 0.25,
+          }}
+        />
+        {/* Middle ring */}
+        <span
+          className="absolute w-16 h-16 rounded-full border-[3px] border-transparent"
+          style={{
+            borderTopColor: "#FF7C71",
+            borderLeftColor: "#FF7C71",
+            animation: "spin 1s linear infinite reverse",
+            opacity: 0.5,
+          }}
+        />
+        {/* Inner solid dot */}
+        <span className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF7C71] to-rose-500 shadow-lg shadow-rose-300/40" />
+      </div>
+
+      {/* Brand wordmark */}
+      <p className="text-base font-black text-slate-800 tracking-tight mb-1">Rajseba</p>
+      <p className="text-xs font-semibold text-slate-400 tracking-wide">Loading your dashboard…</p>
+
+      {/* Keyframes via inline style */}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -13,6 +56,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isAuthLoading = useAppSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     document.documentElement.classList.add("dashboard-html");
@@ -48,6 +92,11 @@ export default function DashboardLayout({
       observer.disconnect();
     };
   }, []);
+
+  /* Show global spinner while auth state is hydrating from localStorage */
+  if (isAuthLoading) {
+    return <DashboardLoader />;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#FFF8F7] text-slate-900 relative">
