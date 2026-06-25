@@ -69,7 +69,7 @@ export default function CategoryDetailClientPage({ slug }: { slug: string }) {
           bookingsCount={bookingsCount}
           reviewsCount={reviewsCount}
           categoryName={service.category?.name}
-          subtitle={service.subtitle}
+        // subtitle={service.subtitle}  ← Removed: not defined in CategorizedHeroProps
         />
         <SpecializedServices
           nestedServices={service.nestedServices}

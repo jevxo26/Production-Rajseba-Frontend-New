@@ -96,7 +96,7 @@ export default function SettingsPage() {
         }}
       />
 
-      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
+      <div className=" mx-auto space-y-8 relative z-10">
 
 
 

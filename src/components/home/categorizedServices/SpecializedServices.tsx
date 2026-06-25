@@ -68,6 +68,7 @@ export function SpecializedServices({
   // Accordion & Selection State
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedSubServices, setSelectedSubServices] = useState<number[]>([]);
+  const [activeService, setActiveService] = useState<SpecializedService | null>(null);
 
   // Booking Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -130,6 +131,25 @@ export function SpecializedServices({
       }
     }
 
+    setActiveService(service);
+    setIsModalOpen(true);
+  };
+
+  // Called when user clicks "+ Add" on a sub-service card — select + immediately open modal
+  const handleAddAndBook = (service: SpecializedService, subId: number) => {
+    if (!authUser) {
+      toast.error("Please login to book a service!", {
+        action: { label: "Login", onClick: () => router.push("/login") },
+      });
+      return;
+    }
+    // Ensure this sub-service is selected
+    setSelectedSubServices((prev) => {
+      const exists = prev.some((id) => String(id) === String(subId));
+      return exists ? prev : [...prev, subId];
+    });
+    setExpandedId(service.id);
+    setActiveService(service);
     setIsModalOpen(true);
   };
 
@@ -141,8 +161,8 @@ export function SpecializedServices({
       return;
     }
 
-    // Filter subservices related to the currently expanded nested service
-    const activeNestedService = displayServices.find((ds) => ds.id === expandedId);
+    // Filter subservices related to the active service (set when modal was triggered)
+    const activeNestedService = activeService || displayServices.find((ds) => ds.id === expandedId);
     const activeSubServiceIds = activeNestedService?.subServices
       ? activeNestedService.subServices
           .filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id)))
@@ -162,9 +182,17 @@ export function SpecializedServices({
 
     try {
       await createBooking(payload).unwrap();
-      toast.success("Your booking has been placed successfully!");
+      toast.success("Booking placed successfully! ✅", {
+        description: "View and track your booking from your dashboard.",
+        action: {
+          label: "Track Booking →",
+          onClick: () => router.push("/dashbord/bookings"),
+        },
+        duration: 6000,
+      });
       setIsModalOpen(false);
       setSelectedSubServices([]);
+      setActiveService(null);
       setBookingDetails({ date: "", time: "", location: "", notes: "" });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to place booking. Please try again.");
@@ -337,12 +365,18 @@ export function SpecializedServices({
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleSubServiceToggle(sub.id);
+                                    if (isAdded) {
+                                      // If already added, just deselect
+                                      handleSubServiceToggle(sub.id);
+                                    } else {
+                                      // Select + open booking modal immediately
+                                      handleAddAndBook(service, sub.id);
+                                    }
                                   }}
-                                  className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                                  className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                                     isAdded
                                       ? "bg-rose-50 text-[#FF7C71] border border-rose-100 hover:bg-rose-100"
-                                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                      : "bg-[#FF7C71] text-white hover:bg-[#E5675D] shadow-sm shadow-rose-200"
                                   }`}
                                 >
                                   {isAdded ? (
@@ -353,7 +387,7 @@ export function SpecializedServices({
                                   ) : (
                                     <>
                                       <Plus size={14} strokeWidth={3} />
-                                      Add
+                                      Book Now
                                     </>
                                   )}
                                 </button>
@@ -408,8 +442,8 @@ export function SpecializedServices({
 
             {/* Selected Subservices summary in modal */}
             {(() => {
-              const activeNestedService = displayServices.find((ds) => ds.id === expandedId);
-              const selectedSubs = activeNestedService?.subServices?.filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id))) || [];
+              const currentSvc = activeService || displayServices.find((ds) => ds.id === expandedId);
+              const selectedSubs = currentSvc?.subServices?.filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id))) || [];
               const totalPrice = selectedSubs.reduce((sum, ss) => sum + Number(ss.price || 0), 0);
 
               if (selectedSubs.length === 0) return null;
@@ -506,28 +540,37 @@ export function SpecializedServices({
                 </div>
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+              <div className="pt-4 flex items-center justify-between gap-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+                  onClick={() => router.push("/dashbord/bookings")}
+                  className="text-xs font-semibold text-slate-400 hover:text-[#FF7C71] transition-colors cursor-pointer"
                 >
-                  Cancel
+                  View My Bookings →
                 </button>
-                <button
-                  type="submit"
-                  disabled={isBooking}
-                  className="px-6 py-2.5 text-sm font-bold text-white bg-[#FF7C71] hover:bg-[#E5675D] rounded-xl transition-colors shadow-md disabled:opacity-70 flex items-center gap-2 cursor-pointer"
-                >
-                  {isBooking ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Placing...
-                    </>
-                  ) : (
-                    "Confirm Booking"
-                  )}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isBooking}
+                    className="px-6 py-2.5 text-sm font-bold text-white bg-[#FF7C71] hover:bg-[#E5675D] rounded-xl transition-colors shadow-md disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+                  >
+                    {isBooking ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Placing...
+                      </>
+                    ) : (
+                      "Confirm Booking"
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

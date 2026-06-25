@@ -64,13 +64,13 @@ export default function DynamicBookingTracker() {
     on_the_way: 2,
     completed: 3
   };
-  
+
   const currentStepIndex = statusMap[booking.status] ?? 0;
 
   return (
     <div className="w-full animate-in fade-in duration-200 pb-10">
-      <div className="max-w-4xl mx-auto space-y-8">
-        
+      <div className="max-w-7xl mx-auto space-y-8">
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
@@ -110,25 +110,23 @@ export default function DynamicBookingTracker() {
                   {steps.map((step, index) => {
                     const isCompleted = currentStepIndex > index;
                     const isActive = currentStepIndex === index;
-                    
+
                     return (
                       <div key={step.id} className="flex flex-col items-center relative w-1/4">
                         {/* Connecting Line */}
                         {index !== 0 && (
-                          <div className={`absolute top-6 left-[-50%] w-full h-[3px] -z-10 transition-colors duration-500 ${
-                            currentStepIndex >= index ? "bg-[#FF7C71]" : "bg-slate-100"
-                          }`} />
+                          <div className={`absolute top-6 left-[-50%] w-full h-[3px] -z-10 transition-colors duration-500 ${currentStepIndex >= index ? "bg-[#FF7C71]" : "bg-slate-100"
+                            }`} />
                         )}
-                        
+
                         {/* Circle */}
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black transition-all duration-300 shadow-sm border-4 border-white ${
-                          isCompleted ? "bg-[#FF7C71] text-white" : 
-                          isActive ? "bg-[#FF7C71] text-white ring-4 ring-[#FF7C71]/20 scale-110" : 
-                          "bg-slate-100 text-slate-400"
-                        }`}>
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-black transition-all duration-300 shadow-sm border-4 border-white ${isCompleted ? "bg-[#FF7C71] text-white" :
+                            isActive ? "bg-[#FF7C71] text-white ring-4 ring-[#FF7C71]/20 scale-110" :
+                              "bg-slate-100 text-slate-400"
+                          }`}>
                           {isCompleted ? <Check size={20} className="stroke-[3]" /> : index + 1}
                         </div>
-                        
+
                         {/* Labels */}
                         <div className="mt-4 text-center">
                           <span className={`text-sm font-black block tracking-wide ${isActive ? "text-[#FF7C71]" : isCompleted ? "text-slate-800" : "text-slate-400"}`}>
@@ -147,21 +145,20 @@ export default function DynamicBookingTracker() {
               {/* Mobile Stepper */}
               <div className="sm:hidden space-y-6 relative ml-4">
                 <div className="absolute left-5 top-5 bottom-5 w-[3px] bg-slate-100 -z-10" />
-                <div className="absolute left-5 top-5 bottom-5 w-[3px] bg-[#FF7C71] -z-10 transition-all duration-500 origin-top" 
-                  style={{ height: `${(currentStepIndex / (steps.length - 1)) * 100}%` }} 
+                <div className="absolute left-5 top-5 bottom-5 w-[3px] bg-[#FF7C71] -z-10 transition-all duration-500 origin-top"
+                  style={{ height: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
                 />
 
                 {steps.map((step, index) => {
                   const isCompleted = currentStepIndex > index;
                   const isActive = currentStepIndex === index;
-                  
+
                   return (
                     <div key={step.id} className="flex items-center gap-6">
-                      <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300 shadow-sm border-2 border-white ${
-                        isCompleted ? "bg-[#FF7C71] text-white" : 
-                        isActive ? "bg-[#FF7C71] text-white ring-4 ring-[#FF7C71]/20 scale-110" : 
-                        "bg-slate-100 text-slate-400"
-                      }`}>
+                      <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300 shadow-sm border-2 border-white ${isCompleted ? "bg-[#FF7C71] text-white" :
+                          isActive ? "bg-[#FF7C71] text-white ring-4 ring-[#FF7C71]/20 scale-110" :
+                            "bg-slate-100 text-slate-400"
+                        }`}>
                         {isCompleted ? <Check size={16} className="stroke-[3]" /> : index + 1}
                       </div>
                       <div>
@@ -182,14 +179,14 @@ export default function DynamicBookingTracker() {
 
         {/* Booking & Assigned Info Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
+
           {/* Service Details */}
           <div className="bg-white p-8 rounded-[36px] border border-slate-100 shadow-sm space-y-6">
             <div>
               <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-2">Service Details</span>
               <h3 className="text-xl font-black text-slate-800">{booking.service?.name || booking.pkg?.name || "Service Details"}</h3>
             </div>
-            
+
             <div className="space-y-4 pt-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500">
@@ -200,7 +197,7 @@ export default function DynamicBookingTracker() {
                   <span className="text-sm font-bold text-slate-700">{new Date(booking.date).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-500">
                   <MapPin size={18} />
@@ -249,7 +246,7 @@ export default function DynamicBookingTracker() {
                           <span className="text-xs font-bold text-slate-400 block mt-0.5 mb-2">Service Vendor</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-t border-slate-200/60 pt-2 mt-1">
                         {booking.vendor.phone && (
                           <a href={`tel:${booking.vendor.phone}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#FF7C71] transition-colors">
@@ -287,7 +284,7 @@ export default function DynamicBookingTracker() {
                           <span className="text-xs font-bold text-slate-400 block mt-0.5 mb-2">Assigned Technician</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-t border-slate-200/60 pt-2 mt-1">
                         {emp.phone && (
                           <a href={`tel:${emp.phone}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-500 transition-colors">
@@ -314,7 +311,7 @@ export default function DynamicBookingTracker() {
               </div>
             )}
           </div>
-          
+
         </div>
       </div>
     </div>

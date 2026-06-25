@@ -176,6 +176,7 @@ export default function SpecialOffers() {
                 id: pkg.id,
                 title: pkg.name.toUpperCase(),
                 price: pkg.price ? Number(pkg.price).toLocaleString() : null,
+                image: pkg.image || section.service?.image || null,
                 features: pkg.items && pkg.items.length > 0
                   ? pkg.items.map((it: any) => it.nestedService?.name || "Premium item")
                   : ["Full Service", "Expert technician", "Quality check", "Support included"],
@@ -184,6 +185,7 @@ export default function SpecialOffers() {
                 badge: variant === "popular" ? "POPULAR" : undefined,
                 description: pkg.description,
                 serviceId: section.service?.id,
+                serviceName: section.service?.name || "",
                 vendorId: section.service?.vendor?.id,
               };
             })
@@ -201,195 +203,105 @@ export default function SpecialOffers() {
                 <motion.div
                   key={pkg.id || index}
                   variants={itemVariants}
-                  className={`rounded-3xl p-8 relative flex flex-col h-full transition-all hover:-translate-y-1 ${
+                  className={`rounded-3xl relative flex flex-col h-full transition-all hover:-translate-y-1 overflow-hidden ${
                     pkg.variant === "popular"
                       ? "border-2 border-[#FF7C71] bg-rose-50/50 shadow-xl"
                       : pkg.variant === "dark"
                         ? "bg-[#261817] text-white"
-                        : "bg-white border border-slate-100"
+                        : "bg-white border border-slate-100 shadow-sm"
                   }`}
                 >
                   {/* Popular Badge */}
                   {pkg.badge && (
-                    <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full z-10">
+                    <div className="absolute top-3 right-3 bg-[#FF7C71] text-white text-[10px] font-bold px-3 py-1 rounded-full z-10 shadow-sm">
                       {pkg.badge}
                     </div>
                   )}
 
-                  <div className="mb-8">
-                    <h3
-                      className={`text-lg font-semibold mb-4 ${pkg.variant === "dark" ? "text-white" : "text-slate-900"}`}
-                    >
-                      {pkg.title}
-                    </h3>
+                  {/* Package Image */}
+                  {pkg.image ? (
+                    <div className="relative h-40 w-full overflow-hidden">
+                      <img
+                        src={pkg.image}
+                        alt={pkg.title}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      />
+                      {pkg.serviceName && (
+                        <div className="absolute bottom-2 left-3 bg-black/50 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">
+                          {pkg.serviceName}
+                        </div>
+                      )}
+                    </div>
+                  ) : pkg.serviceName ? (
+                    <div className={`px-6 pt-6 pb-2`}>
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                        pkg.variant === "dark" ? "bg-white/10 text-slate-300" : "bg-[#FF7C71]/10 text-[#FF7C71]"
+                      }`}>{pkg.serviceName}</span>
+                    </div>
+                  ) : null}
 
-                    {pkg.price ? (
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold">৳{pkg.price}</span>
-                      </div>
+                  <div className={`p-6 flex flex-col flex-1 ${ !pkg.image && !pkg.serviceName ? "pt-8" : "" }`}>
+                    <div className="mb-5">
+                      <h3 className={`text-base font-bold mb-3 leading-snug ${ pkg.variant === "dark" ? "text-white" : "text-slate-900" }`}>
+                        {pkg.title}
+                      </h3>
+                      {pkg.price ? (
+                        <div className="flex items-baseline gap-1">
+                          <span className={`text-3xl font-extrabold ${ pkg.variant === "dark" ? "text-white" : "text-[#FF7C71]" }`}>৳{pkg.price}</span>
+                          <span className={`text-xs font-medium ${ pkg.variant === "dark" ? "text-slate-400" : "text-slate-400" }`}>/package</span>
+                        </div>
+                      ) : (
+                        <div className="text-2xl font-bold text-slate-400">Get Quote</div>
+                      )}
+                    </div>
+
+                    {/* Features or Description */}
+                    {pkg.features ? (
+                      <ul className="space-y-2.5 mb-6 flex-1">
+                        {pkg.features.map((feature: any, i: number) => (
+                          <li key={i} className="flex items-start gap-2.5 text-sm">
+                            <Check className="w-4 h-4 text-[#FF7C71] mt-0.5 flex-shrink-0" />
+                            <span className={pkg.variant === "dark" ? "text-slate-300" : "text-slate-600"}>
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
                     ) : (
-                      <div className="mb-6">
-                        <h4 className="text-3xl font-bold mb-1">Get Quote</h4>
-                      </div>
+                      <p className="text-slate-400 leading-relaxed mb-6 flex-1 text-sm">
+                        {pkg.description}
+                      </p>
                     )}
+
+                    {/* Button */}
+                    <button
+                      onClick={() => handleInitiateBooking(pkg)}
+                      className={`w-full py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer active:scale-[0.98] ${
+                        pkg.variant === "dark"
+                          ? "bg-white text-slate-900 hover:bg-slate-100"
+                          : pkg.variant === "popular"
+                            ? "bg-[#FF7C71] text-white hover:bg-[#E5675D] shadow-md shadow-[#FF7C71]/20"
+                            : "bg-slate-900 text-white hover:bg-black"
+                      }`}
+                    >
+                      {pkg.buttonText}
+                    </button>
                   </div>
-
-                  {/* Features or Description */}
-                  {pkg.features ? (
-                    <ul className="space-y-3 mb-10 flex-1">
-                      {pkg.features.map((feature: any, i: number) => (
-                        <li key={i} className="flex items-start gap-3 text-sm">
-                          <Check className="w-5 h-5 text-[#FF7C71] mt-0.5 flex-shrink-0" />
-                          <span
-                            className={
-                              pkg.variant === "dark"
-                                ? "text-slate-300"
-                                : "text-slate-600"
-                            }
-                          >
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-slate-400 leading-relaxed mb-10 flex-1">
-                      {pkg.description}
-                    </p>
-                  )}
-
-                  {/* Button */}
-                  <button
-                    onClick={() => handleInitiateBooking(pkg)}
-                    className={`block w-full py-3.5 rounded-2xl font-semibold text-sm transition-all cursor-pointer ${
-                      pkg.variant === "dark"
-                        ? "bg-slate-100 text-slate-900 hover:bg-slate-300"
-                        : pkg.variant === "popular"
-                          ? "bg-[#FF7C71] text-white hover:bg-[#E5675D]"
-                          : "bg-[#261817]/90 text-white hover:bg-black"
-                    }`}
-                  >
-                    {pkg.buttonText}
-                  </button>
                 </motion.div>
               ))}
             </motion.div>
           );
         })()}
 
-        {/* Fallback mock data if API is empty */}
+        {/* Empty state if API has no packages */}
         {!isLoading && packagesData.length === 0 && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {/* Fallback map from the previous mock data */}
-            {[
-              {
-                id: 1,
-                title: "APARTMENT STARTER",
-                price: "12,500",
-                features: ["2× 2MP Indoor Cameras", "4-Channel DVR", "500GB Storage", "Free App Setup"],
-                buttonText: "Book Package",
-                variant: "light",
-              },
-              {
-                id: 2,
-                title: "FAMILY GUARD",
-                price: "28,900",
-                badge: "POPULAR",
-                features: ["4× 5MP All-weather Cams", "8-Channel DVR", "1TB Storage + Smart Lock", "1 year Free Maintenance"],
-                buttonText: "Book Package",
-                variant: "popular",
-              },
-              {
-                id: 3,
-                title: "BUSINESS SUITE",
-                price: "45,000",
-                features: ["8× IP Cameras (Night Vision)", "16-Channel NVR", "2TB Server Storage", "24/7 Priority Support"],
-                buttonText: "Book Package",
-                variant: "light",
-              },
-            ].map((pkg: any, index: number) => (
-              <motion.div
-                key={pkg.id || index}
-                variants={itemVariants}
-                className={`rounded-3xl p-8 relative flex flex-col h-full transition-all hover:-translate-y-1 ${
-                  pkg.variant === "popular"
-                    ? "border-2 border-[#FF7C71] bg-rose-50/50 shadow-xl"
-                    : pkg.variant === "dark"
-                      ? "bg-[#261817] text-white"
-                      : "bg-white border border-slate-100"
-                }`}
-              >
-                {/* Popular Badge */}
-                {pkg.badge && (
-                  <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full z-10">
-                    {pkg.badge}
-                  </div>
-                )}
-
-                <div className="mb-8 mt-4">
-                  <h3
-                    className={`text-lg font-semibold mb-4 ${pkg.variant === "dark" ? "text-white" : "text-slate-900"}`}
-                  >
-                    {pkg.title}
-                  </h3>
-
-                  {pkg.price ? (
-                    <div className="mb-6">
-                      <span className="text-4xl font-bold">৳{pkg.price}</span>
-                    </div>
-                  ) : (
-                    <div className="mb-6">
-                      <h4 className="text-3xl font-bold mb-1">Get Quote</h4>
-                    </div>
-                  )}
-                </div>
-
-                {/* Features or Description */}
-                {pkg.features ? (
-                  <ul className="space-y-3 mb-10 flex-1">
-                    {pkg.features.map((feature: any, i: number) => (
-                      <li key={i} className="flex items-start gap-3 text-sm">
-                        <Check className="w-5 h-5 text-[#FF7C71] mt-0.5 flex-shrink-0" />
-                        <span
-                          className={
-                            pkg.variant === "dark"
-                              ? "text-slate-300"
-                              : "text-slate-600"
-                          }
-                        >
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-slate-400 leading-relaxed mb-10 flex-1">
-                    {pkg.description}
-                  </p>
-                )}
-
-                {/* Button */}
-                <button
-                  onClick={() => handleInitiateBooking(pkg)}
-                  className={`block w-full py-3.5 rounded-2xl font-semibold text-sm transition-all cursor-pointer ${
-                    pkg.variant === "dark"
-                      ? "bg-slate-100 text-slate-900 hover:bg-slate-300"
-                      : pkg.variant === "popular"
-                        ? "bg-[#FF7C71] text-white hover:bg-[#E5675D]"
-                        : "bg-[#261817]/90 text-white hover:bg-black"
-                  }`}
-                >
-                  {pkg.buttonText}
-                </button>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-[#FF7C71] mb-4">
+              <Gift size={28} />
+            </div>
+            <h3 className="text-lg font-bold text-slate-700 mb-1">No packages available yet</h3>
+            <p className="text-sm text-slate-400 max-w-xs">Check back soon — our vendors are creating exclusive deals for you.</p>
+          </div>
         )}
 
 

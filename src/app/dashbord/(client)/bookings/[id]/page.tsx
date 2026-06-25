@@ -21,7 +21,7 @@ export default function ClientBookingDetailsPage() {
   const [createReview, { isLoading: isSubmittingReview }] = useCreateReviewMutation();
 
   const booking = response?.data;
-  
+
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [reviewTarget, setReviewTarget] = useState<string>("service");
@@ -43,10 +43,10 @@ export default function ClientBookingDetailsPage() {
 
     try {
       await createReview(payload).unwrap();
-      
+
       toast.success("Review submitted successfully!");
       setReviewSubmitted(true);
-      
+
       // Reset form to allow multiple reviews
       setTimeout(() => {
         setReviewSubmitted(false);
@@ -76,7 +76,7 @@ export default function ClientBookingDetailsPage() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto animate-in fade-in duration-200 pb-12">
+    <div className="w-full  mx-auto animate-in fade-in duration-200 pb-12">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Link href="/dashbord/bookings" className="p-2 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-colors text-slate-600">
@@ -103,7 +103,7 @@ export default function ClientBookingDetailsPage() {
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-50 text-slate-600 mt-2 border border-slate-200">
                   Status: {booking.status.toUpperCase()}
                 </span>
-                
+
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-2 text-sm text-slate-600">
                     <Calendar size={16} className="text-[#FF7C71]" />
@@ -116,7 +116,7 @@ export default function ClientBookingDetailsPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-slate-50 rounded-2xl p-4 min-w-[160px] text-center md:text-right border border-slate-100">
               <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-1">Total Amount</p>
               <p className="text-2xl font-black text-slate-800">৳{booking.total_price}</p>
@@ -133,7 +133,7 @@ export default function ClientBookingDetailsPage() {
               </div>
               Assigned Vendor
             </h4>
-            
+
             {booking.vendor ? (
               <div className="flex items-center justify-between bg-emerald-50/50 border border-emerald-100/50 p-4 rounded-2xl">
                 <div className="flex items-center gap-3">
@@ -241,8 +241,8 @@ export default function ClientBookingDetailsPage() {
                 {booking.employees && booking.employees.length > 0 && (
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-2">Review Subject</label>
-                    <select 
-                      value={reviewTarget} 
+                    <select
+                      value={reviewTarget}
                       onChange={(e) => setReviewTarget(e.target.value)}
                       className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF7C71]/20 focus:border-[#FF7C71]/40 transition-all"
                     >
