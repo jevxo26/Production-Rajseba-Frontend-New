@@ -207,7 +207,7 @@ export default function DynamicBookingTracker() {
                 </div>
                 <div>
                   <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">Location</span>
-                  <span className="text-sm font-bold text-slate-700">{booking.address || "N/A"}</span>
+                  <span className="text-sm font-bold text-slate-700">{booking.location || "N/A"}</span>
                 </div>
               </div>
             </div>
