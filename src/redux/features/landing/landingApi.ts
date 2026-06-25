@@ -60,6 +60,11 @@ export const landingApi = baseApi.injectEndpoints({
       query: (serviceId) => `/packages/service/${serviceId}`,
     }),
 
+    // GET /profiles — public, no auth required, returns all profiles with user info
+    getPublicProfiles: builder.query<any, void>({
+      query: () => '/profiles',
+    }),
+
   }),
   overrideExisting: false,
 });
@@ -76,4 +81,5 @@ export const {
   useGetPublicServiceBySlugQuery,
   useGetPublicPackagesQuery,
   useGetPublicPackagesByServiceQuery,
+  useGetPublicProfilesQuery,
 } = landingApi;

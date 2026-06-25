@@ -198,7 +198,7 @@ export default function TopServices() {
                       </div>
                       <Link href={`/categories/service/${slug}`}>
                         <Button className="bg-[#FF7C71] hover:bg-[#E5675D] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg">
-                          Book Now
+                          Details
                         </Button>
                       </Link>
                     </div>
