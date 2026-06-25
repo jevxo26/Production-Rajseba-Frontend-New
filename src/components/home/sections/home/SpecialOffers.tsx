@@ -2,9 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Tag, Clock, ArrowRight, Zap, Gift, Percent, Sparkles, Loader2 } from "lucide-react";
+import { Tag, Clock, ArrowRight, Zap, Gift, Percent, Sparkles, Loader2, Check } from "lucide-react";
 import Link from "next/link";
 import { useGetPublicPackagesQuery } from "@/redux/features/landing/landingApi";
+import { useCreateBookingMutation } from "@/redux/features/admin/booking";
+import { useAppSelector } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Calendar, X } from "lucide-react";
 
 // Premium styles for cards matching the brand color palette (#FF7C71)
 const DESIGN_ASSETS = [
@@ -66,6 +71,63 @@ export default function SpecialOffers() {
 
   const packagesData = packagesRes?.data || (Array.isArray(packagesRes) ? packagesRes : []);
 
+  const router = useRouter();
+  const authUser = useAppSelector((state) => state.auth.user);
+  const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
+
+  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState({
+    date: "",
+    time: "",
+    location: "",
+    notes: "",
+  });
+
+  const handleInitiateBooking = (pkg: any) => {
+    if (!authUser) {
+      toast.error("Please login to proceed with booking!", {
+        action: {
+          label: "Login",
+          onClick: () => router.push("/login"),
+        },
+      });
+      return;
+    }
+    setSelectedPackage(pkg);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!bookingDetails.date || !bookingDetails.location) {
+      toast.error("Booking Date and Service Location are required!");
+      return;
+    }
+
+    const payload = {
+      user_id: authUser?.id,
+      package_id: selectedPackage?.id,
+      service_id: selectedPackage?.serviceId,
+      vendor_id: selectedPackage?.vendorId || 1, // Fallback to 1 if no vendor, though backend requires it
+      date: bookingDetails.date,
+      time: bookingDetails.time || undefined,
+      location: bookingDetails.location,
+      notes: bookingDetails.notes || undefined,
+    };
+
+    try {
+      await createBooking(payload).unwrap();
+      toast.success("Your package booking has been placed successfully!");
+      setIsModalOpen(false);
+      setSelectedPackage(null);
+      setBookingDetails({ date: "", time: "", location: "", notes: "" });
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to place booking. Please try again.");
+    }
+  };
+
   // Dynamic offers rendering happens directly in the return block now
 
   return (
@@ -106,28 +168,23 @@ export default function SpecialOffers() {
         {/* All Packages — Flat Grid */}
         {!isLoading && packagesData.length > 0 && (() => {
           // Flatten all packages from all services into one list
-          const allOffers = packagesData.flatMap((section: any) =>
+          const displayPackages = packagesData.flatMap((section: any, sIdx: number) =>
             (section.packages || []).map((pkg: any, idx: number) => {
-              const design = DESIGN_ASSETS[idx % DESIGN_ASSETS.length];
-              const discountAmount =
-                pkg.originalPrice && pkg.price
-                  ? Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100)
-                  : 0;
+              const globalIdx = sIdx * 10 + idx;
+              const variant = globalIdx % 3 === 1 ? "popular" : globalIdx % 3 === 2 ? "dark" : "light";
               return {
                 id: pkg.id,
-                badge: discountAmount > 0 ? ` ${discountAmount}% Off` : "✨ Package Deal",
-                badgeColor: design.badgeColor,
-                title: pkg.name,
-                subtitle: pkg.description || "Premium service package",
-                originalPrice: pkg.originalPrice ? `৳${pkg.originalPrice}` : `৳${Number(pkg.price) + 300}`,
-                salePrice: `৳${pkg.price}`,
-                gradient: design.gradient,
-                bg: design.bg,
-                border: design.border,
-                glow: design.glow,
-                iconColor: design.iconColor,
+                title: pkg.name.toUpperCase(),
+                price: pkg.price ? Number(pkg.price).toLocaleString() : null,
+                features: pkg.items && pkg.items.length > 0
+                  ? pkg.items.map((it: any) => it.nestedService?.name || "Premium item")
+                  : ["Full Service", "Expert technician", "Quality check", "Support included"],
+                buttonText: "Book Package",
+                variant,
+                badge: variant === "popular" ? "POPULAR" : undefined,
+                description: pkg.description,
                 serviceId: section.service?.id,
-                serviceName: section.service?.name,
+                vendorId: section.service?.vendor?.id,
               };
             })
           );
@@ -138,68 +195,87 @@ export default function SpecialOffers() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
-              {allOffers.map((offer: any) => (
+              {displayPackages.map((pkg: any, index: number) => (
                 <motion.div
-                  key={offer.id}
+                  key={pkg.id || index}
                   variants={itemVariants}
-                  whileHover={{ y: -5, scale: 1.01 }}
-                  className={`relative rounded-[2rem] border ${offer.border} ${offer.bg} p-6 md:p-7 flex flex-col justify-between min-h-[300px] overflow-hidden cursor-pointer group transition-all duration-300 shadow-sm ${offer.glow} hover:shadow-xl hover:shadow-slate-200/50`}
+                  className={`rounded-3xl p-8 relative flex flex-col h-full transition-all hover:-translate-y-1 ${
+                    pkg.variant === "popular"
+                      ? "border-2 border-[#FF7C71] bg-rose-50/50 shadow-xl"
+                      : pkg.variant === "dark"
+                        ? "bg-[#261817] text-white"
+                        : "bg-white border border-slate-100"
+                  }`}
                 >
-                  {/* Decorative gradient mesh */}
-                  <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${offer.gradient} opacity-[0.08] blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
-
-                  {/* Top Badge Row */}
-                  <div className="flex items-center justify-between z-10">
-                    <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${offer.badgeColor} uppercase tracking-wider`}>
-                      {offer.badge}
-                    </span>
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                      <Percent size={14} className={offer.iconColor} />
+                  {/* Popular Badge */}
+                  {pkg.badge && (
+                    <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full z-10">
+                      {pkg.badge}
                     </div>
-                  </div>
+                  )}
 
-                  {/* Main Title & Description */}
-                  <div className="my-6 z-10 flex-1 flex flex-col justify-center">
-                    {offer.serviceName && (
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
-                        <Tag size={10} />
-                        {offer.serviceName}
-                      </span>
-                    )}
-                    <h3 className="text-xl font-black text-slate-900 group-hover:text-[#FF7C71] transition-colors leading-tight mb-2">
-                      {offer.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
-                      {offer.subtitle}
-                    </p>
-                  </div>
-
-                  {/* Pricing and Action row */}
-                  <div className="pt-4 border-t border-slate-100 z-10 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Special price</p>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="text-xl font-black text-slate-950">{offer.salePrice}</span>
-                        <span className="text-xs text-slate-400 line-through font-semibold">{offer.originalPrice}</span>
-                      </div>
-                    </div>
-
-                    <Link
-                      href={offer.serviceId ? `/services/${offer.serviceId}` : "/services"}
-                      className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2.5 rounded-xl bg-gradient-to-r ${offer.gradient} text-white shadow-md shadow-rose-300/30 group-hover:shadow-lg group-hover:shadow-rose-400/40 transition-all`}
+                  <div className="mb-8">
+                    <h3
+                      className={`text-lg font-semibold mb-4 ${pkg.variant === "dark" ? "text-white" : "text-slate-900"}`}
                     >
-                      Book Deal
-                      <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
+                      {pkg.title}
+                    </h3>
+
+                    {pkg.price ? (
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold">৳{pkg.price}</span>
+                      </div>
+                    ) : (
+                      <div className="mb-6">
+                        <h4 className="text-3xl font-bold mb-1">Get Quote</h4>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Features or Description */}
+                  {pkg.features ? (
+                    <ul className="space-y-3 mb-10 flex-1">
+                      {pkg.features.map((feature: any, i: number) => (
+                        <li key={i} className="flex items-start gap-3 text-sm">
+                          <Check className="w-5 h-5 text-[#FF7C71] mt-0.5 flex-shrink-0" />
+                          <span
+                            className={
+                              pkg.variant === "dark"
+                                ? "text-slate-300"
+                                : "text-slate-600"
+                            }
+                          >
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-slate-400 leading-relaxed mb-10 flex-1">
+                      {pkg.description}
+                    </p>
+                  )}
+
+                  {/* Button */}
+                  <button
+                    onClick={() => handleInitiateBooking(pkg)}
+                    className={`block w-full py-3.5 rounded-2xl font-semibold text-sm transition-all cursor-pointer ${
+                      pkg.variant === "dark"
+                        ? "bg-slate-100 text-slate-900 hover:bg-slate-300"
+                        : pkg.variant === "popular"
+                          ? "bg-[#FF7C71] text-white hover:bg-[#E5675D]"
+                          : "bg-[#261817]/90 text-white hover:bg-black"
+                    }`}
+                  >
+                    {pkg.buttonText}
+                  </button>
                 </motion.div>
               ))}
             </motion.div>
           );
         })()}
-
 
         {/* Fallback mock data if API is empty */}
         {!isLoading && packagesData.length === 0 && (
@@ -208,106 +284,109 @@ export default function SpecialOffers() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {/* Fallback map from the previous mock data */}
             {[
               {
                 id: 1,
-                badge: "🔥 30% Off",
-                badgeColor: DESIGN_ASSETS[0].badgeColor,
-                title: "Deep Home Cleaning Pack",
-                subtitle: "Full apartment service • Complete sanitization & dust removal",
-                discount: "30% OFF",
-                originalPrice: "৳2,500",
-                salePrice: "৳1,750",
-                expires: "Ends tonight",
-                gradient: DESIGN_ASSETS[0].gradient,
-                bg: DESIGN_ASSETS[0].bg,
-                border: DESIGN_ASSETS[0].border,
-                glow: DESIGN_ASSETS[0].glow,
-                iconColor: DESIGN_ASSETS[0].iconColor,
+                title: "APARTMENT STARTER",
+                price: "12,500",
+                features: ["2× 2MP Indoor Cameras", "4-Channel DVR", "500GB Storage", "Free App Setup"],
+                buttonText: "Book Package",
+                variant: "light",
               },
               {
                 id: 2,
-                badge: "🎁 New User Offer",
-                badgeColor: DESIGN_ASSETS[1].badgeColor,
-                title: "Premium AC Tuneup",
-                subtitle: "Jet wash + filter clean + safety check for 1 Unit",
-                discount: "FREE TRIAL",
-                originalPrice: "৳1,200",
-                salePrice: "৳0",
-                expires: "First 100 users",
-                gradient: DESIGN_ASSETS[1].gradient,
-                bg: DESIGN_ASSETS[1].bg,
-                border: DESIGN_ASSETS[1].border,
-                glow: DESIGN_ASSETS[1].glow,
-                iconColor: DESIGN_ASSETS[1].iconColor,
+                title: "FAMILY GUARD",
+                price: "28,900",
+                badge: "POPULAR",
+                features: ["4× 5MP All-weather Cams", "8-Channel DVR", "1TB Storage + Smart Lock", "1 year Free Maintenance"],
+                buttonText: "Book Package",
+                variant: "popular",
               },
               {
                 id: 3,
-                badge: "⚡ Flash Deal",
-                badgeColor: DESIGN_ASSETS[2].badgeColor,
-                title: "All-in-One Appliance Care",
-                subtitle: "Refrigerator, washing machine, and microwave checkup",
-                discount: "25% OFF",
-                originalPrice: "৳3,200",
-                salePrice: "৳2,400",
-                expires: "48 hours left",
-                gradient: DESIGN_ASSETS[2].gradient,
-                bg: DESIGN_ASSETS[2].bg,
-                border: DESIGN_ASSETS[2].border,
-                glow: DESIGN_ASSETS[2].glow,
-                iconColor: DESIGN_ASSETS[2].iconColor,
+                title: "BUSINESS SUITE",
+                price: "45,000",
+                features: ["8× IP Cameras (Night Vision)", "16-Channel NVR", "2TB Server Storage", "24/7 Priority Support"],
+                buttonText: "Book Package",
+                variant: "light",
               },
-            ].map((offer) => (
+            ].map((pkg: any, index: number) => (
               <motion.div
-                key={offer.id}
+                key={pkg.id || index}
                 variants={itemVariants}
-                whileHover={{ y: -5, scale: 1.01 }}
-                className={`relative rounded-[2rem] border ${offer.border} ${offer.bg} p-6 md:p-7 flex flex-col justify-between min-h-[300px] overflow-hidden cursor-pointer group transition-all duration-300 shadow-sm ${offer.glow} hover:shadow-xl hover:shadow-slate-200/50`}
+                className={`rounded-3xl p-8 relative flex flex-col h-full transition-all hover:-translate-y-1 ${
+                  pkg.variant === "popular"
+                    ? "border-2 border-[#FF7C71] bg-rose-50/50 shadow-xl"
+                    : pkg.variant === "dark"
+                      ? "bg-[#261817] text-white"
+                      : "bg-white border border-slate-100"
+                }`}
               >
-                {/* Decorative modern gradient mesh blur */}
-                <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${offer.gradient} opacity-[0.08] blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
-
-                {/* Top Badge Row */}
-                <div className="flex items-center justify-between z-10">
-                  <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${offer.badgeColor} uppercase tracking-wider`}>
-                    {offer.badge}
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                    <Percent size={14} className={offer.iconColor} />
+                {/* Popular Badge */}
+                {pkg.badge && (
+                  <div className="absolute -top-3 right-6 bg-[#FF7C71] text-white text-xs font-bold px-4 py-1 rounded-full z-10">
+                    {pkg.badge}
                   </div>
-                </div>
+                )}
 
-                {/* Main Title & Description */}
-                <div className="my-6 z-10 flex-1 flex flex-col justify-center">
-                  <h3 className="text-xl font-black text-slate-900 group-hover:text-[#FF7C71] transition-colors leading-tight mb-2">
-                    {offer.title}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
-                    {offer.subtitle}
-                  </p>
-                </div>
-
-                {/* Pricing and Action row */}
-                <div className="pt-4 border-t border-slate-100 z-10 flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Special price</p>
-                    <div className="flex items-baseline gap-2 mt-0.5">
-                      <span className="text-xl font-black text-slate-950">{offer.salePrice}</span>
-                      <span className="text-xs text-slate-400 line-through font-semibold">{offer.originalPrice}</span>
-                    </div>
-                  </div>
-
-                  <Link
-                    href="/services"
-                    className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2.5 rounded-xl bg-gradient-to-r ${offer.gradient} text-white shadow-md shadow-rose-300/30 group-hover:shadow-lg group-hover:shadow-rose-400/40 transition-all`}
+                <div className="mb-8 mt-4">
+                  <h3
+                    className={`text-lg font-semibold mb-4 ${pkg.variant === "dark" ? "text-white" : "text-slate-900"}`}
                   >
-                    Book Deal
-                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
+                    {pkg.title}
+                  </h3>
+
+                  {pkg.price ? (
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold">৳{pkg.price}</span>
+                    </div>
+                  ) : (
+                    <div className="mb-6">
+                      <h4 className="text-3xl font-bold mb-1">Get Quote</h4>
+                    </div>
+                  )}
                 </div>
+
+                {/* Features or Description */}
+                {pkg.features ? (
+                  <ul className="space-y-3 mb-10 flex-1">
+                    {pkg.features.map((feature: any, i: number) => (
+                      <li key={i} className="flex items-start gap-3 text-sm">
+                        <Check className="w-5 h-5 text-[#FF7C71] mt-0.5 flex-shrink-0" />
+                        <span
+                          className={
+                            pkg.variant === "dark"
+                              ? "text-slate-300"
+                              : "text-slate-600"
+                          }
+                        >
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-slate-400 leading-relaxed mb-10 flex-1">
+                    {pkg.description}
+                  </p>
+                )}
+
+                {/* Button */}
+                <button
+                  onClick={() => handleInitiateBooking(pkg)}
+                  className={`block w-full py-3.5 rounded-2xl font-semibold text-sm transition-all cursor-pointer ${
+                    pkg.variant === "dark"
+                      ? "bg-slate-100 text-slate-900 hover:bg-slate-300"
+                      : pkg.variant === "popular"
+                        ? "bg-[#FF7C71] text-white hover:bg-[#E5675D]"
+                        : "bg-[#261817]/90 text-white hover:bg-black"
+                  }`}
+                >
+                  {pkg.buttonText}
+                </button>
               </motion.div>
             ))}
           </motion.div>
@@ -315,6 +394,135 @@ export default function SpecialOffers() {
 
 
       </div>
+
+      {/* Booking Form Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                <Calendar size={20} className="text-[#FF7C71]" />
+                Complete Booking Info
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-full transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Selected Package summary in modal */}
+            {selectedPackage && (
+              <div className="px-6 py-4 bg-[#FFF8F7] border-b border-slate-100/60 space-y-2.5">
+                <div className="text-xs font-bold text-[#FF7C71] uppercase tracking-wider flex items-center gap-1">
+                  Selected Package
+                </div>
+                <div className="flex justify-between items-center text-sm font-bold text-slate-800">
+                  <span>{selectedPackage.title}</span>
+                  {selectedPackage.price && <span className="text-[#FF7C71] text-base">৳{selectedPackage.price}</span>}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmBooking} className="p-6 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    Booking Date *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      required
+                      value={bookingDetails.date}
+                      onChange={(e) =>
+                        setBookingDetails({ ...bookingDetails, date: e.target.value })
+                      }
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                    Booking Time
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      value={bookingDetails.time}
+                      onChange={(e) =>
+                        setBookingDetails({ ...bookingDetails, time: e.target.value })
+                      }
+                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Service Address *
+                </label>
+                <div className="relative">
+                  <textarea
+                    required
+                    rows={3}
+                    placeholder="Enter your street address, house no, area..."
+                    value={bookingDetails.location}
+                    onChange={(e) =>
+                      setBookingDetails({ ...bookingDetails, location: e.target.value })
+                    }
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  Additional Notes
+                </label>
+                <div className="relative">
+                  <textarea
+                    rows={2}
+                    placeholder="Any specific requests or requirements..."
+                    value={bookingDetails.notes}
+                    onChange={(e) =>
+                      setBookingDetails({ ...bookingDetails, notes: e.target.value })
+                    }
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isBooking}
+                  className="px-6 py-2.5 text-sm font-bold text-white bg-[#FF7C71] hover:bg-[#E5675D] rounded-xl transition-colors shadow-md disabled:opacity-70 flex items-center gap-2 cursor-pointer"
+                >
+                  {isBooking ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Placing...
+                    </>
+                  ) : (
+                    "Confirm Booking"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

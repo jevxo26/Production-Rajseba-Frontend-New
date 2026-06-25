@@ -98,11 +98,14 @@ export function SpecializedServices({
   };
 
   const handleSubServiceToggle = (subServiceId: number) => {
-    setSelectedSubServices((prev) =>
-      prev.includes(subServiceId)
-        ? prev.filter((id) => id !== subServiceId)
-        : [...prev, subServiceId]
-    );
+    setSelectedSubServices((prev) => {
+      const exists = prev.some((id) => String(id) === String(subServiceId));
+      if (exists) {
+        return prev.filter((id) => String(id) !== String(subServiceId));
+      } else {
+        return [...prev, subServiceId];
+      }
+    });
   };
 
   const handleInitiateBooking = (service: SpecializedService) => {
@@ -119,7 +122,7 @@ export function SpecializedServices({
     const serviceSubs = service.subServices || [];
     if (serviceSubs.length > 0) {
       const selectedFromThisService = serviceSubs.filter((ss) =>
-        selectedSubServices.includes(ss.id)
+        selectedSubServices.some(id => String(id) === String(ss.id))
       );
       if (selectedFromThisService.length === 0) {
         toast.warning("Please select at least one sub-service option to book!");
@@ -142,7 +145,7 @@ export function SpecializedServices({
     const activeNestedService = displayServices.find((ds) => ds.id === expandedId);
     const activeSubServiceIds = activeNestedService?.subServices
       ? activeNestedService.subServices
-          .filter((ss) => selectedSubServices.includes(ss.id))
+          .filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id)))
           .map((ss) => ss.id)
       : [];
 
@@ -240,115 +243,147 @@ export function SpecializedServices({
 
             // Normal Service Cards
             return (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className={`bg-white z-10 border border-slate-100 rounded-[32px] p-6 hover:shadow-xl transition-all group flex flex-col ${
-                  index === 0 ? "md:col-span-8" : "md:col-span-4"
-                }`}
-              >
-                <div className="flex justify-between items-start gap-4">
-                  {service.image ? (
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-16 h-16 rounded-2xl object-cover mb-6 shadow-xs border border-slate-100"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
-                      <Droplet className="w-6 h-6 text-[#FF7C71]" />
-                    </div>
-                  )}
+              <div key={service.id} className={`${index === 0 ? "md:col-span-8" : "md:col-span-4"} flex flex-col gap-3`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  onClick={() => hasSubServices && toggleExpand(service.id)}
+                  className={`bg-white z-10 border border-slate-100 rounded-[32px] p-6 hover:shadow-xl transition-all group flex flex-col h-full ${hasSubServices ? 'cursor-pointer hover:border-[#FF7C71]/30' : ''}`}
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    {service.image ? (
+                      <img
+                        src={service.image}
+                        alt={service.title}
+                        className="w-16 h-16 rounded-2xl object-cover mb-6 shadow-xs border border-slate-100"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
+                        <Droplet className="w-6 h-6 text-[#FF7C71]" />
+                      </div>
+                    )}
+                  </div>
 
-                  {hasSubServices && (
-                    <button
-                      onClick={() => toggleExpand(service.id)}
-                      className="p-2 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-full transition-colors flex items-center gap-1 text-xs font-bold border border-slate-100"
-                    >
-                      {isExpanded ? "Close options" : "Select options"}
-                      {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </button>
-                  )}
-                </div>
+                  <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2 group-hover:text-[#FF7C71] transition-colors">
+                    {service.title}
+                  </h3>
+                  <p className="text-slate-600 leading-relaxed mb-6 flex-1 whitespace-pre-line text-sm">
+                    {service.description}
+                  </p>
 
-                <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">
-                  {service.title}
-                </h3>
-                <p className="text-slate-600 leading-relaxed mb-8 flex-1 whitespace-pre-line text-sm">
-                  {service.description}
-                </p>
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-50 mt-auto">
+                    {service.price && (
+                      <div>
+                        <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                          Starting Price
+                        </span>
+                        <div className="text-[#FF7C71] font-black text-2xl">
+                          ৳{Number(service.price).toLocaleString()}
+                        </div>
+                      </div>
+                    )}
 
-                {/* SubServices Expandable Panel */}
+                    {!hasSubServices ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleInitiateBooking(service); }}
+                        className="bg-[#FF7C71] hover:bg-[#E5675D] text-white px-7 py-3 rounded-full text-sm font-bold transition shadow-md shadow-rose-100 hover:shadow-lg cursor-pointer z-20"
+                      >
+                        Book Now
+                      </button>
+                    ) : (
+                      <div className="text-slate-400 flex items-center gap-1 text-sm font-bold group-hover:text-[#FF7C71] transition-colors">
+                        {isExpanded ? "Close" : "Explore"}
+                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* SubServices Expandable Panel - Now OUTSIDE the main card */}
                 <AnimatePresence>
                   {isExpanded && hasSubServices && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden mb-6 bg-slate-50/50 border border-slate-100 p-4 rounded-2xl space-y-3"
+                      className="overflow-hidden"
                     >
-                      <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                        <Info size={12} />
-                        Choose sub-service packages:
-                      </div>
-                      <div className="space-y-2">
-                        {service.subServices?.map((sub) => {
-                          const isChecked = selectedSubServices.includes(sub.id);
-                          return (
-                            <div
-                              key={sub.id}
-                              onClick={() => handleSubServiceToggle(sub.id)}
-                              className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${
-                                isChecked
-                                  ? "bg-white border-[#FF7C71] shadow-xs scale-[1.01]"
-                                  : "bg-white/80 border-slate-100 hover:border-slate-200"
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all ${
-                                  isChecked
-                                    ? "bg-[#FF7C71] border-[#FF7C71] text-white"
-                                    : "border-slate-200 bg-white"
-                                }`}>
-                                  {isChecked && <CheckCircle className="w-3.5 h-3.5 fill-current text-white" strokeWidth={3} />}
+                      <div className="bg-slate-50 border border-slate-100 p-5 rounded-[24px] space-y-4 shadow-inner mb-2">
+                        <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Info size={14} className="text-[#FF7C71]" />
+                          Explore & Add Sub-services
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {service.subServices?.map((sub) => {
+                            const isAdded = selectedSubServices.some(id => String(id) === String(sub.id));
+                            return (
+                              <div
+                                key={sub.id}
+                                className={`flex flex-col justify-between p-4 rounded-2xl border bg-white transition-all ${
+                                  isAdded
+                                    ? "border-[#FF7C71] shadow-sm ring-1 ring-[#FF7C71]/20"
+                                    : "border-slate-200 hover:border-slate-300 shadow-xs"
+                                }`}
+                              >
+                                <div>
+                                  <h4 className="text-sm font-bold text-slate-800 leading-snug">
+                                    {sub.name}
+                                  </h4>
+                                  <div className="text-[#FF7C71] text-lg font-black mt-1">
+                                    ৳{Number(sub.price).toLocaleString()}
+                                  </div>
                                 </div>
-                                <span className="text-sm font-bold text-slate-800">
-                                  {sub.name}
-                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSubServiceToggle(sub.id);
+                                  }}
+                                  className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    isAdded
+                                      ? "bg-rose-50 text-[#FF7C71] border border-rose-100 hover:bg-rose-100"
+                                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                  }`}
+                                >
+                                  {isAdded ? (
+                                    <>
+                                      <CheckCircle size={14} strokeWidth={3} />
+                                      Added
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Plus size={14} strokeWidth={3} />
+                                      Add
+                                    </>
+                                  )}
+                                </button>
                               </div>
-                              <span className="text-sm font-black text-[#FF7C71]">
-                                ৳{Number(sub.price).toLocaleString()}
-                              </span>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
+                        <div className="pt-4 mt-2 border-t border-slate-200 flex justify-end">
+                          {(() => {
+                            const hasSelection = service.subServices?.some(sub => selectedSubServices.some(id => String(id) === String(sub.id)));
+                            return (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleInitiateBooking(service); }}
+                                disabled={!hasSelection}
+                                className={`px-8 py-3 rounded-full text-sm font-bold transition shadow-md cursor-pointer ${
+                                  hasSelection 
+                                    ? "bg-[#FF7C71] hover:bg-[#E5675D] text-white shadow-rose-100 hover:shadow-lg" 
+                                    : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                                }`}
+                              >
+                                {hasSelection ? "Proceed to Book" : "Select an option to Book"}
+                              </button>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50 mt-auto">
-                  {service.price && (
-                    <div>
-                      <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                        Starting Price
-                      </span>
-                      <div className="text-[#FF7C71] font-black text-2xl">
-                        ৳{Number(service.price).toLocaleString()}
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => handleInitiateBooking(service)}
-                    className="bg-[#FF7C71] hover:bg-[#E5675D] text-white px-7 py-3 rounded-full text-sm font-bold transition shadow-md shadow-rose-100 hover:shadow-lg cursor-pointer"
-                  >
-                    Book Now
-                  </button>
-                </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -374,7 +409,7 @@ export function SpecializedServices({
             {/* Selected Subservices summary in modal */}
             {(() => {
               const activeNestedService = displayServices.find((ds) => ds.id === expandedId);
-              const selectedSubs = activeNestedService?.subServices?.filter((ss) => selectedSubServices.includes(ss.id)) || [];
+              const selectedSubs = activeNestedService?.subServices?.filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id))) || [];
               const totalPrice = selectedSubs.reduce((sum, ss) => sum + Number(ss.price || 0), 0);
 
               if (selectedSubs.length === 0) return null;
