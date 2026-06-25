@@ -5,7 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Heart, Sparkles, Star, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useGetPublicNestedServicesQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
+
 
 // ─── Color pairs for cards (cycling) ────────────────────────────────────────
 const COLOR_PAIRS = [
@@ -43,7 +44,7 @@ function ServiceIllustration({ bgColor, iconColor }: { bgColor: string; iconColo
       </div>
       <div className={`relative z-10 ${iconColor} drop-shadow-sm`}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-16 h-16">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0 3.09 3.09Z" />
         </svg>
       </div>
     </div>
@@ -53,168 +54,217 @@ function ServiceIllustration({ bgColor, iconColor }: { bgColor: string; iconColo
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function TopServices() {
   const [liked, setLiked] = useState<Record<number, boolean>>({});
-  const { data: nestedRes, isLoading, isError } = useGetPublicNestedServicesQuery();
+  const { data: servicesRes, isLoading, isError } = useGetPublicServicesQuery();
 
   // Support both { data: [...] } and [...] shapes
-  const allNestedServices: any[] = nestedRes?.data || (Array.isArray(nestedRes) ? nestedRes : []);
+  const allServices: any[] = servicesRes?.data || (Array.isArray(servicesRes) ? servicesRes : []);
 
-  // Show top 8 services
-  const displayServices = allNestedServices.slice(0, 8);
-
-  const toggleLike = (id: number) =>
-    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  return (
-    <div className="bg-transparent mt-15 py-8 md:py-12 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-
-        {/* ── Header ── */}
-        <div className="space-y-4 mb-8 md:mb-10">
-          <div className="text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
-              Top Rated Services
-            </h2>
-            <p className="text-slate-500 text-sm max-w-md mx-auto">
-              Handpicked services with the highest customer satisfaction.
-            </p>
+  // Show skeleton if loading
+  if (isLoading) {
+    return (
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center gap-4 mb-16">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 animate-pulse" />
+            <div className="space-y-2">
+              <div className="w-48 h-6 bg-slate-100 rounded-md animate-pulse" />
+              <div className="w-32 h-4 bg-slate-50 rounded-md animate-pulse" />
+            </div>
           </div>
-
-          <div className="flex justify-center md:justify-end">
-            <Link
-              href="/services"
-              className="rounded-xl flex items-center gap-2 px-5 py-2 bg-white hover:bg-[#FFF8F7] hover:text-[#FF7C71] border border-slate-200 shadow-sm text-sm font-semibold transition-colors"
-            >
-              View All Services
-            </Link>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="h-80 bg-slate-50 rounded-3xl animate-pulse" />
+            ))}
           </div>
         </div>
+      </section>
+    );
+  }
 
-        {/* Loading */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-[#FF7C71]" />
+  if (isError || allServices.length === 0) {
+    return null;
+  }
+
+  // Sort by highest bookings and reviews
+  const sortedServices = [...allServices].sort((a, b) => {
+    const aBookings = a.bookings?.length || 0;
+    const bBookings = b.bookings?.length || 0;
+
+    // Primary sort: Number of bookings
+    if (aBookings !== bBookings) {
+      return bBookings - aBookings;
+    }
+
+    // Secondary sort: Average rating
+    const aReviews = a.reviews?.length || 0;
+    const bReviews = b.reviews?.length || 0;
+    const aAvg = aReviews > 0 ? a.reviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) / aReviews : 0;
+    const bAvg = bReviews > 0 ? b.reviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) / bReviews : 0;
+
+    return bAvg - aAvg;
+  });
+
+  // Display top 8 services
+  const displayServices = sortedServices.slice(0, 8);
+
+  const toggleLike = (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <section className="py-24 bg-white relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-0 right-0 w-1/3 h-[500px] bg-gradient-to-bl from-rose-50/50 to-transparent rounded-bl-full pointer-events-none" />
+      <div className="absolute -left-32 bottom-0 w-96 h-96 bg-blue-50/50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold uppercase tracking-wider mb-4">
+              <Star size={14} className="fill-current" />
+              Most Booked
+            </div>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Top Rated <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">Services</span>
+            </h2>
+            <p className="mt-4 text-slate-500 text-lg md:text-xl font-medium max-w-lg">
+              Hand-picked professional services highly rated by our community.
+            </p>
           </div>
-        )}
+          <Button variant="outline" className="hidden md:flex rounded-xl font-bold h-12 px-6 border-slate-200 hover:border-[#FF7C71] hover:text-[#FF7C71] hover:bg-rose-50/50 group" asChild>
+            <Link href="/services">
+              View All Services
+              <svg className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </Button>
+        </div>
 
-        {/* Error */}
-        {isError && (
-          <p className="text-center text-slate-400 text-sm py-8">
-            Unable to load services right now. Please try again later.
-          </p>
-        )}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        >
+          {displayServices.map((service: any, i: number) => {
+            const colors = COLOR_PAIRS[i % COLOR_PAIRS.length];
+            const slug = service.slug || String(service.id);
+            const categoryName = service.category?.name || "";
+            const price = service.price ? Number(service.price) : null;
 
-        {/* ── Cards grid ── */}
-        {!isLoading && !isError && displayServices.length > 0 && (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
-          >
-            {displayServices.map((service: any, i: number) => {
-              const colors = COLOR_PAIRS[i % COLOR_PAIRS.length];
-              const slug = service.service?.slug || String(service.id);
-              const category = service.service?.name || service.service?.category?.name || "";
-              const price = service.price ? Number(service.price) : null;
+            const totalReviews = service.reviews?.length || 0;
+            const averageRating = totalReviews > 0
+              ? (service.reviews.reduce((acc: number, r: any) => acc + (r.rating || 5), 0) / totalReviews).toFixed(1)
+              : "0.0";
+            const totalBookings = service.bookings?.length || 0;
 
-              return (
-                <motion.div
-                  key={service.id}
-                  variants={cardVariants}
-                  className="bg-white rounded-3xl overflow-hidden border border-slate-100 group flex flex-col h-full hover-card-premium"
-                >
-                  {/* ── Illustration or image ── */}
-                  <div className="relative">
-                    {service.image ? (
-                      <div className="relative h-48 md:h-52 overflow-hidden">
-                        <img
-                          src={service.image}
-                          alt={service.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                      </div>
-                    ) : (
-                      <ServiceIllustration bgColor={colors.bgColor} iconColor={colors.iconColor} />
-                    )}
-
-                    {/* Verified badge */}
-                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[9px] font-black tracking-wider flex items-center gap-1 shadow-sm text-slate-700 uppercase">
-                      <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clipRule="evenodd" />
-                      </svg>
-                      Verified
-                    </div>
-
-                    {/* Category pill */}
-                    {category && (
-                      <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">
-                        {category}
-                      </div>
-                    )}
-
-                    {/* Wishlist heart */}
-                    <Button
-                      variant="ghost"
-                      onClick={(e) => { e.preventDefault(); toggleLike(service.id); }}
-                      className="absolute top-3 right-3 w-8 h-8 p-0 rounded-full bg-white/90 flex items-center justify-center shadow-sm border border-slate-100/60 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-                      aria-label="Add to wishlist"
-                    >
-                      <Heart
-                        className={`w-4 h-4 transition-colors ${liked[service.id] ? "fill-[#FF7C71] text-[#FF7C71]" : "text-slate-500"}`}
+            return (
+              <motion.div
+                key={service.id}
+                variants={cardVariants}
+                className="bg-white rounded-3xl overflow-hidden border border-slate-100 group flex flex-col h-full hover-card-premium"
+              >
+                {/* ── Illustration or image ── */}
+                <div className="relative">
+                  {service.image ? (
+                    <div className="relative h-48 md:h-52 overflow-hidden">
+                      <img
+                        src={service.image}
+                        alt={service.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                    </Button>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                    </div>
+                  ) : (
+                    <ServiceIllustration bgColor={colors.bgColor} iconColor={colors.iconColor} />
+                  )}
+
+                  {/* Verified badge */}
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[9px] font-black tracking-wider flex items-center gap-1 shadow-sm text-slate-700 uppercase">
+                    <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clipRule="evenodd" />
+                    </svg>
+                    Verified
                   </div>
 
-                  {/* ── Text + CTA ── */}
-                  <div className="p-5 flex flex-col flex-1 justify-between bg-white">
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-start gap-2">
-                        <h3 className="font-extrabold text-slate-900 text-base leading-snug tracking-tight">
-                          {service.name}
-                        </h3>
+                  {/* Category pill */}
+                  {categoryName && (
+                    <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-1 rounded-full">
+                      {categoryName}
+                    </div>
+                  )}
+
+                  {/* Wishlist heart */}
+                  <Button
+                    variant="ghost"
+                    onClick={(e) => { e.preventDefault(); toggleLike(service.id); }}
+                    className="absolute top-3 right-3 w-8 h-8 p-0 rounded-full bg-white/90 flex items-center justify-center shadow-sm border border-slate-100/60 hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+                    aria-label="Add to wishlist"
+                  >
+                    <Heart
+                      className={`w-4 h-4 transition-colors ${liked[service.id] ? "fill-[#FF7C71] text-[#FF7C71]" : "text-slate-500"}`}
+                    />
+                  </Button>
+                </div>
+
+                {/* ── Text + CTA ── */}
+                <div className="p-5 flex flex-col flex-1 justify-between bg-white">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-extrabold text-slate-900 text-base leading-snug tracking-tight">
+                        {service.name}
+                      </h3>
+                      <div className="flex flex-col items-end">
                         <div className="flex items-center gap-0.5 text-[#FF7C71] font-black text-sm whitespace-nowrap">
                           <Star className="w-3 h-3 fill-[#FF7C71]" />
-                          <span>4.8</span>
+                          <span>{averageRating}</span>
                         </div>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{totalReviews} Reviews</span>
                       </div>
-                      {service.description && (
-                        <p className="text-xs font-semibold text-slate-400 line-clamp-2">{service.description}</p>
+                    </div>
+                    {service.description && (
+                      <p className="text-xs font-semibold text-slate-400 line-clamp-2">{service.description}</p>
+                    )}
+                    <p className="text-[10px] text-slate-500 font-semibold pt-1">
+                      <span className="text-emerald-500 font-bold">{totalBookings}</span> bookings completed
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 mt-4 border-t border-slate-50">
+                    <div className="text-sm font-black text-slate-900">
+                      {price ? (
+                        <>
+                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Starting at</span>
+                          <span>৳{price.toLocaleString()}</span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-semibold">Contact for price</span>
                       )}
                     </div>
-
-                    <div className="flex justify-between items-center pt-4 mt-4 border-t border-slate-50">
-                      <div className="text-sm font-black text-slate-900">
-                        {price ? (
-                          <>
-                            <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Starting at</span>
-                            <span>৳{price.toLocaleString()}</span>
-                          </>
-                        ) : (
-                          <span className="text-xs text-slate-400 font-semibold">Contact for price</span>
-                        )}
-                      </div>
-                      <Link href={`/categories/service/${slug}`}>
-                        <Button className="bg-[#FF7C71] hover:bg-[#E5675D] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg">
-                          Details
-                        </Button>
-                      </Link>
-                    </div>
+                    <Link href={`/categories/service/${slug}`}>
+                      <Button className="bg-[#FF7C71] hover:bg-[#E5675D] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg">
+                        Book Now
+                      </Button>
+                    </Link>
                   </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div >
+
 
         {/* Empty state */}
-        {!isLoading && !isError && displayServices.length === 0 && (
-          <p className="text-center text-slate-400 text-sm py-8">No services found.</p>
-        )}
+        {
+          !isLoading && !isError && displayServices.length === 0 && (
+            <p className="text-center text-slate-400 text-sm py-8">No services found.</p>
+          )
+        }
 
       </div>
-    </div>
+    </section>
   );
 }

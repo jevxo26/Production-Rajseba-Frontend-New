@@ -66,79 +66,7 @@ export default function SpecialOffers() {
 
   const packagesData = packagesRes?.data || (Array.isArray(packagesRes) ? packagesRes : []);
 
-  // Map API packages to premium cards, fallback to mock details if API contains no items
-  const offers = packagesData.length > 0
-    ? packagesData.map((pkg: any, idx: number) => {
-      const design = DESIGN_ASSETS[idx % DESIGN_ASSETS.length];
-      const discountAmount = pkg.originalPrice && pkg.price ? Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100) : 0;
-
-      return {
-        id: pkg.id,
-        badge: discountAmount > 0 ? `🔥 ${discountAmount}% Off` : "✨ Package Deal",
-        badgeColor: design.badgeColor,
-        title: pkg.name,
-        subtitle: pkg.description || "Premium service package",
-        discount: discountAmount > 0 ? `${discountAmount}% OFF` : "SAVE BIG",
-        originalPrice: pkg.originalPrice ? `৳${pkg.originalPrice}` : `৳${pkg.price + 300}`,
-        salePrice: `৳${pkg.price}`,
-        expires: "Limited time offer",
-        gradient: design.gradient,
-        bg: design.bg,
-        border: design.border,
-        glow: design.glow,
-        iconColor: design.iconColor,
-      };
-    })
-    : [
-      {
-        id: 1,
-        badge: "🔥 30% Off",
-        badgeColor: DESIGN_ASSETS[0].badgeColor,
-        title: "Deep Home Cleaning Pack",
-        subtitle: "Full apartment service • Complete sanitization & dust removal",
-        discount: "30% OFF",
-        originalPrice: "৳2,500",
-        salePrice: "৳1,750",
-        expires: "Ends tonight",
-        gradient: DESIGN_ASSETS[0].gradient,
-        bg: DESIGN_ASSETS[0].bg,
-        border: DESIGN_ASSETS[0].border,
-        glow: DESIGN_ASSETS[0].glow,
-        iconColor: DESIGN_ASSETS[0].iconColor,
-      },
-      {
-        id: 2,
-        badge: "🎁 New User Offer",
-        badgeColor: DESIGN_ASSETS[1].badgeColor,
-        title: "Premium AC Tuneup",
-        subtitle: "Jet wash + filter clean + safety check for 1 Unit",
-        discount: "FREE TRIAL",
-        originalPrice: "৳1,200",
-        salePrice: "৳0",
-        expires: "First 100 users",
-        gradient: DESIGN_ASSETS[1].gradient,
-        bg: DESIGN_ASSETS[1].bg,
-        border: DESIGN_ASSETS[1].border,
-        glow: DESIGN_ASSETS[1].glow,
-        iconColor: DESIGN_ASSETS[1].iconColor,
-      },
-      {
-        id: 3,
-        badge: "⚡ Flash Deal",
-        badgeColor: DESIGN_ASSETS[2].badgeColor,
-        title: "All-in-One Appliance Care",
-        subtitle: "Refrigerator, washing machine, and microwave checkup",
-        discount: "25% OFF",
-        originalPrice: "৳3,200",
-        salePrice: "৳2,400",
-        expires: "48 hours left",
-        gradient: DESIGN_ASSETS[2].gradient,
-        bg: DESIGN_ASSETS[2].bg,
-        border: DESIGN_ASSETS[2].border,
-        glow: DESIGN_ASSETS[2].glow,
-        iconColor: DESIGN_ASSETS[2].iconColor,
-      },
-    ];
+  // Dynamic offers rendering happens directly in the return block now
 
   return (
     <section className="py-12 md:py-16 overflow-hidden">
@@ -175,8 +103,100 @@ export default function SpecialOffers() {
           </div>
         )}
 
-        {/* Offer Cards */}
-        {!isLoading && (
+        {/* Offer Cards Sectioned by Service */}
+        {!isLoading && packagesData.length > 0 && packagesData.map((section: any, sectionIdx: number) => {
+          const serviceName = section.service?.name || "Featured Packages";
+          const sectionOffers = section.packages.map((pkg: any, idx: number) => {
+            const design = DESIGN_ASSETS[idx % DESIGN_ASSETS.length];
+            const discountAmount = pkg.originalPrice && pkg.price ? Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100) : 0;
+            return {
+              id: pkg.id,
+              badge: discountAmount > 0 ? `🔥 ${discountAmount}% Off` : "✨ Package Deal",
+              badgeColor: design.badgeColor,
+              title: pkg.name,
+              subtitle: pkg.description || "Premium service package",
+              discount: discountAmount > 0 ? `${discountAmount}% OFF` : "SAVE BIG",
+              originalPrice: pkg.originalPrice ? `৳${pkg.originalPrice}` : `৳${pkg.price + 300}`,
+              salePrice: `৳${pkg.price}`,
+              expires: "Limited time offer",
+              gradient: design.gradient,
+              bg: design.bg,
+              border: design.border,
+              glow: design.glow,
+              iconColor: design.iconColor,
+            };
+          });
+
+          return (
+            <div key={section.service?.id || sectionIdx} className="mb-12 last:mb-0">
+              <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span className="w-2 h-6 bg-[#FF7C71] rounded-full inline-block"></span>
+                {serviceName}
+              </h3>
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {sectionOffers.map((offer: any) => (
+                  <motion.div
+                    key={offer.id}
+                    variants={itemVariants}
+                    whileHover={{ y: -5, scale: 1.01 }}
+                    className={`relative rounded-[2rem] border ${offer.border} ${offer.bg} p-6 md:p-7 flex flex-col justify-between min-h-[300px] overflow-hidden cursor-pointer group transition-all duration-300 shadow-sm ${offer.glow} hover:shadow-xl hover:shadow-slate-200/50`}
+                  >
+                    {/* Decorative modern gradient mesh blur */}
+                    <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${offer.gradient} opacity-[0.08] blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
+
+                    {/* Top Badge Row */}
+                    <div className="flex items-center justify-between z-10">
+                      <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${offer.badgeColor} uppercase tracking-wider`}>
+                        {offer.badge}
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                        <Percent size={14} className={offer.iconColor} />
+                      </div>
+                    </div>
+
+                    {/* Main Title & Description */}
+                    <div className="my-6 z-10 flex-1 flex flex-col justify-center">
+                      <h3 className="text-xl font-black text-slate-900 group-hover:text-[#FF7C71] transition-colors leading-tight mb-2">
+                        {offer.title}
+                      </h3>
+                      <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
+                        {offer.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Pricing and Action row */}
+                    <div className="pt-4 border-t border-slate-100 z-10 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Special price</p>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-xl font-black text-slate-950">{offer.salePrice}</span>
+                          <span className="text-xs text-slate-400 line-through font-semibold">{offer.originalPrice}</span>
+                        </div>
+                      </div>
+
+                      <Link
+                        href={`/services/${section.service?.id || ''}`}
+                        className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2.5 rounded-xl bg-gradient-to-r ${offer.gradient} text-white shadow-md shadow-rose-300/30 group-hover:shadow-lg group-hover:shadow-rose-400/40 transition-all`}
+                      >
+                        Book Deal
+                        <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          );
+        })}
+
+        {/* Fallback mock data if API is empty */}
+        {!isLoading && packagesData.length === 0 && (
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -184,58 +204,106 @@ export default function SpecialOffers() {
             viewport={{ once: true, margin: "-60px" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {offers.slice(0, 3).map((offer: any) => {
-              return (
-                <motion.div
-                  key={offer.id}
-                  variants={itemVariants}
-                  whileHover={{ y: -5, scale: 1.01 }}
-                  className={`relative rounded-[2rem] border ${offer.border} ${offer.bg} p-6 md:p-7 flex flex-col justify-between min-h-[300px] overflow-hidden cursor-pointer group transition-all duration-300 shadow-sm ${offer.glow} hover:shadow-xl hover:shadow-slate-200/50`}
-                >
-                  {/* Decorative modern gradient mesh blur */}
-                  <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${offer.gradient} opacity-[0.08] blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
+            {/* Fallback map from the previous mock data */}
+            {[
+              {
+                id: 1,
+                badge: "🔥 30% Off",
+                badgeColor: DESIGN_ASSETS[0].badgeColor,
+                title: "Deep Home Cleaning Pack",
+                subtitle: "Full apartment service • Complete sanitization & dust removal",
+                discount: "30% OFF",
+                originalPrice: "৳2,500",
+                salePrice: "৳1,750",
+                expires: "Ends tonight",
+                gradient: DESIGN_ASSETS[0].gradient,
+                bg: DESIGN_ASSETS[0].bg,
+                border: DESIGN_ASSETS[0].border,
+                glow: DESIGN_ASSETS[0].glow,
+                iconColor: DESIGN_ASSETS[0].iconColor,
+              },
+              {
+                id: 2,
+                badge: "🎁 New User Offer",
+                badgeColor: DESIGN_ASSETS[1].badgeColor,
+                title: "Premium AC Tuneup",
+                subtitle: "Jet wash + filter clean + safety check for 1 Unit",
+                discount: "FREE TRIAL",
+                originalPrice: "৳1,200",
+                salePrice: "৳0",
+                expires: "First 100 users",
+                gradient: DESIGN_ASSETS[1].gradient,
+                bg: DESIGN_ASSETS[1].bg,
+                border: DESIGN_ASSETS[1].border,
+                glow: DESIGN_ASSETS[1].glow,
+                iconColor: DESIGN_ASSETS[1].iconColor,
+              },
+              {
+                id: 3,
+                badge: "⚡ Flash Deal",
+                badgeColor: DESIGN_ASSETS[2].badgeColor,
+                title: "All-in-One Appliance Care",
+                subtitle: "Refrigerator, washing machine, and microwave checkup",
+                discount: "25% OFF",
+                originalPrice: "৳3,200",
+                salePrice: "৳2,400",
+                expires: "48 hours left",
+                gradient: DESIGN_ASSETS[2].gradient,
+                bg: DESIGN_ASSETS[2].bg,
+                border: DESIGN_ASSETS[2].border,
+                glow: DESIGN_ASSETS[2].glow,
+                iconColor: DESIGN_ASSETS[2].iconColor,
+              },
+            ].map((offer) => (
+              <motion.div
+                key={offer.id}
+                variants={itemVariants}
+                whileHover={{ y: -5, scale: 1.01 }}
+                className={`relative rounded-[2rem] border ${offer.border} ${offer.bg} p-6 md:p-7 flex flex-col justify-between min-h-[300px] overflow-hidden cursor-pointer group transition-all duration-300 shadow-sm ${offer.glow} hover:shadow-xl hover:shadow-slate-200/50`}
+              >
+                {/* Decorative modern gradient mesh blur */}
+                <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full bg-gradient-to-br ${offer.gradient} opacity-[0.08] blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
 
-                  {/* Top Badge Row */}
-                  <div className="flex items-center justify-between z-10">
-                    <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${offer.badgeColor} uppercase tracking-wider`}>
-                      {offer.badge}
-                    </span>
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
-                      <Percent size={14} className={offer.iconColor} />
+                {/* Top Badge Row */}
+                <div className="flex items-center justify-between z-10">
+                  <span className={`text-[11px] font-extrabold px-3 py-1 rounded-full border ${offer.badgeColor} uppercase tracking-wider`}>
+                    {offer.badge}
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                    <Percent size={14} className={offer.iconColor} />
+                  </div>
+                </div>
+
+                {/* Main Title & Description */}
+                <div className="my-6 z-10 flex-1 flex flex-col justify-center">
+                  <h3 className="text-xl font-black text-slate-900 group-hover:text-[#FF7C71] transition-colors leading-tight mb-2">
+                    {offer.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
+                    {offer.subtitle}
+                  </p>
+                </div>
+
+                {/* Pricing and Action row */}
+                <div className="pt-4 border-t border-slate-100 z-10 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Special price</p>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="text-xl font-black text-slate-950">{offer.salePrice}</span>
+                      <span className="text-xs text-slate-400 line-through font-semibold">{offer.originalPrice}</span>
                     </div>
                   </div>
 
-                  {/* Main Title & Description */}
-                  <div className="my-6 z-10 flex-1 flex flex-col justify-center">
-                    <h3 className="text-xl font-black text-slate-900 group-hover:text-[#FF7C71] transition-colors leading-tight mb-2">
-                      {offer.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-semibold leading-relaxed line-clamp-3">
-                      {offer.subtitle}
-                    </p>
-                  </div>
-
-                  {/* Pricing and Action row */}
-                  <div className="pt-4 border-t border-slate-100 z-10 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Special price</p>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="text-xl font-black text-slate-950">{offer.salePrice}</span>
-                        <span className="text-xs text-slate-400 line-through font-semibold">{offer.originalPrice}</span>
-                      </div>
-                    </div>
-
-                    <Link
-                      href="/services"
-                      className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2.5 rounded-xl bg-gradient-to-r ${offer.gradient} text-white shadow-md shadow-rose-300/30 group-hover:shadow-lg group-hover:shadow-rose-400/40 transition-all`}
-                    >
-                      Book Deal
-                      <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  <Link
+                    href="/services"
+                    className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2.5 rounded-xl bg-gradient-to-r ${offer.gradient} text-white shadow-md shadow-rose-300/30 group-hover:shadow-lg group-hover:shadow-rose-400/40 transition-all`}
+                  >
+                    Book Deal
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
         )}
 

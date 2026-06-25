@@ -4,11 +4,13 @@ import { baseApi } from '@/redux/api/baseApi';
 export const landingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
+
     // GET /category — public, returns all categories
     getPublicCategories: builder.query<any, void>({
       query: () => '/category',
       providesTags: ['Category'],
     }),
+
 
     // GET /category/:id
     getPublicCategoryById: builder.query<any, number>({
@@ -40,6 +42,12 @@ export const landingApi = baseApi.injectEndpoints({
       query: (nestedServiceId) => `/reviews/nested-service/${nestedServiceId}`,
     }),
 
+    // GET /services/public - public, returns all services
+    getPublicServices: builder.query<any, void>({
+      query: () => '/services/public',
+      providesTags: ['Service'],
+    }),
+
     // GET /services/:id — public, returns a single service details (nestedServices, packages, employees, category)
     getPublicServiceById: builder.query<any, number>({
       query: (id) => `/services/${id}`,
@@ -50,9 +58,9 @@ export const landingApi = baseApi.injectEndpoints({
       query: (slug) => `/services/slug/${slug}`,
     }),
 
-    // GET /packages — public, returns all packages
+    // GET /packages/public — public, returns all packages sectioned by service
     getPublicPackages: builder.query<any, void>({
-      query: () => '/packages',
+      query: () => '/packages/public',
     }),
 
     // GET /packages/service/:serviceId — public, returns packages for a service
@@ -77,6 +85,7 @@ export const {
   useGetPublicReviewsQuery,
   useGetPublicReviewsByServiceQuery,
   useGetPublicReviewsByNestedServiceQuery,
+  useGetPublicServicesQuery,
   useGetPublicServiceByIdQuery,
   useGetPublicServiceBySlugQuery,
   useGetPublicPackagesQuery,
