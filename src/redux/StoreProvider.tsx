@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { useGetUserProfileQuery } from './features/auth/authApi';
 import { restoreUser } from './features/auth/authSlice';
+import { restoreWishlist } from './features/wishlist/wishlistSlice';
 import { useAppDispatch } from './hooks';
 
 let isRestored = false;
@@ -17,6 +18,7 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
   // This avoids race conditions and flashes of unauthenticated states.
   if (typeof window !== 'undefined' && !isRestored) {
     dispatch(restoreUser());
+    dispatch(restoreWishlist());
     isRestored = true;
   }
 

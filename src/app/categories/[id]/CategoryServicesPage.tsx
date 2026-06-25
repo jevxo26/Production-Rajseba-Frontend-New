@@ -72,8 +72,8 @@ export default function CategoryServicesPage({ categoryId }: { categoryId: strin
 
       <div className="relative z-10">
         {/* ── Premium Category Hero Header ── */}
-        <div className="bg-white/95 backdrop-blur-md border-b border-slate-100/80 shadow-sm sticky top-0 z-40">
-          <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-5 md:py-7">
+        <div className="bg-white/95 backdrop-blur-md border-b border-slate-100/80 shadow-sm sticky top-16 md:top-[68px] z-40">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-7">
 
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
