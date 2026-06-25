@@ -159,6 +159,7 @@ export default function ServiceListing({
       const categoryObj = item.category || {};
       const catSlug = categoryObj.slug || categoryObj.name?.toLowerCase().replace(/\s+/g, "-") || "";
       const catLabel = categoryObj.name || "";
+      const catId = String(categoryObj.id || "");
 
       // Price based on nested services minimum price
       let priceVal = 1000;
@@ -177,6 +178,7 @@ export default function ServiceListing({
         description: item.description || item.subtitle || "",
         image: item.image || "/images/service/service-1.png",
         category: catSlug,
+        categoryId: catId,
         categoryLabel: catLabel,
         price: priceVal,
         priceDisplay: priceVal > 0 ? `৳${priceVal.toLocaleString()}` : "Contact for price",
@@ -192,7 +194,8 @@ export default function ServiceListing({
   const filteredListings = useMemo(() => {
     let list = [...mappedListings];
     if (activeCategory !== "all")
-      list = list.filter((s) => s.category === activeCategory);
+      // Match by category slug OR by category ID (for homepage direct links)
+      list = list.filter((s) => s.category === activeCategory || (s as any).categoryId === activeCategory);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
