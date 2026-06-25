@@ -8,10 +8,16 @@ import { logout as authLogout } from "@/redux/features/auth/authSlice";
 import Link from "next/link";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const authUser = useAppSelector((state) => state.auth.user);
   const role = useAppSelector((state) => state.auth.role) || "client";
   const dispatch = useAppDispatch();
-  const roleName = getRoleName(role);
+  const roleName = mounted ? getRoleName(role) : "Client";
   const logout = () => dispatch(authLogout());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -41,10 +47,12 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   ];
 
   // Derive display profile from real user data in Redux
-  const name = authUser?.name || "User";
-  const email = authUser?.email || authUser?.phone || "";
+  const name = mounted && authUser?.name ? authUser.name : "User";
+  const email = mounted ? (authUser?.email || authUser?.phone || "") : "";
   const avatar = name.substring(0, 2).toUpperCase();
-  const activeRoleConfig = rolesList.find((x) => x.value === role) || rolesList[3];
+  const activeRoleConfig = mounted 
+    ? (rolesList.find((x) => x.value === role) || rolesList[3]) 
+    : rolesList[3];
 
   return (
     <header className="bg-[#FFF8F7]/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 py-4 flex items-center justify-between z-30 sticky top-0 shadow-sm">

@@ -22,6 +22,7 @@ import { useGetAllUsersQuery } from "@/redux/features/admin/user"; // Need this 
 export default function VendorWalletPage() {
   const { user, role, isAuthenticated } = useAppSelector((state) => state.auth);
   const vendorId = user?.id ? Number(user.id) : 1; // Fallback to 1 if not fully mocked in state
+  const normalizedRole = typeof role === "string" ? role.toLowerCase() : "";
 
   const {
     data: apiWithdrawsRes,
@@ -134,9 +135,6 @@ export default function VendorWalletPage() {
       toast.error(err.data?.message || err.message || "Failed to delete");
     }
   };
-
-  const rawRole = useAppSelector((state) => state.auth.role);
-  const normalizedRole = typeof rawRole === "string" ? rawRole.toLowerCase() : "";
 
   if (!isAuthenticated || (normalizedRole !== "vendor" && normalizedRole !== "agent")) {
     return (
