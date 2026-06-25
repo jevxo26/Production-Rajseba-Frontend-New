@@ -69,81 +69,81 @@ export default function SpecialOffers() {
   // Map API packages to premium cards, fallback to mock details if API contains no items
   const offers = packagesData.length > 0
     ? packagesData.map((pkg: any, idx: number) => {
-        const design = DESIGN_ASSETS[idx % DESIGN_ASSETS.length];
-        const discountAmount = pkg.originalPrice && pkg.price ? Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100) : 0;
-        
-        return {
-          id: pkg.id,
-          badge: discountAmount > 0 ? `🔥 ${discountAmount}% Off` : "✨ Package Deal",
-          badgeColor: design.badgeColor,
-          title: pkg.name,
-          subtitle: pkg.description || "Premium service package",
-          discount: discountAmount > 0 ? `${discountAmount}% OFF` : "SAVE BIG",
-          originalPrice: pkg.originalPrice ? `৳${pkg.originalPrice}` : `৳${pkg.price + 300}`,
-          salePrice: `৳${pkg.price}`,
-          expires: "Limited time offer",
-          gradient: design.gradient,
-          bg: design.bg,
-          border: design.border,
-          glow: design.glow,
-          iconColor: design.iconColor,
-        };
-      })
+      const design = DESIGN_ASSETS[idx % DESIGN_ASSETS.length];
+      const discountAmount = pkg.originalPrice && pkg.price ? Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100) : 0;
+
+      return {
+        id: pkg.id,
+        badge: discountAmount > 0 ? `🔥 ${discountAmount}% Off` : "✨ Package Deal",
+        badgeColor: design.badgeColor,
+        title: pkg.name,
+        subtitle: pkg.description || "Premium service package",
+        discount: discountAmount > 0 ? `${discountAmount}% OFF` : "SAVE BIG",
+        originalPrice: pkg.originalPrice ? `৳${pkg.originalPrice}` : `৳${pkg.price + 300}`,
+        salePrice: `৳${pkg.price}`,
+        expires: "Limited time offer",
+        gradient: design.gradient,
+        bg: design.bg,
+        border: design.border,
+        glow: design.glow,
+        iconColor: design.iconColor,
+      };
+    })
     : [
-        {
-          id: 1,
-          badge: "🔥 30% Off",
-          badgeColor: DESIGN_ASSETS[0].badgeColor,
-          title: "Deep Home Cleaning Pack",
-          subtitle: "Full apartment service • Complete sanitization & dust removal",
-          discount: "30% OFF",
-          originalPrice: "৳2,500",
-          salePrice: "৳1,750",
-          expires: "Ends tonight",
-          gradient: DESIGN_ASSETS[0].gradient,
-          bg: DESIGN_ASSETS[0].bg,
-          border: DESIGN_ASSETS[0].border,
-          glow: DESIGN_ASSETS[0].glow,
-          iconColor: DESIGN_ASSETS[0].iconColor,
-        },
-        {
-          id: 2,
-          badge: "🎁 New User Offer",
-          badgeColor: DESIGN_ASSETS[1].badgeColor,
-          title: "Premium AC Tuneup",
-          subtitle: "Jet wash + filter clean + safety check for 1 Unit",
-          discount: "FREE TRIAL",
-          originalPrice: "৳1,200",
-          salePrice: "৳0",
-          expires: "First 100 users",
-          gradient: DESIGN_ASSETS[1].gradient,
-          bg: DESIGN_ASSETS[1].bg,
-          border: DESIGN_ASSETS[1].border,
-          glow: DESIGN_ASSETS[1].glow,
-          iconColor: DESIGN_ASSETS[1].iconColor,
-        },
-        {
-          id: 3,
-          badge: "⚡ Flash Deal",
-          badgeColor: DESIGN_ASSETS[2].badgeColor,
-          title: "All-in-One Appliance Care",
-          subtitle: "Refrigerator, washing machine, and microwave checkup",
-          discount: "25% OFF",
-          originalPrice: "৳3,200",
-          salePrice: "৳2,400",
-          expires: "48 hours left",
-          gradient: DESIGN_ASSETS[2].gradient,
-          bg: DESIGN_ASSETS[2].bg,
-          border: DESIGN_ASSETS[2].border,
-          glow: DESIGN_ASSETS[2].glow,
-          iconColor: DESIGN_ASSETS[2].iconColor,
-        },
-      ];
+      {
+        id: 1,
+        badge: "🔥 30% Off",
+        badgeColor: DESIGN_ASSETS[0].badgeColor,
+        title: "Deep Home Cleaning Pack",
+        subtitle: "Full apartment service • Complete sanitization & dust removal",
+        discount: "30% OFF",
+        originalPrice: "৳2,500",
+        salePrice: "৳1,750",
+        expires: "Ends tonight",
+        gradient: DESIGN_ASSETS[0].gradient,
+        bg: DESIGN_ASSETS[0].bg,
+        border: DESIGN_ASSETS[0].border,
+        glow: DESIGN_ASSETS[0].glow,
+        iconColor: DESIGN_ASSETS[0].iconColor,
+      },
+      {
+        id: 2,
+        badge: "🎁 New User Offer",
+        badgeColor: DESIGN_ASSETS[1].badgeColor,
+        title: "Premium AC Tuneup",
+        subtitle: "Jet wash + filter clean + safety check for 1 Unit",
+        discount: "FREE TRIAL",
+        originalPrice: "৳1,200",
+        salePrice: "৳0",
+        expires: "First 100 users",
+        gradient: DESIGN_ASSETS[1].gradient,
+        bg: DESIGN_ASSETS[1].bg,
+        border: DESIGN_ASSETS[1].border,
+        glow: DESIGN_ASSETS[1].glow,
+        iconColor: DESIGN_ASSETS[1].iconColor,
+      },
+      {
+        id: 3,
+        badge: "⚡ Flash Deal",
+        badgeColor: DESIGN_ASSETS[2].badgeColor,
+        title: "All-in-One Appliance Care",
+        subtitle: "Refrigerator, washing machine, and microwave checkup",
+        discount: "25% OFF",
+        originalPrice: "৳3,200",
+        salePrice: "৳2,400",
+        expires: "48 hours left",
+        gradient: DESIGN_ASSETS[2].gradient,
+        bg: DESIGN_ASSETS[2].bg,
+        border: DESIGN_ASSETS[2].border,
+        glow: DESIGN_ASSETS[2].glow,
+        iconColor: DESIGN_ASSETS[2].iconColor,
+      },
+    ];
 
   return (
     <section className="py-12 md:py-16 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
           <div>
@@ -239,16 +239,7 @@ export default function SpecialOffers() {
           </motion.div>
         )}
 
-        {/* Footer Link */}
-        <div className="mt-10 text-center">
-          <Link
-            href="/services"
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-[#FF7C71] hover:underline group"
-          >
-            Explore all service packages 
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
+
       </div>
     </section>
   );
