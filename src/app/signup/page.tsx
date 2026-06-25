@@ -230,7 +230,7 @@ export default function RegisterPage() {
         />
 
         {/* Back to home button */}
-        <div className="relative z-10 px-6 sm:px-10 pt-6">
+        <div className="relative z-10 px-5 sm:px-8 pt-5">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-[#FF7C71] transition-colors group"
@@ -240,34 +240,36 @@ export default function RegisterPage() {
           </Link>
         </div>
 
-        <div className="relative z-10 px-4 sm:px-10 xl:px-20 py-8">
+        {/* Form area — centers content, scrollable */}
+        <div className="flex-1 flex items-start sm:items-center justify-center px-4 sm:px-8 pb-8 pt-4 relative z-10">
+          <div className="w-full max-w-[460px]">
 
-          {!isOtpSent ? (
-            <div className="w-full max-w-[420px] mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm sm:shadow-none sm:border-0 sm:rounded-none p-6 sm:p-0">
+            {/* Card wrapper — visible border on mobile, frameless on sm+ */}
+            <div className="bg-white rounded-3xl sm:rounded-none border border-slate-200 sm:border-0 shadow-xl sm:shadow-none px-6 py-8 sm:px-2 sm:py-0">
 
               {/* Centered Branded Header */}
-              <div className="flex flex-col items-center text-center mb-10">
-                <Link href="/" className="flex flex-col items-center gap-3 group mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-rose-400/30 group-hover:scale-105 transition-transform">
-                    <Sparkles size={28} className="stroke-[2]" />
+              <div className="flex flex-col items-center text-center mb-8">
+                <Link href="/" className="flex flex-col items-center gap-2.5 group mb-5">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-rose-400/25 group-hover:scale-105 transition-transform">
+                    <Sparkles size={26} className="stroke-[2]" />
                   </div>
-                  <span className="font-black text-2xl text-slate-900 tracking-tight">Rajseba</span>
+                  <span className="font-black text-xl sm:text-2xl text-slate-900 tracking-tight">Rajseba</span>
                 </Link>
 
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
                   Create Account
                 </h1>
-                <p className="text-slate-500 text-sm font-medium mt-2 leading-relaxed">
+                <p className="text-slate-500 text-sm font-medium mt-2 leading-relaxed max-w-xs">
                   Sign up to access premium home services.
                 </p>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-4">
 
                 {/* Full Name */}
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-widest">
                     Full Name
                   </label>
                   <div className="relative">
@@ -287,8 +289,8 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Email Address */}
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-widest">
                     Email Address
                   </label>
                   <div className="relative">
@@ -308,13 +310,14 @@ export default function RegisterPage() {
                 </div>
 
                 {/* Phone Number */}
-                <div className="space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-widest">
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-widest">
                     Phone Number
                   </label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                      <Phone size={17} />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 z-10 border-r border-slate-200 pr-3">
+                      <span className="text-base leading-none">🇧🇩</span>
+                      <span className="text-xs font-bold text-slate-400">+880</span>
                     </div>
                     <input
                       type="tel"
@@ -322,7 +325,7 @@ export default function RegisterPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="01712-XXXXXX"
-                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#FF7C71] focus:ring-4 focus:ring-[#FF7C71]/10 focus:outline-none transition-all text-sm font-medium text-slate-900 placeholder-slate-400"
+                      className="w-full pl-[84px] pr-4 py-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-[#FF7C71] focus:ring-4 focus:ring-[#FF7C71]/10 focus:outline-none transition-all text-sm font-medium text-slate-900 placeholder-slate-400"
                       required
                     />
                   </div>
@@ -352,11 +355,11 @@ export default function RegisterPage() {
                   </label>
                 </div>
 
-                {/* Submit */}
+                {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full mt-2 bg-[#FF7C71] hover:bg-[#FF7C71]/90 disabled:opacity-70 text-white text-[15px] font-bold py-3.5 rounded-xl shadow-lg shadow-[#FF7C71]/20 hover:shadow-[#FF7C71]/30 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+                  className="w-full mt-1 bg-[#FF7C71] hover:bg-[#FF7C71]/90 disabled:opacity-70 text-white text-[15px] font-bold py-4 rounded-xl shadow-lg shadow-[#FF7C71]/25 hover:shadow-[#FF7C71]/35 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
                   {isLoading ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -369,119 +372,133 @@ export default function RegisterPage() {
                 </button>
               </form>
 
-
-
-
-
               {/* Login link */}
-              <p className="text-center text-[14px] text-slate-500 font-medium mt-7">
+              <p className="text-center text-sm text-slate-500 font-medium mt-6">
                 Already have an account?{" "}
-                <Link href="/login" className="text-[#FF7C71] hover:underline font-semibold">
+                <Link href="/login" className="text-[#FF7C71] hover:underline font-bold">
                   Login
                 </Link>
               </p>
 
               {/* Trust badges */}
-              <div className="flex items-center justify-center gap-5 flex-wrap mt-8">
+              <div className="flex items-center justify-center gap-4 flex-wrap mt-5 pt-5 border-t border-slate-100">
                 <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-semibold">
-                  <ShieldCheck size={13} className="text-emerald-500" />
+                  <ShieldCheck size={12} className="text-emerald-500" />
                   SSL Encrypted
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-semibold">
-                  <Check size={13} className="text-emerald-500" />
+                  <Check size={12} className="text-emerald-500" />
                   Privacy Protected
                 </div>
               </div>
 
-              {/* Footer */}
-              <p className="text-center text-[11px] text-slate-400 font-medium mt-8">
-                © {new Date().getFullYear()} Rajseba Services. All rights reserved.
-              </p>
 
-              <p className="text-center text-[11px] text-slate-400 font-medium mt-1">
-                Developed by Aftab Farhan
-              </p>
             </div>
+          </div>          {!isOtpSent ? (
+            /* Registration form is rendered above inside the flex container */
+            <></>
           ) : (
             /* ===== OTP Verification Screen ===== */
-            <div className="w-full max-w-[420px] mx-auto flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-rose-400/30">
-                <ShieldCheck size={30} className="stroke-[2]" />
-              </div>
-
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Verify Your Number</h2>
-              <p className="text-xs text-slate-500 font-semibold leading-relaxed mt-2 px-4">
-                We've sent a 4-digit code to{" "}
-                <strong className="text-slate-800">{formData.phone || "+880 1712-XXXXXX"}</strong>
-              </p>
-
-              <form onSubmit={handleVerifyOtp} className="space-y-6 w-full mt-8">
-                {/* OTP inputs */}
-                <div className="flex justify-center gap-3">
-                  {otp.map((digit, idx) => (
-                    <input
-                      key={idx}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
-                      ref={(el) => { otpInputsRef.current[idx] = el }}
-                      onChange={(e) => handleOtpChange(e.target.value, idx)}
-                      onKeyDown={(e) => handleOtpKeyDown(e.key, idx)}
-                      className={`w-14 h-16 rounded-2xl border-2 text-center text-2xl font-black focus:outline-none transition-all shadow-sm ${digit
-                        ? "border-[#FF7C71] bg-rose-50 text-[#FF7C71]"
-                        : "border-slate-200 bg-slate-50 text-slate-800 focus:border-[#FF7C71] focus:bg-white focus:ring-4 focus:ring-[#FF7C71]/10"
-                        }`}
-                      required
-                    />
-                  ))}
+            <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pb-8 pt-4 relative z-10">
+              <div className="w-full max-w-[420px] bg-white rounded-3xl sm:rounded-none border border-slate-200 sm:border-0 shadow-xl sm:shadow-none px-6 py-8 sm:px-2 sm:py-0 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-rose-400/30">
+                  <ShieldCheck size={30} className="stroke-[2]" />
                 </div>
 
-                {/* Timer */}
-                <div className="text-xs text-[#FF7C71] font-extrabold tracking-wide">
-                  {timeLeft > 0 ? (
-                    `Resend code in 0${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60}`
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handleResendOtp}
-                      className="text-[#FF7C71] hover:underline font-black focus:outline-none"
-                    >
-                      Resend Code
-                    </button>
-                  )}
-                </div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Verify Your Number</h2>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed mt-2 px-4">
+                  We've sent a 4-digit code to{" "}
+                  <strong className="text-slate-800">{formData.phone || "+880 1712-XXXXXX"}</strong>
+                </p>
+
+                <form onSubmit={handleVerifyOtp} className="space-y-6 w-full mt-8">
+                  {/* OTP inputs */}
+                  <div className="flex justify-center gap-3">
+                    {otp.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        ref={(el) => { otpInputsRef.current[idx] = el }}
+                        onChange={(e) => handleOtpChange(e.target.value, idx)}
+                        onKeyDown={(e) => handleOtpKeyDown(e.key, idx)}
+                        className={`w-14 h-16 rounded-2xl border-2 text-center text-2xl font-black focus:outline-none transition-all shadow-sm ${digit
+                          ? "border-[#FF7C71] bg-rose-50 text-[#FF7C71]"
+                          : "border-slate-200 bg-slate-50 text-slate-800 focus:border-[#FF7C71] focus:bg-white focus:ring-4 focus:ring-[#FF7C71]/10"
+                          }`}
+                        required
+                      />
+                    ))}
+                  </div>
+
+                  {/* Timer */}
+                  <div className="text-xs text-[#FF7C71] font-extrabold tracking-wide">
+                    {timeLeft > 0 ? (
+                      `Resend code in 0${Math.floor(timeLeft / 60)}:${timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60}`
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        className="text-[#FF7C71] hover:underline font-black focus:outline-none"
+                      >
+                        Resend Code
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isVerifying}
+                    className="w-full bg-[#FF7C71] hover:bg-[#FF7C71]/90 disabled:opacity-75 text-white text-sm font-black py-4 rounded-xl shadow-lg shadow-rose-400/25 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
+                  >
+                    {isVerifying ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <>
+                        VERIFY & PROCEED
+                        <ArrowRight size={18} strokeWidth={2.5} />
+                      </>
+                    )}
+                  </button>
+                </form>
 
                 <button
-                  type="submit"
-                  disabled={isVerifying}
-                  className="w-full bg-[#FF7C71] hover:bg-[#FF7C71]/90 disabled:opacity-75 text-white text-sm font-black py-4 rounded-xl shadow-lg shadow-rose-400/25 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 focus:outline-none"
+                  type="button"
+                  onClick={() => setIsOtpSent(false)}
+                  className="mt-5 text-xs text-slate-500 hover:text-slate-800 hover:underline font-bold focus:outline-none"
                 >
-                  {isVerifying ? (
-                    <Loader2 size={18} className="animate-spin" />
-                  ) : (
-                    <>
-                      VERIFY & PROCEED
-                      <ArrowRight size={18} strokeWidth={2.5} />
-                    </>
-                  )}
+                  ← Change Phone Number
                 </button>
-              </form>
 
-              <button
-                type="button"
-                onClick={() => setIsOtpSent(false)}
-                className="mt-5 text-xs text-slate-500 hover:text-slate-800 hover:underline font-bold focus:outline-none"
-              >
-                ← Change Phone Number
-              </button>
-
-              <span className="text-[10px] text-slate-400 font-extrabold mt-6 flex items-center justify-center gap-1">
-                <ShieldCheck size={12} className="text-emerald-500" />
-                Your connection is secure and encrypted
-              </span>
+                <span className="text-[10px] text-slate-400 font-extrabold mt-6 flex items-center justify-center gap-1">
+                  <ShieldCheck size={12} className="text-emerald-500" />
+                  Your connection is secure and encrypted
+                </span>
+              </div>
             </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center py-5 text-[11px] text-slate-400 font-medium relative z-10 border-t border-slate-100 mx-6 space-y-1">
+          <div>
+            © {new Date().getFullYear()} Rajseba Services Ltd. · All rights reserved.
+            <Link href="/privacy" className="ml-3 text-slate-400 hover:text-[#FF7C71] transition-colors">Privacy</Link>
+            <Link href="/terms" className="ml-3 text-slate-400 hover:text-[#FF7C71] transition-colors">Terms</Link>
+          </div>
+          <div>
+            Developed by{" "}
+            <a
+              href="https://jevxo.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FF7C71] hover:underline font-semibold"
+            >
+              Jevxo
+            </a>
+          </div>
         </div>
       </div>
     </div>

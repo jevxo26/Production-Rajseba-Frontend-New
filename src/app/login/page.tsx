@@ -2,10 +2,11 @@
 
 import * as React from "react"
 import { useState, useEffect, useRef } from "react"
+import dynamic from "next/dynamic"
 import Link from "next/link"
 import {
   ArrowRight, Star, ShieldCheck, Loader2, Sparkles,
-  Phone, CheckCircle2, Users, Award, Clock, ChevronRight
+  Phone, CheckCircle2, Users, Award, Clock, ChevronRight, ChevronLeft
 } from "lucide-react"
 import { useSendOtpMutation, useVerifyOtpMutation, useResendOtpMutation } from "@/redux/features/auth/authApi"
 import { useAppDispatch } from "@/redux/hooks"
@@ -13,6 +14,12 @@ import { setUser } from "@/redux/features/auth/authSlice"
 import { setTokens } from "@/lib/token"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
+
+// Dynamically import Lottie to avoid SSR issues
+const Player = dynamic(
+  () => import("@lottiefiles/react-lottie-player").then((m) => m.Player),
+  { ssr: false }
+)
 
 export default function LoginPage() {
   const router = useRouter()
@@ -122,7 +129,7 @@ export default function LoginPage() {
   ]
 
   const features = [
-    "Verified & background-checked professionals",
+
     "On-time service guarantee",
     "Secure payment & full refund policy",
     "Live booking tracking",
@@ -131,112 +138,62 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full overflow-hidden bg-white flex">
 
-      {/* ===== LEFT PANEL — Dark Premium ===== */}
-      <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] flex-col relative overflow-hidden bg-slate-950">
+      {/* ===== LEFT PANEL — Lottie Animation ===== */}
+      <div className="hidden lg:flex lg:w-[48%] xl:w-[50%] flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-rose-50 via-orange-50 to-amber-50">
 
-        {/* Background image with overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="/cleaner-hero.png"
-            alt="Home services"
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-950/92 via-slate-900/80 to-rose-950/70" />
-        </div>
+        {/* Soft background circles */}
+        <div className="absolute top-[-80px] left-[-80px] w-72 h-72 bg-[#FF7C71]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-[-60px] right-[-60px] w-64 h-64 bg-orange-300/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Subtle grid pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)",
-            backgroundSize: "48px 48px"
-          }}
-        />
-
-        {/* Glow blob */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[400px] bg-rose-600/20 rounded-full blur-[120px] pointer-events-none" />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col h-full px-12 xl:px-16 py-12">
-
-          {/* Logo */}
-          <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/30">
-              <Sparkles size={19} className="stroke-[2.5]" />
-            </div>
-            <span className="font-extrabold text-white text-2xl tracking-tight">Rajseba</span>
-          </Link>
-
-          {/* Hero copy */}
-          <div className="mt-auto mb-10">
-            <div className="inline-flex items-center gap-2 bg-rose-500/15 border border-rose-500/25 text-rose-400 px-4 py-1.5 rounded-full text-xs font-bold mb-6 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-              Bangladesh's #1 Home Service Platform
-            </div>
-
-            <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight">
-              Expert care for<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400">
-                every corner
-              </span><br />
-              of your home.
-            </h1>
-
-            <p className="text-slate-400 text-base mt-5 max-w-sm leading-relaxed font-medium">
-              From deep cleaning to AC repairs — Rajseba brings trusted professionals directly to your door.
-            </p>
-
-            {/* Feature list */}
-            <ul className="mt-8 space-y-3">
-              {features.map((f, i) => (
-                <li key={i} className="flex items-center gap-3 text-sm text-slate-300 font-medium">
-                  <div className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-500/30 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={12} className="text-rose-400" />
-                  </div>
-                  {f}
-                </li>
-              ))}
-            </ul>
+        <div className="relative z-10 flex flex-col items-center text-center px-10">
+          {/* Brand badge */}
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-4 py-1.5 rounded-full text-xs font-bold mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF7C71] animate-pulse" />
+            Bangladesh's #1 Home Service Platform
           </div>
 
-          {/* Stats grid */}
-          <div className="grid grid-cols-4 gap-4 border-t border-white/10 pt-8">
+          {/* Lottie Player */}
+          <div className="w-full max-w-[420px] xl:max-w-[480px]">
+            <Player
+              autoplay
+              loop
+              src="/signup.json"
+              style={{ width: "100%", height: "auto" }}
+            />
+          </div>
+
+          <h2 className="text-2xl xl:text-3xl font-black text-slate-800 leading-tight mt-4">
+            Welcome back to{" "}
+            <span className="text-[#FF7C71]">Rajseba</span>
+          </h2>
+
+
+          {/* Feature list */}
+          <ul className="mt-6 space-y-2.5 text-left w-full max-w-xs">
+            {features.map((f, i) => (
+              <li key={i} className="flex items-center gap-3 text-sm text-slate-600 font-medium">
+                <div className="w-5 h-5 rounded-full bg-[#FF7C71]/15 border border-[#FF7C71]/25 flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={12} className="text-[#FF7C71]" />
+                </div>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-8 mt-8 pt-6 border-t border-slate-200/60 w-full justify-center">
             {stats.map((s, i) => {
               const Icon = s.icon
               return (
-                <div key={i} className="text-center">
-                  <div className="w-9 h-9 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mx-auto mb-2 backdrop-blur-sm">
-                    <Icon size={16} className="text-rose-400" />
+                <React.Fragment key={i}>
+                  {i > 0 && <div className="w-px h-10 bg-slate-200" />}
+                  <div className="text-center">
+                    <p className="text-xl font-black text-slate-800">{s.value}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{s.label}</p>
                   </div>
-                  <div className="text-white font-black text-lg leading-tight">{s.value}</div>
-                  <div className="text-slate-500 text-[10px] font-semibold mt-0.5">{s.label}</div>
-                </div>
+                </React.Fragment>
               )
             })}
-          </div>
-
-          {/* Testimonial card */}
-          <div className="mt-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5">
-            <div className="flex gap-0.5 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
-              ))}
-              <span className="text-slate-400 text-[10px] font-bold ml-2 mt-0.5">5.0</span>
-            </div>
-            <p className="text-slate-300 text-sm leading-relaxed italic">
-              "Rajseba transformed how I manage home repairs. Always on time and premium quality."
-            </p>
-            <div className="flex items-center gap-3 mt-4 pt-4 border-t border-white/10">
-              <img
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop"
-                alt="Elena Rodriguez"
-                className="w-9 h-9 rounded-full object-cover border-2 border-rose-500/30"
-              />
-              <div>
-                <p className="text-white text-xs font-bold">Elena Rodriguez</p>
-                <p className="text-slate-500 text-[10px] font-medium">Premium Member since 2022</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -253,32 +210,50 @@ export default function LoginPage() {
           }}
         />
 
-        <div className="flex-1 flex flex-col justify-center px-6 sm:px-10 md:px-16 xl:px-20 py-10 relative z-10">
+        {/* Back to home */}
+        <div className="relative z-10 px-6 sm:px-10 pt-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-[#FF7C71] transition-colors group"
+          >
+            <ChevronLeft size={17} className="group-hover:-translate-x-0.5 transition-transform" />
+            Back to Home
+          </Link>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-8 py-6 relative z-10">
 
           {/* Mobile logo */}
-          <div className="lg:hidden mb-10">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/25">
-                <Sparkles size={17} className="stroke-[2.5]" />
+          <div className="lg:hidden mb-8 flex flex-col items-center">
+            <Link href="/" className="flex flex-col items-center gap-2.5 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/25">
+                <Sparkles size={20} className="stroke-[2.5]" />
               </div>
-              <span className="font-extrabold text-[#FF7C71] text-2xl tracking-tight">Rajseba</span>
+              <span className="font-extrabold text-[#FF7C71] text-xl tracking-tight">Rajseba</span>
             </Link>
           </div>
 
           {!isOtpSent ? (
             /* ---- STEP 1: Phone number form ---- */
-            <div className="w-full max-w-[420px] mx-auto">
+            <div className="w-full max-w-[440px] bg-white rounded-3xl sm:rounded-none border border-slate-200 sm:border-0 shadow-xl sm:shadow-none px-6 py-8 sm:px-2 sm:py-0">
 
-              {/* Header */}
-              <div className="mb-10">
-                <div className="inline-flex items-center gap-2 bg-rose-50 text-rose-500 px-3.5 py-1.5 rounded-full text-xs font-bold mb-5 border border-rose-100">
+              {/* Centered Header */}
+              <div className="flex flex-col items-center text-center mb-8">
+                <Link href="/" className="flex flex-col items-center gap-2.5 group mb-5 lg:flex hidden">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#FF7C71] to-rose-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-rose-400/25 group-hover:scale-105 transition-transform">
+                    <Sparkles size={24} className="stroke-[2]" />
+                  </div>
+                  <span className="font-black text-xl text-slate-900 tracking-tight">Rajseba</span>
+                </Link>
+
+                <div className="inline-flex items-center gap-2 bg-rose-50 text-rose-500 px-3.5 py-1.5 rounded-full text-xs font-bold mb-4 border border-rose-100">
                   <ShieldCheck size={13} className="stroke-[2.5]" />
                   Secure OTP Login
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
                   Welcome back 👋
                 </h2>
-                <p className="text-slate-500 text-sm font-medium mt-2.5 leading-relaxed">
+                <p className="text-slate-500 text-sm font-medium mt-2 leading-relaxed max-w-xs">
                   Enter your phone number and we'll send you a login code instantly.
                 </p>
               </div>
@@ -345,32 +320,7 @@ export default function LoginPage() {
                   )}
                 </button>
 
-                {/* Divider */}
-                <div className="relative my-2">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-100" />
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span className="bg-white px-4 text-xs text-slate-400 font-semibold">or continue with</span>
-                  </div>
-                </div>
 
-                {/* Social/Quick login hint */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-3 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-50 transition-colors cursor-pointer">
-                    <Phone size={15} className="text-slate-400" />
-                    Bkash / Nagad
-                  </div>
-                  <div className="flex items-center justify-center gap-2 border border-slate-200 rounded-xl py-3 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-50 transition-colors cursor-pointer">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                    </svg>
-                    Google
-                  </div>
-                </div>
               </form>
 
               {/* Sign up link */}
@@ -491,10 +441,23 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="text-center py-6 text-[11px] text-slate-400 font-medium relative z-10 border-t border-slate-100 mx-6">
-          © 2024 Rajseba Services Ltd. · All rights reserved.
-          <Link href="/privacy" className="ml-3 text-slate-400 hover:text-rose-500 transition-colors">Privacy</Link>
-          <Link href="/terms" className="ml-3 text-slate-400 hover:text-rose-500 transition-colors">Terms</Link>
+        <div className="text-center py-5 text-[11px] text-slate-400 font-medium relative z-10 border-t border-slate-100 mx-6 space-y-1">
+          <div>
+            © {new Date().getFullYear()} Rajseba Services Ltd. · All rights reserved.
+            <Link href="/privacy" className="ml-3 text-slate-400 hover:text-[#FF7C71] transition-colors">Privacy</Link>
+            <Link href="/terms" className="ml-3 text-slate-400 hover:text-[#FF7C71] transition-colors">Terms</Link>
+          </div>
+          <div>
+            Developed by{" "}
+            <a
+              href="https://jevxo.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FF7C71] hover:underline font-semibold"
+            >
+              Jevxo
+            </a>
+          </div>
         </div>
       </div>
     </div>
