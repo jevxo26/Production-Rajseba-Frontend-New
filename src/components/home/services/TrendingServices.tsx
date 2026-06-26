@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
 
 function StarRating({ rating }: { rating: number }) {
@@ -45,12 +46,32 @@ export default function TrendingServices() {
   const { data: servicesRes, isLoading } = useGetPublicServicesQuery();
   const allServices = servicesRes?.data || (Array.isArray(servicesRes) ? servicesRes : []);
 
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q")?.toLowerCase() || "";
+  const categorySlug = searchParams.get("category") || "";
+
   // Map API services or use exact design match fallbacks
   const trendingListings = useMemo<TrendingServiceItem[]>(() => {
     if (!allServices.length) return [];
 
+    let filteredServices = allServices;
+    if (q || categorySlug) {
+      filteredServices = allServices.filter((service: any) => {
+        let match = true;
+        if (q) {
+          const nameMatch = service.name?.toLowerCase().includes(q);
+          const descMatch = (service.description || service.subtitle || "")?.toLowerCase().includes(q);
+          if (!nameMatch && !descMatch) match = false;
+        }
+        if (categorySlug) {
+          if (service.category?.slug !== categorySlug) match = false;
+        }
+        return match;
+      });
+    }
+
     // Sort by most bookings and most reviews
-    const sortedServices = [...allServices].sort((a: any, b: any) => {
+    const sortedServices = [...filteredServices].sort((a: any, b: any) => {
       const aScore = (a.bookings?.length || 0) + (a.reviews?.length || 0);
       const bScore = (b.bookings?.length || 0) + (b.reviews?.length || 0);
       return bScore - aScore;
@@ -98,7 +119,7 @@ export default function TrendingServices() {
 
     // Return the top 6 items
     return mapped.slice(0, 6);
-  }, [allServices]);
+  }, [allServices, q, categorySlug]);
 
   if (isLoading) {
     return (
@@ -192,7 +213,7 @@ export default function TrendingServices() {
                     </p>
                   </div>
                   <Link
-                    href={featured.slug ? `/categories/service/${featured.slug}` : "/services"}
+                    href={featured.slug ? `/categories/service/${featured.slug}` : `/services/${featured.id}`}
                     className="px-5 py-2.5 bg-[#1a1a1a] hover:bg-black text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer"
                   >
                     Book Now
@@ -231,7 +252,7 @@ export default function TrendingServices() {
                     ৳{secondary.price.toLocaleString()}
                   </span>
                   <Link
-                    href={secondary.slug ? `/categories/service/${secondary.slug}` : "/services"}
+                    href={secondary.slug ? `/categories/service/${secondary.slug}` : `/services/${secondary.id}`}
                     className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 hover:bg-[#FF7C71] text-slate-500 hover:text-white border border-slate-100 hover:border-transparent transition-all cursor-pointer shadow-sm"
                     aria-label={`View ${secondary.title}`}
                   >

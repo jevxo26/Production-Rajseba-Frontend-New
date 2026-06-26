@@ -7,6 +7,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useGetPublicCategoriesQuery } from "@/redux/features/landing/landingApi";
+import { useGetAllDevisionsQuery } from "@/redux/features/admin/location";
+import { CustomSelect } from "@/components/ui/select";
 import { TbAirConditioning, TbScissors, TbTruck } from "react-icons/tb";
 import {
   FaFaucet,
@@ -45,22 +47,40 @@ const FALLBACK_ICON = LayoutGrid;
 const ServiceHero = () => {
   const { data: categoriesRes, isLoading: isCategoriesLoading } = useGetPublicCategoriesQuery();
   const apiCategories = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
-
+  const { data: divisionsRes } = useGetAllDevisionsQuery();
 
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
+  const [selectedDivision, setSelectedDivision] = useState(searchParams.get("devision") || "");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [location, setLocation] = useState(searchParams.get("location") || "Dhaka, BD");
 
   const activeCategory = searchParams.get("category") || "";
+
+  const categoryOptions = useMemo(() => {
+    return apiCategories
+      .filter((cat: { parent?: unknown }) => !cat.parent)
+      .map((cat: { id: number; name: string }) => ({
+        value: String(cat.id),
+        label: cat.name,
+      }));
+  }, [apiCategories]);
+
+  const divisionOptions = useMemo(() => {
+    const divisions = divisionsRes?.data || [];
+    return divisions.map((div: { id: number; name: string }) => ({
+      value: String(div.id),
+      label: div.name,
+    }));
+  }, [divisionsRes]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (searchQuery) params.set("q", searchQuery);
-    if (location) params.set("location", location);
-    if (activeCategory) params.set("category", activeCategory);
+    if (selectedDivision) params.set("devision", selectedDivision);
+    if (selectedCategory) params.set("category", selectedCategory);
 
     router.push(`/services?${params.toString()}`);
   };
@@ -82,44 +102,43 @@ const ServiceHero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           onSubmit={handleSearch}
-          className="w-full max-w-2xl mx-auto bg-white rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.06)] border border-slate-100 p-2 flex items-center justify-between gap-1 mb-10"
+          className="w-full max-w-3xl mx-auto bg-white rounded-2xl md:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.06)] border border-slate-100 p-2 sm:p-3 flex flex-col md:flex-row items-center gap-2.5 sm:gap-3 md:gap-0 mb-10"
         >
-          {/* Search Input */}
-          <div className="flex items-center gap-2.5 flex-1 pl-4">
-            <Search className="text-slate-400 w-4.5 h-4.5 flex-shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="What service do you need?"
-              className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 outline-none w-full py-1.5"
-              suppressHydrationWarning
+          {/* Category Select */}
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative">
+            <Search className="text-slate-400 w-5 h-5 flex-shrink-0" />
+            <CustomSelect
+              options={categoryOptions}
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              placeholder="Select Category"
+              className="w-full"
+              triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
             />
           </div>
 
           {/* Vertical Separator */}
-          <div className="h-6 w-px bg-slate-200" />
+          <div className="hidden md:block h-8 w-px bg-slate-200" />
 
-          {/* Location Input */}
-          <div className="flex items-center gap-2.5 flex-1 max-w-[160px] pl-2 sm:pl-3">
-            <MapPin className="text-slate-400 w-4.5 h-4.5 flex-shrink-0" />
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Dhaka, BD"
-              className="bg-transparent text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 outline-none w-full py-1.5"
-              suppressHydrationWarning
+          {/* Location Select */}
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1">
+            <MapPin className="text-slate-400 w-5 h-5 flex-shrink-0" />
+            <CustomSelect
+              options={divisionOptions}
+              value={selectedDivision}
+              onChange={setSelectedDivision}
+              placeholder="Select Division"
+              className="w-full"
+              triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
             />
           </div>
 
-          {/* Search Button (Square/Round Red) */}
+          {/* Search Button */}
           <Button
             type="submit"
-            className="w-10 h-10 bg-[#FF7C71] hover:bg-[#E5675D] text-white flex items-center justify-center rounded-full transition-all duration-200 shrink-0 cursor-pointer shadow-md shadow-rose-200"
-            aria-label="Search"
+            className="w-full md:w-auto bg-[#FF7C71] hover:bg-[#E5675D] text-white font-extrabold px-6 sm:px-8 py-3.5 h-auto rounded-xl md:rounded-full transition-all duration-200 shadow-sm active:scale-95 text-sm sm:text-base flex-shrink-0 cursor-pointer"
           >
-            <Search size={16} strokeWidth={2.8} />
+            Search
           </Button>
         </motion.form>
 
