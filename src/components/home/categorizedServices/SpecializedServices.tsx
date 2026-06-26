@@ -81,17 +81,17 @@ export function SpecializedServices({
 
   const displayServices: SpecializedService[] = nestedServices && nestedServices.length > 0
     ? nestedServices.map((ns, idx) => {
-        const isEmergency = nestedServices.length > 2 && idx === nestedServices.length - 1;
-        return {
-          id: String(ns.id),
-          title: ns.name,
-          description: ns.description || "Expert service technician ready to assist you.",
-          price: ns.starting_price || ns.price,
-          image: ns.image,
-          subServices: ns.subServices || [],
-          type: isEmergency ? ("emergency" as const) : ("normal" as const),
-        };
-      })
+      const isEmergency = nestedServices.length > 2 && idx === nestedServices.length - 1;
+      return {
+        id: String(ns.id),
+        title: ns.name,
+        description: ns.description || "Expert service technician ready to assist you.",
+        price: ns.starting_price || ns.price,
+        image: ns.image,
+        subServices: ns.subServices || [],
+        type: isEmergency ? ("emergency" as const) : ("normal" as const),
+      };
+    })
     : fallbackServices;
 
   const toggleExpand = (id: string) => {
@@ -165,8 +165,8 @@ export function SpecializedServices({
     const activeNestedService = activeService || displayServices.find((ds) => ds.id === expandedId);
     const activeSubServiceIds = activeNestedService?.subServices
       ? activeNestedService.subServices
-          .filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id)))
-          .map((ss) => ss.id)
+        .filter((ss) => selectedSubServices.some(id => String(id) === String(ss.id)))
+        .map((ss) => ss.id)
       : [];
 
     const payload = {
@@ -202,7 +202,7 @@ export function SpecializedServices({
   return (
     <section className="py-16 relative">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
@@ -348,11 +348,10 @@ export function SpecializedServices({
                             return (
                               <div
                                 key={sub.id}
-                                className={`flex flex-col justify-between p-4 rounded-2xl border bg-white transition-all ${
-                                  isAdded
-                                    ? "border-[#FF7C71] shadow-sm ring-1 ring-[#FF7C71]/20"
-                                    : "border-slate-200 hover:border-slate-300 shadow-xs"
-                                }`}
+                                className={`flex flex-col justify-between p-4 rounded-2xl border bg-white transition-all ${isAdded
+                                  ? "border-[#FF7C71] shadow-sm ring-1 ring-[#FF7C71]/20"
+                                  : "border-slate-200 hover:border-slate-300 shadow-xs"
+                                  }`}
                               >
                                 <div>
                                   <h4 className="text-sm font-bold text-slate-800 leading-snug">
@@ -373,11 +372,10 @@ export function SpecializedServices({
                                       handleAddAndBook(service, sub.id);
                                     }
                                   }}
-                                  className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                                    isAdded
-                                      ? "bg-rose-50 text-[#FF7C71] border border-rose-100 hover:bg-rose-100"
-                                      : "bg-[#FF7C71] text-white hover:bg-[#E5675D] shadow-sm shadow-rose-200"
-                                  }`}
+                                  className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${isAdded
+                                    ? "bg-rose-50 text-[#FF7C71] border border-rose-100 hover:bg-rose-100"
+                                    : "bg-[#FF7C71] text-white hover:bg-[#E5675D] shadow-sm shadow-rose-200"
+                                    }`}
                                 >
                                   {isAdded ? (
                                     <>
@@ -402,11 +400,10 @@ export function SpecializedServices({
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleInitiateBooking(service); }}
                                 disabled={!hasSelection}
-                                className={`px-8 py-3 rounded-full text-sm font-bold transition shadow-md cursor-pointer ${
-                                  hasSelection 
-                                    ? "bg-[#FF7C71] hover:bg-[#E5675D] text-white shadow-rose-100 hover:shadow-lg" 
-                                    : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
-                                }`}
+                                className={`px-8 py-3 rounded-full text-sm font-bold transition shadow-md cursor-pointer ${hasSelection
+                                  ? "bg-[#FF7C71] hover:bg-[#E5675D] text-white shadow-rose-100 hover:shadow-lg"
+                                  : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                                  }`}
                               >
                                 {hasSelection ? "Proceed to Book" : "Select an option to Book"}
                               </button>
