@@ -93,7 +93,7 @@ export default function SpecialOffers() {
 
         {/* All Packages — Flat Grid */}
         {!isLoading && packagesData.length > 0 && (() => {
-          const displayPackages = packagesData.flatMap((section: any, sIdx: number) =>
+          const displayPackages: DisplayPackage[] = packagesData.flatMap((section: any, sIdx: number) =>
             mapPackagesToDisplay(section.packages || [], {
               serviceId: section.service?.id,
               serviceName: section.service?.name || "",

@@ -15,14 +15,16 @@ export interface DisplayPackage {
 
 function normalizePackageFeatures(pkg: any): string[] {
   if (Array.isArray(pkg.features)) {
-    return pkg.features.map(String).map((f) => f.trim()).filter(Boolean);
+    return pkg.features
+      .map((f: unknown) => String(f).trim())
+      .filter((f: string) => f.length > 0);
   }
 
   if (typeof pkg.features === "string" && pkg.features.trim()) {
     return pkg.features
       .split(",")
-      .map((f) => f.trim())
-      .filter(Boolean);
+      .map((f: string) => f.trim())
+      .filter((f: string) => f.length > 0);
   }
 
   if (pkg.items?.length > 0) {
