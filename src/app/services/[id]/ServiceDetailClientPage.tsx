@@ -8,18 +8,29 @@ import { Experts } from '@/components/home/categorizedServices/Experts';
 import { Commitments } from '@/components/home/categorizedServices/Commitments';
 import { VendorProfile } from '@/components/home/categorizedServices/VendorProfile';
 import { ServiceReviews } from '@/components/home/categorizedServices/ServiceReviews';
-import { useGetPublicServiceByIdQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicServiceByIdQuery, useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function ServiceDetailClientPage({ id }: { id: string }) {
-  const serviceId = Number(id);
+  const isNumericId = /^\d+$/.test(id);
 
-  const { data: serviceRes, isLoading, isError } = useGetPublicServiceByIdQuery(
-    isNaN(serviceId) ? 0 : serviceId
+  const { data: publicRes, isLoading: isPublicLoading } = useGetPublicServicesQuery(
+    undefined,
+    { skip: isNumericId }
+  );
+  const allServices = publicRes?.data || (Array.isArray(publicRes) ? publicRes : []);
+  const matchedId = isNumericId
+    ? Number(id)
+    : allServices.find((s: any) => s.slug === id)?.id;
+
+  const { data: serviceRes, isLoading: isServiceLoading, isError } = useGetPublicServiceByIdQuery(
+    matchedId || 0,
+    { skip: !matchedId }
   );
 
   const service = serviceRes?.data;
+  const isLoading = isNumericId ? isServiceLoading : isPublicLoading || isServiceLoading;
 
   if (isLoading) {
     return (

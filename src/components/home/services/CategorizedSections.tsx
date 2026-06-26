@@ -3,47 +3,11 @@
 import React, { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, LayoutGrid, Sparkles, Loader2 } from "lucide-react";
-import { TbAirConditioning, TbScissors, TbTruck } from "react-icons/tb";
-import {
-  FaFaucet,
-  FaBolt,
-  FaTv,
-  FaPaintRoller,
-  FaLeaf,
-  FaBug,
-  FaHammer,
-} from "react-icons/fa";
-import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
+import { ArrowRight, Sparkles, Loader2, Star, CalendarCheck } from "lucide-react";
 import {
   useGetPublicCategoriesQuery,
-  useGetPublicNestedServicesQuery,
+  useGetPublicServicesQuery,
 } from "@/redux/features/landing/landingApi";
-
-// Dynamic Icon Map lookup helper
-const ICON_MAP: Record<string, React.ComponentType<any>> = {
-  "cleaning": MdOutlineCleaningServices,
-  "ac-repair": TbAirConditioning,
-  "ac": TbAirConditioning,
-  "plumbing": FaFaucet,
-  "electrical": FaBolt,
-  "carpentry": FaHammer,
-  "painting": FaPaintRoller,
-  "salon-spa": TbScissors,
-  "salon": TbScissors,
-  "home-salon": TbScissors,
-  "gardening": FaLeaf,
-  "pest-control": FaBug,
-  "shifting": TbTruck,
-  "cctv": MdOutlineSecurity,
-  "security": MdOutlineSecurity,
-  "appliance": FaTv,
-  "appliance-repair": FaTv,
-};
-
-const getCategoryIcon = (slug: string) => {
-  return ICON_MAP[slug] || ICON_MAP[slug.replace("-services", "")] || ICON_MAP[slug.replace("-repair", "")] || LayoutGrid;
-};
 
 const SectionHeader = ({ title, viewAllHref }: { title: string; viewAllHref?: string }) => (
   <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
@@ -64,24 +28,36 @@ const SectionHeader = ({ title, viewAllHref }: { title: string; viewAllHref?: st
   </div>
 );
 
+const getServicePrice = (service: any) => {
+  if (service.nestedServices?.length > 0) {
+    const prices = service.nestedServices
+      .map((ns: any) => Number(ns.starting_price || 0))
+      .filter((p: number) => p > 0);
+    if (prices.length > 0) return Math.min(...prices);
+  }
+  return Number(service.starting_price || service.price || 0);
+};
+
 export default function CategorizedSections() {
   const { data: categoriesRes, isLoading: isCategoriesLoading } = useGetPublicCategoriesQuery();
-  const { data: nestedRes, isLoading: isNestedLoading } = useGetPublicNestedServicesQuery();
+  const { data: servicesRes, isLoading: isServicesLoading } = useGetPublicServicesQuery();
 
   const categories = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
-  const allNestedServices = nestedRes?.data || (Array.isArray(nestedRes) ? nestedRes : []);
+  const allServices = servicesRes?.data || (Array.isArray(servicesRes) ? servicesRes : []);
 
-  // Group nested services by category
   const groupedData = useMemo(() => {
     if (!categories.length) return [];
 
     return categories.map((cat: any) => {
       const catSlug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || "";
 
-      // Filter nested services belonging to this category
-      const servicesForCategory = allNestedServices.filter((ns: any) => {
-        const parentCategory = ns.service?.category;
-        return parentCategory?.id === cat.id || parentCategory?.slug === cat.slug;
+      const servicesForCategory = allServices.filter((service: any) => {
+        const serviceCategory = service.category;
+        if (!serviceCategory) return false;
+        return (
+          String(serviceCategory.id) === String(cat.id) ||
+          serviceCategory.slug === cat.slug
+        );
       });
 
       return {
@@ -89,10 +65,10 @@ export default function CategorizedSections() {
         slug: catSlug,
         services: servicesForCategory,
       };
-    }); // Show all categories regardless of whether services are linked yet
-  }, [categories, allNestedServices]);
+    });
+  }, [categories, allServices]);
 
-  if (isCategoriesLoading || isNestedLoading) {
+  if (isCategoriesLoading || isServicesLoading) {
     return (
       <div className="flex justify-center items-center py-20">
         <div className="flex flex-col items-center gap-3">
@@ -115,14 +91,11 @@ export default function CategorizedSections() {
           Explore By Category
         </div>
         <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-8">
-          Services Catalog
+          Services Category
         </h2>
       </div>
 
-      {groupedData.map((category: any) => {
-        const Icon = getCategoryIcon(category.slug);
-
-        return (
+      {groupedData.map((category: any) => (
           <section key={category.id} className="max-w-7xl mx-auto px-4 md:px-6">
             <SectionHeader
               title={category.name}
@@ -136,41 +109,62 @@ export default function CategorizedSections() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.services.slice(0, 6).map((item: any) => {
-                  const priceVal = item.price ? Number(item.price) : 0;
+                  const priceVal = getServicePrice(item);
+                  const totalReviews = item.reviews?.length || 0;
+                  const totalBookings = item.bookings?.length || 0;
+                  const serviceImage = item.image || "/images/service/service-1.png";
 
                   return (
                     <motion.div
                       key={item.id}
                       whileHover={{ y: -5, scale: 1.01 }}
-                      className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm hover:shadow-md hover:border-[#FF7C71]/20 transition-all duration-300 flex flex-col justify-between min-h-[160px]"
+                      className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md hover:border-[#FF7C71]/20 transition-all duration-300 flex flex-col"
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#FFF8F7] text-[#FF7C71] flex items-center justify-center shrink-0 shadow-sm">
-                          <Icon size={22} />
-                        </div>
+                      <div className="relative h-40 bg-slate-50 shrink-0">
+                        <img
+                          src={serviceImage}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <span className="absolute top-3 left-3 py-1 px-2.5 bg-white/95 text-slate-800 text-[10px] font-bold rounded-lg uppercase tracking-wide shadow-sm">
+                          {category.name}
+                        </span>
+                      </div>
+
+                      <div className="p-5 flex flex-col flex-1 justify-between">
                         <div>
                           <h4 className="font-extrabold text-slate-800 text-sm mb-1 leading-snug line-clamp-1">
                             {item.name}
                           </h4>
-                          <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">
+                          <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2 mb-3">
                             {item.description || "Professional services tailored for your home needs."}
                           </p>
+                          <div className="flex items-center gap-4 text-[11px] font-semibold text-slate-500">
+                            <span className="flex items-center gap-1.5">
+                              <Star size={12} className="text-amber-400 fill-amber-400" />
+                              {totalReviews} {totalReviews === 1 ? "Review" : "Reviews"}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <CalendarCheck size={12} className="text-[#FF7C71]" />
+                              {totalBookings} {totalBookings === 1 ? "Booking" : "Bookings"}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
-                        <div>
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Price starts at</span>
-                          <span className="text-sm font-black text-slate-900">
-                            {priceVal > 0 ? `৳${priceVal.toLocaleString()}` : "Contact"}
-                          </span>
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-100 mt-4">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Price starts at</span>
+                            <span className="text-sm font-black text-slate-900">
+                              {priceVal > 0 ? `৳${priceVal.toLocaleString()}` : "Contact"}
+                            </span>
+                          </div>
+                          <Link
+                            href={`/services/${item.slug || item.id}`}
+                            className="text-xs font-bold text-[#FF7C71] hover:text-[#E5675D] transition-colors flex items-center gap-1"
+                          >
+                            Book Now <ArrowRight size={13} />
+                          </Link>
                         </div>
-                        <Link
-                          href={`/categories/service/${item.service?.slug || item.id}`}
-                          className="text-xs font-bold text-[#FF7C71] hover:text-[#E5675D] transition-colors flex items-center gap-1"
-                        >
-                          Book Now <ArrowRight size={13} />
-                        </Link>
                       </div>
                     </motion.div>
                   );
@@ -178,8 +172,7 @@ export default function CategorizedSections() {
               </div>
             )}
           </section>
-        );
-      })}
+      ))}
     </div>
   );
 }
