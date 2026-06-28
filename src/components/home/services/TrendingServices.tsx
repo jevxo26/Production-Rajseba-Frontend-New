@@ -5,6 +5,27 @@ import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 65, damping: 15 },
+  },
+} as const;
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -171,11 +192,20 @@ export default function TrendingServices() {
         </div>
 
         {/* Dynamic Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-6 items-stretch">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-6 items-stretch"
+        >
 
           {/* Featured Large Card */}
           {featured && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 bg-white rounded-3xl overflow-hidden border border-slate-100/60 hover-card-premium">
+            <motion.div
+              variants={itemVariants}
+              className="grid grid-cols-1 sm:grid-cols-2 bg-white rounded-3xl overflow-hidden border border-slate-100/60 hover-card-premium"
+            >
               <div className="relative min-h-[220px] sm:min-h-full bg-slate-50">
                 <img
                   src={featured.image}
@@ -220,12 +250,15 @@ export default function TrendingServices() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Secondary Vertical Card */}
           {secondary && (
-            <div className="bg-white rounded-3xl overflow-hidden border border-slate-100/60 flex flex-col hover-card-premium">
+            <motion.div
+              variants={itemVariants}
+              className="bg-white rounded-3xl overflow-hidden border border-slate-100/60 flex flex-col hover-card-premium"
+            >
               <div className="relative h-44 w-full bg-slate-50 shrink-0">
                 <img
                   src={secondary.image}
@@ -260,10 +293,10 @@ export default function TrendingServices() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
-        </div>
+        </motion.div>
       </div>
     </section>
   );

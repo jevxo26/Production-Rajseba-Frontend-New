@@ -9,6 +9,26 @@ import {
   useGetPublicServicesQuery,
 } from "@/redux/features/landing/landingApi";
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 65, damping: 15 },
+  },
+} as const;
+
 const SectionHeader = ({ title, viewAllHref }: { title: string; viewAllHref?: string }) => (
   <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
     <div className="relative">
@@ -107,7 +127,13 @@ export default function CategorizedSections() {
                 No services listed yet for this category.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1 }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
                 {category.services.slice(0, 6).map((item: any) => {
                   const priceVal = getServicePrice(item);
                   const totalReviews = item.reviews?.length || 0;
@@ -117,6 +143,7 @@ export default function CategorizedSections() {
                   return (
                     <motion.div
                       key={item.id}
+                      variants={itemVariants}
                       whileHover={{ y: -5, scale: 1.01 }}
                       className="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-md hover:border-[#FF7C71]/20 transition-all duration-300 flex flex-col"
                     >
@@ -169,7 +196,7 @@ export default function CategorizedSections() {
                     </motion.div>
                   );
                 })}
-              </div>
+              </motion.div>
             )}
           </section>
       ))}

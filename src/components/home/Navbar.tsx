@@ -192,7 +192,7 @@ export function Navbar() {
     <>
       <motion.nav
         style={{ boxShadow: headerShadow, borderBottomColor: borderColor }}
-        className="bg-[#FFF8F7] border-b sticky top-0 z-50"
+        className="bg-[#FFF8F7]/50 backdrop-blur-lg border-b sticky top-0 z-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* ─── TOP BAR ─── */}
@@ -204,7 +204,7 @@ export function Navbar() {
               aria-label="Rajseba — Home"
             >
               <Image
-                src="/logo.png"
+                src="/rajshiblogo.png"
                 alt="Rajseba"
                 width={40}
                 height={40}
@@ -261,11 +261,11 @@ export function Navbar() {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.95 }}
                             transition={{ duration: 0.15 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-[500px] bg-white rounded-2xl border border-slate-100 shadow-xl p-4 z-50"
+                            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-[500px] bg-white/70 backdrop-blur-lg rounded-2xl border border-slate-100/80 shadow-xl p-4 z-50"
                           >
                             {apiCategories.length === 0 ? (
                               <div className="grid grid-cols-4 gap-2">
-                                {[1,2,3,4,5,6,7,8].map((n) => (
+                                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                                   <div key={n} className="h-12 bg-slate-50 rounded-xl animate-pulse" />
                                 ))}
                               </div>
@@ -437,7 +437,7 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
+                      className="absolute right-0 mt-2 w-56 bg-white/70 backdrop-blur-lg border border-slate-100/80 rounded-2xl shadow-xl py-2 z-50 overflow-hidden"
                     >
                       <div className="px-4 py-3 border-b border-slate-50 bg-slate-50/40">
                         <p className="text-sm font-bold text-slate-800 truncate">
@@ -611,7 +611,7 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.22, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden border-t border-slate-100 bg-[#FFF8F7]"
+              className="md:hidden overflow-hidden border-t border-slate-100/80 bg-[#FFF8F7]/80 backdrop-blur-lg"
             >
               <div className="px-4 py-4 space-y-1">
                 {/* Nav Links */}
@@ -654,7 +654,7 @@ export function Navbar() {
                             >
                               <div className="grid grid-cols-2 gap-1.5">
                                 {apiCategories.length === 0 ? (
-                                  [1,2,3,4].map((n) => (
+                                  [1, 2, 3, 4].map((n) => (
                                     <div key={n} className="h-12 bg-slate-50 rounded-xl animate-pulse" />
                                   ))
                                 ) : apiCategories.map((cat: any) => {
@@ -663,11 +663,10 @@ export function Navbar() {
                                     <Link
                                       key={cat.id}
                                       href={`/categories/${cat.id}`}
-                                      className={`flex items-center gap-2.5 p-3 rounded-xl transition-all text-sm font-medium ${
-                                        isCategoryActive
+                                      className={`flex items-center gap-2.5 p-3 rounded-xl transition-all text-sm font-medium ${isCategoryActive
                                           ? "bg-rose-50 text-[#FF7C71] font-semibold"
                                           : "text-slate-600 hover:bg-slate-50 hover:text-[#FF7C71]"
-                                      }`}
+                                        }`}
                                       onClick={() => {
                                         setIsOpen(false);
                                         setShowMobileAccordion(false);

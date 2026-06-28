@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, SlidersHorizontal, LayoutGrid } from "lucide-react";
 import { useMemo } from "react";
+import { motion } from "framer-motion";
 import FilterPanel, { FilterPanelDesktop } from "./FilterPanel";
 import ServiceCard from "./ServiceCard";
 import { CustomSelect } from "@/components/ui/select";
@@ -11,6 +12,26 @@ import {
 import { FaBolt, FaBug, FaFaucet, FaLeaf, FaPaintRoller, FaTv, FaHammer } from "react-icons/fa";
 import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
 import { TbAirConditioning, TbScissors, TbTruck } from "react-icons/tb";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06,
+      delayChildren: 0.05,
+    },
+  },
+} as const;
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 25 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 },
+  },
+} as const;
 
 interface ServiceListing {
   id: string;
@@ -481,17 +502,25 @@ export default function ServiceListing({
 
           {/* Services Grid (spans remaining width) */}
           <div className="flex-1 min-w-0 w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              key={`${activeCategory}-${currentPage}-${searchQuery}-${sortBy}-${selectedRating}-${priceMax}`}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {isServicesLoadingCombined ? (
                 Array.from({ length: 6 }).map((_, idx) => (
                   <ServiceCardSkeleton key={idx} />
                 ))
               ) : (
                 pagedItems.map((service) => (
-                  <ServiceCard key={service.id} service={service} />
+                  <motion.div key={service.id} variants={itemVariants} className="h-full">
+                    <ServiceCard service={service} />
+                  </motion.div>
                 ))
               )}
-            </div>
+            </motion.div>
 
             {/* Empty state */}
             {pagedItems.length === 0 && (

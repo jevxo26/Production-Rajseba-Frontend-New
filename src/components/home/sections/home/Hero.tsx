@@ -80,9 +80,24 @@ const Hero = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const searchOpacity = useTransform(scrollY, [0, 200], [1, 0]);
-  const searchScale = useTransform(scrollY, [0, 200], [1, 0.85]);
-  const searchY = useTransform(scrollY, [0, 200], [0, -60]);
+  const searchOpacity = useTransform(scrollY, (y) => {
+    if (isMobile) return 1;
+    if (y <= 0) return 1;
+    if (y >= 200) return 0;
+    return 1 - y / 200;
+  });
+  const searchScale = useTransform(scrollY, (y) => {
+    if (isMobile) return 1;
+    if (y <= 0) return 1;
+    if (y >= 200) return 0.85;
+    return 1 - (y / 200) * 0.15;
+  });
+  const searchY = useTransform(scrollY, (y) => {
+    if (isMobile) return 0;
+    if (y <= 0) return 0;
+    if (y >= 200) return -60;
+    return -(y / 200) * 60;
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +153,7 @@ const Hero = () => {
 
         <motion.form
           variants={itemVariants}
-          style={isMobile ? {} : {
+          style={{
             opacity: searchOpacity,
             scale: searchScale,
             y: searchY,

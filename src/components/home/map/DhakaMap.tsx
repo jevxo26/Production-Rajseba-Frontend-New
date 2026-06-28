@@ -10,7 +10,7 @@ import { TbTruck, TbScissors } from "react-icons/tb";
 import { MdOutlineSecurity } from "react-icons/md";
 import { LayoutGrid } from "lucide-react";
 import { Expert } from "./types";
-import "leaflet/dist/leaflet.css";
+import "./leaflet-custom.css";
 import VendorCategoryTags from "./VendorCategoryTags";
 import VendorLocationInfo from "./VendorLocationInfo";
 
@@ -248,18 +248,18 @@ export default function DhakaMap({
           <MapController selectedExpert={selectedExpert} />
           <ResetController resetToken={resetToken} />
 
-        {filteredExperts.map((expert) => {
-          const isSelected = selectedExpertId === expert.id;
-          return (
-            <VendorMarker
-              key={expert.id}
-              expert={expert}
-              isSelected={isSelected}
-              onSelect={() => setSelectedExpertId(expert.id)}
-              onViewDetails={() => onViewDetails?.(expert)}
-            />
-          );
-        })}
+          {filteredExperts.map((expert) => {
+            const isSelected = selectedExpertId === expert.id;
+            return (
+              <VendorMarker
+                key={expert.id}
+                expert={expert}
+                isSelected={isSelected}
+                onSelect={() => setSelectedExpertId(expert.id)}
+                onViewDetails={() => onViewDetails?.(expert)}
+              />
+            );
+          })}
         </MapContainer>
       </div>
 

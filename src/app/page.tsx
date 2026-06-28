@@ -10,6 +10,7 @@ import FeaturedProviders from "@/components/home/sections/home/FeaturedProviders
 import ServiceAreas from "@/components/home/sections/home/ServiceAreas";
 // import PartnerCta from "@/components/home/sections/home/PartnerCta";
 import FAQ from "@/components/home/sections/home/FAQ";
+import HomeMotionWrapper from "@/components/home/HomeMotionWrapper";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,21 +42,51 @@ export default function Home() {
           className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
           style={{ backgroundSize: 'auto' }}
         />
-        <div className="relative z-10">
-          <ExploreCategories />
-          <TopServices />
+        <div className="relative z-10 flex flex-col gap-6 md:gap-10">
+          <HomeMotionWrapper>
+            <ExploreCategories />
+          </HomeMotionWrapper>
+
+          <HomeMotionWrapper>
+            <TopServices />
+          </HomeMotionWrapper>
+
           {/* ✨ Special Deals — shown right after browsing services to drive booking */}
-          <SpecialOffers />
+          <HomeMotionWrapper>
+            <SpecialOffers />
+          </HomeMotionWrapper>
+
           {/* 👷 Top Professionals — builds trust before WhyChooseUs */}
-          <FeaturedProviders />
-          <WhyChooseUs />
-          <Stats />
+          <HomeMotionWrapper>
+            <FeaturedProviders />
+          </HomeMotionWrapper>
+
+          <HomeMotionWrapper>
+            <WhyChooseUs />
+          </HomeMotionWrapper>
+
+          <HomeMotionWrapper>
+            <Stats />
+          </HomeMotionWrapper>
+
           {/* 🗺️ Coverage Map — shown after stats to answer "is this available near me?" */}
-          <ServiceAreas />
-          <HowItWorks />
-          <Testimonials />
+          <HomeMotionWrapper>
+            <ServiceAreas />
+          </HomeMotionWrapper>
+
+          <HomeMotionWrapper>
+            <HowItWorks />
+          </HomeMotionWrapper>
+
+          <HomeMotionWrapper>
+            <Testimonials />
+          </HomeMotionWrapper>
+
           {/* <PartnerCta /> */}
-          <FAQ />
+          
+          <HomeMotionWrapper>
+            <FAQ />
+          </HomeMotionWrapper>
         </div>
       </div>
     </div>

@@ -13,30 +13,28 @@ const safetyFeatures = [
 
 export function Commitments() {
   return (
-    <section className="py-12">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="bg-gradient-to-br from-[#FF7C71]/20 to-[#FF7C71]/8 rounded-3xl p-8 md:p-12">
-          <h2 className="text-center text-3xl md:text-4xl font-bold text-[#FF7C71] mb-12">
-            Committed to Zero-Risk Safety
-          </h2>
+    <section className="py-6 w-full">
+      <div className="bg-gradient-to-br from-[#FF7C71]/15 to-[#FF7C71]/5 rounded-[32px] p-6 md:p-8 border border-[#FF7C71]/10">
+        <h2 className="text-center text-xl md:text-2xl font-black text-[#FF7C71] mb-8">
+          Committed to Zero-Risk Safety
+        </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 md:gap-8">
-            {safetyFeatures.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="flex flex-col items-center text-center group"
-              >
-                <div className="w-16 h-16 bg-[#fff0f0] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                  <feature.icon className="w-8 h-8 text-[#FF7C71]" />
-                </div>
-                <p className="font-semibold text-slate-800 text-sm">{feature.label}</p>
-              </motion.div>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+          {safetyFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08 }}
+              className="flex flex-col items-center text-center group"
+            >
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-3 group-hover:scale-105 transition-transform shadow-xs border border-rose-100/50">
+                <feature.icon className="w-6 h-6 text-[#FF7C71]" />
+              </div>
+              <p className="font-bold text-slate-700 text-xs">{feature.label}</p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

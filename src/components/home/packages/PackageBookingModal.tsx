@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, Loader2, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Loader2, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
 import { useCreateBookingMutation } from "@/redux/features/admin/booking";
 import { ValidateCouponResult } from "@/redux/features/admin/coupon";
 import { CouponApply } from "@/components/home/booking/CouponApply";
 import { DisplayPackage } from "./packageOfferUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function PackageBookingModal({
   selectedPackage,
@@ -30,6 +31,18 @@ export function PackageBookingModal({
   const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResult | null>(
     null
   );
+
+  // Disable body scroll when modal is open on mobile
+  useEffect(() => {
+    if (selectedPackage) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedPackage]);
 
   if (!selectedPackage) return null;
 
@@ -73,161 +86,187 @@ export function PackageBookingModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-            <Calendar size={20} className="text-[#FF7C71]" />
+    <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs"
+      />
+
+      {/* Sheet / Modal Container */}
+      <motion.div
+        initial={{ y: "100%", scale: 1 }}
+        className="relative bg-white w-full sm:max-w-lg sm:rounded-[32px] rounded-t-[32px]
+          shadow-2xl overflow-hidden border border-slate-100 max-h-[92dvh] sm:max-h-[90vh] flex flex-col z-10"
+        breakpoints-class="sm:animate-in sm:zoom-in-95"
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 26, stiffness: 230 }}
+      >
+        {/* Grab handle indicator for mobile */}
+        <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto my-3 shrink-0 sm:hidden" />
+
+        {/* Modal Header */}
+        <div className="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+          <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+            <Calendar size={18} className="text-[#FF7C71]" />
             Complete Booking Info
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-full transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-full transition cursor-pointer"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <div className="px-6 py-4 bg-[#FFF8F7] border-b border-slate-100/60 space-y-2.5">
-          <div className="text-xs font-bold text-[#FF7C71] uppercase tracking-wider">
-            Selected Package
-          </div>
-          <div className="flex justify-between items-center text-sm font-bold text-slate-800">
-            <span>{selectedPackage.title}</span>
-            {selectedPackage.price && (
-              <span className="text-[#FF7C71] text-base">
-                ৳{packagePayableTotal.toLocaleString()}
-              </span>
+        {/* Scrollable Content Body */}
+        <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5 pb-[calc(env(safe-area-inset-bottom)+20px)]">
+          {/* Selected Package Details */}
+          <div className="bg-[#FFF8F7] border border-[#FF7C71]/10 rounded-2xl p-4 space-y-3 text-xs">
+            <div className="text-[10px] font-bold text-[#FF7C71] uppercase tracking-wider">
+              Selected Package
+            </div>
+            <div className="flex justify-between items-center text-sm font-black text-slate-800">
+              <span>{selectedPackage.title}</span>
+              {selectedPackage.price && (
+                <span className="text-[#FF7C71] text-base">
+                  ৳{packagePayableTotal.toLocaleString()}
+                </span>
+              )}
+            </div>
+            {appliedCoupon && (
+              <p className="text-[10px] font-bold text-emerald-600">
+                Coupon {appliedCoupon.coupon.code} applied — saved ৳
+                {Number(appliedCoupon.discount_amount).toLocaleString()}
+              </p>
             )}
           </div>
-          {appliedCoupon && (
-            <p className="text-xs font-semibold text-emerald-600">
-              Coupon {appliedCoupon.coupon.code} — saved ৳
-              {Number(appliedCoupon.discount_amount).toLocaleString()}
-            </p>
-          )}
-        </div>
 
-        <form onSubmit={handleConfirmBooking} className="p-6 space-y-5">
-          <CouponApply
-            subtotal={packageSubtotal}
-            serviceId={selectedPackage.serviceId}
-            packageId={selectedPackage.id}
-            onApplied={setAppliedCoupon}
-          />
+          <form onSubmit={handleConfirmBooking} className="space-y-4">
+            <CouponApply
+              subtotal={packageSubtotal}
+              serviceId={selectedPackage.serviceId}
+              packageId={selectedPackage.id}
+              onApplied={setAppliedCoupon}
+            />
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Quantity
-            </label>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setPackageQuantity((qty) => Math.max(1, qty - 1))}
-                className="w-10 h-10 rounded-xl border border-slate-200 text-[#FF7C71] font-black hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                -
-              </button>
-              <span className="w-12 text-center text-lg font-black text-slate-800">
-                {packageQuantity}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPackageQuantity((qty) => qty + 1)}
-                className="w-10 h-10 rounded-xl border border-slate-200 text-[#FF7C71] font-black hover:bg-rose-50 transition-colors cursor-pointer"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Booking Date *
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Quantity
               </label>
-              <input
-                type="date"
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPackageQuantity((qty) => Math.max(1, qty - 1))}
+                  className="w-9 h-9 rounded-xl border border-slate-200 text-[#FF7C71] font-black hover:bg-rose-50 transition cursor-pointer flex items-center justify-center"
+                >
+                  <Minus size={14} strokeWidth={2.5} />
+                </button>
+                <span className="w-10 text-center text-base font-black text-slate-800">
+                  {packageQuantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPackageQuantity((qty) => qty + 1)}
+                  className="w-9 h-9 rounded-xl border border-slate-200 text-[#FF7C71] font-black hover:bg-rose-50 transition cursor-pointer flex items-center justify-center"
+                >
+                  <Plus size={14} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Booking Date *
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={bookingDetails.date}
+                  onChange={(e) =>
+                    setBookingDetails({ ...bookingDetails, date: e.target.value })
+                  }
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition font-semibold"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  Booking Time
+                </label>
+                <input
+                  type="time"
+                  value={bookingDetails.time}
+                  onChange={(e) =>
+                    setBookingDetails({ ...bookingDetails, time: e.target.value })
+                  }
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition font-semibold"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Service Address *
+              </label>
+              <textarea
                 required
-                value={bookingDetails.date}
+                rows={2}
+                placeholder="Enter your street address, house no, area..."
+                value={bookingDetails.location}
                 onChange={(e) =>
-                  setBookingDetails({ ...bookingDetails, date: e.target.value })
+                  setBookingDetails({ ...bookingDetails, location: e.target.value })
                 }
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition font-semibold resize-none"
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Booking Time
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                Additional Notes
               </label>
-              <input
-                type="time"
-                value={bookingDetails.time}
+              <textarea
+                rows={1}
+                placeholder="Any specific requests or requirements..."
+                value={bookingDetails.notes}
                 onChange={(e) =>
-                  setBookingDetails({ ...bookingDetails, time: e.target.value })
+                  setBookingDetails({ ...bookingDetails, notes: e.target.value })
                 }
-                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold"
+                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition font-semibold resize-none"
               />
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Service Address *
-            </label>
-            <textarea
-              required
-              rows={3}
-              placeholder="Enter your street address, house no, area..."
-              value={bookingDetails.location}
-              onChange={(e) =>
-                setBookingDetails({ ...bookingDetails, location: e.target.value })
-              }
-              className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold resize-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Additional Notes
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Any specific requests or requirements..."
-              value={bookingDetails.notes}
-              onChange={(e) =>
-                setBookingDetails({ ...bookingDetails, notes: e.target.value })
-              }
-              className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-1 focus:ring-[#FF7C71] focus:border-[#FF7C71] block p-3 outline-none transition-all font-semibold resize-none"
-            />
-          </div>
-
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isBooking}
-              className="px-6 py-2.5 text-sm font-bold text-white bg-[#FF7C71] hover:bg-[#E5675D] rounded-xl transition-colors shadow-md disabled:opacity-70 flex items-center gap-2 cursor-pointer"
-            >
-              {isBooking ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Placing...
-                </>
-              ) : (
-                "Confirm Booking"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-5 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 border border-slate-200 rounded-xl transition cursor-pointer flex-1 sm:flex-none"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isBooking}
+                className="px-6 py-3 text-sm font-bold text-white bg-[#FF7C71] hover:bg-[#E5675D] rounded-xl transition shadow-md disabled:opacity-70 flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-none"
+              >
+                {isBooking ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Placing...
+                  </>
+                ) : (
+                  "Confirm Booking"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 }

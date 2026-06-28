@@ -5,11 +5,11 @@ import { Check } from "lucide-react";
 import { DisplayPackage } from "./packageOfferUtils";
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 28 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 65, damping: 14 },
+    transition: { type: "spring", stiffness: 65, damping: 15 },
   },
 } as const;
 

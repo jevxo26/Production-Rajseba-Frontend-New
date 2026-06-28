@@ -60,20 +60,21 @@ const FALLBACK_ICON = LayoutGrid;
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
 } as const;
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 85, damping: 16 },
-  },
-  exit: {
-    opacity: 0,
-    y: 16,
-    transition: { duration: 0.18, ease: "easeIn" },
+    transition: { type: "spring", stiffness: 65, damping: 15 },
   },
 } as const;
 
@@ -116,94 +117,90 @@ const ExploreCategories = () => {
       {/* Grid — real data */}
       {!isLoading && !isError && categories.length > 0 && (
         <motion.div
-          layout
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5 md:gap-6"
         >
-          <AnimatePresence mode="popLayout">
-            {categories.map((cat: any) => {
-              // Try to find icon by name, otherwise use fallback
-              const IconComponent =
-                CATEGORY_ICON_MAP[cat.name] ||
-                CATEGORY_ICON_MAP[Object.keys(CATEGORY_ICON_MAP).find((k) =>
-                  cat.name?.toLowerCase().includes(k.toLowerCase())
-                ) || ""] ||
-                FALLBACK_ICON;
+          {categories.map((cat: any) => {
+            // Try to find icon by name, otherwise use fallback
+            const IconComponent =
+              CATEGORY_ICON_MAP[cat.name] ||
+              CATEGORY_ICON_MAP[Object.keys(CATEGORY_ICON_MAP).find((k) =>
+                cat.name?.toLowerCase().includes(k.toLowerCase())
+              ) || ""] ||
+              FALLBACK_ICON;
 
-              const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
+            const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
 
-              return (
-                <motion.div
-                  key={cat.id}
-                  variants={cardVariants}
-                  exit="exit"
-                  whileTap={{ scale: 0.97 }}
-                  layout
-                >
-                  <Link href={`/categories/${cat.id}`} className="block h-full">
+            return (
+              <motion.div
+                key={cat.id}
+                variants={cardVariants}
+                whileTap={{ scale: 0.97 }}
+                className="h-full"
+              >
+                <Link href={`/categories/${cat.id}`} className="block h-full">
+                  <div
+                    className="
+                      group relative overflow-hidden
+                      flex flex-col items-center justify-center
+                      h-full rounded-[28px] p-6 md:p-8
+                      bg-gradient-to-br from-white to-[#e8eaed]
+                      border border-white/80
+                      cursor-pointer
+                      hover-card-premium
+                    "
+                  >
+                    {/* Gloss sheen */}
+                    <span
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/65 to-transparent"
+                      aria-hidden
+                    />
+
+                    {/* Icon orb */}
                     <div
                       className="
-                        group relative overflow-hidden
-                        flex flex-col items-center justify-center
-                        h-full rounded-[28px] p-6 md:p-8
-                        bg-gradient-to-br from-white to-[#e8eaed]
-                        border border-white/80
-                        cursor-pointer
-                        hover-card-premium
+                        relative overflow-hidden
+                        w-20 h-20 rounded-full mb-4
+                        flex items-center justify-center
+                        bg-gradient-to-br from-[#f5f7fa] to-[#e8eaed]
+                        shadow-[4px_4px_10px_rgba(174,180,190,0.5),_-4px_-4px_10px_rgba(255,255,255,1)]
+                        transition-all duration-300
+                        group-hover:from-[#ff6b6b] group-hover:to-[#e53935]
+                        group-hover:shadow-[4px_4px_14px_rgba(229,57,53,0.35),_-3px_-3px_10px_rgba(255,200,200,0.6)]
                       "
                     >
-                      {/* Gloss sheen */}
                       <span
-                        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/65 to-transparent"
+                        className="pointer-events-none absolute top-[6px] left-[10px] w-10 h-5 rounded-full bg-[radial-gradient(ellipse,rgba(255,255,255,0.75)_0%,transparent_70%)]"
                         aria-hidden
                       />
-
-                      {/* Icon orb */}
-                      <div
-                        className="
-                          relative overflow-hidden
-                          w-20 h-20 rounded-full mb-4
-                          flex items-center justify-center
-                          bg-gradient-to-br from-[#f5f7fa] to-[#e8eaed]
-                          shadow-[4px_4px_10px_rgba(174,180,190,0.5),_-4px_-4px_10px_rgba(255,255,255,1)]
-                          transition-all duration-300
-                          group-hover:from-[#ff6b6b] group-hover:to-[#e53935]
-                          group-hover:shadow-[4px_4px_14px_rgba(229,57,53,0.35),_-3px_-3px_10px_rgba(255,200,200,0.6)]
-                        "
-                      >
-                        <span
-                          className="pointer-events-none absolute top-[6px] left-[10px] w-10 h-5 rounded-full bg-[radial-gradient(ellipse,rgba(255,255,255,0.75)_0%,transparent_70%)]"
-                          aria-hidden
+                      {/* If category has an image, show it; else show icon */}
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-10 h-10 object-cover rounded-full group-hover:brightness-0 group-hover:invert transition-all"
                         />
-                        {/* If category has an image, show it; else show icon */}
-                        {cat.image ? (
-                          <img
-                            src={cat.image}
-                            alt={cat.name}
-                            className="w-10 h-10 object-cover rounded-full group-hover:brightness-0 group-hover:invert transition-all"
-                          />
-                        ) : (
-                          <IconComponent
-                            className="w-7 h-7 md:w-8 md:h-8 text-primary transition-colors duration-300 group-hover:text-white"
-                          />
-                        )}
-                      </div>
-
-                      {/* Label */}
-                      <span
-                        className="font-semibold text-sm md:text-base text-center text-slate-700 mt-1 transition-colors duration-200 group-hover:text-primary"
-                      >
-                        {cat.name}
-                      </span>
+                      ) : (
+                        <IconComponent
+                          className="w-7 h-7 md:w-8 md:h-8 text-primary transition-colors duration-300 group-hover:text-white"
+                        />
+                      )}
                     </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+
+                    {/* Label */}
+                    <span
+                      className="font-semibold text-sm md:text-base text-center text-slate-700 mt-1 transition-colors duration-200 group-hover:text-primary"
+                    >
+                      {cat.name}
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </motion.div>
       )}
 

@@ -91,7 +91,10 @@ export function CategorizedHero({
   };
 
   const handleViewRateCard = () => {
-    router.push(`/services/${id}/rate-card`);
+    const target = document.getElementById("specialized-services");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
@@ -100,7 +103,7 @@ export function CategorizedHero({
         <div className="grid grid-cols-1 md:grid-cols-[1fr_420px] lg:grid-cols-[1fr_460px] gap-8 md:gap-12 items-center">
 
           {/* ── Left Content ── */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 min-w-0">
             {/* Badges */}
             <div className="flex flex-wrap gap-2">
               <div className="inline-flex items-center gap-2 bg-[#fff0f0] text-[#FF7C71] px-4 py-1.5 rounded-full text-xs font-semibold">
@@ -161,13 +164,13 @@ export function CategorizedHero({
             </p>
 
             {/* ── Action Buttons ── */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full sm:w-auto">
+            <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 pt-2 w-full sm:w-auto">
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={handleBookNow}
                 className="flex items-center justify-center gap-2 bg-[#FF7C71] hover:bg-[#E5675D]
-                  text-white px-7 py-3.5 rounded-full font-semibold text-sm
+                  text-white px-7 py-3.5 rounded-full font-semibold text-xs sm:text-sm
                   transition-all shadow-lg shadow-rose-100 cursor-pointer w-full sm:w-auto"
               >
                 <Calendar className="w-4 h-4" />
@@ -180,10 +183,10 @@ export function CategorizedHero({
                 onClick={handleViewRateCard}
                 className="flex items-center justify-center gap-2 bg-white border border-slate-200
                   hover:border-slate-300 hover:bg-slate-50
-                  px-7 py-3.5 rounded-full font-semibold text-slate-700 text-sm
+                  px-7 py-3.5 rounded-full font-semibold text-slate-700 text-xs sm:text-sm
                   transition-all cursor-pointer w-full sm:w-auto"
               >
-                View Rate Card
+                Rate Card
               </motion.button>
             </div>
           </div>
