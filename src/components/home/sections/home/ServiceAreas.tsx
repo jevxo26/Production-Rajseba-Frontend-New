@@ -15,7 +15,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 70, damping: 14 } },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 85, damping: 16 } },
 } as const;
 
 export default function ServiceAreas() {
@@ -50,20 +50,20 @@ export default function ServiceAreas() {
   const isLoading = isDivisionsLoading || isDistrictsLoading;
 
   return (
-    <section className="py-12 md:py-16 overflow-hidden">
+    <section className="py-10 md:py-16 lg:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
           <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
             <MapPin size={13} />
             Coverage Areas
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center justify-center gap-2">
-            <Building2 className="w-7 h-7 text-[#FF7C71]" />
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+            <Building2 className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
             We Serve Across Bangladesh
           </h2>
-          <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
             {isLoading
               ? "Loading our coverage areas..."
               : `Rajseba is available in ${activeCount} divisions with ${totalDistricts} districts and verified professionals ready to serve you.`}
@@ -100,7 +100,7 @@ export default function ServiceAreas() {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, amount: 0.15 }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
           >
             {areas.map((area) => (

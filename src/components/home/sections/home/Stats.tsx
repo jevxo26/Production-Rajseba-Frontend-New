@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import { Users, Wrench, Star, ShieldCheck, TrendingUp, BarChart3 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const stats = [
   { id: 1, label: 'Happy Customers', value: 50000, suffix: '+', display: '50,000+', icon: Users },
@@ -79,25 +80,35 @@ export default function Stats() {
   }, []);
 
   return (
-    <div className="py-8 md:py-12 mt-15 bg-transparent relative" ref={ref}>
+    <div className="py-10 md:py-16 lg:py-20 bg-transparent relative" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
-        {/* Title */}
-        <div className="mb-10 md:mb-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+            <TrendingUp size={13} />
+            Our Impact
+          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
             <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
             Our Platform Impact
           </h2>
-
-          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
             Providing top-notch home services with trust and excellence
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ type: "spring", stiffness: 85, damping: 16 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center"
+        >
           {stats.map((stat) => (
             <StatCard key={stat.id} stat={stat} triggered={triggered} />
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </div>

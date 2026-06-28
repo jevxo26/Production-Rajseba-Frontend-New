@@ -30,19 +30,25 @@ export default function FAQ() {
   };
 
   return (
-    <div className="py-16 md:py-24 bg-transparent">
+    <div className="py-10 md:py-16 lg:py-20 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ type: "spring", stiffness: 85, damping: 16 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-start"
+        >
 
           {/* Left — Text */}
           <div className="md:sticky md:top-24">
-            <span className="text-sm font-medium tracking-widest uppercase text-[#FF7C71] block mb-3">
+            <span className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-4">
               Got questions?
             </span>
-            <h2 className="text-3xl md:text-4xl text-slate-800 font-semibold leading-tight mb-4">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-slate-500 text-base leading-relaxed mb-8">
+            <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-8">
               Find answers to the most common questions about our services and booking process.
             </p>
 
@@ -106,7 +112,7 @@ export default function FAQ() {
             })}
           </div>
 
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -43,33 +43,35 @@ const containerVariants = {
 } as const;
 
 const nodeVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       type: "spring",
-      stiffness: 80,
-      damping: 14
+      stiffness: 85,
+      damping: 16
     }
   }
 } as const;
 
 const HowItWorks = () => {
   return (
-    <div className=" py-8 md:py-12 mt-15 overflow-hidden relative">
+    <div className="py-10 md:py-16 lg:py-20 overflow-hidden relative">
       {/* Decorative light blurs */}
       {/* <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF7C71]/5 blur-[90px] rounded-full pointer-events-none" /> */}
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         {/* Header Block */}
-        <div className="mb-10 md:mb-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-            <Workflow className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+            <Workflow size={13} />
+            Timeline
+          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
             {HOW_IT_WORKS_CONTENT.title}
           </h2>
-
-          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
             {HOW_IT_WORKS_CONTENT.subtitle}
           </p>
         </div>
@@ -147,7 +149,7 @@ const HowItWorks = () => {
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.15 }}
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 lg:gap-12 z-10 relative"
           >
             {HOW_IT_WORKS_CONTENT.steps.map((step, i) => (

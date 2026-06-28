@@ -44,25 +44,28 @@ const containerVariants = {
 } as const;
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 70, damping: 14 },
+    transition: { type: "spring", stiffness: 85, damping: 16 },
   },
 } as const;
 
 export default function WhyChooseUs() {
   return (
-    <div className="bg-transparent mt-15 py-8 md:py-12 overflow-hidden">
+    <div className="py-10 md:py-16 lg:py-20 bg-transparent overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="mb-10 md:mb-12 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
-            <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+            <ShieldCheck size={13} />
+            Safety First
+          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
             {WHY_CHOOSE_US_CONTENT.title}
           </h2>
-
-          <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
             {WHY_CHOOSE_US_CONTENT.subtitle}
           </p>
         </div>
@@ -71,7 +74,7 @@ export default function WhyChooseUs() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-10"
         >
           {WHY_CHOOSE_US_CONTENT.features.map((feature, i) => {

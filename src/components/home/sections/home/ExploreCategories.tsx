@@ -58,18 +58,21 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<any>> = {
 
 const FALLBACK_ICON = LayoutGrid;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+} as const;
+
 const cardVariants = {
-  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { type: "spring", stiffness: 70, damping: 14 },
+    transition: { type: "spring", stiffness: 85, damping: 16 },
   },
   exit: {
     opacity: 0,
     y: 16,
-    scale: 0.96,
     transition: { duration: 0.18, ease: "easeIn" },
   },
 } as const;
@@ -81,18 +84,19 @@ const ExploreCategories = () => {
   const categories: any[] = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 lg:py-20 overflow-hidden">
       {/* Header */}
-      <div className="space-y-4 mb-8 md:mb-10">
-        <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2 flex items-center justify-center gap-2">
-            <LayoutGrid className="w-6 h-6 text-[#FF7C71]" />
-            Explore Categories
-          </h2>
-          <p className="text-slate-500 text-sm max-w-md mx-auto">
-            Choose from our wide range of professional, verified home services
-          </p>
+      <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+        <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+          <LayoutGrid size={13} />
+          Categories
         </div>
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Explore Categories
+        </h2>
+        <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+          Choose from our wide range of professional, verified home services
+        </p>
       </div>
 
       {/* Loading state */}
@@ -113,6 +117,10 @@ const ExploreCategories = () => {
       {!isLoading && !isError && categories.length > 0 && (
         <motion.div
           layout
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
           className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5 md:gap-6"
         >
           <AnimatePresence mode="popLayout">
@@ -131,8 +139,6 @@ const ExploreCategories = () => {
                 <motion.div
                   key={cat.id}
                   variants={cardVariants}
-                  initial="hidden"
-                  animate="visible"
                   exit="exit"
                   whileTap={{ scale: 0.97 }}
                   layout

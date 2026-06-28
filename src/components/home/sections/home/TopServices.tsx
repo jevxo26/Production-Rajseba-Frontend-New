@@ -29,11 +29,11 @@ const containerVariants = {
 } as const;
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 70, damping: 14 },
+    transition: { type: "spring", stiffness: 85, damping: 16 },
   },
 } as const;
 
@@ -71,7 +71,7 @@ export default function TopServices() {
   // Show skeleton if loading
   if (isLoading) {
     return (
-      <section className="py-24 bg-white">
+      <section className="py-10 md:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-16">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 animate-pulse" />
@@ -135,40 +135,32 @@ export default function TopServices() {
   };
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden">
+    <section className="py-10 md:py-16 lg:py-20 bg-white relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-1/3 h-[500px] bg-gradient-to-bl from-rose-50/50 to-transparent rounded-bl-full pointer-events-none" />
       <div className="absolute -left-32 bottom-0 w-96 h-96 bg-blue-50/50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold uppercase tracking-wider mb-4">
-              <Star size={14} className="fill-current" />
-              Most Booked
-            </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Top Rated Services
-            </h2>
-            <p className="mt-4 text-slate-500 text-lg md:text-xl font-medium max-w-lg">
-              Hand-picked professional services highly rated by our community.
-            </p>
+        
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-[#FF7C71] text-xs font-bold uppercase tracking-wider mb-3">
+            <Star size={13} className="fill-[#FF7C71]" />
+            Most Booked
           </div>
-          <Button variant="outline" className="hidden md:flex rounded-xl font-bold h-12 px-6 border-slate-200 hover:border-[#FF7C71] hover:text-[#FF7C71] hover:bg-rose-50/50 group" asChild>
-            <Link href="/services">
-              View All Services
-              <svg className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </Button>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Top Rated Services
+          </h2>
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            Hand-picked professional services highly rated by our community.
+          </p>
         </div>
 
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-40px" }}
+          viewport={{ once: true, amount: 0.15 }}
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
         >
           {displayServices.map((service: any, i: number) => {
@@ -281,6 +273,19 @@ export default function TopServices() {
           })}
         </motion.div >
 
+        {/* View All Button */}
+        {!isLoading && !isError && displayServices.length > 0 && (
+          <div className="flex justify-center mt-10 md:mt-12">
+            <Button variant="outline" className="rounded-xl font-bold h-12 px-6 border-slate-200 hover:border-[#FF7C71] hover:text-[#FF7C71] hover:bg-rose-50/50 group" asChild>
+              <Link href="/services">
+                View All Services
+                <svg className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </Button>
+          </div>
+        )}
 
         {/* Empty state */}
         {

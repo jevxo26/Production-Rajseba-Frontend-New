@@ -57,27 +57,25 @@ export default function SpecialOffers() {
   };
 
   return (
-    <section className="py-12 md:py-16 overflow-hidden">
+    <section className="py-10 md:py-16 lg:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
-              <Sparkles size={13} />
-              Featured Promotions
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2">
-              <Zap className="w-7 h-7 text-[#FF7C71]" />
-              Special Deals & Packages
-            </h2>
-            <p className="text-slate-500 text-sm mt-1 max-w-md">
-              Grab exclusive deals and combo service packages prepared for your home care.
-            </p>
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14 flex flex-col items-center">
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+            <Sparkles size={13} />
+            Featured Promotions
           </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+            <Zap className="w-6 h-6 md:w-8 md:h-8 text-[#FF7C71]" />
+            Special Deals & Packages
+          </h2>
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            Grab exclusive deals and combo service packages prepared for your home care.
+          </p>
 
           {/* Live Countdown */}
-          <div className="flex items-center gap-2.5 bg-slate-900 text-white px-4 py-2.5 rounded-2xl self-start sm:self-auto shadow-lg shadow-slate-900/10">
+          <div className="mt-5 flex items-center gap-2.5 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-lg shadow-slate-900/10">
             <Clock size={15} className="text-[#FF7C71] animate-pulse" />
             <span className="text-xs font-semibold text-slate-400">Offer ends in</span>
             <span className="text-sm font-black tabular-nums text-[#FF7C71]">{countdown}</span>
@@ -108,7 +106,7 @@ export default function SpecialOffers() {
               variants={containerVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, amount: 0.15 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             >
               {displayPackages.map((pkg, index) => (

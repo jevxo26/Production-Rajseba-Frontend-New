@@ -53,6 +53,12 @@ export default function ServiceCard({ service }: { service: ServiceListing }) {
     }
   };
 
+  const truncatedDesc = service.description
+    ? service.description.length > 150
+      ? service.description.slice(0, 150) + "..."
+      : service.description
+    : "";
+
   return (
     <Link
       href={`/services/${service.id}`}
@@ -95,8 +101,8 @@ export default function ServiceCard({ service }: { service: ServiceListing }) {
         <h3 className="text-sm font-bold text-[#1a1a1a] mb-1 leading-snug">
           {service.title}
         </h3>
-        <p className="text-xs text-[#6b7280] leading-relaxed flex-1">
-          {service.description}
+        <p className="text-xs text-[#6b7280] leading-relaxed flex-1 line-clamp-3">
+          {truncatedDesc}
         </p>
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#f3f4f6]">
           <span className="text-base font-extrabold text-[#FF7C71]">

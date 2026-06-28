@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Star, Quote, MessageSquare, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetPublicReviewsQuery } from "@/redux/features/landing/landingApi";
+import { motion } from "framer-motion";
 
 // Fallback testimonials
 const FALLBACK_TESTIMONIALS = [
@@ -103,44 +104,22 @@ const Testimonials = () => {
       setActiveIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
     }, 4500);
     return () => clearInterval(timer);
-  }, [maxIndex]);
-
-  return (
-    <div className="py-12 md:py-16">
+  }, [maxIndex]); return (
+    <div className="py-10 md:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
-              <MessageSquare size={13} />
-              Customer Reviews
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
-              What Our Clients Say
-            </h2>
-            <p className="text-slate-500 text-sm mt-1 max-w-sm">
-              Trusted by thousands of happy homes across Bangladesh.
-            </p>
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+          <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+            <MessageSquare size={13} />
+            Customer Reviews
           </div>
-
-          {/* Nav controls */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
-              disabled={activeIndex === 0}
-              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={() => setActiveIndex((p) => Math.min(maxIndex, p + 1))}
-              disabled={activeIndex === maxIndex}
-              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+            What Our Clients Say
+          </h2>
+          <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            Trusted by thousands of happy homes across Bangladesh.
+          </p>
         </div>
 
         {/* Loading */}
@@ -152,7 +131,13 @@ const Testimonials = () => {
 
         {/* Carousel */}
         {!isLoading && (
-          <div className="overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ type: "spring", stiffness: 85, damping: 16 }}
+            className="overflow-hidden"
+          >
             <div
               className="flex transition-transform duration-700 ease-out animate-none"
               style={{ transform: `translateX(-${activeIndex * (100 / cardsToShow)}%)` }}
@@ -204,20 +189,36 @@ const Testimonials = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Dot indicators */}
+        {/* Navigation & Dot indicators */}
         {!isLoading && testimonials.length > cardsToShow && (
-          <div className="flex justify-center gap-1.5 mt-6">
-            {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${i === activeIndex ? "w-6 bg-[#FF7C71]" : "w-1.5 bg-slate-200"
-                  }`}
-              />
-            ))}
+          <div className="flex items-center justify-center gap-6 mt-8">
+            <button
+              onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
+              disabled={activeIndex === 0}
+              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <div className="flex gap-1.5">
+              {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveIndex(i)}
+                  className={`h-1.5 rounded-full transition-all ${i === activeIndex ? "w-6 bg-[#FF7C71]" : "w-1.5 bg-slate-200"
+                    }`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={() => setActiveIndex((p) => Math.min(maxIndex, p + 1))}
+              disabled={activeIndex === maxIndex}
+              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
