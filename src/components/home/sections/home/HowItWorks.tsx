@@ -57,7 +57,7 @@ const nodeVariants = {
 
 const HowItWorks = () => {
   return (
-    <div className="py-10 md:py-16 lg:py-20 overflow-hidden relative">
+    <div className="py-5 md:py-16 lg:py-20 overflow-hidden relative">
       {/* Decorative light blurs */}
       {/* <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF7C71]/5 blur-[90px] rounded-full pointer-events-none" /> */}
 

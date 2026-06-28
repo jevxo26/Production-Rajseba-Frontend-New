@@ -57,7 +57,7 @@ export default function SpecialOffers() {
   };
 
   return (
-    <section className="py-10 md:py-16 lg:py-20 overflow-hidden">
+    <section className="py-5 md:py-16 lg:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}

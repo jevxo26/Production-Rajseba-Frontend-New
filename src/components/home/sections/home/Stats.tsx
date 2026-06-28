@@ -80,7 +80,7 @@ export default function Stats() {
   }, []);
 
   return (
-    <div className="py-10 md:py-16 lg:py-20 bg-transparent relative" ref={ref}>
+    <div className="py-5 md:py-16 lg:py-20 bg-transparent relative" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Header */}

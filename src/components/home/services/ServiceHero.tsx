@@ -174,7 +174,7 @@ const ServiceHero = () => {
               return (
                 <Link
                   key={cat.id}
-                  href={pillHref}
+                  href={`/categories/${cat.id}`}
                   className={`flex items-center gap-2 px-4 py-2 rounded-full border font-extrabold text-xs transition-all duration-200 hover:-translate-y-0.5 no-underline cursor-pointer shadow-sm ${
                     isActive
                       ? "border-[#FF7C71] text-[#FF7C71] bg-[#FFF8F7]"

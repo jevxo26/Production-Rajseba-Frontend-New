@@ -100,10 +100,10 @@ export default function Footer() {
 
       {/* ── Main Content ── */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-10">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-8 sm:gap-10">
 
           {/* Brand Column */}
-          <div className="sm:col-span-2 lg:col-span-1 xl:col-span-2 space-y-6">
+          <div className="col-span-2 sm:col-span-2 lg:col-span-1 xl:col-span-2 space-y-6">
             <Link href="/" aria-label="Rajseba home">
               <Image
                 src="/logo.png"
@@ -153,7 +153,7 @@ export default function Footer() {
           </div>
 
           {/* Categories */}
-          <div className="space-y-4">
+          <div className="col-span-1 space-y-4">
             <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase">Categories</h3>
             <ul className="space-y-2.5 text-sm">
               {apiCategories.length > 0
@@ -181,7 +181,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
+          <div className="col-span-1 space-y-4">
             <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase">Quick Links</h3>
             <ul className="space-y-2.5 text-sm">
               {QUICK_LINKS.map((l) => (
@@ -199,7 +199,7 @@ export default function Footer() {
           </div>
 
           {/* Account + Newsletter */}
-          <div className="space-y-8">
+          <div className="col-span-2 sm:col-span-2 lg:col-span-1 space-y-8">
 
 
 

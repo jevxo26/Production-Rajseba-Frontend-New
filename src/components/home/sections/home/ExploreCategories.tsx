@@ -84,7 +84,7 @@ const ExploreCategories = () => {
   const categories: any[] = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 lg:py-20 overflow-hidden">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-5 md:py-16 lg:py-20 overflow-hidden">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
         <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">

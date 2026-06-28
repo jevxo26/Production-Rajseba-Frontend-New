@@ -1,19 +1,17 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { Star, Quote, MessageSquare, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetPublicReviewsQuery } from "@/redux/features/landing/landingApi";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Fallback testimonials
+// Fallback high-quality testimonials
 const FALLBACK_TESTIMONIALS = [
   {
     name: "Adnan Sami",
     location: "Gulshan, Dhaka",
     rating: 5,
-    comment: "The AC service was professional and on-time. Best experience in Dhaka so far.",
+    comment: "The AC service was professional and on-time. Best service experience in Dhaka so far.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-    accent: "from-[#FF7C71] to-rose-500",
   },
   {
     name: "Mehjabin R.",
@@ -21,15 +19,13 @@ const FALLBACK_TESTIMONIALS = [
     rating: 5,
     comment: "Finding a reliable plumber was impossible before Rajseba. Life-changing app!",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-    accent: "from-violet-500 to-purple-600",
   },
   {
     name: "Saif Islam",
     location: "Banani, Dhaka",
     rating: 5,
-    comment: "Fast, reliable and high-quality cleaning service. I highly recommend them.",
+    comment: "Fast, reliable and high-quality cleaning service. I highly recommend them to everyone.",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
-    accent: "from-emerald-500 to-teal-600",
   },
   {
     name: "Tasnim Jahan",
@@ -37,7 +33,6 @@ const FALLBACK_TESTIMONIALS = [
     rating: 5,
     comment: "Very satisfied with the plumbing repair. Diagnosed and fixed quickly at a great price.",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop",
-    accent: "from-amber-500 to-orange-500",
   },
   {
     name: "Adnan Chowdhury",
@@ -45,7 +40,6 @@ const FALLBACK_TESTIMONIALS = [
     rating: 5,
     comment: "Courteous electricians who fixed my wiring issues professionally. Even cleaned up after!",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop",
-    accent: "from-blue-500 to-cyan-500",
   },
   {
     name: "Sabrina Yasmin",
@@ -53,17 +47,7 @@ const FALLBACK_TESTIMONIALS = [
     rating: 5,
     comment: "Booked a deep cleaning — they exceeded expectations. Spotless corners, great team!",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-    accent: "from-pink-500 to-rose-500",
   },
-];
-
-const ACCENTS = [
-  "from-[#FF7C71] to-rose-500",
-  "from-[#FF7C71] to-orange-500",
-  "from-rose-500 to-pink-650",
-  "from-amber-500 to-[#FF7C71]",
-  "from-[#FF7C71] to-pink-500",
-  "from-orange-500 to-red-500",
 ];
 
 const Testimonials = () => {
@@ -73,17 +57,25 @@ const Testimonials = () => {
   const { data: reviewsRes, isLoading } = useGetPublicReviewsQuery();
   const rawReviews: any[] = reviewsRes?.data || (Array.isArray(reviewsRes) ? reviewsRes : []);
 
-  const testimonials = rawReviews.length > 0
-    ? rawReviews.map((r: any, i: number) => ({
+  // Filter out low-quality/placeholder reviews (less than 10 chars)
+  const realReviews = rawReviews
+    .filter((r: any) => {
+      const comment = r.comment || r.content || r.review || "";
+      return comment.trim().length > 10;
+    })
+    .map((r: any) => ({
       name: r.user?.name || "Valued Customer",
       location: r.user?.profile?.address || "Dhaka, Bangladesh",
       rating: r.rating || 5,
       comment: r.comment || r.content || r.review || "",
       avatar: r.user?.profile?.avatar ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(r.user?.name || "U")}&background=FF5A5F&color=fff&size=100`,
-      accent: ACCENTS[i % ACCENTS.length],
-    }))
-    : FALLBACK_TESTIMONIALS;
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(r.user?.name || "U")}&background=FF7C71&color=fff&size=100`,
+    }));
+
+  // Combine real reviews with fallbacks to always guarantee at least 5 testimonials for the slider
+  const testimonials = realReviews.length >= 5
+    ? realReviews
+    : [...realReviews, ...FALLBACK_TESTIMONIALS.slice(0, 5 - realReviews.length)];
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -99,17 +91,31 @@ const Testimonials = () => {
     if (activeIndex > maxIndex) setActiveIndex(maxIndex);
   }, [cardsToShow, maxIndex]);
 
+  // Autoplay slider every 5 seconds
   useEffect(() => {
+    if (maxIndex === 0) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
-  }, [maxIndex]); return (
-    <div className="py-10 md:py-16 lg:py-20">
+  }, [maxIndex]);
+
+  // Framer Motion drag end handler for swipe capability
+  const handleDragEnd = (event: any, info: any) => {
+    const swipeThreshold = 50;
+    if (info.offset.x < -swipeThreshold && activeIndex < maxIndex) {
+      setActiveIndex((prev) => prev + 1);
+    } else if (info.offset.x > swipeThreshold && activeIndex > 0) {
+      setActiveIndex((prev) => prev - 1);
+    }
+  };
+
+  return (
+    <div className="py-5 md:py-16 lg:py-20 relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-12">
           <div className="inline-flex items-center gap-2 bg-[#FF7C71]/10 border border-[#FF7C71]/20 text-[#FF7C71] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
             <MessageSquare size={13} />
             Customer Reviews
@@ -124,101 +130,117 @@ const Testimonials = () => {
 
         {/* Loading */}
         {isLoading && (
-          <div className="flex justify-center py-10">
+          <div className="flex justify-center py-12">
             <Loader2 className="w-7 h-7 animate-spin text-[#FF7C71]" />
           </div>
         )}
 
-        {/* Carousel */}
+        {/* Simple & Premium Slider */}
         {!isLoading && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.15 }}
-            transition={{ type: "spring", stiffness: 85, damping: 16 }}
-            className="overflow-hidden"
-          >
-            <div
-              className="flex transition-transform duration-700 ease-out animate-none"
-              style={{ transform: `translateX(-${activeIndex * (100 / cardsToShow)}%)` }}
-            >
-              {testimonials.map((test: any, idx: number) => (
-                <div key={idx} className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-2.5">
-                  {/* Card */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col justify-between h-[210px] md:h-[220px]">
+          <div className="relative select-none">
+            <div className="overflow-hidden cursor-grab active:cursor-grabbing px-1 py-3">
+              <motion.div
+                className="flex gap-4"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragEnd={handleDragEnd}
+                animate={{ x: `-${activeIndex * (100 / cardsToShow)}%` }}
+                transition={{ type: "spring", stiffness: 100, damping: 18 }}
+                style={{ width: "100%" }}
+              >
+                {testimonials.map((test: any, idx: number) => {
+                  const cardWidthPct = 100 / cardsToShow;
+                  const gapAdjustment = ((cardsToShow - 1) * 16) / cardsToShow;
 
-                    {/* Colored top bar */}
-                    <div className={`h-1 w-full bg-gradient-to-r ${test.accent}`} />
-
-                    <div className="p-5 flex flex-col justify-between flex-1">
-                      {/* Quote icon + stars row */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${test.accent} flex items-center justify-center`}>
-                          <Quote size={14} className="text-white fill-white" />
-                        </div>
-                        <div className="flex gap-0.5">
-                          {[...Array(Math.min(test.rating || 5, 5))].map((_, i) => (
-                            <Star key={i} size={13} className="text-amber-400 fill-amber-400" />
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Comment */}
-                      <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 flex-1 mb-2 italic">
-                        "{test.comment}"
-                      </p>
-
-                      {/* Author */}
-                      <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
-                        <img
-                          src={test.avatar}
-                          alt={test.name}
-                          className="w-9 h-9 rounded-full object-cover border-2 border-slate-100 flex-shrink-0"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(test.name)}&background=FF5A5F&color=fff&size=80`;
-                          }}
-                        />
+                  return (
+                    <div
+                      key={idx}
+                      className="flex-shrink-0"
+                      style={{
+                        width: `calc(${cardWidthPct}% - ${gapAdjustment}px)`,
+                      }}
+                    >
+                      {/* Simple Card Design */}
+                      <div className="bg-white rounded-3xl border border-slate-100/80 p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between h-[230px] md:h-[220px]">
                         <div>
-                          <h4 className="font-bold text-slate-900 text-xs leading-tight">{test.name}</h4>
-                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">{test.location}</p>
+                          {/* Stars and Quote */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex gap-0.5">
+                              {[...Array(Math.min(test.rating || 5, 5))].map((_, i) => (
+                                <Star key={i} size={14} className="text-amber-400 fill-amber-400" />
+                              ))}
+                            </div>
+                            <Quote className="w-8 h-8 text-[#FF7C71]/15" />
+                          </div>
+
+                          {/* Client Comment */}
+                          <p className="text-slate-600 text-sm leading-relaxed line-clamp-3 italic">
+                            "{test.comment}"
+                          </p>
+                        </div>
+
+                        {/* Author info */}
+                        <div className="flex items-center gap-3 pt-4 border-t border-slate-50 mt-auto">
+                          <img
+                            src={test.avatar}
+                            alt={test.name}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 flex-shrink-0"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                `https://ui-avatars.com/api/?name=${encodeURIComponent(test.name)}&background=FF5A5F&color=fff&size=80`;
+                            }}
+                          />
+                          <div>
+                            <h4 className="font-extrabold text-slate-800 text-xs md:text-sm leading-tight">
+                              {test.name}
+                            </h4>
+                            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                              {test.location}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </motion.div>
             </div>
-          </motion.div>
-        )}
 
-        {/* Navigation & Dot indicators */}
-        {!isLoading && testimonials.length > cardsToShow && (
-          <div className="flex items-center justify-center gap-6 mt-8">
-            <button
-              onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
-              disabled={activeIndex === 0}
-              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <div className="flex gap-1.5">
-              {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+            {/* Premium Dots Indicators & Arrows */}
+            {testimonials.length > cardsToShow && (
+              <div className="flex items-center justify-between mt-8 max-w-xs mx-auto px-4">
                 <button
-                  key={i}
-                  onClick={() => setActiveIndex(i)}
-                  className={`h-1.5 rounded-full transition-all ${i === activeIndex ? "w-6 bg-[#FF7C71]" : "w-1.5 bg-slate-200"
-                    }`}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setActiveIndex((p) => Math.min(maxIndex, p + 1))}
-              disabled={activeIndex === maxIndex}
-              className="w-9 h-9 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight size={16} />
-            </button>
+                  onClick={() => setActiveIndex((p) => Math.max(0, p - 1))}
+                  disabled={activeIndex === 0}
+                  className="w-8 h-8 rounded-full border border-slate-150 flex items-center justify-center text-slate-400 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <div className="flex gap-1.5">
+                  {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveIndex(i)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === activeIndex ? "w-5 bg-[#FF7C71]" : "w-1.5 bg-slate-200"
+                      }`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setActiveIndex((p) => Math.min(maxIndex, p + 1))}
+                  disabled={activeIndex === maxIndex}
+                  className="w-8 h-8 rounded-full border border-slate-150 flex items-center justify-center text-slate-400 hover:border-[#FF7C71] hover:text-[#FF7C71] disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -71,7 +71,7 @@ export default function TopServices() {
   // Show skeleton if loading
   if (isLoading) {
     return (
-      <section className="py-10 md:py-16 lg:py-20 bg-white">
+      <section className="py-5 md:py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-16">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 animate-pulse" />
@@ -135,7 +135,7 @@ export default function TopServices() {
   };
 
   return (
-    <section className="py-10 md:py-16 lg:py-20 bg-white relative overflow-hidden">
+    <section className="py-5 md:py-16 lg:py-20 bg-white relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-1/3 h-[500px] bg-gradient-to-bl from-rose-50/50 to-transparent rounded-bl-full pointer-events-none" />
       <div className="absolute -left-32 bottom-0 w-96 h-96 bg-blue-50/50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />

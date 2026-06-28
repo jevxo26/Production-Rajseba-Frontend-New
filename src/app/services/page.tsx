@@ -27,7 +27,7 @@ const Services = () => {
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
-      <div className="relative z-10 space-y-16 md:space-y-24 lg:space-y-32">
+      <div className="relative space-y-16 md:space-y-24 lg:space-y-32">
         <TrendingServices />
         <ServiceLists />
         <CategorizedSections />
