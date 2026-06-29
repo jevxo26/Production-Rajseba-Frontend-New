@@ -1,413 +1,63 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, ShieldCheck, XCircle, Check, Eye, MoreVertical, Trash2, Edit2, Contact } from "lucide-react";
-import { useState, useEffect } from "react";
-import { CustomTable } from "@/components/ui/table";
-import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
-import { useGetAllRolesQuery } from "@/redux/features/admin/role";
-import { useCreateProfileMutation, useUpdateProfileMutation } from "@/redux/features/admin/profile";
-import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
-import { toast } from "sonner";
-import { LocationCascader } from "@/components/ui/LocationCascader";
-
-interface EmployeeItem {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  joined: string;
-  phone?: string;
-  rating?: string;
-  categoryName?: string;
-  profileId?: number;
-  categoryIds?: number[];
-  location?: string;
-  description?: string;
-  min_starting_price?: number;
-  google_map_link?: string;
-}
+import { ShieldAlert, Contact } from "lucide-react";
+import EmployeeModal from "./components/EmployeeModal";
+import EmployeeViewModal from "./components/EmployeeViewModal";
+import EmployeeTable from "./components/EmployeeTable";
+import { useEmployeeState } from "./hooks/useEmployeeState";
 
 export default function EmployeesPage() {
-  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
-  const currentUser = useAppSelector((state) => state.auth.user);
-  const role = typeof rawRole === 'string' ? rawRole.toLowerCase() : (rawRole as any)?.name?.toLowerCase() || "superadmin";
-
-  const [employees, setEmployees] = useState<EmployeeItem[]>([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<EmployeeItem | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [step, setStep] = useState<1 | 2>(1);
-  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
-  const [createdEmployeeId, setCreatedEmployeeId] = useState<number | null>(null);
-
-  const [selectedDevision, setSelectedDevision] = useState<string>("");
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedArea, setSelectedArea] = useState<string>("");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<EmployeeItem | null>(null);
-
-  // Connect APIs
-  const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
-  const { data: rolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
-  const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
-
-  const [updateUserMut] = useUpdateUserMutation();
-  const [createUserMut, { isLoading: isCreating }] = useCreateUserMutation();
-  const [deleteUserMut] = useDeleteUserMutation();
-  const [createProfileMut, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
-  const [updateProfileMut, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
-
-  const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
-
-  useEffect(() => {
-    const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
-    if (apiUsers && apiUsers.length > 0) {
-      // Filter only employees
-      const employeeUsers = apiUsers.filter((u: any) =>
-        u.role?.name === "Employee" || u.role === "Employee"
-      );
-
-      const mappedUsers = employeeUsers.map((u: any) => ({
-        id: u.id || u._id || `EMP-${Math.floor(Math.random() * 1000)}`,
-        name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown User',
-        email: u.email || 'No Email',
-        phone: u.phone || u.phoneNumber || 'No Phone',
-        role: u.role?.name || (typeof u.role === 'string' ? u.role : 'Employee'),
-        status: u.status?.toLowerCase() || 'inactive',
-        joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Unknown',
-        rating: u.profile?.rating || 'New',
-        categoryName: u.profile?.categories?.length > 0 ? u.profile.categories.map((c: any) => c.name).join(', ') : 'Unassigned',
-        profileId: u.profile?.id,
-        categoryIds: u.profile?.categories?.map((c: any) => c.id) || [],
-        location: u.profile?.location || '',
-        description: u.profile?.description || '',
-        min_starting_price: u.profile?.min_starting_price || 0,
-        google_map_link: u.profile?.google_map_link || '',
-      }));
-      setEmployees(mappedUsers);
-    } else {
-      setEmployees([]);
-    }
-  }, [apiUsersRes]);
-
-  const vendorOptions = (apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []))
-    .filter((u: any) => u.role?.name === "Vendor" || u.role === "Vendor")
-    .map((u: any) => ({
-      id: u.id || u._id,
-      name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown Vendor',
-    }));
-
-  const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    // Find Employee role ID
-    const roles = rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []);
-    const employeeRole = roles.find((r: any) => r.name === "Employee");
-
-    if (!employeeRole) {
-      toast.error("Employee role not found in the database!");
-      return;
-    }
-
-    const userData = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      roleId: Number(employeeRole.id || employeeRole._id),
-      vendor_id: role === "vendor" ? Number(currentUser?.id) : (formData.get("vendor_id") ? Number(formData.get("vendor_id")) : undefined),
-      vendor_unique_id: null,
-    };
-
-    try {
-      // 1. Create User
-      const userRes = await createUserMut(userData).unwrap();
-      const newUserId = userRes.data?.id || userRes.id;
-
-      setCreatedUserId(newUserId);
-      setCreatedEmployeeId(newUserId);
-      toast.success("Employee account created! Now complete their profile.");
-      setStep(2);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.data?.message || err.message || "Failed to create employee account.");
-    }
-  };
-
-  const handleCreateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!createdEmployeeId) {
-      toast.error("User ID missing. Start over.");
-      return;
-    }
-
-    const formData = new FormData(e.currentTarget);
-    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
-
-    const profileData = {
-      user_id: createdEmployeeId,
-      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
-      type: formData.get("type")?.toString() || "personal",
-      location: formData.get("location")?.toString() || "",
-      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
-      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
-      area_id: selectedArea ? Number(selectedArea) : undefined,
-      description: formData.get("description")?.toString() || "",
-      company_name: formData.get("company_name")?.toString() || "",
-      min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
-      google_map_link: formData.get("google_map_link")?.toString() || "",
-    };
-
-    try {
-      await createProfileMut(profileData).unwrap();
-      toast.success("Employee profile completed successfully!");
-      closeCreateModal();
-      refetch();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.data?.message || err.message || "Failed to create profile.");
-    }
-  };
-
-  const handleEditEmployee = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!editingEmployee) return;
-
-    const formData = new FormData(e.currentTarget);
-    const categoryIds = formData.getAll("category_ids").map(id => Number(id));
-
-    try {
-      // 1. Update User
-      await updateUserMut({
-        id: editingEmployee.id,
-        data: {
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-        }
-      }).unwrap();
-
-      // 2. Update or Create Profile
-      const profileData = {
-        category_ids: categoryIds.length > 0 ? categoryIds : [],
-        location: formData.get("location")?.toString() || "",
-        description: formData.get("description")?.toString() || "",
-        min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
-        google_map_link: formData.get("google_map_link")?.toString() || "",
-      };
-
-      if (editingEmployee.profileId) {
-        await updateProfileMut({
-          id: editingEmployee.profileId,
-          data: profileData
-        }).unwrap();
-      } else {
-        await createProfileMut({
-          ...profileData,
-          user_id: Number(editingEmployee.id),
-          type: "personal"
-        }).unwrap();
-      }
-
-      toast.success("Employee updated successfully!");
-      setIsEditModalOpen(false);
-      setEditingEmployee(null);
-      refetch();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.data?.message || err.message || "Failed to update employee.");
-    }
-  };
-
-  const closeCreateModal = () => {
-    setIsAddModalOpen(false);
-    setStep(1);
-    setCreatedUserId(null);
-    setCreatedEmployeeId(null);
-    setSelectedDevision("");
-    setSelectedDistrict("");
-    setSelectedArea("");
-  };
-
-  // Verification and Status update actions
-  const handleActivate = async (id: string) => {
-    setEmployees(prev => prev.map(u => u.id === id ? { ...u, status: "active" as const } : u));
-    try { await updateUserMut({ id, data: { status: "active" } }).unwrap(); } catch (e) { console.error(e); }
-  };
-
-  const handleDeactivate = async (id: string) => {
-    setEmployees(prev => prev.map(u => u.id === id ? { ...u, status: "inactive" as const } : u));
-    try { await updateUserMut({ id, data: { status: "inactive" } }).unwrap(); } catch (e) { console.error(e); }
-  };
-
-  const handleBlock = async (id: string) => {
-    setEmployees(prev => prev.map(u => u.id === id ? { ...u, status: "blocked" as const } : u));
-    try { await updateUserMut({ id, data: { status: "blocked" } }).unwrap(); } catch (e) { console.error(e); }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this employee?")) return;
-    try {
-      await deleteUserMut(id).unwrap();
-      toast.success("Employee deleted successfully!");
-      refetch();
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.data?.message || "Failed to delete employee.");
-    }
-  };
+  const {
+    role,
+    employees,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    selectedUser,
+    setSelectedUser,
+    openDropdownId,
+    setOpenDropdownId,
+    step,
+    selectedDevision,
+    setSelectedDevision,
+    selectedDistrict,
+    setSelectedDistrict,
+    selectedArea,
+    setSelectedArea,
+    isEditModalOpen,
+    setIsEditModalOpen,
+    editingEmployee,
+    setEditingEmployee,
+    isUsersLoading,
+    isCategoriesLoading,
+    allCategories,
+    vendorOptions,
+    isCreating,
+    isCreatingProfile,
+    isUpdatingProfile,
+    handleCreateUser,
+    handleCreateProfile,
+    handleEditEmployee,
+    closeCreateModal,
+    handleActivate,
+    handleDeactivate,
+    handleBlock,
+    handleDelete,
+  } = useEmployeeState();
 
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   if (!isAuthenticated) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center animate-in fade-in duration-200">
-        <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4"><ShieldAlert size={48} /></div>
+        <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4">
+          <ShieldAlert size={48} />
+        </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">Please log in to access this panel.</p>
       </div>
     );
   }
-
-  // Column definitions for CustomTable
-  const columns = [
-    {
-      key: "name",
-      header: "Employee Details",
-      render: (user: EmployeeItem) => (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-center">
-            {user.name.split(" ").map(n => n[0]).join("")}
-          </div>
-          <div>
-            <p className="font-bold text-slate-900 leading-none">{user.name}</p>
-            <p className="text-xs text-slate-400 mt-1">{user.email}</p>
-            {user.phone && user.phone !== 'No Phone' && (
-              <p className="text-[11px] text-slate-500 font-medium mt-0.5">{user.phone}</p>
-            )}
-          </div>
-        </div>
-      )
-    },
-    {
-      key: "categoryName",
-      header: "Category",
-      render: (user: EmployeeItem) => (
-        <span className="font-bold text-slate-600 text-xs">{user.categoryName}</span>
-      )
-    },
-    {
-      key: "joined",
-      header: "Joined Date"
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (user: EmployeeItem) => (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${user.status === "active"
-          ? "bg-emerald-50 text-emerald-700"
-          : user.status === "blocked"
-            ? "bg-[#FFF8F4] text-[#E0530A]"
-            : "bg-slate-100 text-slate-600"
-          }`}>
-          {user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1) : ''}
-        </span>
-      )
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      render: (user: EmployeeItem) => (
-        <div className="relative flex justify-end">
-          <button
-            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <MoreVertical size={16} />
-          </button>
-
-          {openDropdownId === user.id && (
-            <>
-              {/* Dark Blur Backdrop */}
-              <div
-                className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 animate-in fade-in duration-200"
-                onClick={() => setOpenDropdownId(null)}
-              />
-
-              {/* Action Modal */}
-              <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 p-5 animate-in fade-in zoom-in-95 duration-200 text-left">
-                <div className="pb-3 border-b border-slate-100 mb-3">
-                  <h3 className="text-sm font-extrabold text-slate-900">Employee Actions</h3>
-                  <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{user.name}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <button
-                    onClick={() => { setSelectedUser(user); setOpenDropdownId(null); }}
-                    className="w-full text-left px-3 py-2.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                  >
-                    <Eye size={15} className="text-slate-400" /> View Details
-                  </button>
-
-                  <button
-                    onClick={() => { setEditingEmployee(user); setIsEditModalOpen(true); setOpenDropdownId(null); }}
-                    className="w-full text-left px-3 py-2.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                  >
-                    <Edit2 size={15} className="text-slate-400" /> Edit Details
-                  </button>
-
-                  {user.status !== "active" && (
-                    <button
-                      onClick={() => { handleActivate(user.id); setOpenDropdownId(null); }}
-                      className="w-full text-left px-3 py-2.5 text-xs text-emerald-600 hover:bg-emerald-50 flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                    >
-                      <ShieldCheck size={15} /> Activate
-                    </button>
-                  )}
-
-                  {user.status !== "inactive" && (
-                    <button
-                      onClick={() => { handleDeactivate(user.id); setOpenDropdownId(null); }}
-                      className="w-full text-left px-3 py-2.5 text-xs text-amber-600 hover:bg-amber-50 flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                    >
-                      <XCircle size={15} /> Deactivate
-                    </button>
-                  )}
-
-                  {user.status !== "blocked" && (
-                    <button
-                      onClick={() => { handleBlock(user.id); setOpenDropdownId(null); }}
-                      className="w-full text-left px-3 py-2.5 text-xs text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                    >
-                      <XCircle size={15} /> Block
-                    </button>
-                  )}
-
-                  <div className="h-px bg-slate-100 my-2" />
-
-                  <button
-                    onClick={() => { handleDelete(user.id); setOpenDropdownId(null); }}
-                    className="w-full text-left px-3 py-2.5 text-xs text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2.5 font-semibold rounded-xl transition-all cursor-pointer"
-                  >
-                    <Trash2 size={15} /> Delete
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => setOpenDropdownId(null)}
-                  className="w-full mt-4 bg-slate-50 hover:bg-slate-100 text-slate-500 text-xs font-bold py-2.5 rounded-xl transition-all text-center cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      )
-    }
-  ];
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -432,7 +82,6 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {/* Loading State */}
       {isUsersLoading ? (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
           <div className="w-8 h-8 border-2 border-[#FF6014] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
@@ -443,242 +92,68 @@ export default function EmployeesPage() {
           <p className="text-sm text-slate-400 font-medium">No employees found.</p>
         </div>
       ) : (
-        <CustomTable
-          columns={columns}
-          data={employees}
-          searchKey="name"
-          searchPlaceholder="Search employees by name..."
-          filterKey="status"
-          filterPlaceholder="All Statuses"
-          filterOptions={[
-            { label: "Active", value: "active" },
-            { label: "Inactive", value: "inactive" },
-            { label: "Blocked", value: "blocked" }
-          ]}
-          pageSize={10}
+        <EmployeeTable
+          employees={employees}
+          openDropdownId={openDropdownId}
+          setOpenDropdownId={setOpenDropdownId}
+          setSelectedUser={setSelectedUser}
+          setEditingEmployee={setEditingEmployee}
+          setIsEditModalOpen={setIsEditModalOpen}
+          handleActivate={handleActivate}
+          handleDeactivate={handleDeactivate}
+          handleBlock={handleBlock}
+          handleDelete={handleDelete}
         />
       )}
 
       {/* Add Employee Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">
-                {step === 1 ? "Step 1: Employee Account" : "Step 2: Employee Profile"}
-              </h2>
-              <button onClick={closeCreateModal} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
-                <XCircle size={24} />
-              </button>
-            </div>
-
-            {step === 1 ? (
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
-                  <input name="name" type="text" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="Jane Doe" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
-                  <input name="email" type="email" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="jane@example.com" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
-                  <input name="phone" type="tel" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="01XXXXXXXXX" />
-                </div>
-                {role !== "vendor" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Vendor</label>
-                    <select name="vendor_id" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all">
-                      <option value="">No Vendor (Optional)</option>
-                      {isUsersLoading ? (
-                        <option value="" disabled>Loading vendors...</option>
-                      ) : (
-                        vendorOptions.map((v: any) => (
-                          <option key={v.id} value={v.id}>{v.name}</option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-                )}
-                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                  <button type="button" onClick={closeCreateModal} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={isCreating} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
-                    {isCreating ? "Saving..." : "Next Step"}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={handleCreateProfile} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
-                  <select multiple name="category_ids" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all h-24">
-                    {isCategoriesLoading ? (
-                      <option value="" disabled>Loading categories...</option>
-                    ) : (
-                      allCategories.map((c: any) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <LocationCascader
-                    selectedDevisionId={selectedDevision}
-                    selectedDistrictId={selectedDistrict}
-                    selectedAreaId={selectedArea}
-                    onDevisionChange={setSelectedDevision}
-                    onDistrictChange={setSelectedDistrict}
-                    onAreaChange={setSelectedArea}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Specific Location (Optional)</label>
-                  <input name="location" type="text" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="City, Region" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
-                  <textarea name="description" rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all resize-none" placeholder="Briefly describe the employee's skills..."></textarea>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
-                    <input name="min_starting_price" type="number" step="0.01" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="0.00" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
-                    <input name="google_map_link" type="url" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all" placeholder="https://maps.google.com/..." />
-                  </div>
-                </div>
-                <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                  <button type="submit" disabled={isCreatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
-                    {isCreatingProfile ? "Saving..." : "Complete Profile"}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
+        <EmployeeModal
+          mode="create"
+          step={step}
+          closeCreateModal={closeCreateModal}
+          handleCreateUser={handleCreateUser}
+          isCreating={isCreating}
+          handleCreateProfile={handleCreateProfile}
+          isCreatingProfile={isCreatingProfile}
+          role={role}
+          vendorOptions={vendorOptions}
+          isUsersLoading={isUsersLoading}
+          isCategoriesLoading={isCategoriesLoading}
+          allCategories={allCategories}
+          selectedDevision={selectedDevision}
+          setSelectedDevision={setSelectedDevision}
+          selectedDistrict={selectedDistrict}
+          setSelectedDistrict={setSelectedDistrict}
+          selectedArea={selectedArea}
+          setSelectedArea={setSelectedArea}
+        />
       )}
 
       {/* Edit Employee Modal */}
       {isEditModalOpen && editingEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">
-                Edit Employee
-              </h2>
-              <button onClick={() => { setIsEditModalOpen(false); setEditingEmployee(null); }} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
-                <XCircle size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleEditEmployee} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-              <h3 className="font-bold text-slate-700 border-b pb-2 mb-2">Account Details</h3>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
-                <input name="name" type="text" defaultValue={editingEmployee.name} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
-                <input name="email" type="email" defaultValue={editingEmployee.email} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
-                <input name="phone" type="tel" defaultValue={editingEmployee.phone !== 'No Phone' ? editingEmployee.phone : ''} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-              </div>
-
-              <h3 className="font-bold text-slate-700 border-b pb-2 mb-2 mt-4">Profile Details</h3>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories (Hold Ctrl/Cmd to select multiple)</label>
-                <select multiple name="category_ids" defaultValue={editingEmployee.categoryIds?.map(String)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all h-24">
-                  {isCategoriesLoading ? (
-                    <option value="" disabled>Loading categories...</option>
-                  ) : (
-                    allCategories.map((c: any) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
-                <input name="location" type="text" defaultValue={editingEmployee.location} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
-                <textarea name="description" rows={3} defaultValue={editingEmployee.description} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all resize-none"></textarea>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
-                  <input name="min_starting_price" type="number" step="0.01" defaultValue={editingEmployee.min_starting_price} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
-                  <input name="google_map_link" type="url" defaultValue={editingEmployee.google_map_link} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all" />
-                </div>
-              </div>
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                <button type="button" onClick={() => { setIsEditModalOpen(false); setEditingEmployee(null); }} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-                  Cancel
-                </button>
-                <button type="submit" disabled={isUpdatingProfile} className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50">
-                  {isUpdatingProfile ? "Saving..." : "Update Employee"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <EmployeeModal
+          mode="edit"
+          editingEmployee={editingEmployee}
+          handleEditEmployee={handleEditEmployee}
+          isUpdatingProfile={isUpdatingProfile}
+          role={role}
+          vendorOptions={vendorOptions}
+          isUsersLoading={isUsersLoading}
+          isCategoriesLoading={isCategoriesLoading}
+          allCategories={allCategories}
+          selectedDevision={selectedDevision}
+          setSelectedDevision={setSelectedDevision}
+          selectedDistrict={selectedDistrict}
+          setSelectedDistrict={setSelectedDistrict}
+          selectedArea={selectedArea}
+          setSelectedArea={setSelectedArea}
+          setIsEditModalOpen={setIsEditModalOpen}
+          setEditingEmployee={setEditingEmployee}
+        />
       )}
 
-      {/* View Modal */}
-      {selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Employee Details</h2>
-              <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
-                <XCircle size={24} />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Name</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.name}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Email</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.email}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Phone</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.phone}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Category</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.categoryName}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Status</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.status}</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-slate-50">
-                <span className="text-sm text-slate-500 font-medium">Joined Date</span>
-                <span className="text-sm font-bold text-slate-900">{selectedUser.joined}</span>
-              </div>
-            </div>
-            <div className="pt-6 flex justify-end">
-              <button onClick={() => setSelectedUser(null)} className="px-5 py-2.5 text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 rounded-xl transition-all">
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EmployeeViewModal selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
     </div>
   );
 }

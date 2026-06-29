@@ -1,313 +1,72 @@
 "use client";
 
-import { useAppSelector } from "@/redux/hooks";
-import {
-  ShieldAlert,
-  Trash2,
-  PlusCircle,
-  Edit2,
-  X,
-  Wrench,
-  Image as ImageIcon,
-  Sparkles,
-  Layers,
-  Tag,
-  Globe,
-  Eye,
-  User,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { CustomTable } from "@/components/ui/table";
-import type { TableAction } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomSelect } from "@/components/ui/select";
-import {
-  useGetAllServicesQuery,
-  useCreateServiceMutation,
-  useUpdateServiceMutation,
-  useDeleteServiceMutation,
-  Service,
-} from "@/redux/features/admin/service";
-import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
-import { useGetAllUsersQuery } from "@/redux/features/admin/user";
-import { toast } from "sonner";
-import { uploadImage } from "@/lib/upload";
+import { ShieldAlert, PlusCircle, Wrench } from "lucide-react";
+import ServiceModal from "./components/ServiceModal";
+import DeleteServiceModal from "./components/DeleteServiceModal";
+import ServiceTable from "./components/ServiceTable";
+import { useServiceState } from "./hooks/useServiceState";
 
 export default function AdminServicesManagementPage() {
-  const router = useRouter();
-  const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
-  const role =
-    typeof rawRole === "string"
-      ? rawRole.toLowerCase().replace(/\s+/g, "")
-      : "client";
-
-  // APIs
   const {
-    data: apiServicesRes,
-    isLoading: isServicesLoading,
-    refetch: refetchServices,
-  } = useGetAllServicesQuery();
-  const { data: apiCategoriesRes } = useGetAllCategoriesQuery();
-  const { data: apiUsersRes } = useGetAllUsersQuery();
-
-  const [createMut, { isLoading: isCreating }] = useCreateServiceMutation();
-  const [updateMut, { isLoading: isUpdating }] = useUpdateServiceMutation();
-  const [deleteMut] = useDeleteServiceMutation();
-
-  const [services, setServices] = useState<Service[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Service | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<Service | null>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-
-  // Form states
-  const [name, setName] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [overview, setOverview] = useState("");
-  const [details, setDetails] = useState("");
-  const [faq, setFaq] = useState<{ question: string, answer: string }[]>([]);
-  const [image, setImage] = useState("");
-  const [categoryId, setCategoryId] = useState("NONE");
-  const [vendorId, setVendorId] = useState("NONE");
-  const [employeeIds, setEmployeeIds] = useState<number[]>([]);
-  const [agentCommissionPercentage, setAgentCommissionPercentage] = useState("0");
-
-  const allCategories =
-    apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
-
-  const categoryOptions = [
-    { value: "NONE", label: "Select a Category" },
-    ...allCategories.map((c: any) => ({
-      value: String(c.id),
-      label: c.name,
-    })),
-  ];
-
-  const allUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
-
-  const vendorOptions = [
-    { value: "NONE", label: "Select a Vendor" },
-    ...allUsers.filter((u: any) => u.role?.name?.toLowerCase() === "vendor" || (typeof u.role === 'string' && u.role.toLowerCase() === "vendor")).map((u: any) => ({
-      value: String(u.id || u._id),
-      label: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
-    })),
-  ];
-
-  const employeeOptions = (categoryId === "NONE" || vendorId === "NONE") ? [] : allUsers
-    .filter((u: any) => u.role?.name === "Employee" || u.role === "Employee")
-    .filter((u: any) => String(u.profile?.category?.id) === categoryId)
-    .filter((u: any) => String(u.vendor?.id || u.vendor) === vendorId)
-    .map((u: any) => ({
-      id: Number(u.id || u._id),
-      name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
-    }));
-
-  useEffect(() => {
-    const all: Service[] =
-      apiServicesRes?.data || (Array.isArray(apiServicesRes) ? apiServicesRes : []);
-    setServices(all);
-  }, [apiServicesRes]);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsUploadingImage(true);
-    try {
-      const url = await uploadImage(file);
-      setImage(url);
-      toast.success("Image uploaded!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to upload image");
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-  const resetForm = () => {
-    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setOverview(""); setDetails(""); setFaq([]); setImage(""); setCategoryId("NONE"); setVendorId("NONE"); setEmployeeIds([]); setAgentCommissionPercentage("0");
-  };
-
-  const openCreateModal = () => {
-    setEditingItem(null);
-    resetForm();
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (item: Service) => {
-    setEditingItem(item);
-    setName(item.name);
-    setSubtitle(item.subtitle || "");
-    setSlug(item.slug);
-    setDescription(item.description || "");
-    setOverview(item.overview || "");
-    setDetails(item.details || "");
-    setFaq(item.faq || []);
-    setImage(item.image || "");
-    setCategoryId(item.category_id ? String(item.category_id) : "NONE");
-    setVendorId(item.vendor ? String(item.vendor.id) : "NONE");
-    setEmployeeIds(item.employees ? item.employees.map((e: any) => Number(e.id)) : []);
-    setAgentCommissionPercentage(item.agent_commission_percentage ? String(item.agent_commission_percentage) : "0");
-    setIsModalOpen(true);
-  };
-
-  const openDeleteModal = (item: Service) => {
-    setItemToDelete(item);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) { toast.error("Service name is required"); return; }
-    if (!slug.trim()) { toast.error("Slug is required"); return; }
-    try {
-      if (editingItem) {
-        await updateMut({
-          id: editingItem.id!,
-          data: {
-            name: name.trim(),
-            subtitle: subtitle.trim() || undefined,
-            slug: slug.trim(),
-            description: description.trim() || undefined,
-            overview: overview.trim() || undefined,
-            details: details.trim() || undefined,
-            faq: faq.length > 0 ? faq : undefined,
-            image: image || undefined,
-            category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
-            vendor_id: vendorId !== "NONE" ? Number(vendorId) : undefined,
-            employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
-            agent_commission_percentage: Number(agentCommissionPercentage) || 0,
-          },
-        }).unwrap();
-        toast.success("Service updated successfully!");
-      } else {
-        await createMut({
-          name: name.trim(),
-          subtitle: subtitle.trim() || undefined,
-          slug: slug.trim(),
-          description: description.trim() || undefined,
-          overview: overview.trim() || undefined,
-          details: details.trim() || undefined,
-          faq: faq.length > 0 ? faq : undefined,
-          image: image || undefined,
-          category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
-          vendor_id: vendorId !== "NONE" ? Number(vendorId) : undefined,
-          employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
-          agent_commission_percentage: Number(agentCommissionPercentage) || 0,
-        }).unwrap();
-        toast.success("Service created successfully!");
-      }
-      setIsModalOpen(false);
-      refetchServices();
-    } catch (err: any) {
-      toast.error(err.data?.message || err.message || "Failed to save service");
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!itemToDelete) return;
-    try {
-      await deleteMut(itemToDelete.id!).unwrap();
-      toast.success("Service deleted successfully!");
-      setIsDeleteModalOpen(false);
-      setItemToDelete(null);
-      refetchServices();
-    } catch (err: any) {
-      toast.error(err.data?.message || err.message || "Failed to delete service");
-    }
-  };
+    role,
+    isServicesLoading,
+    services,
+    isModalOpen,
+    setIsModalOpen,
+    editingItem,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    itemToDelete,
+    setItemToDelete,
+    isUploadingImage,
+    name,
+    setName,
+    slug,
+    setSlug,
+    subtitle,
+    setSubtitle,
+    categoryId,
+    setCategoryId,
+    agentCommissionPercentage,
+    setAgentCommissionPercentage,
+    vendorId,
+    setVendorId,
+    employeeIds,
+    setEmployeeIds,
+    description,
+    setDescription,
+    overview,
+    setOverview,
+    details,
+    setDetails,
+    faq,
+    setFaq,
+    image,
+    setImage,
+    categoryOptions,
+    vendorOptions,
+    employeeOptions,
+    handleImageUpload,
+    openCreateModal,
+    openEditModal,
+    openDeleteModal,
+    handleSubmit,
+    handleDelete,
+    isCreating,
+    isUpdating,
+  } = useServiceState();
 
   if (role !== "superadmin" && role !== "agent") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center animate-in fade-in duration-200">
-        <div className="p-4 bg-rose-50 rounded-2xl text-rose-500 mb-4"><ShieldAlert size={48} /></div>
+        <div className="p-4 bg-rose-50 rounded-2xl text-rose-500 mb-4">
+          <ShieldAlert size={48} />
+        </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">This panel is restricted to Administrators and Agents.</p>
       </div>
     );
   }
-
-  const columns = [
-    {
-      key: "name",
-      header: "Service Details",
-      render: (item: Service) => (
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-rose-100/40">
-            {item.image ? (
-              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-            ) : (
-              <Wrench size={20} />
-            )}
-          </div>
-          <div>
-            <p className="font-bold text-slate-900 leading-none">{item.name}</p>
-            {item.subtitle && <p className="text-xs text-slate-400 mt-1">{item.subtitle}</p>}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "slug",
-      header: "Slug",
-      render: (item: Service) => (
-        <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 font-mono font-bold text-xs px-2.5 py-1 rounded-xl">
-          <Globe size={11} />{item.slug}
-        </span>
-      ),
-    },
-    {
-      key: "category",
-      header: "Category",
-      render: (item: Service | any) => (
-        <span className="inline-flex items-center gap-1.5 bg-indigo-50/70 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-indigo-100/50">
-          <Tag size={11} />
-          {item.category?.name || (item.category_id ? `Cat #${item.category_id}` : "—")}
-        </span>
-      ),
-    },
-    {
-      key: "vendor",
-      header: "Vendor",
-      render: (item: Service | any) => (
-        <span className="inline-flex items-center gap-1.5 bg-emerald-50/70 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-emerald-100/50">
-          <User size={11} />
-          {item.vendor?.name || (item.vendor_id ? `Vendor #${item.vendor_id}` : "—")}
-        </span>
-      ),
-    },
-    {
-      key: "commission",
-      header: "Agent Commission",
-      render: (item: Service | any) => (
-        <span className="inline-flex items-center gap-1.5 bg-amber-50/70 text-amber-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-amber-100/50">
-          <Sparkles size={11} />
-          {item.agent_commission_percentage ? `${item.agent_commission_percentage}%` : "0%"}
-        </span>
-      ),
-    },
-    {
-      key: "createdAt",
-      header: "Created",
-      render: (item: Service) => (
-        <span className="text-slate-400 text-xs font-medium">
-          {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "—"}
-        </span>
-      ),
-    },
-  ];
-
-  const tableActions: TableAction<Service>[] = [
-    { label: "View Details", icon: Eye, onClick: (item) => router.push(`/dashbord/services/${item.id || (item as any)._id}`), variant: "default" },
-    ...(role === "superadmin" ? [
-      { label: "Edit", icon: Edit2, onClick: openEditModal, variant: "secondary" as const },
-      { label: "Delete", icon: Trash2, onClick: openDeleteModal, variant: "destructive" as const },
-    ] : []),
-  ];
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -334,7 +93,7 @@ export default function AdminServicesManagementPage() {
 
       {/* Table */}
       {isServicesLoading ? (
-        <div className="flex items-center justify-center py-20 bg-white border border-slate-100 rounded-3xl shadow-premium">
+        <div className="flex items-center justify-center py-20 bg-white border border-slate-100 rounded-3xl shadow-sm">
           <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : services.length === 0 ? (
@@ -344,202 +103,70 @@ export default function AdminServicesManagementPage() {
           </div>
           <h3 className="text-base font-bold text-slate-800">No Services Found</h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">Start by creating your first service.</p>
-          <button onClick={openCreateModal} className="mt-4 bg-rose-50 hover:bg-rose-100 text-rose-500 font-bold px-4 py-2 rounded-xl text-xs transition-all">
+          <button
+            onClick={openCreateModal}
+            className="mt-4 bg-rose-50 hover:bg-rose-100 text-rose-500 font-bold px-4 py-2 rounded-xl text-xs transition-all"
+          >
             Add New Service
           </button>
         </div>
       ) : (
-        <CustomTable columns={columns} data={services} actions={tableActions} searchKey="name" searchPlaceholder="Search services..." pageSize={10} />
+        <ServiceTable
+          services={services}
+          role={role}
+          openEditModal={openEditModal}
+          openDeleteModal={openDeleteModal}
+        />
       )}
 
       {/* Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="text-rose-500" size={20} />
-                {editingItem ? "Edit Service" : "Create New Service"}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all">
-                <X size={18} />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Service Name *</label>
-                <Input
-                  placeholder="e.g. AC Repairing"
-                  value={name}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setName(val);
-                    setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
-                  }}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Slug *</label>
-                <Input placeholder="e.g. ac-repairing" value={slug} onChange={(e) => setSlug(e.target.value)} required />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Subtitle</label>
-                <Input placeholder="Short tagline" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
-                <CustomSelect options={categoryOptions} value={categoryId} onChange={setCategoryId} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Agent Commission (%)</label>
-                <Input type="number" min="0" max="100" placeholder="e.g. 5" value={agentCommissionPercentage} onChange={(e) => setAgentCommissionPercentage(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Vendor</label>
-                <CustomSelect options={vendorOptions} value={vendorId} onChange={setVendorId} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
-                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
-                  {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
-                    <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30"
-                        checked={employeeIds.includes(emp.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setEmployeeIds([...employeeIds, emp.id]);
-                          else setEmployeeIds(employeeIds.filter(id => id !== emp.id));
-                        }}
-                      />
-                      <span className="text-sm text-slate-700">{emp.name}</span>
-                    </label>
-                  )) : (
-                    <span className="text-xs text-slate-400">No employees found.</span>
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</label>
-                <Textarea
-                  placeholder="Describe this service..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={2}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Overview</label>
-                <Textarea
-                  placeholder="Service overview..."
-                  value={overview}
-                  onChange={(e) => setOverview(e.target.value)}
-                  rows={2}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Details</label>
-                <Textarea
-                  placeholder="Detailed information..."
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
-                  rows={3}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:border-rose-400/80 transition-all w-full"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">FAQs</label>
-                  <button type="button" onClick={() => setFaq([...faq, { question: '', answer: '' }])} className="text-xs text-brand-primary font-bold hover:underline flex items-center gap-1">
-                    <PlusCircle size={12} /> Add FAQ
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {faq.map((f, i) => (
-                    <div key={i} className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 relative">
-                      <button type="button" onClick={() => setFaq(faq.filter((_, idx) => idx !== i))} className="absolute -top-2 -right-2 bg-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white rounded-full p-1 transition-colors">
-                        <X size={12} />
-                      </button>
-                      <Input placeholder="Question" value={f.question} onChange={(e) => {
-                        const newFaq = [...faq];
-                        newFaq[i].question = e.target.value;
-                        setFaq(newFaq);
-                      }} />
-                      <Textarea placeholder="Answer" rows={2} value={f.answer} onChange={(e) => {
-                        const newFaq = [...faq];
-                        newFaq[i].answer = e.target.value;
-                        setFaq(newFaq);
-                      }} className="text-sm rounded-xl" />
-                    </div>
-                  ))}
-                  {faq.length === 0 && <p className="text-xs text-slate-400 italic">No FAQs added yet.</p>}
-                </div>
-              </div>
-              {/* Image Upload */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Service Image</label>
-                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                  <div className="w-14 h-14 bg-white border border-slate-200/80 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 relative group shadow-sm">
-                    {image ? (
-                      <>
-                        <img src={image} alt="Preview" className="w-full h-full object-cover" />
-                        <button type="button" onClick={() => setImage("")} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-150 rounded-2xl">
-                          <Trash2 size={14} />
-                        </button>
-                      </>
-                    ) : (
-                      <ImageIcon className="text-slate-400" size={20} />
-                    )}
-                  </div>
-                  <label className="cursor-pointer bg-brand-primary hover:bg-brand-dark text-white text-[10px] font-bold px-3 py-2 rounded-lg inline-flex items-center gap-1.5 transition-all active:scale-[0.98]">
-                    {isUploadingImage ? "Uploading..." : "Browse Photo"}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploadingImage} className="hidden" />
-                  </label>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Cancel</button>
-                <button type="submit" disabled={isCreating || isUpdating || isUploadingImage} className="bg-brand-primary hover:bg-brand-dark disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-[0.98] shadow-md shadow-brand-primary/10">
-                  {editingItem ? "Update Service" : "Create Service"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ServiceModal
+          editingItem={editingItem}
+          setIsModalOpen={setIsModalOpen}
+          handleSubmit={handleSubmit}
+          name={name}
+          setName={setName}
+          slug={slug}
+          setSlug={setSlug}
+          subtitle={subtitle}
+          setSubtitle={setSubtitle}
+          categoryOptions={categoryOptions}
+          categoryId={categoryId}
+          setCategoryId={setCategoryId}
+          agentCommissionPercentage={agentCommissionPercentage}
+          setAgentCommissionPercentage={setAgentCommissionPercentage}
+          vendorOptions={vendorOptions}
+          vendorId={vendorId}
+          setVendorId={setVendorId}
+          employeeOptions={employeeOptions}
+          employeeIds={employeeIds}
+          setEmployeeIds={setEmployeeIds}
+          description={description}
+          setDescription={setDescription}
+          overview={overview}
+          setOverview={setOverview}
+          details={details}
+          setDetails={setDetails}
+          faq={faq}
+          setFaq={setFaq}
+          image={image}
+          setImage={setImage}
+          isUploadingImage={isUploadingImage}
+          handleImageUpload={handleImageUpload}
+          isCreating={isCreating}
+          isUpdating={isUpdating}
+        />
       )}
 
       {/* Delete Modal */}
-      {isDeleteModalOpen && itemToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900">Delete Service</h2>
-              <button onClick={() => { setIsDeleteModalOpen(false); setItemToDelete(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"><X size={18} /></button>
-            </div>
-            <div className="p-6 space-y-6 text-center">
-              <div className="flex flex-col items-center gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm">
-                  {itemToDelete.image ? <img src={itemToDelete.image} alt={itemToDelete.name} className="w-full h-full object-cover" /> : <Wrench className="text-slate-400" size={28} />}
-                </div>
-                <div>
-                  <span className="font-mono text-slate-400 font-bold text-xs">ID: {itemToDelete.id}</span>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">{itemToDelete.name}</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">/{itemToDelete.slug}</p>
-                </div>
-              </div>
-              <p className="text-sm text-slate-500 max-w-xs mx-auto">Are you sure you want to delete this service? All nested services and packages under it may also be affected.</p>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" onClick={() => { setIsDeleteModalOpen(false); setItemToDelete(null); }} className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Cancel</button>
-                <button onClick={handleDelete} className="bg-[#FF464C] hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-[0.98] shadow-md shadow-red-500/10">Delete</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteServiceModal
+        isDeleteModalOpen={isDeleteModalOpen}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        itemToDelete={itemToDelete}
+        setItemToDelete={setItemToDelete}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 }

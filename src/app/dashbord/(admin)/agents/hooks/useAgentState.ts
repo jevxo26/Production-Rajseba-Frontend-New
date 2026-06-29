@@ -1,0 +1,212 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import { toast } from "sonner";
+import { useGetAllUsersQuery, useUpdateUserMutation, useCreateUserMutation, useDeleteUserMutation } from "@/redux/features/admin/user";
+import { useGetAllRolesQuery } from "@/redux/features/admin/role";
+import { useCreateProfileMutation } from "@/redux/features/admin/profile";
+import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
+
+interface AgentItem {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  joined: string;
+  phone?: string;
+  rating?: string;
+  categoryName?: string;
+}
+
+export function useAgentState() {
+  const [agents, setAgents] = useState<AgentItem[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<AgentItem | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
+  const [step, setStep] = useState<1 | 2>(1);
+  const [createdUserId, setCreatedUserId] = useState<number | null>(null);
+
+  const [selectedDevision, setSelectedDevision] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedArea, setSelectedArea] = useState<string>("");
+
+  const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
+  const { data: rolesRes } = useGetAllRolesQuery();
+  const { data: apiCategoriesRes, isLoading: isCategoriesLoading } = useGetAllCategoriesQuery();
+
+  const [updateUserMut] = useUpdateUserMutation();
+  const [createUserMut, { isLoading: isCreatingUser }] = useCreateUserMutation();
+  const [deleteUserMut] = useDeleteUserMutation();
+  const [createProfileMut, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
+
+  const allCategories = apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
+
+  useEffect(() => {
+    const apiUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
+    if (apiUsers && apiUsers.length > 0) {
+      const agentUsers = apiUsers.filter((u: any) => u.role?.name === "Agent" || u.role === "Agent");
+
+      const mappedUsers = agentUsers.map((u: any) => ({
+        id: u.id || u._id || `AGT-${Math.floor(Math.random() * 1000)}`,
+        name: u.name || `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Unknown User",
+        email: u.email || "No Email",
+        phone: u.phone || u.phoneNumber || "No Phone",
+        role: u.role?.name || (typeof u.role === "string" ? u.role : "Agent"),
+        status: u.status?.toLowerCase() || "inactive",
+        joined: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "Unknown",
+        rating: u.profile?.rating || "New",
+        categoryName: u.profile?.category?.name || "Unassigned",
+      }));
+      setAgents(mappedUsers);
+    } else {
+      setAgents([]);
+    }
+  }, [apiUsersRes]);
+
+  const handleCreateUser = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const roles = rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []);
+    const agentRole = roles.find((r: any) => r.name === "Agent");
+
+    if (!agentRole) {
+      toast.error("Agent role not found in the database!");
+      return;
+    }
+
+    const userData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      roleId: Number(agentRole.id || agentRole._id),
+    };
+
+    try {
+      const userRes = await createUserMut(userData).unwrap();
+      const newUserId = userRes.data?.id || userRes.id;
+      setCreatedUserId(newUserId);
+      toast.success("Agent user created! Now complete the profile.");
+      setStep(2);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.data?.message || err.message || "Failed to create agent user.");
+    }
+  };
+
+  const handleCreateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!createdUserId) {
+      toast.error("User ID missing. Start over.");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const categoryIds = formData.getAll("category_ids").map((id) => Number(id));
+
+    const profileData = {
+      user_id: createdUserId,
+      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
+      type: "personal",
+      location: formData.get("location")?.toString() || "",
+      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
+      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
+      area_id: selectedArea ? Number(selectedArea) : undefined,
+      description: formData.get("description")?.toString() || "",
+      min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
+      google_map_link: formData.get("google_map_link")?.toString() || "",
+    };
+
+    try {
+      await createProfileMut(profileData).unwrap();
+      toast.success("Agent profile created successfully!");
+      closeModal();
+      refetch();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.data?.message || err.message || "Failed to create agent profile.");
+    }
+  };
+
+  const closeModal = () => {
+    setIsAddModalOpen(false);
+    setStep(1);
+    setCreatedUserId(null);
+    setSelectedDevision("");
+    setSelectedDistrict("");
+    setSelectedArea("");
+  };
+
+  const handleActivate = async (id: string) => {
+    setAgents((prev) => prev.map((u) => (u.id === id ? { ...u, status: "active" } : u)));
+    try {
+      await updateUserMut({ id, data: { status: "active" } }).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDeactivate = async (id: string) => {
+    setAgents((prev) => prev.map((u) => (u.id === id ? { ...u, status: "inactive" } : u)));
+    try {
+      await updateUserMut({ id, data: { status: "inactive" } }).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleBlock = async (id: string) => {
+    setAgents((prev) => prev.map((u) => (u.id === id ? { ...u, status: "blocked" } : u)));
+    try {
+      await updateUserMut({ id, data: { status: "blocked" } }).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this agent?")) return;
+    try {
+      await deleteUserMut(id).unwrap();
+      toast.success("Agent deleted successfully!");
+      refetch();
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.data?.message || "Failed to delete agent.");
+    }
+  };
+
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  return {
+    agents,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    selectedUser,
+    setSelectedUser,
+    openDropdownId,
+    setOpenDropdownId,
+    step,
+    isUsersLoading,
+    isCategoriesLoading,
+    allCategories,
+    selectedDevision,
+    setSelectedDevision,
+    selectedDistrict,
+    setSelectedDistrict,
+    selectedArea,
+    setSelectedArea,
+    isCreatingUser,
+    isCreatingProfile,
+    handleCreateUser,
+    handleCreateProfile,
+    closeModal,
+    handleActivate,
+    handleDeactivate,
+    handleBlock,
+    handleDelete,
+    isAuthenticated,
+  };
+}

@@ -1,11 +1,12 @@
 "use client";
 
 import { useAppSelector } from "@/redux/hooks";
-import { ShieldAlert, Trash2, PlusCircle, XCircle, KeyRound } from "lucide-react";
+import { ShieldAlert, Trash2, PlusCircle, KeyRound } from "lucide-react";
 import { useState, useEffect } from "react";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllRolesQuery, useCreateRoleMutation, useDeleteRoleMutation } from "@/redux/features/admin/role";
 import { toast } from "sonner";
+import RoleModal from "./components/RoleModal";
 
 interface RoleItem {
   id: string;
@@ -27,9 +28,8 @@ export default function RoleManagementPage() {
     "MANAGE_ROLES",
     "MANAGE_SERVICES",
     "MANAGE_BOOKINGS",
-    "VIEW_AUDIT_LOGS"
+    "VIEW_AUDIT_LOGS",
   ];
-
 
   // Connect APIs
   const { data: apiRolesRes, isLoading: isRolesLoading } = useGetAllRolesQuery();
@@ -41,9 +41,9 @@ export default function RoleManagementPage() {
     if (apiRoles && apiRoles.length > 0) {
       const mappedRoles = apiRoles.map((r: any) => ({
         id: r.id || r._id || `ROL-${Math.floor(Math.random() * 1000)}`,
-        name: r.name || 'Unknown Role',
+        name: r.name || "Unknown Role",
         permissions: r.permissions || [],
-        createdAt: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Unknown',
+        createdAt: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "Unknown",
       }));
       setRoles(mappedRoles);
     } else {
@@ -58,13 +58,12 @@ export default function RoleManagementPage() {
     try {
       const newRole = {
         name: formData.get("name"),
-        permissions: selectedPermissions
+        permissions: selectedPermissions,
       };
       await createRoleMut(newRole).unwrap();
       toast.success("Role created successfully!");
       setIsAddModalOpen(false);
       setSelectedPermissions([]);
-
     } catch (e: any) {
       console.error("Failed to create role:", e);
       toast.error(e.data?.message || e.message || "Failed to create role");
@@ -90,7 +89,8 @@ export default function RoleManagementPage() {
         </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          This panel is restricted to Administrators. Please switch your role using the selector in the navbar to test this view.
+          This panel is restricted to Administrators. Please switch your role using the selector in the navbar to test
+          this view.
         </p>
       </div>
     );
@@ -109,36 +109,34 @@ export default function RoleManagementPage() {
             <p className="font-bold text-slate-900 leading-none">{r.name}</p>
           </div>
         </div>
-      )
+      ),
     },
     {
       key: "id",
       header: "ID",
-      render: (r: RoleItem) => (
-        <span className="font-mono text-slate-500 font-bold text-xs">{r.id}</span>
-      )
+      render: (r: RoleItem) => <span className="font-mono text-slate-500 font-bold text-xs">{r.id}</span>,
     },
     {
       key: "permissions",
       header: "Permissions",
       render: (r: RoleItem) => (
         <div className="flex flex-wrap gap-1 max-w-[250px]">
-          {r.permissions.length > 0 ? r.permissions.map((p, i) => (
-            <span key={i} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px] font-bold">
-              {p.replace(/_/g, " ")}
-            </span>
-          )) : (
+          {r.permissions.length > 0 ? (
+            r.permissions.map((p, i) => (
+              <span key={i} className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px] font-bold">
+                {p.replace(/_/g, " ")}
+              </span>
+            ))
+          ) : (
             <span className="text-slate-400 text-xs">No permissions</span>
           )}
         </div>
-      )
+      ),
     },
     {
       key: "createdAt",
       header: "Created Date",
-      render: (r: RoleItem) => (
-        <span className="text-slate-500 font-medium text-xs">{r.createdAt}</span>
-      )
+      render: (r: RoleItem) => <span className="text-slate-500 font-medium text-xs">{r.createdAt}</span>,
     },
     {
       key: "actions",
@@ -152,8 +150,8 @@ export default function RoleManagementPage() {
             <Trash2 size={14} /> Delete
           </button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -180,71 +178,17 @@ export default function RoleManagementPage() {
       </div>
 
       {/* Premium Paginated Table */}
-      <CustomTable
-        columns={columns}
-        data={roles}
-        searchKey="name"
-        searchPlaceholder="Search roles by name..."
-        pageSize={5}
-      />
+      <CustomTable columns={columns} data={roles} searchKey="name" searchPlaceholder="Search roles by name..." pageSize={5} />
 
       {/* Add Role Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-slate-800">Add New Role</h2>
-              <button onClick={() => { setIsAddModalOpen(false); setSelectedPermissions([]); }} className="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-full p-1.5 transition-all">
-                <XCircle size={24} />
-              </button>
-            </div>
-            <form onSubmit={handleCreateRole} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Role Name</label>
-                <select name="name" required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all">
-                  <option value="" disabled selected>Select Role Name</option>
-                  <option value="Super Admin">Super Admin</option>
-                  <option value="Agent">Agent</option>
-                  <option value="Vendor">Vendor</option>
-                  <option value="Employee">Employee</option>
-                  <option value="Client">Client</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-2 uppercase">Permissions</label>
-                <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-1">
-                  {AVAILABLE_PERMISSIONS.map(permission => (
-                    <label key={permission} className="flex items-center gap-2 cursor-pointer group">
-                      <input 
-                        type="checkbox" 
-                        className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30 transition-all cursor-pointer"
-                        checked={selectedPermissions.includes(permission)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedPermissions([...selectedPermissions, permission]);
-                          } else {
-                            setSelectedPermissions(selectedPermissions.filter(p => p !== permission));
-                          }
-                        }}
-                      />
-                      <span className="text-sm text-slate-700 font-medium group-hover:text-slate-900 transition-colors">
-                        {permission.replace(/_/g, " ")}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                <button type="button" onClick={() => { setIsAddModalOpen(false); setSelectedPermissions([]); }} className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">
-                  Cancel
-                </button>
-                <button type="submit" className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all">
-                  Save Role
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <RoleModal
+          setIsAddModalOpen={setIsAddModalOpen}
+          selectedPermissions={selectedPermissions}
+          setSelectedPermissions={setSelectedPermissions}
+          handleCreateRole={handleCreateRole}
+          AVAILABLE_PERMISSIONS={AVAILABLE_PERMISSIONS}
+        />
       )}
     </div>
   );
