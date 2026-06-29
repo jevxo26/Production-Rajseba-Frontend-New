@@ -74,12 +74,9 @@ export function CategorizedHero({
 
   const handleBookNow = () => {
     if (!authUser) {
-      toast.error("Please login to book a service!", {
-        action: {
-          label: "Login",
-          onClick: () => router.push("/login"),
-        },
-      });
+      toast.error("Please login to proceed with booking.");
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
     const target = document.getElementById("specialized-services");
