@@ -173,7 +173,7 @@ export default function MapPage() {
       />
       <div className="flex-1 flex flex-col relative z-10">
         {activeTab === "map" && (
-          <div className="w-full flex-1 flex flex-col md:flex-row h-[calc(100vh-64px)] md:h-[calc(100vh-68px)] overflow-hidden relative">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 w-full flex-1 flex flex-col md:flex-row gap-4 md:gap-6 py-4 md:py-5 h-[calc(100vh-72px)] min-h-[680px] overflow-hidden relative">
             <SidebarList
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
