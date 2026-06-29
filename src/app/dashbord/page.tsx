@@ -113,7 +113,7 @@ function RevenueChart({ data }: { data?: { month: string; value: number }[] }) {
   const yMax = Math.ceil(maxVal / 30000) * 30000 || 30000;
   const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
 
-  const barWidth = (chartW / chartDataToUse.length) * 0.54;
+  const barWidth = (chartW / chartDataToUse.length) * 0.8;
   const barGap = chartW / chartDataToUse.length;
 
   const getBarX = (i: number) => PADDING.left + i * barGap + (barGap - barWidth) / 2;
@@ -344,7 +344,7 @@ function SuperAdminDashboard() {
   const { data: overviewRes, isLoading: isOverviewLoading } = useGetOverviewStatsQuery();
   const { data: profilesRes } = useGetAllProfilesQuery(undefined);
   const { data: categoriesRes } = useGetAllCategoriesQuery(undefined);
-  
+
   const allBookings = bookingsRes?.data || [];
   const overview = overviewRes?.data || {
     revenue: { total: 0, today: 0, weekly: 0, monthly: 0, chart: [] },
@@ -396,10 +396,10 @@ function SuperAdminDashboard() {
       render: (b: any) => (
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold ${b.status === "completed" ? "bg-emerald-50 text-emerald-700"
-              : b.status === "on_the_way" ? "bg-indigo-50 text-indigo-700"
-                : b.status === "assigned" ? "bg-amber-50 text-amber-700"
-                  : b.status === "cancelled" ? "bg-red-50 text-red-700"
-                    : "bg-slate-50 text-slate-700"
+            : b.status === "on_the_way" ? "bg-indigo-50 text-indigo-700"
+              : b.status === "assigned" ? "bg-amber-50 text-amber-700"
+                : b.status === "cancelled" ? "bg-red-50 text-red-700"
+                  : "bg-slate-50 text-slate-700"
             }`}
         >
           {b.status.replace(/_/g, " ")}
@@ -636,8 +636,8 @@ function SuperAdminDashboard() {
 
           {/* Quick action button */}
           <div className="mt-5 pt-3 border-t border-slate-100">
-            <Link href="/dashbord/user-directory" className="w-full py-2.5 bg-slate-50 hover:bg-[#FF6014] hover:text-white rounded-2xl border border-slate-100 hover:border-[#FF6014] transition-all text-xs font-bold text-slate-600 flex items-center justify-center gap-1 shadow-2xs">
-              <span>Manage Users & Vendors</span>
+            <Link href="/dashbord/vendors" className="w-full py-2.5 bg-slate-50 hover:bg-[#FF6014] hover:text-white rounded-2xl border border-slate-100 hover:border-[#FF6014] transition-all text-xs font-bold text-slate-600 flex items-center justify-center gap-1 shadow-2xs">
+              <span>Manage Vendors</span>
               <ChevronRight size={14} />
             </Link>
           </div>
@@ -828,10 +828,10 @@ function ProviderDashboard() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-[#FF6014]">#{job.id}</span>
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${currentStatus === "completed" ? "bg-emerald-50 text-emerald-700"
-                          : currentStatus === "on_the_way" ? "bg-indigo-50 text-indigo-700"
-                            : currentStatus === "assigned" ? "bg-amber-50 text-amber-700"
-                              : currentStatus === "cancelled" ? "bg-red-50 text-red-700"
-                                : "bg-slate-50 text-slate-700"
+                        : currentStatus === "on_the_way" ? "bg-indigo-50 text-indigo-700"
+                          : currentStatus === "assigned" ? "bg-amber-50 text-amber-700"
+                            : currentStatus === "cancelled" ? "bg-red-50 text-red-700"
+                              : "bg-slate-50 text-slate-700"
                         }`}>
                         {currentStatus.replace(/_/g, " ")}
                       </span>
@@ -879,8 +879,8 @@ function ProviderDashboard() {
                       <button
                         onClick={() => updateJobStatus(activeJobDetails.id, "On The Way")}
                         className={`w-full py-2.5 rounded-xl text-xs font-semibold border transition-all ${activeJobDetails.status === "on_the_way"
-                            ? "bg-amber-500 border-amber-500 text-white"
-                            : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                          ? "bg-amber-500 border-amber-500 text-white"
+                          : "border-slate-200 hover:bg-slate-50 text-slate-700"
                           }`}
                       >
                         On The Way
@@ -1175,8 +1175,8 @@ function CustomerDashboard() {
       header: "Status",
       render: (b: any) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${b.status === "completed" ? "bg-emerald-50 text-emerald-700"
-            : b.status === "cancelled" ? "bg-red-50 text-red-700"
-              : "bg-amber-50 text-amber-700"
+          : b.status === "cancelled" ? "bg-red-50 text-red-700"
+            : "bg-amber-50 text-amber-700"
           }`}>
           {b.status.replace('_', ' ')}
         </span>
@@ -1295,8 +1295,8 @@ function CustomerDashboard() {
                   ].map((step, i) => (
                     <div key={i} className="relative">
                       <span className={`absolute -left-[22px] top-1.5 w-3 h-3 rounded-full border-2 ring-4 ring-white ${step.done ? "bg-[#FF6014] border-[#FF6014]"
-                          : step.current ? "bg-[#FF6014] border-[#FF6014] animate-pulse"
-                            : "bg-slate-200 border-slate-200"
+                        : step.current ? "bg-[#FF6014] border-[#FF6014] animate-pulse"
+                          : "bg-slate-200 border-slate-200"
                         }`} />
                       <div>
                         <h5 className={`text-sm font-semibold ${step.done || step.current ? "text-slate-800" : "text-slate-400"}`}>
@@ -1415,8 +1415,8 @@ function AgentDashboard() {
       header: "Status",
       render: (o: any) => (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${o.status === "completed" ? "bg-emerald-50 text-emerald-700"
-            : o.status === "cancelled" ? "bg-red-50 text-red-700"
-              : "bg-amber-50 text-amber-700"
+          : o.status === "cancelled" ? "bg-red-50 text-red-700"
+            : "bg-amber-50 text-amber-700"
           }`}>
           {o.status.replace('_', ' ')}
         </span>

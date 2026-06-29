@@ -44,7 +44,9 @@ function LiveChatContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch inbox for everyone
-  const { data: inboxRes, refetch: refetchInbox } = useGetInboxQuery(undefined);
+  const { data: inboxRes, refetch: refetchInbox } = useGetInboxQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const inbox = inboxRes || [];
 
   // If query params are provided, set active chat user
@@ -108,6 +110,7 @@ function LiveChatContent() {
   // Fetch History for active chat
   const { data: historyRes, refetch: refetchHistory } = useGetChatHistoryQuery(activeChatUser?.id || activeChatUser?._id, {
     skip: !activeChatUser,
+    refetchOnMountOrArgChange: true,
   });
 
   useEffect(() => {
@@ -130,13 +133,27 @@ function LiveChatContent() {
     });
 
     newSocket.on("newMessage", (message: any) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        // Prevent duplicate optimistic messages
+        const exists = prev.some(m => m.id === message.id || (m.content === message.content && String(m.sender?.id) === String(message.sender?.id)));
+        if (exists) {
+          return prev.map(m => m.isOptimistic && m.content === message.content ? message : m);
+        }
+        return [...prev, message];
+      });
       refetchInbox();
       scrollToBottom();
     });
 
     newSocket.on("messageSent", (message: any) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        const hasOptimistic = prev.some(m => m.isOptimistic && m.content === message.content);
+        if (hasOptimistic) {
+          return prev.map(m => m.isOptimistic && m.content === message.content ? message : m);
+        }
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
       refetchInbox();
       scrollToBottom();
     });
@@ -151,7 +168,7 @@ function LiveChatContent() {
   const scrollToBottom = () => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    }, 50);
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,27 +183,50 @@ function LiveChatContent() {
     e.preventDefault();
     if ((!messageInput.trim() && !imageFile) || !socket || !activeChatUser || isUploading) return;
 
+    const currentMsgText = messageInput;
+    const receiverId = activeChatUser.id || activeChatUser._id;
+
+    // Create optimistic message
+    const optimisticMsg = {
+      id: "temp-" + Date.now(),
+      sender: {
+        id: user?.id || user?._id,
+        name: user?.name || "You",
+        role: role
+      },
+      content: currentMsgText,
+      imageUrl: imagePreview || undefined,
+      createdAt: new Date().toISOString(),
+      isOptimistic: true
+    };
+
+    setMessages((prev) => [...prev, optimisticMsg]);
+    setMessageInput("");
+    scrollToBottom();
+
     let uploadedImageUrl = undefined;
     if (imageFile) {
       setIsUploading(true);
+      setImagePreview(null);
+      setImageFile(null);
       try {
         uploadedImageUrl = await uploadImage(imageFile);
       } catch (error) {
         console.error("Image upload failed:", error);
         setIsUploading(false);
+        // Remove optimistic message on failure
+        setMessages((prev) => prev.filter(m => m.id !== optimisticMsg.id));
         return;
       }
       setIsUploading(false);
     }
 
-    const receiverId = activeChatUser.id || activeChatUser._id;
     socket.emit("sendMessage", {
       receiverId: Number(receiverId),
-      content: messageInput || " ",
+      content: currentMsgText || " ",
       imageUrl: uploadedImageUrl,
     });
 
-    setMessageInput("");
     setImageFile(null);
     setImagePreview(null);
     if (fileInputRef.current) {
@@ -201,7 +241,7 @@ function LiveChatContent() {
   });
 
   return (
-    <div className="flex h-[82vh] bg-white rounded-3xl shadow-lg border border-slate-100/80 overflow-hidden relative">
+    <div className="flex h-[78vh] md:h-[82vh] bg-white rounded-3xl shadow-xl border border-slate-100/90 overflow-hidden relative">
 
       {/* ── Inbox Sidebar ── */}
       <div
@@ -240,24 +280,32 @@ function LiveChatContent() {
           ) : (
             <AnimatePresence>
               {filteredInbox.map((item: any, idx: number) => {
-                const isActive = activeChatUser?.id === item.user.id || activeChatUser?._id === item.user.id;
+                const activeId = activeChatUser?.id || activeChatUser?._id;
+                const itemId = item.user?.id || item.user?._id;
+                const isActive = activeId && itemId && String(activeId) === String(itemId);
                 return (
                   <motion.button
                     key={idx}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     onClick={() => setActiveChatUser(item.user)}
-                    className={`w-full text-left p-3.5 rounded-xl flex items-center gap-3 transition-all cursor-pointer ${isActive
-                        ? "bg-[#FFF8F4] border border-[#FF6014]/15 shadow-sm"
+                    className={`w-full text-left p-3 flex items-center gap-3 transition-all cursor-pointer rounded-2xl ${isActive
+                        ? "bg-[#FFF8F4] border-l-4 border-l-[#FF6014] border border-[#FF6014]/15 shadow-sm shadow-[#FF6014]/5"
                         : "bg-transparent border border-transparent hover:bg-white hover:border-slate-100"
                       }`}
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${isActive ? "bg-gradient-to-br from-[#FF6014] to-[#FF8142] text-white" : "bg-slate-100 text-slate-500"
-                      }`}>
-                      {item.user?.name ? (
-                        <span className="font-extrabold text-sm uppercase">{item.user.name.charAt(0)}</span>
+                    <div className="shrink-0">
+                      {item.user?.avatar || item.user?.image ? (
+                        <img src={item.user.avatar || item.user.image} alt={item.user.name} className="w-10 h-10 rounded-full object-cover border border-slate-100 shadow-xs" />
                       ) : (
-                        <UserIcon size={18} />
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-xs ${isActive ? "bg-gradient-to-br from-[#FF6014] to-[#FF8142] text-white" : "bg-slate-100 text-slate-500"
+                          }`}>
+                          {item.user?.name ? (
+                            <span className="font-extrabold text-sm uppercase">{item.user.name.charAt(0)}</span>
+                          ) : (
+                            <UserIcon size={18} />
+                          )}
+                        </div>
                       )}
                     </div>
                     <div className="flex-1 overflow-hidden space-y-0.5">
@@ -298,8 +346,14 @@ function LiveChatContent() {
                 <ChevronLeft className="w-5 h-5" />
               </button>
 
-              <div className="w-10 h-10 bg-gradient-to-br from-[#FF6014] to-[#FF8142] rounded-full flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-[#FF6014]/10">
-                {activeChatUser.name?.charAt(0) || "U"}
+              <div className="shrink-0">
+                {activeChatUser.avatar || activeChatUser.image ? (
+                  <img src={activeChatUser.avatar || activeChatUser.image} alt={activeChatUser.name} className="w-10 h-10 rounded-full object-cover border border-slate-100 shadow-sm" />
+                ) : (
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#FF6014] to-[#FF8142] rounded-full flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-[#FF6014]/10">
+                    {activeChatUser.name?.charAt(0) || "U"}
+                  </div>
+                )}
               </div>
               <div>
                 <h3 className="font-extrabold text-slate-800 text-sm leading-tight">{activeChatUser.name}</h3>
@@ -313,7 +367,7 @@ function LiveChatContent() {
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50/30">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-3">
                   <div className="p-4 bg-white rounded-full border border-slate-100 shadow-sm">
@@ -336,9 +390,9 @@ function LiveChatContent() {
                   return (
                     <div key={idx} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                       <div
-                        className={`max-w-[75%] md:max-w-[70%] rounded-2xl px-4 py-2.5 shadow-xs border ${isMe
-                            ? "bg-gradient-to-br from-[#FF6014] to-[#FF8142] text-white rounded-br-none border-transparent shadow-[#FF6014]/10"
-                            : "bg-white text-slate-800 rounded-bl-none border-slate-100/90"
+                        className={`max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-2.5 shadow-xs border ${isMe
+                            ? "bg-gradient-to-br from-[#FF6014] to-[#FF8142] text-white rounded-tr-none border-transparent shadow-[#FF6014]/10"
+                            : "bg-white text-slate-800 rounded-tl-none border-slate-100/90"
                           }`}
                       >
                         <div className={`flex items-baseline gap-2 mb-1 ${isMe ? "justify-end text-white/90" : "justify-start text-slate-550"}`}>
@@ -368,7 +422,7 @@ function LiveChatContent() {
             </div>
 
             {/* Chat Input */}
-            <div className="p-3 md:p-4 bg-white border-t border-slate-100 shrink-0">
+            <div className="p-3 bg-white border-t border-slate-100 shrink-0">
               {imagePreview && (
                 <div className="mb-3 relative inline-block">
                   <img src={imagePreview} alt="Preview" className="h-20 rounded-lg object-cover border border-slate-200 shadow-sm" />
@@ -385,7 +439,7 @@ function LiveChatContent() {
                   </button>
                 </div>
               )}
-              <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2.5">
                 <input
                   type="file"
                   accept="image/*"
@@ -396,7 +450,7 @@ function LiveChatContent() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                  className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer shrink-0 animate-in fade-in zoom-in"
                 >
                   <ImageIcon size={18} />
                 </button>
@@ -405,13 +459,13 @@ function LiveChatContent() {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder={isUploading ? "Uploading image..." : "Type your message..."}
-                  className="flex-1 bg-slate-50 border border-slate-200/80 rounded-full px-5 py-3 text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FF6014]/5 transition-all"
+                  className="flex-1 bg-slate-50 border border-slate-200/80 rounded-full px-4 py-2.5 text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FF6014]/5 transition-all"
                   disabled={isUploading}
                 />
                 <button
                   type="submit"
                   disabled={(!messageInput.trim() && !imageFile) || isUploading}
-                  className="w-11 h-11 bg-[#FF6014] hover:bg-[#E0530A] rounded-full flex items-center justify-center text-white transition-all disabled:opacity-55 disabled:cursor-not-allowed shadow-md shadow-[#FF6014]/15 hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+                  className="w-10 h-10 bg-[#FF6014] hover:bg-[#E0530A] rounded-full flex items-center justify-center text-white transition-all disabled:opacity-55 disabled:cursor-not-allowed shadow-md shadow-[#FF6014]/15 hover:scale-105 active:scale-95 cursor-pointer shrink-0"
                 >
                   {isUploading ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} className="ml-0.5" />}
                 </button>
@@ -419,17 +473,18 @@ function LiveChatContent() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 space-y-4">
-            <div className="p-6 bg-white rounded-full border border-slate-100 shadow-sm relative">
-              <MessageSquare size={48} className="text-[#FF6014]/15" />
-              <div className="absolute -top-1 -right-1 p-1 bg-[#FF6014] rounded-full text-white">
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-6 bg-slate-50/20 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFF8F4]/20 via-transparent to-transparent pointer-events-none" />
+            <div className="p-6 bg-white rounded-full border border-slate-100 shadow-md relative mb-4 animate-bounce duration-[2000ms]">
+              <MessageSquare size={48} className="text-[#FF6014]/30" />
+              <div className="absolute -top-1 -right-1 p-1 bg-gradient-to-br from-[#FF6014] to-[#FF8142] rounded-full text-white shadow-sm">
                 <Sparkles className="w-3.5 h-3.5" />
               </div>
             </div>
-            <div className="text-center space-y-1">
+            <div className="text-center space-y-2 max-w-sm">
               <p className="text-sm font-black text-slate-800 uppercase tracking-widest">Live Chat Room</p>
-              <p className="text-xs text-slate-400 font-semibold">
-                Select a conversation from the inbox to start messaging
+              <p className="text-xs text-slate-400 font-semibold leading-relaxed">
+                Select a customer or partner from the conversation list to start messaging in real-time.
               </p>
             </div>
           </div>

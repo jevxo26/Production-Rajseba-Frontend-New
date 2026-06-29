@@ -6,6 +6,10 @@ export const contactApi = baseApi.injectEndpoints({
       query: () => '/contact',
       providesTags: ['Admin'],
     }),
+    getContactById: builder.query<any, number | string>({
+      query: (id) => `/contact/${id}`,
+      providesTags: ['Admin'],
+    }),
     updateContactStatus: builder.mutation<any, { id: number; data: any }>({
       query: ({ id, data }) => ({
         url: `/contact/${id}`,
@@ -27,6 +31,7 @@ export const contactApi = baseApi.injectEndpoints({
 
 export const {
   useGetContactsQuery,
+  useGetContactByIdQuery,
   useUpdateContactStatusMutation,
   useDeleteContactMutation,
 } = contactApi;
