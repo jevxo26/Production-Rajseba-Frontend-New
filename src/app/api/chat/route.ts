@@ -13,14 +13,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Fetch Categories and Services from the Backend API to build fresh context
+    // 1. Fetch Categories, Services, and Districts from the Backend API to build fresh context
     let categoriesList = [];
     let servicesList = [];
+    let districtsList = [];
 
     try {
-      const [categoriesRes, servicesRes] = await Promise.all([
+      const [categoriesRes, servicesRes, districtsRes] = await Promise.all([
         fetch(`${API_BASE_URL}/category`, { next: { revalidate: 300 } }), // Cache for 5 mins
         fetch(`${API_BASE_URL}/services/public`, { next: { revalidate: 300 } }),
+        fetch(`${API_BASE_URL}/district`, { next: { revalidate: 300 } }),
       ]);
 
       if (categoriesRes.ok) {
@@ -31,11 +33,15 @@ export async function POST(req: NextRequest) {
         const servData = await servicesRes.json();
         servicesList = servData.data || servData || [];
       }
+      if (districtsRes.ok) {
+        const distData = await districtsRes.json();
+        districtsList = distData.data || distData || [];
+      }
     } catch (fetchError) {
       console.error("Failed to fetch live context from Rajseba API:", fetchError);
     }
 
-    // 2. Build a simplified, light-weight catalog representation for AI context
+    // 2. Build a simplified, light-weight catalog and districts representation for AI context
     const simplifiedContext = categoriesList.map((cat: any) => {
       const catServices = servicesList.filter(
         (s: any) => s.category?.id === cat.id || s.category_id === cat.id
@@ -56,21 +62,31 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    const simplifiedDistricts = districtsList.map((d: any) => ({
+      name: d.name,
+      banglaName: d.banglaName,
+      division: d.devision?.name || d.devision?.banglaName || ""
+    }));
+
     // 3. Define System Instruction prompt
     const systemPrompt = `You are the official Rajseba AI Assistant, an intelligent customer support agent for Rajseba (www.rajseba.com). 
 Rajseba is Bangladesh's leading premium home service marketplace. 
 Our official hotline number is +8801335106726.
+
+Below is the live list of districts and regions in Bangladesh where Rajseba currently provides services:
+${JSON.stringify(simplifiedDistricts, null, 2)}
 
 Below is the live catalog of our categories, services, nested sub-services, and the vendors providing them:
 ${JSON.stringify(simplifiedContext, null, 2)}
 
 Instructions:
 1. Always act as a polite, friendly, and helpful support agent.
-2. If a customer asks about categories, list the categories from the catalog.
-3. If they ask about services under a category, describe the services and list their nested sub-services and prices from the catalog.
-4. If they ask who provides a service, mention the vendor name from the catalog.
-5. Answer in English or Bengali depending on the user's input language. Keep responses concise (3-4 sentences maximum).
-6. If the user wants to book, tell them to browse the website, choose a service, click "View Options", then "Book Now".`;
+2. If a customer asks where we provide services (e.g., "Bangladesh er kon khna services provide kore?", "Which areas/districts do you cover?", "kon khane service den", "service location", "kothay kothay active achen"), explain clearly and list the available districts where we provide services based on the provided list of districts (e.g., Rajshahi, Chapai Nawabganj, Bogura, Pabna, Natore, Naogaon, Joypurhat, Sirajganj, etc.). Tell them that they can see our service coverage in these districts and divisions.
+3. If a customer asks about categories, list the categories from the catalog.
+4. If they ask about services under a category, describe the services and list their nested sub-services and prices from the catalog.
+5. If they ask who provides a service, mention the vendor name from the catalog.
+6. Answer in English or Bengali depending on the user's input language. Keep responses concise (3-4 sentences maximum).
+7. If the user wants to book, tell them to browse the website, choose a service, click "View Options", then "Book Now".`;
 
     // 4. Retrieve API Key from environment variables
     const openrouterKey = process.env.OPENROUTER_API_KEY || process.env.GEMINI_API_KEY;
