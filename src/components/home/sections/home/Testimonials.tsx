@@ -53,6 +53,7 @@ const GAP = 20;
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [windowWidth, setWindowWidth] = useState(1024);
+  const [mounted, setMounted] = useState(false);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -90,18 +91,25 @@ const Testimonials = () => {
   };
 
   useEffect(() => {
+    setMounted(true);
+    setWindowWidth(window.innerWidth);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       recalc();
     };
-    setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [mounted, cardsToShow]);
 
   useEffect(() => {
-    recalc();
-  }, [cardsToShow, isLoading]);
+    if (mounted) {
+      recalc();
+    }
+  }, [cardsToShow, isLoading, mounted]);
 
   // Apply transform directly — no framer-motion percentage bugs
   useEffect(() => {
@@ -122,9 +130,11 @@ const Testimonials = () => {
   };
 
   useEffect(() => {
-    startAutoplay();
+    if (mounted) {
+      startAutoplay();
+    }
     return () => { if (autoplayRef.current) clearInterval(autoplayRef.current); };
-  }, [maxIndex, cardWidth]);
+  }, [maxIndex, cardWidth, mounted]);
 
   const goTo = (idx: number) => {
     const clamped = Math.max(0, Math.min(maxIndex, idx));
@@ -142,6 +152,32 @@ const Testimonials = () => {
     else if (diff < -50) goTo(activeIndex - 1);
     dragStart.current = null;
   };
+
+  if (!mounted) {
+    return (
+      <div className="py-5 md:py-16 lg:py-24 relative overflow-hidden bg-transparent">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
+            <div className="inline-flex items-center gap-2 bg-[#FF6014]/10 border border-[#FF6014]/20 text-[#FF6014] px-3.5 py-1.5 rounded-full text-xs font-bold mb-3">
+              <MessageSquare size={13} />
+              Customer Reviews
+            </div>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              What our clients
+              <span className="text-[#FF6014]"> say about us</span>
+            </h2>
+            <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+              Trusted by thousands of happy homes across Bangladesh.
+            </p>
+          </div>
+          <div className="flex justify-center py-12">
+            <Loader2 className="w-7 h-7 animate-spin text-[#FF6014]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-5 md:py-16 lg:py-24 relative overflow-hidden bg-transparent">
