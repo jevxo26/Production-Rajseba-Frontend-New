@@ -143,7 +143,7 @@ function RevenueChart({ data }: { data?: { month: string; value: number }[] }) {
   };
 
   return (
-    <div className="relative w-full select-none">
+    <div className="relative w-full max-w-[680px] mx-auto select-none">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
@@ -342,6 +342,8 @@ function SuperAdminDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { data: bookingsRes, isLoading: isBookingsLoading } = useGetAllBookingsQuery(undefined);
   const { data: overviewRes, isLoading: isOverviewLoading } = useGetOverviewStatsQuery();
+  const { data: profilesRes } = useGetAllProfilesQuery(undefined);
+  const { data: categoriesRes } = useGetAllCategoriesQuery(undefined);
   
   const allBookings = bookingsRes?.data || [];
   const overview = overviewRes?.data || {
@@ -350,6 +352,11 @@ function SuperAdminDashboard() {
     bookings: { todayAssigned: 0, completed: 0, pending: 0 },
     withdraws: { totalAmount: 0, todayAmount: 0, weeklyAmount: 0, monthlyAmount: 0 }
   };
+
+  const topVendors = [...(profilesRes?.data || [])]
+    .filter((p: any) => p.company_name || p.company_name)
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 3);
 
   const dynamicChartData = overview.revenue.chart.map((c: any) => ({
     month: c.date,
@@ -532,35 +539,108 @@ function SuperAdminDashboard() {
         </div>
       </div>
 
-      {/* Main Grid: Revenue Chart */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 overflow-hidden">
-        <div className="px-6 pt-6 pb-4 flex justify-between items-start border-b border-slate-50">
+      {/* ── Revenue Chart & Platform Insights Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+        {/* Chart Column (2/3 width) */}
+        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 overflow-hidden flex flex-col justify-between">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Revenue Trends</h3>
-            <p className="text-xs text-slate-400 mt-0.5 font-medium">Daily breakdown (Last 7 Days)</p>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold">
-              <span className="inline-block w-3 h-3 rounded-sm bg-gradient-to-b from-[#FF6014] to-[#FFBAB4]" />
-              Revenue
+            <div className="px-6 pt-6 pb-4 flex justify-between items-start border-b border-slate-50">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">Revenue Trends</h3>
+                <p className="text-xs text-slate-400 mt-0.5 font-medium">Daily breakdown (Last 7 Days)</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold">
+                  <span className="inline-block w-3 h-3 rounded-sm bg-gradient-to-b from-[#FF6014] to-[#FFBAB4]" />
+                  Revenue
+                </div>
+              </div>
+            </div>
+            <div className="px-4 pt-4 pb-2">
+              <RevenueChart data={dynamicChartData} />
             </div>
           </div>
+          <div className="mx-6 mb-6 mt-2 grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
+            {[
+              { label: "This Month Rev", value: `৳${overview.revenue.monthly.toLocaleString()}`, accent: "text-[#FF6014]" },
+              { label: "This Week Rev", value: `৳${overview.revenue.weekly.toLocaleString()}`, accent: "text-indigo-500" },
+              { label: "Month Withdraws", value: `৳${overview.withdraws.monthlyAmount.toLocaleString()}`, accent: "text-emerald-500" },
+              { label: "Week Withdraws", value: `৳${overview.withdraws.weeklyAmount.toLocaleString()}`, accent: "text-amber-500" },
+            ].map((s, i) => (
+              <div key={i} className="text-center py-3 px-2">
+                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{s.label}</p>
+                <p className={`text-sm font-extrabold mt-1 ${s.accent}`}>{s.value}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="px-4 pt-4 pb-2">
-          <RevenueChart data={dynamicChartData} />
-        </div>
-        <div className="mx-6 mb-6 mt-2 grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
-          {[
-            { label: "This Month Rev", value: `৳${overview.revenue.monthly.toLocaleString()}`, accent: "text-[#FF6014]" },
-            { label: "This Week Rev", value: `৳${overview.revenue.weekly.toLocaleString()}`, accent: "text-indigo-500" },
-            { label: "Month Withdraws", value: `৳${overview.withdraws.monthlyAmount.toLocaleString()}`, accent: "text-emerald-500" },
-            { label: "Week Withdraws", value: `৳${overview.withdraws.weeklyAmount.toLocaleString()}`, accent: "text-amber-500" },
-          ].map((s, i) => (
-            <div key={i} className="text-center py-3 px-2">
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{s.label}</p>
-              <p className={`text-sm font-extrabold mt-1 ${s.accent}`}>{s.value}</p>
+
+        {/* Platform Insights / Activity Column (1/3 width) */}
+        <div className="lg:col-span-1 bg-white rounded-3xl border border-slate-100 hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">Operational Insights</h3>
+                <p className="text-xs text-slate-400 font-medium">Top vendors & category activity</p>
+              </div>
+              <div className="p-2.5 bg-[#FFF8F4] text-[#FF6014] rounded-2xl"><Zap size={20} /></div>
             </div>
-          ))}
+
+            {/* Quick stats indicators */}
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-slate-50/60 p-3 rounded-2xl border border-slate-100/50 flex flex-col">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Categories</span>
+                <span className="text-sm font-black text-slate-800 mt-1">{categoriesRes?.data?.length || 0} Active</span>
+              </div>
+              <div className="bg-slate-50/60 p-3 rounded-2xl border border-slate-100/50 flex flex-col">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Vendors</span>
+                <span className="text-sm font-black text-[#FF6014] mt-1">{profilesRes?.data?.length || 0} Registered</span>
+              </div>
+            </div>
+
+            {/* Top Vendors Section */}
+            <div>
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Top Performing Vendors</h4>
+              <div className="space-y-3">
+                {topVendors.length === 0 ? (
+                  <div className="text-center py-6 text-xs text-slate-400 font-medium bg-slate-50/40 rounded-2xl border border-slate-100">
+                    No vendor profiles found.
+                  </div>
+                ) : (
+                  topVendors.map((vendor: any, idx: number) => (
+                    <div key={vendor.id || idx} className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-slate-50/80 transition-colors border border-transparent hover:border-slate-100 group/v">
+                      {vendor.avatar ? (
+                        <img src={vendor.avatar} alt={vendor.company_name} className="w-9 h-9 rounded-full object-cover border border-slate-100" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6014]/10 to-[#FFBAB4]/10 flex items-center justify-center text-xs font-bold text-[#FF6014]">
+                          {vendor.company_name?.substring(0, 2).toUpperCase() || "VD"}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-extrabold text-slate-800 truncate group-hover/v:text-[#FF6014] transition-colors">{vendor.company_name}</p>
+                        <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">{vendor.serviceArea || "Dhaka Division"}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="flex items-center gap-1 text-amber-500 font-extrabold text-[10px]">
+                          <Star size={12} className="fill-amber-400 text-amber-400" />
+                          <span>{vendor.rating || "5.0"}</span>
+                        </div>
+                        <p className="text-[10px] text-[#FF6014] font-bold mt-0.5">৳{vendor.min_starting_price || 400}+</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick action button */}
+          <div className="mt-5 pt-3 border-t border-slate-100">
+            <Link href="/dashbord/user-directory" className="w-full py-2.5 bg-slate-50 hover:bg-[#FF6014] hover:text-white rounded-2xl border border-slate-100 hover:border-[#FF6014] transition-all text-xs font-bold text-slate-600 flex items-center justify-center gap-1 shadow-2xs">
+              <span>Manage Users & Vendors</span>
+              <ChevronRight size={14} />
+            </Link>
+          </div>
         </div>
       </div>
 
