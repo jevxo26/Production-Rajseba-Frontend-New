@@ -186,11 +186,11 @@ const Hero = () => {
               y: searchY,
             }}
             onSubmit={handleSearch}
-            className="w-full bg-white rounded-2xl md:rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-slate-100 p-2 sm:p-3 flex flex-col md:flex-row items-center gap-2.5 sm:gap-3 md:gap-0"
+            className="w-full bg-[#FF6014]/5 rounded-2xl md:rounded-full shadow-[0_10px_30px_rgba(255,96,20,0.04)] border border-[#FF6014]/10 p-2 sm:p-3 flex flex-col md:flex-row items-center gap-2.5 sm:gap-3 md:gap-0"
           >
             {/* Search Input */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative">
-              <Search className="text-slate-400 w-5 h-5 flex-shrink-0" />
+              <Search className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Search services..."
@@ -204,11 +204,11 @@ const Hero = () => {
               />
             </div>
 
-            <div className="hidden md:block h-8 w-px bg-slate-200" />
+            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
 
             {/* Category Select */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
-              <LayoutGrid className="text-slate-400 w-5 h-5 flex-shrink-0" />
+              <LayoutGrid className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
               <CustomSelect
                 options={categoryOptions}
                 value={selectedCategory}
@@ -218,15 +218,16 @@ const Hero = () => {
                 }}
                 placeholder="Select Category"
                 className="w-full"
+                controlBg="transparent"
                 triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
               />
             </div>
 
-            <div className="hidden md:block h-8 w-px bg-slate-200" />
+            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
 
             {/* Location Select */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
-              <MapPin className="text-slate-400 w-5 h-5 flex-shrink-0" />
+              <MapPin className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
               <CustomSelect
                 options={divisionOptions}
                 value={selectedDivision}
@@ -236,6 +237,7 @@ const Hero = () => {
                 }}
                 placeholder="Select Division"
                 className="w-full"
+                controlBg="transparent"
                 triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
               />
             </div>
@@ -284,30 +286,30 @@ const Hero = () => {
           variants={itemVariants}
           className="grid grid-cols-2 lg:flex items-center justify-center gap-2.5 sm:gap-6 md:gap-8 mt-8 sm:mt-10 text-slate-500 font-semibold text-[10px] sm:text-xs md:text-sm w-full max-w-sm lg:max-w-none mx-auto"
         >
-          <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3.5 py-2 rounded-full border border-slate-200/40 shadow-xs justify-center w-full lg:w-auto">
+          <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">★</span>
-            <span>
-              <strong className="text-slate-800 font-extrabold">
+            <span className="text-slate-600">
+              <strong className="text-[#FF6014] font-extrabold">
                 4.9/5 Rating
               </strong>{" "}
               (20k+ Reviews)
             </span>
           </div>
 
-          <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3.5 py-2 rounded-full border border-slate-200/40 shadow-xs justify-center w-full lg:w-auto">
+          <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">⚡</span>
-            <span>
-              <strong className="text-slate-800 font-extrabold">
+            <span className="text-slate-600">
+              <strong className="text-[#FF6014] font-extrabold">
                 30 Min
               </strong>{" "}
               Express Response
             </span>
           </div>
 
-          <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3.5 py-2 rounded-full border border-slate-200/40 shadow-xs justify-center w-full col-span-2 lg:col-span-1 lg:w-auto">
+          <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full col-span-2 lg:col-span-1 lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">🛡️</span>
-            <span>
-              <strong className="text-slate-800 font-extrabold">
+            <span className="text-slate-600">
+              <strong className="text-[#FF6014] font-extrabold">
                 100%
               </strong>{" "}
               Satisfaction Insured

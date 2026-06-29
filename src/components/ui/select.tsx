@@ -206,6 +206,7 @@ export interface CustomSelectProps {
   size?: "sm" | "default" | "lg";
   disabled?: boolean;
   isMulti?: boolean;
+  controlBg?: string;
 }
 
 export function CustomSelect({
@@ -220,6 +221,7 @@ export function CustomSelect({
   size = "default",
   disabled = false,
   isMulti = false,
+  controlBg,
 }: CustomSelectProps) {
   const selectedOption = isMulti 
     ? options.filter((opt) => Array.isArray(value) && value.includes(opt.value))
@@ -230,11 +232,11 @@ export function CustomSelect({
       ...base,
       borderRadius: size === "sm" ? "0.5rem" : size === "lg" ? "1rem" : "0.75rem",
       minHeight: size === "sm" ? "36px" : size === "lg" ? "48px" : "42px",
-      borderColor: state.isFocused ? "#fda4af" : "#e2e8f0",
-      backgroundColor: "#ffffff",
+      borderColor: state.isFocused ? "#FF6014" : controlBg ? "transparent" : "#e2e8f0",
+      backgroundColor: controlBg || "#ffffff",
       boxShadow: state.isFocused ? "0 0 0 2px #FFF0EB" : "none",
       "&:hover": {
-        borderColor: state.isFocused ? "#fda4af" : "#cbd5e1"
+        borderColor: state.isFocused ? "#FF6014" : controlBg ? "transparent" : "#cbd5e1"
       }
     }),
     valueContainer: (base: any) => ({
@@ -243,11 +245,11 @@ export function CustomSelect({
     }),
     option: (base: any, state: any) => ({
       ...base,
-      backgroundColor: state.isSelected ? "#f43f5e" : state.isFocused ? "#FFF0EB" : "white",
+      backgroundColor: state.isSelected ? "#FF6014" : state.isFocused ? "#FFF0EB" : "white",
       color: state.isSelected ? "white" : "#0f172a",
       fontSize: "0.875rem",
       "&:active": {
-        backgroundColor: "#e11d48",
+        backgroundColor: "#E04F00",
       }
     })
   };
@@ -260,18 +262,18 @@ export function CustomSelect({
         {...innerProps} 
         className={cn(
           "flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors text-sm",
-          isSelected ? "bg-rose-500 text-white" : isFocused ? "bg-rose-50 text-slate-900" : "bg-white text-slate-700"
+          isSelected ? "bg-[#FF6014] text-white" : isFocused ? "bg-[#FFF0EB] text-slate-900" : "bg-white text-slate-700"
         )}
       >
         {data.icon && (
-          <div className={cn("p-1 rounded", isSelected ? "bg-rose-600 text-white" : "bg-slate-50 text-slate-500")}>
+          <div className={cn("p-1 rounded", isSelected ? "bg-[#FF6014] text-white" : "bg-slate-50 text-slate-500")}>
             <data.icon className="size-4" />
           </div>
         )}
         <div>
           <p className="font-semibold leading-tight">{data.label}</p>
           {data.desc && (
-            <p className={cn("text-[10px] leading-tight mt-0.5", isSelected ? "text-rose-100" : "text-slate-400")}>{data.desc}</p>
+            <p className={cn("text-[10px] leading-tight mt-0.5", isSelected ? "text-orange-100" : "text-slate-400")}>{data.desc}</p>
           )}
         </div>
       </div>
