@@ -1,0 +1,161 @@
+"use client";
+
+import React from "react";
+import { Sparkles, Briefcase, Zap, DollarSign, Clock, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
+import { CustomTable } from "@/components/ui/table";
+import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
+
+export default function AgentOverview() {
+  const authUser = useAppSelector((state) => state.auth.user);
+  const { data: bookingsRes, isLoading } = useGetAllBookingsQuery();
+  const allBookings = (bookingsRes?.data || []) as any[];
+
+  const totalOrders = allBookings.length;
+  const todayOrders = allBookings.filter((b: any) => {
+    const created = new Date(b.createdAt);
+    const today = new Date();
+    return created.toDateString() === today.toDateString();
+  }).length;
+
+  const stats = [
+    {
+      label: "Total Bookings",
+      value: isLoading ? "—" : `${totalOrders}`,
+      desc: "All time bookings",
+      icon: Briefcase,
+      color: "text-[#E0530A] bg-[#FFF8F4]",
+    },
+    {
+      label: "Today's Bookings",
+      value: isLoading ? "—" : `${todayOrders}`,
+      desc: "Placed today",
+      icon: Zap,
+      color: "text-amber-600 bg-amber-50",
+    },
+    {
+      label: "Completed",
+      value: isLoading ? "—" : `${allBookings.filter((b: any) => b.status === "completed").length}`,
+      desc: "Total completed orders",
+      icon: DollarSign,
+      color: "text-emerald-600 bg-emerald-50",
+    },
+    {
+      label: "Pending",
+      value: isLoading ? "—" : `${allBookings.filter((b: any) => b.status === "pending").length}`,
+      desc: "Awaiting assignment",
+      icon: Clock,
+      color: "text-indigo-600 bg-indigo-50",
+    },
+  ];
+
+  const columns = [
+    {
+      key: "id",
+      header: "Booking ID",
+      render: (o: any) => <span className="font-bold text-brand-primary">#{o.id}</span>,
+    },
+    {
+      key: "user",
+      header: "Client Name",
+      render: (o: any) => <span>{o.user?.name || "—"}</span>,
+    },
+    {
+      key: "nestedService",
+      header: "Service Booked",
+      render: (o: any) => <span>{o.nestedService?.name || o.pkg?.name || "—"}</span>,
+    },
+    {
+      key: "vendor",
+      header: "Vendor",
+      render: (o: any) => <span>{o.vendor?.name || "—"}</span>,
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (o: any) => (
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
+            o.status === "completed" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-700"
+          }`}
+        >
+          {o.status}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Date",
+      render: (o: any) => <span>{new Date(o.createdAt).toLocaleDateString("en-BD")}</span>,
+    },
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-200">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-[#FFF8F4] text-[#FF6014] rounded-2xl">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Agent Overview</h1>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Hello, {authUser?.name || "Agent"}! Manage bookings and track activity.
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/dashbord/quick-booking"
+          className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-semibold px-6 py-3 rounded-2xl shadow-lg shadow-[#FF6014]/20 text-sm transition-all active:scale-[0.985] text-center"
+        >
+          Book a New Lead
+        </Link>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, i) => {
+          const Icon = stat.icon;
+          return (
+            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4">
+              <div className={`p-3 rounded-xl ${stat.color}`}>
+                <Icon size={24} />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
+                <h4 className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</h4>
+                <span className="text-xs text-slate-400 mt-1 block font-medium">{stat.desc}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Recent Bookings Table */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+          <h3 className="text-lg font-bold text-slate-900">Recent Lead Orders</h3>
+          <Link href="/dashbord/orders" className="text-xs font-bold text-[#FF6014] hover:underline">
+            View All &rarr;
+          </Link>
+        </div>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <Loader2 size={32} className="animate-spin text-[#FF6014]" />
+          </div>
+        ) : (
+          <CustomTable
+            columns={columns}
+            data={allBookings}
+            searchKey="id"
+            searchPlaceholder="Search bookings..."
+            pageSize={5}
+          />
+        )}
+      </div>
+    </div>
+  );
+}

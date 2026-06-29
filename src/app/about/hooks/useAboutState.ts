@@ -1,0 +1,63 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { getAccessToken } from "@/lib/token";
+import { getRoleName } from "@/redux/features/auth/authSlice";
+
+const TEAM_MEMBERS_FALLBACK = [
+  { name: "Mahbubur Rahman", role: "Founder & CEO", bio: "Pioneering digital logistics for urban home maintenance, driven to establish job security and dignity for service professionals.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
+  { name: "Farhana Yasmin", role: "Head of Customer Experience", bio: "Setting strict SLA protocols and service compliance measures to ensure every customer is delighted on every visit.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" },
+  { name: "Asif Adnan", role: "Director of Vendor Operations", bio: "Leading verification audits and continuous skill training labs to verify only the top 5% of technicians join Rajseba.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" },
+];
+
+export function useAboutState() {
+  const [statsData, setStatsData] = useState<any>(null);
+  const [teamMembers, setTeamMembers] = useState<any[]>(TEAM_MEMBERS_FALLBACK);
+
+  useEffect(() => {
+    fetch("https://api.rajseba.com/stats")
+      .then((res) => res.json())
+      .then((json) => { if (json.success && json.data) setStatsData(json.data); })
+      .catch((err) => console.error("Error fetching stats:", err));
+
+    const token = getAccessToken();
+    const headers: any = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    fetch("https://api.rajseba.com/users", { headers })
+      .then((res) => res.json())
+      .then((json) => {
+        const users = json.data || (Array.isArray(json) ? json : []);
+        if (Array.isArray(users) && users.length > 0) {
+          const admins = users.filter((u: any) => {
+            const uRole = (typeof u.role === "string" ? u.role : u.role?.name || "").toLowerCase();
+            return uRole === "superadmin" || uRole === "super admin";
+          });
+          if (admins.length > 0) {
+            const mappedTeam = admins.map((u: any) => {
+              const uRole = (typeof u.role === "string" ? u.role : u.role?.name || "").toLowerCase();
+              const roleName = getRoleName(uRole as any) || "Super Admin";
+              const profileImg = u?.profile?.avatar || u?.profile?.images?.[0] || u?.profile?.picture || u?.avatar;
+              return {
+                name: u.name || `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Super Admin",
+                role: roleName,
+                bio: u.profile?.description || u.description || "Leading operations, technology, and service standards.",
+                avatar: profileImg || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop"
+              };
+            });
+            setTeamMembers(mappedTeam);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching users for team:", err));
+  }, []);
+
+  const displayStats = [
+    { value: statsData?.servicesCompleted ? `${statsData.servicesCompleted.toLocaleString()}+` : "120,000+", label: "Bookings Done", desc: "Across Dhaka City" },
+    { value: statsData?.verifiedExperts ? `${statsData.verifiedExperts.toLocaleString()}+` : "2,500+", label: "Verified Experts", desc: "Background screened" },
+    { value: statsData?.averageRating ? `${statsData.averageRating.toFixed(1)}/5.0` : "4.0/5.0", label: "Average Rating", desc: "From real clients" },
+    { value: statsData?.happyCustomers ? `${statsData.happyCustomers.toLocaleString()}+` : "50,000+", label: "Happy Customers", desc: "Rajseba Guarantee" },
+  ];
+
+  return { displayStats, teamMembers };
+}

@@ -1,210 +1,31 @@
 "use client";
 
-import { useAppSelector } from "@/redux/hooks";
+import React from "react";
 import {
   ShieldAlert,
   Trash2,
   PlusCircle,
   Edit2,
-  X,
   Wrench,
-  Image as ImageIcon,
-  Sparkles,
-  Tag,
   Globe,
   Eye,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
 import type { TableAction } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { CustomSelect } from "@/components/ui/select";
-import {
-  useGetAllServicesQuery,
-  useCreateServiceMutation,
-  useUpdateServiceMutation,
-  useDeleteServiceMutation,
-  Service,
-} from "@/redux/features/admin/service";
-import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
-import { useGetAllUsersQuery } from "@/redux/features/admin/user";
-import { toast } from "sonner";
-import { uploadImage } from "@/lib/upload";
+import { Service } from "@/redux/features/admin/service";
+import { useVendorServicesState } from "./hooks/useVendorServicesState";
+import ServiceFormModal from "./components/ServiceFormModal";
+import DeleteServiceModal from "./components/DeleteServiceModal";
 
 export default function VendorServicesPage() {
-  const router = useRouter();
-  const rawRole = useAppSelector((state) => state.auth.role) || "vendor";
-  const role =
-    typeof rawRole === "string"
-      ? rawRole.toLowerCase().replace(/\s+/g, "")
-      : "client";
-  const currentUser = useAppSelector((state) => state.auth.user);
-  const currentUserId = currentUser?.id || currentUser?._id || "";
+  const state = useVendorServicesState();
 
-  const {
-    data: apiServicesRes,
-    isLoading,
-    refetch,
-  } = useGetAllServicesQuery();
-  const { data: apiCategoriesRes } = useGetAllCategoriesQuery();
-  const { data: apiUsersRes } = useGetAllUsersQuery();
-
-  const [createMut, { isLoading: isCreating }] = useCreateServiceMutation();
-  const [updateMut, { isLoading: isUpdating }] = useUpdateServiceMutation();
-  const [deleteMut] = useDeleteServiceMutation();
-
-  const [services, setServices] = useState<Service[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Service | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<Service | null>(null);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-
-  const [name, setName] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [overview, setOverview] = useState("");
-  const [details, setDetails] = useState("");
-  const [faq, setFaq] = useState<{question: string, answer: string}[]>([]);
-  const [image, setImage] = useState("");
-  const [categoryId, setCategoryId] = useState("NONE");
-  const [employeeIds, setEmployeeIds] = useState<number[]>([]);
-
-  const allCategories =
-    apiCategoriesRes?.data || (Array.isArray(apiCategoriesRes) ? apiCategoriesRes : []);
-
-  const categoryOptions = [
-    { value: "NONE", label: "Select a Category" },
-    ...allCategories.map((c: any) => ({ value: String(c.id), label: c.name })),
-  ];
-
-  const allUsers = apiUsersRes?.data || (Array.isArray(apiUsersRes) ? apiUsersRes : []);
-
-  const employeeOptions = categoryId === "NONE" ? [] : allUsers
-    .filter((u: any) => u.role?.name === "Employee" || u.role === "Employee")
-    .filter((u: any) => String(u.vendor?.id || u.vendor) === String(currentUserId))
-    .filter((u: any) => {
-      const cats = u.profile?.categories;
-      if (Array.isArray(cats)) {
-        return cats.some((c: any) => String(c.id) === categoryId);
-      }
-      return false;
-    })
-    .map((u: any) => ({
-      id: Number(u.id || u._id),
-      name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Unknown',
-    }));
-
-  // Backend API already filters services for the vendor based on authentication token
-  useEffect(() => {
-    const all: Service[] =
-      apiServicesRes?.data || (Array.isArray(apiServicesRes) ? apiServicesRes : []);
-    setServices(all);
-  }, [apiServicesRes]);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsUploadingImage(true);
-    try {
-      const url = await uploadImage(file);
-      setImage(url);
-      toast.success("Image uploaded!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to upload image");
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-  const resetForm = () => {
-    setName(""); setSubtitle(""); setSlug(""); setDescription(""); setOverview(""); setDetails(""); setFaq([]); setImage(""); setCategoryId("NONE"); setEmployeeIds([]);
-  };
-
-  const openCreateModal = () => { setEditingItem(null); resetForm(); setIsModalOpen(true); };
-
-  const openEditModal = (item: Service) => {
-    setEditingItem(item);
-    setName(item.name);
-    setSubtitle(item.subtitle || "");
-    setSlug(item.slug);
-    setDescription(item.description || "");
-    setOverview(item.overview || "");
-    setDetails(item.details || "");
-    setFaq(item.faq || []);
-    setImage(item.image || "");
-    setCategoryId(item.category_id ? String(item.category_id) : "NONE");
-    setEmployeeIds(item.employees ? item.employees.map((e: any) => Number(e.id)) : []);
-    setIsModalOpen(true);
-  };
-
-  const openDeleteModal = (item: Service) => { setItemToDelete(item); setIsDeleteModalOpen(true); };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) { toast.error("Service name is required"); return; }
-    if (!slug.trim()) { toast.error("Slug is required"); return; }
-    try {
-      if (editingItem) {
-        await updateMut({
-          id: editingItem.id!,
-          data: {
-            name: name.trim(),
-            subtitle: subtitle.trim() || undefined,
-            slug: slug.trim(),
-            description: description.trim() || undefined,
-            overview: overview.trim() || undefined,
-            details: details.trim() || undefined,
-            faq: faq.length > 0 ? faq : undefined,
-            image: image || undefined,
-            category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
-            employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
-          },
-        }).unwrap();
-        toast.success("Service updated successfully!");
-      } else {
-        await createMut({
-          name: name.trim(),
-          subtitle: subtitle.trim() || undefined,
-          slug: slug.trim(),
-          description: description.trim() || undefined,
-          overview: overview.trim() || undefined,
-          details: details.trim() || undefined,
-          faq: faq.length > 0 ? faq : undefined,
-          image: image || undefined,
-          category_id: categoryId !== "NONE" ? Number(categoryId) : undefined,
-          vendor_id: Number(currentUserId),
-          employee_ids: employeeIds.length > 0 ? employeeIds : undefined,
-        }).unwrap();
-        toast.success("Service created successfully!");
-      }
-      setIsModalOpen(false);
-      refetch();
-    } catch (err: any) {
-      toast.error(err.data?.message || err.message || "Failed to save service");
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!itemToDelete) return;
-    try {
-      await deleteMut(itemToDelete.id!).unwrap();
-      toast.success("Service deleted!");
-      setIsDeleteModalOpen(false);
-      setItemToDelete(null);
-      refetch();
-    } catch (err: any) {
-      toast.error(err.data?.message || err.message || "Failed to delete");
-    }
-  };
-
-  if (role !== "superadmin" && role !== "vendor") {
+  if (state.role !== "superadmin" && state.role !== "vendor") {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center animate-in fade-in duration-200">
-        <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4"><ShieldAlert size={48} /></div>
+        <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4">
+          <ShieldAlert size={48} />
+        </div>
         <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">This panel is restricted to Vendors only.</p>
       </div>
@@ -218,7 +39,11 @@ export default function VendorServicesPage() {
       render: (item: Service) => (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-[#FFF8F4] text-[#FF6014] rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-[#FFF0EB]/40">
-            {item.image ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" /> : <Wrench size={20} />}
+            {item.image ? (
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            ) : (
+              <Wrench size={20} />
+            )}
           </div>
           <div>
             <p className="font-bold text-slate-900 leading-none">{item.name}</p>
@@ -232,7 +57,8 @@ export default function VendorServicesPage() {
       header: "Slug",
       render: (item: Service) => (
         <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 font-mono font-bold text-xs px-2.5 py-1 rounded-xl">
-          <Globe size={11} />{item.slug}
+          <Globe size={11} />
+          {item.slug}
         </span>
       ),
     },
@@ -248,9 +74,14 @@ export default function VendorServicesPage() {
   ];
 
   const tableActions: TableAction<Service>[] = [
-    { label: "View", icon: Eye, onClick: (item) => router.push(`/dashbord/vendor-services/${item.id}`), variant: "default" },
-    { label: "Edit", icon: Edit2, onClick: openEditModal, variant: "secondary" },
-    { label: "Delete", icon: Trash2, onClick: openDeleteModal, variant: "destructive" },
+    {
+      label: "View",
+      icon: Eye,
+      onClick: (item) => state.router.push(`/dashbord/vendor-services/${item.id}`),
+      variant: "default",
+    },
+    { label: "Edit", icon: Edit2, onClick: state.openEditModal, variant: "secondary" },
+    { label: "Delete", icon: Trash2, onClick: state.openDeleteModal, variant: "destructive" },
   ];
 
   return (
@@ -266,183 +97,87 @@ export default function VendorServicesPage() {
             <p className="text-xs text-slate-400 mt-0.5">Manage your service offerings on the platform.</p>
           </div>
         </div>
-        <button onClick={openCreateModal} className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-[#FF6014]/10">
+        <button
+          onClick={state.openCreateModal}
+          className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-[#FF6014]/10"
+        >
           <PlusCircle size={18} /> Add Service
         </button>
       </div>
 
-      {isLoading ? (
+      {state.isLoading ? (
         <div className="flex items-center justify-center py-20 bg-white border border-slate-100 rounded-3xl shadow-premium">
           <div className="w-8 h-8 border-4 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
         </div>
-      ) : services.length === 0 ? (
+      ) : state.services.length === 0 ? (
         <div className="bg-white border border-slate-100 rounded-3xl p-12 text-center shadow-sm">
-          <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50"><Wrench size={28} /></div>
+          <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
+            <Wrench size={28} />
+          </div>
           <h3 className="text-base font-bold text-slate-800">No Services Found</h3>
-          <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">Create your first service to start offering it to clients.</p>
-          <button onClick={openCreateModal} className="mt-4 bg-[#FFF8F4] hover:bg-[#FFF0EB] text-[#FF6014] font-bold px-4 py-2 rounded-xl text-xs transition-all">Add New Service</button>
+          <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+            Create your first service to start offering it to clients.
+          </p>
+          <button
+            onClick={state.openCreateModal}
+            className="mt-4 bg-[#FFF8F4] hover:bg-[#FFF0EB] text-[#FF6014] font-bold px-4 py-2 rounded-xl text-xs transition-all"
+          >
+            Add New Service
+          </button>
         </div>
       ) : (
-        <CustomTable columns={columns} data={services} actions={tableActions} searchKey="name" searchPlaceholder="Search services..." pageSize={10} />
+        <CustomTable
+          columns={columns}
+          data={state.services}
+          actions={tableActions}
+          searchKey="name"
+          searchPlaceholder="Search services..."
+          pageSize={10}
+        />
       )}
 
       {/* Create/Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Sparkles className="text-[#FF6014]" size={20} />
-                {editingItem ? "Edit Service" : "Add New Service"}
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"><X size={18} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Service Name *</label>
-                <Input placeholder="e.g. AC Repairing" value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Slug *</label>
-                <Input placeholder="e.g. ac-repairing" value={slug} onChange={(e) => setSlug(e.target.value)} required />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Subtitle</label>
-                <Input placeholder="Short tagline" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Category</label>
-                <CustomSelect 
-                  options={categoryOptions} 
-                  value={categoryId} 
-                  onChange={(val) => {
-                    setCategoryId(val);
-                    setEmployeeIds([]); // Clear employees on category change
-                  }} 
-                />
-              </div>
-              {categoryId !== "NONE" ? (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Employees</label>
-                  <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-200 rounded-xl bg-slate-50">
-                    {employeeOptions.length > 0 ? employeeOptions.map((emp: any) => (
-                      <label key={emp.id} className="flex items-center gap-2 cursor-pointer group">
-                        <input 
-                          type="checkbox" 
-                          className="w-4 h-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary/30"
-                          checked={employeeIds.includes(emp.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) setEmployeeIds([...employeeIds, emp.id]);
-                            else setEmployeeIds(employeeIds.filter(id => id !== emp.id));
-                          }}
-                        />
-                        <span className="text-sm text-slate-700">{emp.name}</span>
-                      </label>
-                    )) : (
-                      <span className="text-xs text-slate-400">
-                        No employees found for this category. Please add employees to your account first.
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="p-4 bg-slate-50 border border-slate-200 border-dashed rounded-xl text-center">
-                  <p className="text-xs font-medium text-slate-500">Please select a Category to assign employees.</p>
-                </div>
-              )}
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Description</label>
-                <Textarea placeholder="Describe this service..." value={description} onChange={(e) => setDescription(e.target.value)} rows={2}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6014]/20/10 focus-visible:border-rose-400/80 transition-all w-full" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Overview</label>
-                <Textarea placeholder="Service overview..." value={overview} onChange={(e) => setOverview(e.target.value)} rows={2}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6014]/20/10 focus-visible:border-rose-400/80 transition-all w-full" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Details</label>
-                <Textarea placeholder="Detailed information..." value={details} onChange={(e) => setDetails(e.target.value)} rows={3}
-                  className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6014]/20/10 focus-visible:border-rose-400/80 transition-all w-full" />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">FAQs</label>
-                  <button type="button" onClick={() => setFaq([...faq, { question: '', answer: '' }])} className="text-xs text-brand-primary font-bold hover:underline flex items-center gap-1">
-                    <PlusCircle size={12} /> Add FAQ
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {faq.map((f, i) => (
-                    <div key={i} className="flex flex-col gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 relative">
-                      <button type="button" onClick={() => setFaq(faq.filter((_, idx) => idx !== i))} className="absolute -top-2 -right-2 bg-[#FFF0EB] text-[#FF6014] hover:bg-[#FF6014] hover:text-white rounded-full p-1 transition-colors">
-                        <X size={12} />
-                      </button>
-                      <Input placeholder="Question" value={f.question} onChange={(e) => {
-                        const newFaq = [...faq];
-                        newFaq[i].question = e.target.value;
-                        setFaq(newFaq);
-                      }} />
-                      <Textarea placeholder="Answer" rows={2} value={f.answer} onChange={(e) => {
-                        const newFaq = [...faq];
-                        newFaq[i].answer = e.target.value;
-                        setFaq(newFaq);
-                      }} className="text-sm rounded-xl" />
-                    </div>
-                  ))}
-                  {faq.length === 0 && <p className="text-xs text-slate-400 italic">No FAQs added yet.</p>}
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Service Image</label>
-                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                  <div className="w-14 h-14 bg-white border border-slate-200/80 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 relative group shadow-sm">
-                    {image ? (<><img src={image} alt="Preview" className="w-full h-full object-cover" /><button type="button" onClick={() => setImage("")} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity duration-150 rounded-2xl"><Trash2 size={14} /></button></>) : (<ImageIcon className="text-slate-400" size={20} />)}
-                  </div>
-                  <label className="cursor-pointer bg-brand-primary hover:bg-brand-dark text-white text-[10px] font-bold px-3 py-2 rounded-lg inline-flex items-center gap-1.5 transition-all active:scale-[0.98]">
-                    {isUploadingImage ? "Uploading..." : "Browse Photo"}
-                    <input type="file" accept="image/*" onChange={handleImageUpload} disabled={isUploadingImage} className="hidden" />
-                  </label>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Cancel</button>
-                <button type="submit" disabled={isCreating || isUpdating || isUploadingImage} className="bg-brand-primary hover:bg-brand-dark disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-[0.98] shadow-md shadow-brand-primary/10">
-                  {editingItem ? "Update Service" : "Create Service"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ServiceFormModal
+        isModalOpen={state.isModalOpen}
+        setIsModalOpen={state.setIsModalOpen}
+        editingItem={state.editingItem}
+        name={state.name}
+        setName={state.setName}
+        slug={state.slug}
+        setSlug={state.setSlug}
+        subtitle={state.subtitle}
+        setSubtitle={state.setSubtitle}
+        categoryId={state.categoryId}
+        setCategoryId={state.setCategoryId}
+        categoryOptions={state.categoryOptions}
+        employeeIds={state.employeeIds}
+        setEmployeeIds={state.setEmployeeIds}
+        employeeOptions={state.employeeOptions}
+        description={state.description}
+        setDescription={state.setDescription}
+        overview={state.overview}
+        setOverview={state.setOverview}
+        details={state.details}
+        setDetails={state.setDetails}
+        faq={state.faq}
+        setFaq={state.setFaq}
+        image={state.image}
+        setImage={state.setImage}
+        isUploadingImage={state.isUploadingImage}
+        handleImageUpload={state.handleImageUpload}
+        handleSubmit={state.handleSubmit}
+        isCreating={state.isCreating}
+        isUpdating={state.isUpdating}
+      />
 
       {/* Delete Modal */}
-      {isDeleteModalOpen && itemToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-900">Delete Service</h2>
-              <button onClick={() => { setIsDeleteModalOpen(false); setItemToDelete(null); }} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"><X size={18} /></button>
-            </div>
-            <div className="p-6 space-y-6 text-center">
-              <div className="flex flex-col items-center gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                <div className="w-16 h-16 bg-white border border-slate-200 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm">
-                  {itemToDelete.image ? <img src={itemToDelete.image} alt={itemToDelete.name} className="w-full h-full object-cover" /> : <Wrench className="text-slate-400" size={28} />}
-                </div>
-                <div>
-                  <span className="font-mono text-slate-400 font-bold text-xs">ID: {itemToDelete.id}</span>
-                  <h3 className="text-lg font-bold text-slate-900 mt-1">{itemToDelete.name}</h3>
-                </div>
-              </div>
-              <p className="text-sm text-slate-500 max-w-xs mx-auto">Are you sure? Deleting this service will also affect associated sub-services and packages.</p>
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <button type="button" onClick={() => { setIsDeleteModalOpen(false); setItemToDelete(null); }} className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-all">Cancel</button>
-                <button onClick={handleDelete} className="bg-[#FF6014] hover:bg-red-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-[0.98] shadow-md shadow-red-500/10">Delete</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteServiceModal
+        isDeleteModalOpen={state.isDeleteModalOpen}
+        setIsDeleteModalOpen={state.setIsDeleteModalOpen}
+        itemToDelete={state.itemToDelete}
+        setItemToDelete={state.setItemToDelete}
+        handleDelete={state.handleDelete}
+      />
     </div>
   );
 }

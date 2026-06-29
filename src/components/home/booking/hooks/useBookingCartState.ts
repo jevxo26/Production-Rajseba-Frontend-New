@@ -1,0 +1,255 @@
+"use client";
+
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppSelector } from "@/redux/hooks";
+import { useCreateBookingMutation } from "@/redux/features/admin/booking";
+import { ValidateCouponResult } from "@/redux/features/admin/coupon";
+import { toast } from "sonner";
+
+const fallbackServices = [
+  {
+    id: "leak-repair",
+    title: "Leak Repair & Detection",
+    description: "Non-invasive ultrasonic leak detection for hidden pipes.",
+    price: "800",
+    type: "normal",
+  },
+  {
+    id: "plumbing-emergency",
+    title: "Plumbing Emergency?",
+    description: "Our rapid response team is available 24/7 for burst pipes, flooding, or severe blockages.",
+    type: "emergency",
+  },
+];
+
+interface UseBookingCartStateProps {
+  service: any;
+  isLoading: boolean;
+}
+
+export function useBookingCartState({ service, isLoading }: UseBookingCartStateProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const authUser = useAppSelector((state) => state.auth.user);
+
+  const [cartQuantities, setCartQuantities] = useState<Record<number, number>>({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState({
+    date: "",
+    time: "",
+    location: "",
+    notes: "",
+  });
+  const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResult | null>(null);
+  const [activeTab, setActiveTab] = useState("specialized-services");
+  const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
+  const hasAutoBooked = useRef(false);
+
+  const displayServices = useMemo(() => {
+    const nested = service?.nestedServices;
+    if (nested && nested.length > 0) {
+      return nested.map((ns: any, idx: number) => {
+        const isEmergency = nested.length > 2 && idx === nested.length - 1;
+        return {
+          id: String(ns.id),
+          title: ns.name,
+          description: ns.description || "Expert service technician ready to assist you.",
+          price: ns.starting_price || ns.price,
+          image: ns.image,
+          subServices: ns.subServices || [],
+          type: isEmergency ? "emergency" : "normal",
+        };
+      });
+    }
+    return fallbackServices;
+  }, [service]);
+
+  const cartItems = useMemo(
+    () =>
+      displayServices
+        .flatMap((s: any) =>
+          (s.subServices || []).map((sub: any) => ({
+            ...sub,
+            parentTitle: s.title,
+            quantity: cartQuantities[sub.id] || 0,
+          }))
+        )
+        .filter((sub: any) => sub.quantity > 0),
+    [displayServices, cartQuantities]
+  );
+
+  const cartItemCount = cartItems.reduce((sum: number, item: any) => sum + item.quantity, 0);
+  const cartTotal = cartItems.reduce(
+    (sum: number, item: any) => sum + Number(item.price || 0) * item.quantity,
+    0
+  );
+  const payableTotal = appliedCoupon ? appliedCoupon.final_price : cartTotal;
+
+  const handleUpdateQuantity = (subId: number, delta: number) => {
+    setCartQuantities((prev) => {
+      const nextQty = (prev[subId] || 0) + delta;
+      if (nextQty <= 0) {
+        const { [subId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [subId]: nextQty };
+    });
+  };
+
+  const handleRemoveFromCart = (subId: number) => {
+    setCartQuantities((prev) => {
+      const { [subId]: _, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  const handleClearCart = () => {
+    setCartQuantities({});
+    setAppliedCoupon(null);
+  };
+
+  const handleAddToCart = (item: any, subId: number) => {
+    if (!authUser) {
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    setCartQuantities((prev) => ({ ...prev, [subId]: (prev[subId] || 0) + 1 }));
+    toast.success("Added to booking cart", { duration: 1500 });
+  };
+
+  const handleInitiateBooking = () => {
+    if (!authUser) {
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingDetails.date || !bookingDetails.location) {
+      toast.error("Booking Date and Service Location are required!");
+      return;
+    }
+    const subServiceItems = cartItems.map((item: any) => ({
+      sub_service_id: item.id,
+      quantity: item.quantity,
+    }));
+    const payload = {
+      user_id: authUser?.id,
+      vendor_id: service?.vendor?.id || 1,
+      service_id: service?.id,
+      date: bookingDetails.date,
+      time: bookingDetails.time || undefined,
+      location: bookingDetails.location,
+      notes: bookingDetails.notes || undefined,
+      sub_service_items: subServiceItems,
+      coupon_code: appliedCoupon?.coupon.code,
+    };
+    try {
+      await createBooking(payload).unwrap();
+      toast.success(
+        cartItemCount > 1
+          ? `${cartItemCount} services booked successfully! ✅`
+          : "Booking placed successfully! ✅",
+        {
+          description: "View and track your booking from your dashboard.",
+          action: {
+            label: "Track Booking →",
+            onClick: () => router.push("/dashbord/bookings"),
+          },
+          duration: 6000,
+        }
+      );
+      setIsModalOpen(false);
+      setCartQuantities({});
+      setAppliedCoupon(null);
+      setBookingDetails({ date: "", time: "", location: "", notes: "" });
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to place booking. Please try again.");
+    }
+  };
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      setActiveTab(id);
+      const offset = 140;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = el.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+  };
+
+  // Keep active tab updated on scroll
+  useEffect(() => {
+    const sections = ["specialized-services", "packages", "experts", "vendor", "reviews"];
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 200;
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            setActiveTab(section);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Automatically open booking modal if ?book=true is passed
+  useEffect(() => {
+    if (isLoading || !service || hasAutoBooked.current) return;
+    const shouldBook = searchParams.get("book") === "true";
+    if (shouldBook) {
+      hasAutoBooked.current = true;
+      const firstSubService = displayServices.find(
+        (s: any) => s.subServices && s.subServices.length > 0
+      )?.subServices[0];
+      if (firstSubService) {
+        setCartQuantities({ [firstSubService.id]: 1 });
+      }
+      if (!authUser) {
+        const currentPath = window.location.pathname + window.location.search;
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        return;
+      }
+      setIsModalOpen(true);
+    }
+  }, [isLoading, service, searchParams, displayServices, authUser, router]);
+
+  return {
+    authUser,
+    cartItems,
+    cartItemCount,
+    cartTotal,
+    payableTotal,
+    displayServices,
+    isModalOpen,
+    setIsModalOpen,
+    bookingDetails,
+    setBookingDetails,
+    appliedCoupon,
+    setAppliedCoupon,
+    activeTab,
+    setActiveTab,
+    isBooking,
+    handleUpdateQuantity,
+    handleRemoveFromCart,
+    handleClearCart,
+    handleAddToCart,
+    handleInitiateBooking,
+    handleConfirmBooking,
+    scrollToSection,
+  };
+}

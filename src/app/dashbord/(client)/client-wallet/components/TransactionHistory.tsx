@@ -1,0 +1,83 @@
+"use client";
+
+import React from "react";
+import { ArrowRight, SlidersHorizontal, Sparkles } from "lucide-react";
+
+interface TransactionHistoryProps {
+  myCompletedBookings: any[];
+}
+
+export default function TransactionHistory({ myCompletedBookings }: TransactionHistoryProps) {
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="font-extrabold text-slate-800 text-lg">Transaction History</h3>
+        <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors flex items-center gap-1.5 focus:outline-none">
+          <SlidersHorizontal size={14} />
+          <span className="text-[10px] font-bold text-slate-600">Filter</span>
+        </button>
+      </div>
+
+      <div className="bg-white rounded-[28px] border border-slate-100 shadow-sm overflow-hidden p-2">
+        <div className="overflow-x-auto custom-scrollbar pb-2">
+          <table className="w-full min-w-[600px] text-left border-collapse">
+            <thead>
+              <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-50">
+                <th className="px-3 md:px-6 py-3 md:py-4">Service / Description</th>
+                <th className="px-3 md:px-6 py-3 md:py-4">Date</th>
+                <th className="px-3 md:px-6 py-3 md:py-4">Amount</th>
+                <th className="px-3 md:px-6 py-3 md:py-4 pr-6">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50/50">
+              {myCompletedBookings.length > 0 ? (
+                myCompletedBookings.map((b: any) => (
+                  <tr key={b.id} className="hover:bg-slate-50/30 transition-colors">
+                    <td className="px-3 md:px-6 py-3 md:py-4 flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl shrink-0 bg-[#FFF8F4] text-[#FF6014]">
+                        <Sparkles size={16} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-850">
+                          {b.nestedService?.name || b.pkg?.name || "Service Booking"}
+                        </h4>
+                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Order #{b.id}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-xs font-semibold text-slate-400">
+                      {new Date(b.createdAt).toLocaleDateString("en-BD", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 text-xs font-extrabold text-[#FF6014]">
+                      - ৳ {Number(b.total_price || 0).toLocaleString("en-BD")}
+                    </td>
+                    <td className="px-3 md:px-6 py-3 md:py-4 pr-6">
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-lg bg-[#FFF8F4] text-[#FF6014] uppercase">
+                        EXPENSE
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-3 md:px-6 py-6 text-center text-xs text-slate-400 font-semibold">
+                    No completed bookings found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="p-4 text-center border-t border-slate-50">
+          <button className="text-xs font-bold text-[#FF6014] hover:underline focus:outline-none flex items-center gap-1 mx-auto">
+            View All Transactions <ArrowRight size={12} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
