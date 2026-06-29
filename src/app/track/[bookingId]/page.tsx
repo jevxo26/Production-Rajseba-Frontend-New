@@ -3,10 +3,9 @@
 import React, { use } from 'react';
 import { useGetBookingTrackingQuery } from '@/redux/features/admin/booking';
 
-export default function TrackingPage({ params }: { params: Promise<{ bookingId: string }> | { bookingId: string } }) {
-  // Unwrap params using React.use if it's a promise (Next.js 15+ handling), or just cast for compatibility.
-  // We'll safely access it.
-  const resolvedParams = params as { bookingId: string };
+export default function TrackingPage({ params }: { params: Promise<{ bookingId: string }> }) {
+  // Unwrap params using React.use if it's a promise (Next.js 15+ handling).
+  const resolvedParams = React.use(params);
   const bookingId = resolvedParams.bookingId;
   
   const { data: response, isLoading, isError } = useGetBookingTrackingQuery(bookingId, {
