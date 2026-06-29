@@ -63,7 +63,7 @@ export default function ProfilePage() {
       if (hasProfile && profile?.id) {
         await updateProfileMut({
           id: profile.id,
-          data: { avatar: url },
+          data: { picture: url },
         }).unwrap();
         toast.success("Profile image updated successfully!");
         refetch();
@@ -71,7 +71,7 @@ export default function ProfilePage() {
         await createProfileMut({
           user_id: user.id || user._id,
           type: selectedType || "personal",
-          avatar: url,
+          picture: url,
         }).unwrap();
         toast.success("Profile image uploaded successfully!");
         refetch();
@@ -127,7 +127,7 @@ export default function ProfilePage() {
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
       google_map_link: formData.get("google_map_link")?.toString() || "",
-      avatar: avatarUrl || undefined,
+      picture: avatarUrl || undefined,
     };
 
     try {
