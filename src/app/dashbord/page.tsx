@@ -36,6 +36,7 @@ import {
 } from "@/redux/features/shared/profileApi";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { useGetAllBookingsQuery, useUpdateBookingStatusMutation } from "@/redux/features/admin/booking";
+import { useGetOverviewStatsQuery } from "@/redux/features/admin/dashboardApi";
 import { toast } from "sonner";
 
 export default function DashboardPage() {
@@ -95,9 +96,10 @@ const chartData = [
   { month: "Jun", value: 114000 },
 ];
 
-function RevenueChart() {
+function RevenueChart({ data }: { data?: { month: string; value: number }[] }) {
+  const chartDataToUse = data && data.length > 0 ? data : chartData;
   const [tooltip, setTooltip] = useState<{ x: number; y: number; value: number; month: string; pct: number } | null>(null);
-  const [animatedHeights, setAnimatedHeights] = useState<number[]>(chartData.map(() => 0));
+  const [animatedHeights, setAnimatedHeights] = useState<number[]>(chartDataToUse.map(() => 0));
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -107,19 +109,20 @@ function RevenueChart() {
   const chartW = W - PADDING.left - PADDING.right;
   const chartH = H - PADDING.top - PADDING.bottom;
 
-  const maxVal = Math.max(...chartData.map((d) => d.value));
-  const yMax = Math.ceil(maxVal / 30000) * 30000;
+  const maxVal = Math.max(...chartDataToUse.map((d) => d.value), 1);
+  const yMax = Math.ceil(maxVal / 30000) * 30000 || 30000;
   const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
 
-  const barWidth = (chartW / chartData.length) * 0.54;
-  const barGap = chartW / chartData.length;
+  const barWidth = (chartW / chartDataToUse.length) * 0.54;
+  const barGap = chartW / chartDataToUse.length;
 
   const getBarX = (i: number) => PADDING.left + i * barGap + (barGap - barWidth) / 2;
   const getBarH = (val: number) => (val / yMax) * chartH;
 
   // Staggered animation on mount
   useEffect(() => {
-    chartData.forEach((d, i) => {
+    setAnimatedHeights(chartDataToUse.map(() => 0));
+    chartDataToUse.forEach((d, i) => {
       setTimeout(() => {
         setAnimatedHeights((prev) => {
           const next = [...prev];
@@ -128,15 +131,15 @@ function RevenueChart() {
         });
       }, 60 + i * 80);
     });
-  }, []);
+  }, [chartDataToUse]);
 
   const formatVal = (v: number) =>
     v >= 1000 ? `৳${(v / 1000).toFixed(0)}k` : `৳${v}`;
 
-  const prevVal = (i: number) => (i === 0 ? chartData[0].value : chartData[i - 1].value);
+  const prevVal = (i: number) => (i === 0 ? chartDataToUse[0].value : chartDataToUse[i - 1].value);
   const pctChange = (i: number) => {
     if (i === 0) return 0;
-    return Math.round(((chartData[i].value - prevVal(i)) / prevVal(i)) * 100);
+    return Math.round(((chartDataToUse[i].value - prevVal(i)) / prevVal(i)) * 100) || 0;
   };
 
   return (
@@ -214,7 +217,7 @@ function RevenueChart() {
         })}
 
         {/* Bars */}
-        {chartData.map((d, i) => {
+        {chartDataToUse.map((d, i) => {
           const bx = getBarX(i);
           const animH = animatedHeights[i] ?? 0;
           const by = PADDING.top + chartH - animH;
@@ -339,23 +342,20 @@ function RevenueChart() {
 function SuperAdminDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { data: bookingsRes, isLoading: isBookingsLoading } = useGetAllBookingsQuery(undefined);
-  const { data: profilesRes, isLoading: isProfilesLoading } = useGetAllProfilesQuery(undefined);
-
+  const { data: overviewRes, isLoading: isOverviewLoading } = useGetOverviewStatsQuery();
+  
   const allBookings = bookingsRes?.data || [];
-  const allProfiles = profilesRes?.data || [];
+  const overview = overviewRes?.data || {
+    revenue: { total: 0, today: 0, weekly: 0, monthly: 0, chart: [] },
+    users: { totalClients: 0, totalVendors: 0, totalAgents: 0 },
+    bookings: { todayAssigned: 0, completed: 0, pending: 0 },
+    withdraws: { totalAmount: 0, todayAmount: 0, weeklyAmount: 0, monthlyAmount: 0 }
+  };
 
-  const completedBookings = allBookings.filter((b: any) => b.status === "completed");
-  const activeBookingsList = allBookings.filter((b: any) => b.status !== "completed" && b.status !== "cancelled");
-  const totalRevenue = completedBookings.reduce((sum: number, b: any) => sum + Number(b.total_price || 0), 0);
-
-  const providerProfiles = allProfiles.filter((p: any) => p.type === "company" || p.category_id);
-
-  const stats = [
-    { label: "Total Revenue", value: `৳${totalRevenue.toLocaleString()}`, desc: "From completed bookings", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
-    { label: "Providers", value: providerProfiles.length.toString(), desc: "Registered business profiles", icon: HardHat, color: "text-teal-600 bg-teal-50" },
-    { label: "Active Bookings", value: activeBookingsList.length.toString(), desc: "In progress/pending", icon: Briefcase, color: "text-indigo-600 bg-indigo-50" },
-    { label: "Platform Rating", value: "4.92 / 5", desc: "Based on platform reviews", icon: Star, color: "text-amber-600 bg-amber-50" },
-  ];
+  const dynamicChartData = overview.revenue.chart.map((c: any) => ({
+    month: c.date,
+    value: c.amount
+  }));
 
   const recentBookings = [...allBookings]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -411,13 +411,11 @@ function SuperAdminDashboard() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* ── Premium Header ── */}
       <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm px-7 py-6">
-        {/* Decorative gradient blob */}
         <div className="absolute -top-10 -right-10 w-56 h-56 bg-gradient-to-br from-[#FF6014]/10 to-[#FFB3AD]/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-gradient-to-tr from-indigo-100/40 to-transparent rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            {/* Live badge */}
             <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
               Live Dashboard
@@ -428,7 +426,6 @@ function SuperAdminDashboard() {
             <p className="text-slate-400 mt-1.5 text-sm font-medium">Real-time statistics and administrative insights for Rajseba.</p>
           </div>
 
-          {/* Right side: date + quick actions */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-xs font-bold text-slate-700">
@@ -444,93 +441,115 @@ function SuperAdminDashboard() {
         </div>
       </div>
 
-      {/* ── Premium Stats Cards ── */}
+      {/* ── Key Performance Metrics (Revenue & Withdrawals) ── */}
+      <h2 className="text-xl font-bold text-slate-800 -mb-2 mt-4 px-1">Financial Overview</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {stats.map((stat, i) => {
+        {[
+          { label: "Total Revenue", value: `৳${overview.revenue.total.toLocaleString()}`, sub: "All time", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
+          { label: "Today's Revenue", value: `৳${overview.revenue.today.toLocaleString()}`, sub: "Today", icon: TrendingUp, color: "text-indigo-600 bg-indigo-50" },
+          { label: "Total Withdraws", value: `৳${overview.withdraws.totalAmount.toLocaleString()}`, sub: "All time", icon: Briefcase, color: "text-amber-600 bg-amber-50" },
+          { label: "Today's Withdraws", value: `৳${overview.withdraws.todayAmount.toLocaleString()}`, sub: "Today", icon: AlertCircle, color: "text-red-600 bg-red-50" },
+        ].map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div
-              key={i}
-              className="group bg-white p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3 sm:gap-4 hover:shadow-lg hover:shadow-slate-100/80 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
-            >
-              <div className={`p-2.5 sm:p-3 rounded-xl ${stat.color} group-hover:scale-110 transition-transform duration-200 shrink-0`}>
-                <Icon size={20} className="sm:w-6 sm:h-6" />
+            <div key={i} className="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4 hover:shadow-md transition-all duration-200">
+              <div className={`p-3 rounded-xl ${stat.color} shrink-0`}>
+                <Icon size={22} />
               </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-slate-400 font-semibold truncate">{stat.label}</p>
-                <h4 className="text-lg sm:text-2xl font-extrabold text-slate-900 mt-0.5 leading-tight tracking-tight">{stat.value}</h4>
-                <span className="text-[10px] sm:text-xs text-slate-400 mt-1 block font-medium leading-tight">{stat.desc}</span>
+              <div>
+                <p className="text-xs text-slate-400 font-semibold">{stat.label}</p>
+                <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">{stat.value}</h4>
+                <p className="text-[10px] text-slate-400 mt-1 font-medium">{stat.sub}</p>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Main Grid: Revenue Chart & Pending Approvals */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Columns: Revenue Chart */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm lg:col-span-2 overflow-hidden">
-          {/* Chart header with subtle gradient */}
-          <div className="px-6 pt-6 pb-4 flex justify-between items-start border-b border-slate-50">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900 tracking-tight">Revenue Growth</h3>
-              <p className="text-xs text-slate-400 mt-0.5 font-medium">Monthly breakdown — 2026</p>
+      {/* ── User & Booking Metrics ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* User Stats Grid */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-lg font-bold text-slate-900">User Demographics</h3>
+            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><Users size={18} /></div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalClients}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Clients</p>
             </div>
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold">
-                <span className="inline-block w-3 h-3 rounded-sm bg-gradient-to-b from-[#FF6014] to-[#FFBAB4]" />
-                Revenue
-              </div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
-                <TrendingUp size={12} /> +15% YoY
-              </span>
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalVendors}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Vendors</p>
+            </div>
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalAgents}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Agents</p>
             </div>
           </div>
-
-          {/* Chart area */}
-          <div className="px-4 pt-4 pb-2">
-            <RevenueChart />
-          </div>
-
-          {/* Summary row — premium */}
-          <div className="mx-6 mb-5 mt-1 grid grid-cols-3 divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
-            {[
-              { label: "Peak Month", value: "Jun 2026", sub: "৳1,14,000", accent: "text-[#FF6014]" },
-              { label: "Avg / Month", value: "৳79,000", sub: "6-month avg", accent: "text-indigo-500" },
-              { label: "Growth Rate", value: "+137%", sub: "Jan → Jun", accent: "text-emerald-500" },
-            ].map((s, i) => (
-              <div key={i} className="text-center py-3 px-2">
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{s.label}</p>
-                <p className={`text-sm font-extrabold mt-1 ${s.accent}`}>{s.value}</p>
-                <p className="text-[10px] text-slate-400 font-medium">{s.sub}</p>
-              </div>
-            ))}
+          <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center px-2">
+            <span className="text-sm font-semibold text-slate-500">Total Registered Users</span>
+            <span className="text-lg font-bold text-[#FF6014]">{overview.users.totalClients + overview.users.totalVendors + overview.users.totalAgents}</span>
           </div>
         </div>
 
-        {/* Right 1 Column: Pending Verification */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-slate-900">Pending Approvals</h3>
-            <span className="text-xs font-semibold text-[#FF6014] bg-[#FFF8F4] px-2 py-0.5 rounded-lg">18 New</span>
+        {/* Booking Stats Grid */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-lg font-bold text-slate-900">Booking Pipeline</h3>
+            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><CheckCircle2 size={18} /></div>
           </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-emerald-600">{overview.bookings.completed}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Completed</p>
+            </div>
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-amber-500">{overview.bookings.pending}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Pending</p>
+            </div>
+            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
+              <p className="text-2xl font-extrabold text-indigo-500">{overview.bookings.todayAssigned}</p>
+              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Assigned</p>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center px-2">
+            <span className="text-sm font-semibold text-slate-500">Active Pipeline Total</span>
+            <span className="text-lg font-bold text-slate-800">{overview.bookings.completed + overview.bookings.pending + overview.bookings.todayAssigned}</span>
+          </div>
+        </div>
+      </div>
 
-          <div className="space-y-4">
-            {providerProfiles.slice(0, 3).map((p: any, i: number) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 transition-colors">
-                <div>
-                  <h5 className="text-sm font-semibold text-slate-800">{p.company_name || p.user?.name || "Provider"}</h5>
-                  <span className="text-xs text-slate-400">{p.category?.name || "Service Provider"} • {p.location || "Dhaka"}</span>
-                </div>
-                <button className="text-xs font-semibold bg-[#FF6014] hover:bg-[#E0530A] text-white px-3 py-1.5 rounded-lg transition-all active:scale-[0.97]">
-                  Verify
-                </button>
-              </div>
-            ))}
-            {providerProfiles.length === 0 && (
-              <div className="text-xs text-slate-400 text-center py-4">No pending approvals</div>
-            )}
+      {/* Main Grid: Revenue Chart */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="px-6 pt-6 pb-4 flex justify-between items-start border-b border-slate-50">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Revenue Trends</h3>
+            <p className="text-xs text-slate-400 mt-0.5 font-medium">Daily breakdown (Last 7 Days)</p>
           </div>
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-semibold">
+              <span className="inline-block w-3 h-3 rounded-sm bg-gradient-to-b from-[#FF6014] to-[#FFBAB4]" />
+              Revenue
+            </div>
+          </div>
+        </div>
+        <div className="px-4 pt-4 pb-2">
+          <RevenueChart data={dynamicChartData} />
+        </div>
+        <div className="mx-6 mb-5 mt-1 grid grid-cols-4 divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
+          {[
+            { label: "This Month Rev", value: `৳${overview.revenue.monthly.toLocaleString()}`, accent: "text-[#FF6014]" },
+            { label: "This Week Rev", value: `৳${overview.revenue.weekly.toLocaleString()}`, accent: "text-indigo-500" },
+            { label: "Month Withdraws", value: `৳${overview.withdraws.monthlyAmount.toLocaleString()}`, accent: "text-emerald-500" },
+            { label: "Week Withdraws", value: `৳${overview.withdraws.weeklyAmount.toLocaleString()}`, accent: "text-amber-500" },
+          ].map((s, i) => (
+            <div key={i} className="text-center py-3 px-2">
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{s.label}</p>
+              <p className={`text-sm font-extrabold mt-1 ${s.accent}`}>{s.value}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -538,9 +557,9 @@ function SuperAdminDashboard() {
       <div className="space-y-4">
         <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-premium">
           <h3 className="text-lg font-bold text-slate-900">Recent Booking Log</h3>
-          <button className="text-xs font-semibold text-[#FF6014] hover:underline flex items-center gap-0.5">
+          <Link href="/dashbord/manage-bookings" className="text-xs font-semibold text-[#FF6014] hover:underline flex items-center gap-0.5">
             View All Bookings <ArrowUpRight size={14} />
-          </button>
+          </Link>
         </div>
         <CustomTable
           columns={adminColumns}
