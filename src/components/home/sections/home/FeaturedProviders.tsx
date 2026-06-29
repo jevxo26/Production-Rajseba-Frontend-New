@@ -19,13 +19,6 @@ const itemVariants = {
   },
 } as const;
 
-const BADGE_CONFIGS = [
-  { label: "Top Rated", cls: "bg-[#FF6014] text-white" },
-  { label: "Verified Pro", cls: "bg-violet-600 text-white" },
-  { label: "5★ Provider", cls: "bg-amber-500 text-white" },
-  { label: "Trusted", cls: "bg-teal-600 text-white" },
-  { label: "Expert", cls: "bg-slate-800 text-white" },
-];
 
 function SkeletonCard() {
   return (
@@ -51,8 +44,11 @@ export default function FeaturedProviders() {
   const { data: profilesRes, isLoading } = useGetPublicProfilesQuery();
 
   const rawProfiles: any[] = profilesRes?.data ?? (Array.isArray(profilesRes) ? profilesRes : []);
+  const activeProviders = rawProfiles.filter(
+    (p: any) => p.categories && p.categories.length > 0
+  );
 
-  const providers = rawProfiles.slice(0, 8).map((p: any, idx: number) => {
+  const providers = activeProviders.slice(0, 8).map((p: any, idx: number) => {
     const user = p.user ?? {};
 
     const services: string[] = Array.isArray(p.categories) && p.categories.length > 0
@@ -70,23 +66,24 @@ export default function FeaturedProviders() {
       .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
       .join(", ");
 
-    const rating = p.rating != null && Number(p.rating) > 0
+    const rating = p.rating != null && !isNaN(Number(p.rating))
       ? Number(p.rating).toFixed(1)
-      : (4.5 + (idx * 0.07) % 0.5).toFixed(1);
+      : "0.0";
 
-    const reviews = p.total_reviews ?? Math.floor(80 + (idx * 37) % 300);
-    const jobs = p.total_projects > 0
+    const reviews = p.total_reviews ?? 0;
+    const jobs = p.total_projects != null && Number(p.total_projects) > 0
       ? `${p.total_projects}+`
-      : `${Math.floor(50 + (idx * 83) % 400)}+`;
-
-    const avatarSeed = encodeURIComponent(user.name ?? user.email ?? `profile-${idx}`);
-    const bgColors = ["b6e3f4", "c0aede", "ffdfbf", "d1f4d1", "ffd5dc", "b6f4d8"];
-    const bg = bgColors[idx % bgColors.length];
+      : "0+";
 
     const specialty =
       p.company_name ||
       (p.description ? p.description.slice(0, 45) : null) ||
       "Service Provider";
+
+    const badge = {
+      label: p.type === "company" ? "Company" : "Individual",
+      cls: p.type === "company" ? "bg-violet-600 text-white" : "bg-slate-700 text-white",
+    };
 
     return {
       id: p.id ?? idx,
@@ -96,12 +93,9 @@ export default function FeaturedProviders() {
       rating,
       reviews,
       jobs,
-      avatar:
-        user.profileImage ??
-        user.avatar ??
-        `https://api.dicebear.com/7.x/avataaars/svg?seed=${avatarSeed}&backgroundColor=${bg}`,
+      avatar: p.picture || user.profileImage || user.avatar || null,
       services,
-      badge: BADGE_CONFIGS[idx % BADGE_CONFIGS.length],
+      badge,
     };
   });
 
@@ -161,11 +155,17 @@ export default function FeaturedProviders() {
                   {/* Avatar */}
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
                     <div className="relative">
-                      <img
-                        src={provider.avatar}
-                        alt={provider.name}
-                        className="w-14 h-14 rounded-full object-cover bg-slate-100 border-4 border-white shadow-md"
-                      />
+                      {provider.avatar ? (
+                        <img
+                          src={provider.avatar}
+                          alt={provider.name}
+                          className="w-14 h-14 rounded-full object-cover bg-slate-100 border-4 border-white shadow-md"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#FF6014] to-[#ff7c71] text-white flex items-center justify-center font-black text-lg border-4 border-white shadow-md uppercase">
+                          {provider.name.charAt(0)}
+                        </div>
+                      )}
                       <div className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
                     </div>
                   </div>
