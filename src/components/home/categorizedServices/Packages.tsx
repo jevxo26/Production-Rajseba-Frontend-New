@@ -2,6 +2,9 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/redux/hooks";
+import { toast } from "sonner";
 import { PackageOfferCard } from "../packages/PackageOfferCard";
 import { PackageBookingModal } from "../packages/PackageBookingModal";
 import { DisplayPackage, mapPackagesToDisplay } from "../packages/packageOfferUtils";
@@ -55,6 +58,8 @@ export function Packages({
   serviceName?: string;
   serviceImage?: string;
 }) {
+  const router = useRouter();
+  const authUser = useAppSelector((state) => state.auth.user);
   const [selectedPackage, setSelectedPackage] = useState<DisplayPackage | null>(null);
 
   const displayPackages = mapPackagesToDisplay(
@@ -68,6 +73,12 @@ export function Packages({
   );
 
   const handleBookPackage = (pkg: DisplayPackage) => {
+    if (!authUser) {
+      toast.error("Please login to proceed with booking.");
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
     setSelectedPackage(pkg);
   };
 

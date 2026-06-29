@@ -45,12 +45,9 @@ export default function SpecialOffers() {
 
   const handleInitiateBooking = (pkg: DisplayPackage) => {
     if (!authUser) {
-      toast.error("Please login to proceed with booking!", {
-        action: {
-          label: "Login",
-          onClick: () => router.push("/login"),
-        },
-      });
+      toast.error("Please login to proceed with booking.");
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
       return;
     }
     setSelectedPackage(pkg);
