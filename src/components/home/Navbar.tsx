@@ -56,7 +56,7 @@ const ALL_NAV_LINKS: NavLink[] = [...LEFT_NAV_LINKS, ...RIGHT_NAV_LINKS];
 
 const MOBILE_BOTTOM_LINKS: NavLink[] = [
   { label: "Home", href: "/", icon: HomeIcon },
-  { label: "Menu", href: "#menu", icon: LayoutGrid, hasDropdown: true },
+  { label: "Services", href: "/services", icon: Briefcase },
   { label: "Opportunity", href: "/opportunity", icon: TrendingUp },
   { label: "Map", href: "/map", icon: MapPin },
   { label: "Booking", href: "/bookings", icon: Calendar },

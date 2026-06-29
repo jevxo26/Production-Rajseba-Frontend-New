@@ -147,8 +147,7 @@ function RevenueChart({ data }: { data?: { month: string; value: number }[] }) {
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full overflow-visible"
-        style={{ maxHeight: 260 }}
+        className="w-full h-auto overflow-visible"
         onMouseLeave={() => { setTooltip(null); setHoveredIdx(null); }}
       >
         <defs>
@@ -408,7 +407,7 @@ function SuperAdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* ── Premium Header ── */}
       <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm px-7 py-6">
         <div className="absolute -top-10 -right-10 w-56 h-56 bg-gradient-to-br from-[#FF6014]/10 to-[#FFB3AD]/5 rounded-full blur-3xl pointer-events-none" />
@@ -442,8 +441,10 @@ function SuperAdminDashboard() {
       </div>
 
       {/* ── Key Performance Metrics (Revenue & Withdrawals) ── */}
-      <h2 className="text-xl font-bold text-slate-800 -mb-2 mt-4 px-1">Financial Overview</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="flex items-center justify-between mt-2 px-1">
+        <h2 className="text-lg font-black text-slate-800 tracking-tight uppercase">Financial Overview</h2>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         {[
           { label: "Total Revenue", value: `৳${overview.revenue.total.toLocaleString()}`, sub: "All time", icon: DollarSign, color: "text-emerald-600 bg-emerald-50" },
           { label: "Today's Revenue", value: `৳${overview.revenue.today.toLocaleString()}`, sub: "Today", icon: TrendingUp, color: "text-indigo-600 bg-indigo-50" },
@@ -452,14 +453,18 @@ function SuperAdminDashboard() {
         ].map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div key={i} className="group bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-4 hover:shadow-md transition-all duration-200">
-              <div className={`p-3 rounded-xl ${stat.color} shrink-0`}>
-                <Icon size={22} />
+            <div
+              key={i}
+              className="group bg-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-100 hover:border-[#FF6014]/20 hover:shadow-lg hover:shadow-[#FF6014]/5 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2.5 sm:gap-4 relative overflow-hidden"
+            >
+              <div className="absolute -right-6 -bottom-6 w-20 h-20 bg-gradient-to-br from-[#FF6014]/5 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              <div className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl ${stat.color} shrink-0 transition-transform duration-300 group-hover:scale-110 shadow-xs`}>
+                <Icon size={16} className="sm:w-[22px] sm:h-[22px]" />
               </div>
-              <div>
-                <p className="text-xs text-slate-400 font-semibold">{stat.label}</p>
-                <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">{stat.value}</h4>
-                <p className="text-[10px] text-slate-400 mt-1 font-medium">{stat.sub}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] sm:text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">{stat.label}</p>
+                <h4 className="text-sm xs:text-base sm:text-xl md:text-2xl font-black text-slate-800 mt-0.5 sm:mt-1 tracking-tight truncate">{stat.value}</h4>
+                <p className="text-[8px] sm:text-[10px] text-slate-400 mt-0.5 font-semibold">{stat.sub}</p>
               </div>
             </div>
           );
@@ -467,62 +472,68 @@ function SuperAdminDashboard() {
       </div>
 
       {/* ── User & Booking Metrics ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
         {/* User Stats Grid */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="bg-white rounded-3xl border border-slate-100 hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 p-6">
           <div className="flex justify-between items-center mb-5">
-            <h3 className="text-lg font-bold text-slate-900">User Demographics</h3>
-            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg"><Users size={18} /></div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight">User Demographics</h3>
+              <p className="text-xs text-slate-400 font-medium">Registered account distribution</p>
+            </div>
+            <div className="p-2.5 bg-[#FFF8F4] text-[#FF6014] rounded-2xl"><Users size={20} /></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalClients}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Clients</p>
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-[#FFF8F4]/30 hover:border-[#FF6014]/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight group-hover/item:scale-105 transition-transform">{overview.users.totalClients}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Clients</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalVendors}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Vendors</p>
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-[#FFF8F4]/30 hover:border-[#FF6014]/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight group-hover/item:scale-105 transition-transform">{overview.users.totalVendors}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Vendors</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-slate-800">{overview.users.totalAgents}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Agents</p>
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-[#FFF8F4]/30 hover:border-[#FF6014]/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight group-hover/item:scale-105 transition-transform">{overview.users.totalAgents}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Agents</p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center px-2">
-            <span className="text-sm font-semibold text-slate-500">Total Registered Users</span>
-            <span className="text-lg font-bold text-[#FF6014]">{overview.users.totalClients + overview.users.totalVendors + overview.users.totalAgents}</span>
+          <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center px-1">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Total Registered Users</span>
+            <span className="text-lg font-black text-[#FF6014]">{overview.users.totalClients + overview.users.totalVendors + overview.users.totalAgents}</span>
           </div>
         </div>
 
-        {/* Booking Stats Grid */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        {/* Booking Pipeline Grid */}
+        <div className="bg-white rounded-3xl border border-slate-100 hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 p-6">
           <div className="flex justify-between items-center mb-5">
-            <h3 className="text-lg font-bold text-slate-900">Booking Pipeline</h3>
-            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><CheckCircle2 size={18} /></div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight">Booking Pipeline</h3>
+              <p className="text-xs text-slate-400 font-medium">Status overview of booking records</p>
+            </div>
+            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl"><CheckCircle2 size={20} /></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-emerald-600">{overview.bookings.completed}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Completed</p>
+          <div className="grid grid-cols-3 gap-3 md:gap-4">
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-emerald-50/20 hover:border-emerald-500/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-emerald-600 tracking-tight group-hover/item:scale-105 transition-transform">{overview.bookings.completed}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Completed</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-amber-500">{overview.bookings.pending}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Pending</p>
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-amber-50/20 hover:border-amber-500/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-amber-500 tracking-tight group-hover/item:scale-105 transition-transform">{overview.bookings.pending}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Pending</p>
             </div>
-            <div className="text-center p-4 bg-slate-50 rounded-xl border border-slate-100/50">
-              <p className="text-2xl font-extrabold text-indigo-500">{overview.bookings.todayAssigned}</p>
-              <p className="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Assigned</p>
+            <div className="text-center p-4 bg-slate-50/50 hover:bg-indigo-50/20 hover:border-indigo-500/10 rounded-2xl border border-slate-100 transition-all duration-200 group/item">
+              <p className="text-2xl md:text-3xl font-black text-indigo-500 tracking-tight group-hover/item:scale-105 transition-transform">{overview.bookings.todayAssigned}</p>
+              <p className="text-[10px] font-bold text-slate-400 mt-1.5 uppercase tracking-wider">Assigned</p>
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-50 flex justify-between items-center px-2">
-            <span className="text-sm font-semibold text-slate-500">Active Pipeline Total</span>
-            <span className="text-lg font-bold text-slate-800">{overview.bookings.completed + overview.bookings.pending + overview.bookings.todayAssigned}</span>
+          <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center px-1">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Active Pipeline Total</span>
+            <span className="text-lg font-black text-slate-800">{overview.bookings.completed + overview.bookings.pending + overview.bookings.todayAssigned}</span>
           </div>
         </div>
       </div>
 
       {/* Main Grid: Revenue Chart */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:border-[#FF6014]/15 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 overflow-hidden">
         <div className="px-6 pt-6 pb-4 flex justify-between items-start border-b border-slate-50">
           <div>
             <h3 className="text-lg font-bold text-slate-900 tracking-tight">Revenue Trends</h3>
@@ -538,7 +549,7 @@ function SuperAdminDashboard() {
         <div className="px-4 pt-4 pb-2">
           <RevenueChart data={dynamicChartData} />
         </div>
-        <div className="mx-6 mb-5 mt-1 grid grid-cols-4 divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
+        <div className="mx-6 mb-6 mt-2 grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-slate-50/70 rounded-2xl border border-slate-100 overflow-hidden">
           {[
             { label: "This Month Rev", value: `৳${overview.revenue.monthly.toLocaleString()}`, accent: "text-[#FF6014]" },
             { label: "This Week Rev", value: `৳${overview.revenue.weekly.toLocaleString()}`, accent: "text-indigo-500" },

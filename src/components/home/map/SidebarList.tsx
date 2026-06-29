@@ -53,7 +53,7 @@ export default function SidebarList({
   }, []);
 
   return (
-    <div className="w-full md:w-[380px] bg-white border border-slate-200 rounded-3xl flex flex-col h-[32vh] max-h-[340px] md:h-full md:max-h-none z-10 shadow-md overflow-hidden shrink-0">
+    <div className="w-full md:w-[380px] bg-white border border-slate-200 rounded-3xl flex flex-col h-auto md:h-full md:max-h-none z-10 shadow-md overflow-hidden shrink-0">
       {/* Sidebar Header Filters */}
       <div className="p-4 border-b border-slate-100 space-y-4">
         {/* Search Bar */}
@@ -125,7 +125,7 @@ export default function SidebarList({
       </div>
 
       {/* Sidebar List Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
+      <div className="hidden md:flex flex-col flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50 custom-scrollbar">
         <h3 className="text-sm font-extrabold text-slate-800 tracking-wide uppercase px-1">
           Nearby Professionals ({filteredExperts.length})
         </h3>
