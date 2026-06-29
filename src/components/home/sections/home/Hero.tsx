@@ -1,15 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Search, MapPin, LayoutGrid } from "lucide-react";
+import { Search } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { CustomSelect } from "@/components/ui/select";
-import { useGetPublicCategoriesQuery, useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
-import { useGetAllDevisionsQuery } from "@/redux/features/admin/location";
 import Link from "next/link";
+import { useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
 
 const HERO_CONTENT = {
   titleText: "Expert Home",
@@ -47,41 +44,14 @@ const itemVariants = {
 
 const Hero = () => {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedDivision, setSelectedDivision] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: categoriesRes } = useGetPublicCategoriesQuery();
-  const { data: divisionsRes } = useGetAllDevisionsQuery();
-
-  const categoryOptions = useMemo(() => {
-    const categories = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
-    return categories
-      .filter((cat: { parent?: unknown }) => !cat.parent)
-      .map((cat: { id: number; name: string }) => ({
-        value: String(cat.id),
-        label: cat.name,
-      }));
-  }, [categoriesRes]);
-
-  const divisionOptions = useMemo(() => {
-    const divisions = divisionsRes?.data || [];
-    return divisions.map((div: { id: number; name: string }) => ({
-      value: String(div.id),
-      label: div.name,
-    }));
-  }, [divisionsRes]);
-
   const { data: searchRes, isFetching: isSearching } = useSearchPublicServicesQuery(
-    {
-      q: searchQuery || undefined,
-      category_id: selectedCategory ? Number(selectedCategory) : undefined,
-      devision_id: selectedDivision ? Number(selectedDivision) : undefined,
-    },
-    { skip: !searchQuery && !selectedCategory && !selectedDivision }
+    { q: searchQuery || undefined },
+    { skip: !searchQuery }
   );
 
   const searchResults = searchRes?.data || [];
@@ -124,20 +94,16 @@ const Hero = () => {
     return -(y / 200) * 60;
   });
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const params = new URLSearchParams();
     if (searchQuery) params.set("q", searchQuery);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedDivision) params.set("devision", selectedDivision);
     const qs = params.toString();
     router.push(qs ? `/services?${qs}` : "/services");
   };
 
   return (
-    <div
-      className="relative w-full min-h-0 sm:min-h-[60vh] md:min-h-[66vh] lg:min-h-[70vh] flex items-center justify-center py-10 md:py-24"
-    >
+    <div className="relative w-full min-h-0 sm:min-h-[60vh] md:min-h-[66vh] lg:min-h-[70vh] flex items-center justify-center py-10 md:py-24">
       <div className="absolute inset-0 z-0 bg-[#FFF8F4] overflow-hidden">
         <div className="absolute inset-0 w-full h-full opacity-15 md:opacity-20 pointer-events-none select-none">
           <Image
@@ -177,7 +143,8 @@ const Hero = () => {
           {HERO_CONTENT.description}
         </motion.p>
 
-        <div className="relative w-full max-w-4xl mx-auto mb-10" ref={dropdownRef}>
+        {/* Search Bar with Round Button on Right */}
+        <div className="relative w-full max-w-2xl mx-auto mb-10" ref={dropdownRef}>
           <motion.form
             variants={itemVariants}
             style={{
@@ -186,10 +153,9 @@ const Hero = () => {
               y: searchY,
             }}
             onSubmit={handleSearch}
-            className="w-full bg-[#FF6014]/5 rounded-2xl md:rounded-full shadow-[0_10px_30px_rgba(255,96,20,0.04)] border border-[#FF6014]/10 p-2 sm:p-3 flex flex-col md:flex-row items-center gap-2.5 sm:gap-3 md:gap-0"
+            className="w-full bg-[#FF6014]/5 rounded-2xl md:rounded-full shadow-[0_10px_30px_rgba(255,96,20,0.04)] border border-[#FF6014]/10 p-2 sm:p-3 flex items-center"
           >
-            {/* Search Input */}
-            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative">
+            <div className="flex items-center gap-3 flex-1 w-full px-4 py-2 relative">
               <Search className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
               <input
                 type="text"
@@ -200,52 +166,23 @@ const Hero = () => {
                   setShowResults(true);
                 }}
                 onFocus={() => setShowResults(true)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 className="w-full border-none bg-transparent outline-none text-slate-700 font-medium placeholder:text-slate-400 focus:ring-0"
               />
             </div>
 
-            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
-
-            {/* Location/Division Select */}
-            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
-              <MapPin className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
-              <CustomSelect
-                options={divisionOptions}
-                value={selectedDivision}
-                onChange={(val) => {
-                  setSelectedDivision(val);
-                  setShowResults(true);
-                }}
-                placeholder="Select Division"
-                className="w-full"
-                controlBg="transparent"
-                triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
-              />
-            </div>
-
-            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
-
-            {/* Category Select */}
-            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
-              <LayoutGrid className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
-              <CustomSelect
-                options={categoryOptions}
-                value={selectedCategory}
-                onChange={(val) => {
-                  setSelectedCategory(val);
-                  setShowResults(true);
-                }}
-                placeholder="Select Category"
-                className="w-full"
-                controlBg="transparent"
-                triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
-              />
-            </div>
-
+            {/* Round Search Button */}
+            <button
+              type="submit"
+              onClick={() => handleSearch()}
+              className="bg-[#FF6014] hover:bg-[#FF5000] text-white rounded-full p-3 sm:p-4 flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:scale-95 flex-shrink-0"
+            >
+              <Search className="w-5 h-5" />
+            </button>
           </motion.form>
 
           {/* Search Results Dropdown */}
-          {showResults && (searchQuery || selectedCategory || selectedDivision) && (
+          {showResults && searchQuery && (
             <div className="absolute top-full left-0 right-0 mt-3 bg-[#FFFDFB] rounded-2xl shadow-xl border border-[#FF6014]/20 overflow-hidden z-50 max-h-[400px] overflow-y-auto text-left">
               {isSearching ? (
                 <div className="p-8 flex justify-center items-center">
@@ -261,10 +198,12 @@ const Hero = () => {
                       className="group flex items-center gap-4 p-4 hover:bg-[#FF6014]/5 transition-all border-b border-[#FF6014]/10 last:border-0"
                     >
                       <div className="w-12 h-12 bg-[#FF6014]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
-                        <LayoutGrid className="w-6 h-6 text-[#FF6014]" />
+                        <Search className="w-6 h-6 text-[#FF6014]" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm md:text-base group-hover:text-[#FF6014] transition-colors duration-200">{service.name}</h4>
+                        <h4 className="font-bold text-slate-800 text-sm md:text-base group-hover:text-[#FF6014] transition-colors duration-200">
+                          {service.name}
+                        </h4>
                         <p className="text-xs md:text-sm text-slate-500 font-medium">
                           {service.category?.name || 'Service'} • {service.price ? `৳${service.price}` : 'Price varies'}
                         </p>
@@ -282,6 +221,7 @@ const Hero = () => {
           )}
         </div>
 
+        {/* Trust Badges */}
         <motion.div
           variants={itemVariants}
           className="grid grid-cols-2 lg:flex items-center justify-center gap-2.5 sm:gap-6 md:gap-8 mt-8 sm:mt-10 text-slate-500 font-semibold text-[10px] sm:text-xs md:text-sm w-full max-w-sm lg:max-w-none mx-auto"
@@ -289,34 +229,24 @@ const Hero = () => {
           <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">★</span>
             <span className="text-slate-600">
-              <strong className="text-[#FF6014] font-extrabold">
-                4.9/5 Rating
-              </strong>{" "}
-              (20k+ Reviews)
+              <strong className="text-[#FF6014] font-extrabold">4.9/5 Rating</strong> (20k+ Reviews)
             </span>
           </div>
 
           <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">⚡</span>
             <span className="text-slate-600">
-              <strong className="text-[#FF6014] font-extrabold">
-                30 Min
-              </strong>{" "}
-              Express Response
+              <strong className="text-[#FF6014] font-extrabold">30 Min</strong> Express Response
             </span>
           </div>
 
           <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full col-span-2 lg:col-span-1 lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">🛡️</span>
             <span className="text-slate-600">
-              <strong className="text-[#FF6014] font-extrabold">
-                100%
-              </strong>{" "}
-              Satisfaction Insured
+              <strong className="text-[#FF6014] font-extrabold">100%</strong> Satisfaction Insured
             </span>
           </div>
         </motion.div>
-
       </motion.div>
     </div>
   );
