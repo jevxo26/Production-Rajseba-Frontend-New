@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Headphones, Send, X, Sparkles, Loader2, Bot } from "lucide-react";
+import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
 
 interface Message {
   role: "user" | "model";
@@ -10,6 +12,7 @@ interface Message {
 }
 
 export function AiChatBot() {
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -29,6 +32,59 @@ export function AiChatBot() {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  const parseMessageText = (text: string) => {
+    // Regex to match markdown links: [Label](url)
+    const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const [_, label, url] = match;
+      const matchIndex = match.index;
+
+      if (matchIndex > lastIndex) {
+        parts.push(text.substring(lastIndex, matchIndex));
+      }
+
+      const isInternal = url.startsWith("/");
+      if (isInternal) {
+        parts.push(
+          <Link
+            key={matchIndex}
+            href={url}
+            onClick={() => {
+              // Optionally close chatbot on navigation if desired
+            }}
+            className="text-amber-600 hover:text-amber-700 underline font-bold inline-flex items-center gap-0.5"
+          >
+            {label}
+          </Link>
+        );
+      } else {
+        parts.push(
+          <a
+            key={matchIndex}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-600 hover:text-amber-700 underline font-bold inline-flex items-center gap-0.5"
+          >
+            {label}
+          </a>
+        );
+      }
+
+      lastIndex = regex.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
+
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
@@ -45,7 +101,15 @@ export function AiChatBot() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({
+          messages: updatedMessages,
+          user: isAuthenticated && user ? {
+            name: user.name || "User",
+            email: user.email || "",
+            phone: user.phone || user.phoneNumber || "",
+            role: user.role || "client",
+          } : null
+        }),
       });
 
       if (!response.ok) {
@@ -164,13 +228,13 @@ export function AiChatBot() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-[20px] p-3.5 text-xs font-semibold leading-relaxed shadow-2xs ${
+                    className={`max-w-[80%] rounded-[20px] p-3.5 text-xs font-semibold leading-relaxed shadow-2xs whitespace-pre-wrap ${
                       msg.role === "user"
                         ? "bg-[#FF6014] text-white rounded-tr-none"
                         : "bg-white text-slate-700 border border-slate-100/50 rounded-tl-none"
                     }`}
                   >
-                    {msg.text}
+                    {parseMessageText(msg.text)}
                   </div>
                 </div>
               ))}

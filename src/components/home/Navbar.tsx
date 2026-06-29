@@ -28,7 +28,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useGetPublicCategoriesQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicCategoriesQuery, useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { logout as authLogout, getRoleName } from "@/redux/features/auth/authSlice";
 
@@ -74,6 +74,14 @@ export function Navbar() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [showMobileResults, setShowMobileResults] = useState(false);
+
+  const { data: mobileSearchRes, isFetching: isMobileSearching } = useSearchPublicServicesQuery(
+    { q: mobileSearchQuery || undefined },
+    { skip: !mobileSearchQuery }
+  );
+  const mobileSearchResults = mobileSearchRes?.data || [];
   const [mounted, setMounted] = useState(false);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [showMobileAccordion, setShowMobileAccordion] = useState(false);
@@ -81,6 +89,7 @@ export function Navbar() {
   const [currentHash, setCurrentHash] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchContainerRef = useRef<HTMLDivElement>(null);
   const isHomepage = pathname === "/";
 
   const roleName = getRoleName(role);
@@ -130,6 +139,8 @@ export function Navbar() {
   useEffect(() => {
     setIsOpen(false);
     setMobileSearchOpen(false);
+    setMobileSearchQuery("");
+    setShowMobileResults(false);
     setShowMenuDropdown(false);
     setShowMobileAccordion(false);
     setProfileDropdownOpen(false);
@@ -139,6 +150,9 @@ export function Navbar() {
     function handleClickOutside(event: MouseEvent) {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
         setProfileDropdownOpen(false);
+      }
+      if (mobileSearchContainerRef.current && !mobileSearchContainerRef.current.contains(event.target as Node)) {
+        setShowMobileResults(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -152,7 +166,14 @@ export function Navbar() {
   };
 
   const handleMobileSearchToggle = () => {
-    setMobileSearchOpen((v) => !v);
+    setMobileSearchOpen((v) => {
+      const next = !v;
+      if (!next) {
+        setMobileSearchQuery("");
+        setShowMobileResults(false);
+      }
+      return next;
+    });
     if (isOpen) setIsOpen(false);
   };
 
@@ -448,13 +469,14 @@ export function Navbar() {
             {mobileSearchOpen && (
               <motion.div
                 key="mobile-search"
+                ref={mobileSearchContainerRef}
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="md:hidden overflow-hidden border-t border-slate-100"
+                className="md:hidden overflow-visible border-t border-slate-100 relative z-[99]"
               >
-                <div className="py-3 px-1">
+                <div className="py-3 px-1 relative">
                   <label htmlFor="mobile-search" className="sr-only">Search services</label>
                   <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 h-11 gap-2 focus-within:border-[#FF6014] focus-within:ring-2 focus-within:ring-[#FF6014]/10 transition-all">
                     <Search className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
@@ -463,9 +485,66 @@ export function Navbar() {
                       ref={mobileSearchRef}
                       type="text"
                       placeholder="What service do you need today?"
-                      className="bg-transparent text-sm text-slate-700 outline-none w-full placeholder-slate-400"
+                      value={mobileSearchQuery}
+                      onChange={(e) => {
+                        setMobileSearchQuery(e.target.value);
+                        setShowMobileResults(true);
+                      }}
+                      onFocus={() => setShowMobileResults(true)}
+                      className="bg-transparent text-sm text-slate-700 outline-none w-full placeholder-slate-400 font-medium focus:ring-0"
                     />
+                    {mobileSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileSearchQuery("");
+                          setShowMobileResults(false);
+                        }}
+                        className="p-1 text-slate-400 hover:text-[#FF6014] transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
+
+                  {showMobileResults && mobileSearchQuery && (
+                    <div className="absolute left-1 right-1 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-[100] max-h-[300px] overflow-y-auto text-left">
+                      {isMobileSearching ? (
+                        <div className="p-6 flex justify-center items-center">
+                          <div className="w-6 h-6 border-3 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      ) : mobileSearchResults.length > 0 ? (
+                        <div className="flex flex-col">
+                          {mobileSearchResults.map((service: any) => (
+                            <Link
+                              key={service.id}
+                              href={`/services/${service.id}`}
+                              onClick={() => {
+                                setMobileSearchOpen(false);
+                                setMobileSearchQuery("");
+                                setShowMobileResults(false);
+                              }}
+                              className="flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                            >
+                              <div className="w-9 h-9 bg-[#FFF8F4] rounded-lg flex items-center justify-center flex-shrink-0">
+                                <LayoutGrid className="w-4.5 h-4.5 text-[#FF6014]" />
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-slate-800 text-xs">{service.name}</h4>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                  {service.category?.name || 'Service'} • {service.price ? `৳${service.price}` : 'Price varies'}
+                                </p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-6 text-center">
+                          <p className="text-slate-500 text-xs font-medium">No services found.</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
