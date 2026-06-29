@@ -151,7 +151,7 @@ const HowItWorks = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.15 }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-8 lg:gap-12 z-10 relative"
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 lg:gap-12 z-10 relative"
           >
             {HOW_IT_WORKS_CONTENT.steps.map((step, i) => (
               <React.Fragment key={i}>
@@ -162,14 +162,14 @@ const HowItWorks = () => {
                   {/* Timeline Step node bubble */}
                   <motion.div
                     whileHover={{ y: -2 }}
-                    className="w-20 h-20 bg-white group-hover:bg-primary group-hover:scale-105 border border-slate-200 text-slate-800 rounded-full flex items-center justify-center text-xl font-extrabold mb-6 shadow-lg relative z-10 group-hover:border-[#FF6014]/40  group-hover:shadow-xl transition-all duration-300"
+                    className="w-20 h-20 bg-white group-hover:bg-primary group-hover:scale-105 border border-slate-200 text-slate-800 rounded-full flex items-center justify-center text-xl font-extrabold mb-3 sm:mb-6 shadow-lg relative z-10 group-hover:border-[#FF6014]/40  group-hover:shadow-xl transition-all duration-300"
                   >
                     <span className="text-primary group-hover:text-white">
                       {step.stepNumber}
                     </span>
                   </motion.div>
 
-                  <h3 className="font-extrabold text-slate-800 text-xl mb-3 group-hover:text-[#FF6014] transition-colors duration-200">
+                  <h3 className="font-extrabold text-slate-800 text-xl mb-2 sm:mb-3 group-hover:text-[#FF6014] transition-colors duration-200">
                     {step.title}
                   </h3>
                   <p className="text-sm text-slate-500 leading-relaxed max-w-xs mx-auto">
@@ -179,7 +179,7 @@ const HowItWorks = () => {
 
                 {/* Vertical SVG Arrow for Mobile Screens */}
                 {i < HOW_IT_WORKS_CONTENT.steps.length - 1 && (
-                  <div className="flex sm:hidden my-2 items-center justify-center text-[#FF6014] z-0 pointer-events-none">
+                  <div className="flex sm:hidden my-0.5 items-center justify-center text-[#FF6014] z-0 pointer-events-none">
                     <svg
                       className="w-6 h-10"
                       viewBox="0 0 24 40"

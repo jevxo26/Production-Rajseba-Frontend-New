@@ -504,8 +504,8 @@ export function Navbar() {
               >
                 <div className="py-3 px-1 relative">
                   <label htmlFor="mobile-search" className="sr-only">Search services</label>
-                  <div className="flex items-center bg-slate-50 border border-slate-200 rounded-full px-4 h-11 gap-2 focus-within:border-[#FF6014] focus-within:ring-2 focus-within:ring-[#FF6014]/10 transition-all">
-                    <Search className="w-4 h-4 text-slate-400 flex-shrink-0" aria-hidden="true" />
+                  <div className="flex items-center bg-[#FF6014]/5 border border-[#FF6014]/15 rounded-full px-4 h-11 gap-2 focus-within:border-[#FF6014] focus-within:ring-2 focus-within:ring-[#FF6014]/10 transition-all">
+                    <Search className="w-4 h-4 text-[#FF6014] flex-shrink-0" aria-hidden="true" />
                     <input
                       id="mobile-search"
                       ref={mobileSearchRef}
@@ -534,7 +534,7 @@ export function Navbar() {
                   </div>
 
                   {showMobileResults && mobileSearchQuery && (
-                    <div className="absolute left-1 right-1 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-[100] max-h-[300px] overflow-y-auto text-left">
+                    <div className="absolute left-1 right-1 mt-2 bg-[#FFFDFB] rounded-2xl shadow-xl border border-[#FF6014]/20 overflow-hidden z-[100] max-h-[300px] overflow-y-auto text-left">
                       {isMobileSearching ? (
                         <div className="p-6 flex justify-center items-center">
                           <div className="w-6 h-6 border-3 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
@@ -550,13 +550,13 @@ export function Navbar() {
                                 setMobileSearchQuery("");
                                 setShowMobileResults(false);
                               }}
-                              className="flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                              className="group flex items-center gap-3 p-3 hover:bg-[#FF6014]/5 transition-all border-b border-[#FF6014]/10 last:border-0"
                             >
-                              <div className="w-9 h-9 bg-[#FFF8F4] rounded-lg flex items-center justify-center flex-shrink-0">
+                              <div className="w-9 h-9 bg-[#FF6014]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
                                 <LayoutGrid className="w-4.5 h-4.5 text-[#FF6014]" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-slate-800 text-xs">{service.name}</h4>
+                                <h4 className="font-bold text-slate-800 text-xs group-hover:text-[#FF6014] transition-colors duration-200">{service.name}</h4>
                                 <p className="text-[10px] text-slate-500 font-medium">
                                   {service.category?.name || 'Service'} • {service.price ? `৳${service.price}` : 'Price varies'}
                                 </p>
@@ -566,7 +566,7 @@ export function Navbar() {
                         </div>
                       ) : (
                         <div className="p-6 text-center">
-                          <p className="text-slate-500 text-xs font-medium">No services found.</p>
+                          <p className="text-[#FF6014]/80 text-xs font-bold">No services found.</p>
                         </div>
                       )}
                     </div>

@@ -206,6 +206,25 @@ const Hero = () => {
 
             <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
 
+            {/* Location/Division Select */}
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
+              <MapPin className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
+              <CustomSelect
+                options={divisionOptions}
+                value={selectedDivision}
+                onChange={(val) => {
+                  setSelectedDivision(val);
+                  setShowResults(true);
+                }}
+                placeholder="Select Division"
+                className="w-full"
+                controlBg="transparent"
+                triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
+              />
+            </div>
+
+            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
+
             {/* Category Select */}
             <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
               <LayoutGrid className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
@@ -223,30 +242,11 @@ const Hero = () => {
               />
             </div>
 
-            <div className="hidden md:block h-8 w-px bg-[#FF6014]/20" />
-
-            {/* Location Select */}
-            <div className="flex items-center gap-2.5 sm:gap-3 flex-1 w-full px-3 sm:px-4 py-1.5 sm:py-2 md:py-1 relative z-[60]">
-              <MapPin className="text-[#FF6014] w-5 h-5 flex-shrink-0" />
-              <CustomSelect
-                options={divisionOptions}
-                value={selectedDivision}
-                onChange={(val) => {
-                  setSelectedDivision(val);
-                  setShowResults(true);
-                }}
-                placeholder="Select Division"
-                className="w-full"
-                controlBg="transparent"
-                triggerClassName="border-none bg-transparent hover:bg-transparent shadow-none px-0 py-1.5 h-auto text-slate-700 font-medium focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-0 focus:outline-none"
-              />
-            </div>
-
           </motion.form>
 
           {/* Search Results Dropdown */}
           {showResults && (searchQuery || selectedCategory || selectedDivision) && (
-            <div className="absolute top-full left-0 right-0 mt-3 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 max-h-[400px] overflow-y-auto text-left">
+            <div className="absolute top-full left-0 right-0 mt-3 bg-[#FFFDFB] rounded-2xl shadow-xl border border-[#FF6014]/20 overflow-hidden z-50 max-h-[400px] overflow-y-auto text-left">
               {isSearching ? (
                 <div className="p-8 flex justify-center items-center">
                   <div className="w-8 h-8 border-4 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
@@ -258,13 +258,13 @@ const Hero = () => {
                       key={service.id}
                       href={`/services/${service.id}`}
                       onClick={() => setShowResults(false)}
-                      className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                      className="group flex items-center gap-4 p-4 hover:bg-[#FF6014]/5 transition-all border-b border-[#FF6014]/10 last:border-0"
                     >
-                      <div className="w-12 h-12 bg-[#FFF8F4] rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-[#FF6014]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
                         <LayoutGrid className="w-6 h-6 text-[#FF6014]" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm md:text-base">{service.name}</h4>
+                        <h4 className="font-bold text-slate-800 text-sm md:text-base group-hover:text-[#FF6014] transition-colors duration-200">{service.name}</h4>
                         <p className="text-xs md:text-sm text-slate-500 font-medium">
                           {service.category?.name || 'Service'} • {service.price ? `৳${service.price}` : 'Price varies'}
                         </p>
@@ -274,8 +274,8 @@ const Hero = () => {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <p className="text-slate-500 font-medium">No services found.</p>
-                  <p className="text-slate-400 text-sm mt-1">Try adjusting your search criteria</p>
+                  <p className="text-[#FF6014]/80 font-bold">No services found.</p>
+                  <p className="text-slate-500 text-sm mt-1 font-medium">Try adjusting your search criteria</p>
                 </div>
               )}
             </div>
