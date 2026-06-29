@@ -248,18 +248,6 @@ export default function DynamicBookingTracker() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-t border-slate-200/60 pt-2 mt-1">
-                        {booking.vendor.phone && (
-                          <a href={`tel:${booking.vendor.phone}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#FF6014] transition-colors">
-                            <Phone size={12} className="text-[#FF6014]" />
-                            {booking.vendor.phone}
-                          </a>
-                        )}
-                        {booking.vendor.email && (
-                          <a href={`mailto:${booking.vendor.email}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#FF6014] transition-colors">
-                            <Mail size={12} className="text-[#FF6014]" />
-                            {booking.vendor.email}
-                          </a>
-                        )}
                         <button
                           onClick={() => router.push(`/dashbord/live-chat?receiverId=${booking.vendor.id}&receiverName=${encodeURIComponent(booking.vendor.name)}`)}
                           className="flex items-center gap-1.5 text-xs font-semibold text-[#FF6014] hover:text-[#E0530A] transition-colors sm:ml-auto"
@@ -286,18 +274,6 @@ export default function DynamicBookingTracker() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 border-t border-slate-200/60 pt-2 mt-1">
-                        {emp.phone && (
-                          <a href={`tel:${emp.phone}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-500 transition-colors">
-                            <Phone size={12} className="text-indigo-400" />
-                            {emp.phone}
-                          </a>
-                        )}
-                        {emp.email && (
-                          <a href={`mailto:${emp.email}`} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-500 transition-colors">
-                            <Mail size={12} className="text-indigo-400" />
-                            {emp.email}
-                          </a>
-                        )}
                         <button
                           onClick={() => router.push(`/dashbord/live-chat?receiverId=${emp.id}&receiverName=${encodeURIComponent(emp.name)}`)}
                           className="flex items-center gap-1.5 text-xs font-semibold text-indigo-500 hover:text-indigo-600 transition-colors sm:ml-auto"

@@ -49,7 +49,8 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   // Derive display profile from real user data in Redux
   const name = mounted && authUser?.name ? authUser.name : "User";
   const email = mounted ? (authUser?.email || authUser?.phone || "") : "";
-  const avatar = name.substring(0, 2).toUpperCase();
+  const avatarText = name.substring(0, 2).toUpperCase();
+  const profileImg = mounted ? (authUser?.profile?.avatar || authUser?.profile?.images?.[0] || authUser?.profile?.picture || authUser?.avatar) : undefined;
   const activeRoleConfig = mounted
     ? (rolesList.find((x) => x.value === role) || rolesList[3])
     : rolesList[3];
@@ -91,10 +92,10 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
               <p className="text-[11px] text-slate-400 mt-1.5 font-medium leading-none">{roleName}</p>
             </div>
             <div className="w-10 h-10 bg-gradient-to-br from-[#FF6014] to-[#FF6014] text-white font-bold rounded-xl flex items-center justify-center overflow-hidden shadow-md shadow-[#FF6014]/20 select-none transition-transform hover:scale-105 shrink-0">
-              {mounted && authUser?.avatar ? (
-                <img src={authUser.avatar} alt={name} className="w-full h-full object-cover" />
+              {profileImg ? (
+                <img src={profileImg} alt={name} className="w-full h-full object-cover" />
               ) : (
-                avatar
+                avatarText
               )}
             </div>
           </button>
@@ -106,10 +107,10 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
               <div className="px-4 py-3 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-[#FF6014] to-[#FF6014] text-white font-bold rounded-xl flex items-center justify-center overflow-hidden shadow-md shadow-[#FF6014]/20 select-none shrink-0">
-                    {mounted && authUser?.avatar ? (
-                      <img src={authUser.avatar} alt={name} className="w-full h-full object-cover" />
+                    {profileImg ? (
+                      <img src={profileImg} alt={name} className="w-full h-full object-cover" />
                     ) : (
-                      avatar
+                      avatarText
                     )}
                   </div>
                   <div className="min-w-0">

@@ -21,6 +21,7 @@ import {
   MessageSquare,
   Shield,
   Headphones,
+  Sparkles,
 } from "lucide-react";
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -109,18 +110,20 @@ const INITIAL_FORM: FormState = {
 function RevealSection({
   children,
   className = "",
+  delay = 0,
 }: {
   children: React.ReactNode;
   className?: string;
+  delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 15 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, ease: "easeOut", delay }}
       className={className}
     >
       {children}
@@ -137,7 +140,8 @@ export default function ContactClientPage() {
 
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const glowY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const glowY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const glowY2 = useTransform(scrollYProgress, [0, 1], [0, 30]);
 
   const validate = (): boolean => {
     const next: Partial<FormState> = {};
@@ -164,130 +168,202 @@ export default function ContactClientPage() {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    await new Promise((res) => setTimeout(res, 1000));
-    setLoading(false);
-    setSubmitted(true);
-    setTimeout(() => setForm(INITIAL_FORM), 300);
+
+    try {
+      const response = await fetch("https://rajseba-api-production.up.railway.app/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
+
+      if (!response.ok && response.status !== 404) {
+        throw new Error("Failed to send inquiry");
+      }
+
+      setSubmitted(true);
+      setForm(INITIAL_FORM);
+    } catch (error) {
+      console.error("Contact API error:", error);
+      alert("Something went wrong sending your inquiry. Please call our hotline at +8801335106726.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* ── Input style helpers ── */
   const inputBase =
-    "w-full text-xs px-4 py-3 rounded-xl border bg-white text-slate-800 outline-none transition-all placeholder:text-slate-400 font-semibold";
-  const inputNormal = `${inputBase} border-slate-200 focus:border-[#FF6014] focus:ring-2 focus:ring-[#FF6014]/10`;
-  const inputError = `${inputBase} border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-300/10 bg-rose-50/40`;
+    "w-full text-[12px] px-4 py-3 rounded-xl border bg-[#FAFAF9] text-slate-800 outline-none transition-all duration-200 placeholder:text-slate-300 font-semibold focus:bg-white focus:ring-2";
+  const inputNormal = `${inputBase} border-[#E7E5E4] focus:border-[#FF6014] focus:ring-[#FF6014]/10`;
+  const inputError = `${inputBase} border-rose-300 focus:border-rose-400 focus:ring-rose-200/40 bg-rose-50/40`;
 
   return (
-    <div className="min-h-screen bg-slate-50/20 overflow-x-hidden text-slate-800">
-      {/* ══ HERO SECTION ══════════════════════════════════════════ */}
+    <div className="min-h-screen bg-white overflow-x-hidden text-slate-800">
+
+      {/* ══════════════════════════════════════════════════════════
+          HERO
+      ══════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative bg-white border-b border-slate-100 py-8 md:py-12 overflow-hidden"
+        className="relative bg-white border-b border-slate-100 pt-12 pb-10 md:pt-16 md:pb-12 overflow-hidden"
       >
+        {/* Ambient glows */}
         <motion.div
           style={{ y: glowY }}
-          className="pointer-events-none absolute -top-24 right-0 w-[450px] h-[450px] bg-[#FF6014]/6 blur-[110px] rounded-full"
+          className="pointer-events-none absolute -top-32 right-0 w-[500px] h-[500px] bg-[#FF6014]/5 blur-[120px] rounded-full"
         />
         <motion.div
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, 20]) }}
-          className="pointer-events-none absolute bottom-0 left-1/4 w-[280px] h-[280px] bg-blue-500/3 blur-[90px] rounded-full"
+          style={{ y: glowY2 }}
+          className="pointer-events-none absolute -bottom-16 left-1/4 w-[300px] h-[300px] bg-[#FF6014]/4 blur-[100px] rounded-full"
         />
+        {/* Decorative corner arc */}
+        <div className="pointer-events-none absolute top-0 right-0 w-64 h-64 border-l border-b border-[#FF6014]/6 rounded-bl-full" />
 
-        <div className="max-w-3xl mx-auto px-4 md:px-6 text-center relative z-10 space-y-4">
-          <span className="inline-block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100/50">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 text-center relative z-10">
+          {/* Eyebrow pill */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center gap-2 text-[10px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/20 mb-5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6014] animate-pulse" />
             Support Center
-          </span>
+          </motion.div>
 
-          <h1 className="text-2xl md:text-3.5xl font-black text-slate-900 tracking-tight leading-tight">
-            How Can We{" "}
-            <span className="text-[#FF6014] relative inline-block">
-              Help You Today?
-              <span className="absolute bottom-1 left-0 w-full h-1 bg-[#FF6014]/15 rounded-full" />
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="text-[clamp(28px,5vw,44px)] font-black text-slate-900 tracking-[-0.03em] leading-[1.12] mb-4"
+          >
+            How can we{" "}
+            <span className="relative inline-block text-[#FF6014]">
+              help you today?
+              <span className="absolute bottom-1 left-0 w-full h-[3px] bg-[#FF6014]/15 rounded-full" />
             </span>
-          </h1>
+          </motion.h1>
 
-          <p className="text-xs md:text-sm text-slate-500 font-semibold max-w-xl mx-auto leading-relaxed">
-            Reach out to our customer support desk regarding service bookings, partner inquiries, billing clarifications, or warranty claims.
-          </p>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.16 }}
+            className="text-[13px] text-slate-400 font-medium max-w-md mx-auto leading-[1.75] mb-7"
+          >
+            Reach our customer desk for bookings, billing, partner inquiries, or
+            warranty claims. We reply within 4 hours.
+          </motion.p>
 
-          <div className="flex flex-wrap justify-center gap-4 pt-2">
-            {TRUST_BARS.map(({ icon: Icon, text }, i) => (
+          {/* Trust pills */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.24 }}
+            className="flex flex-wrap justify-center gap-2"
+          >
+            {TRUST_BARS.map(({ icon: Icon, text }) => (
               <span
                 key={text}
-                className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider"
+                className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-full"
               >
-                <Icon className="w-3.5 h-3.5 text-blue-500" />
+                <Icon className="w-3 h-3 text-[#FF6014]" />
                 {text}
               </span>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ══ CHANNEL CARDS SECTION ════════════════════════════════ */}
-      <section className="py-6 md:py-8 bg-white border-b border-slate-100/80">
+      {/* ══════════════════════════════════════════════════════════
+          CHANNEL CARDS
+      ══════════════════════════════════════════════════════════ */}
+      <section className="py-6 md:py-8 bg-[#FAFAF9] border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <RevealSection>
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-3">
               {CONTACT_CHANNELS.map(({ icon: Icon, label, primary, href, secondary, badge }, i) => (
-                <a
+                <motion.a
                   key={label}
                   href={href}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group bg-white border border-slate-100 rounded-2xl p-5 flex items-start gap-4 hover:border-blue-500/20 hover:shadow-md transition-all duration-300"
+                  whileHover={{ y: -2 }}
+                  transition={{ duration: 0.2 }}
+                  className="group relative bg-white border border-slate-100 rounded-2xl p-5 flex items-start gap-4 hover:border-[#FF6014]/25 hover:shadow-[0_4px_24px_rgba(255,96,20,0.08)] transition-all duration-300 overflow-hidden"
                 >
-                  <span className="p-3 rounded-xl bg-blue-50 text-blue-600 flex-shrink-0">
-                    <Icon className="w-5 h-5" />
+                  {/* Hover tint */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FF6014]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <span className="relative p-2.5 rounded-xl bg-[#FFF4EE] text-[#FF6014] flex-shrink-0 border border-[#FF6014]/10">
+                    <Icon className="w-4.5 h-4.5" />
                   </span>
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-extrabold text-slate-900 text-[10px] uppercase tracking-wide">
+                  <div className="relative min-w-0 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-black text-[9px] uppercase tracking-[.12em] text-slate-400">
                         {label}
                       </h3>
-                      <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+                      <span className="text-[9px] font-bold text-[#FF6014] bg-[#FFF4EE] border border-[#FF6014]/15 px-2 py-0.5 rounded-full whitespace-nowrap">
                         {badge}
                       </span>
                     </div>
-                    <p className="text-sm font-black text-slate-800 group-hover:text-blue-600 transition-colors truncate">
+                    <p className="text-[13px] font-black text-slate-800 group-hover:text-[#FF6014] transition-colors truncate">
                       {primary}
                     </p>
-                    <p className="text-[11px] text-slate-400 font-semibold">{secondary}</p>
+                    <p className="text-[11px] text-slate-400 font-medium">{secondary}</p>
                   </div>
-                </a>
+                </motion.a>
               ))}
             </div>
           </RevealSection>
         </div>
       </section>
 
-      {/* ══ FORM + DETAILS ROW ═══════════════════════════════════ */}
-      <section className="py-8 md:py-10">
+      {/* ══════════════════════════════════════════════════════════
+          FORM + SIDEBAR
+      ══════════════════════════════════════════════════════════ */}
+      <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="grid lg:grid-cols-12 gap-6 items-start">
-            
-            {/* Contact Form Card */}
+
+            {/* ── Contact Form ── */}
             <RevealSection className="lg:col-span-7">
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-xs">
-                <div className="mb-6">
-                  <h2 className="text-base md:text-lg font-black text-slate-900">Send an Inquiry</h2>
-                  <p className="text-xs text-slate-400 font-semibold mt-1">
-                    Please fill out the form below. We typically respond within 4 hours.
+              <div className="relative bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.04)] overflow-hidden">
+                {/* Top accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#FF6014] via-[#FF8142] to-[#FF6014]/40 rounded-t-3xl" />
+
+                <div className="mb-6 pt-1">
+                  <h2 className="text-[17px] font-black text-slate-900 tracking-tight mb-1">
+                    Send an inquiry
+                  </h2>
+                  <p className="text-[12px] text-slate-400 font-medium">
+                    We typically respond within 4 hours on business days.
                   </p>
                 </div>
 
                 <AnimatePresence mode="wait">
                   {!submitted ? (
-                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                    <motion.form
+                      key="form"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onSubmit={handleSubmit}
+                      noValidate
+                      className="space-y-4"
+                    >
                       {/* Name & Email */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label htmlFor="name" className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                          <label htmlFor="name" className="text-[10px] font-black text-slate-400 uppercase tracking-[.1em]">
                             Full Name <span className="text-[#FF6014]">*</span>
                           </label>
                           <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            placeholder="e.g. Mahbubur Rahman"
+                            id="name" name="name" type="text"
+                            placeholder="Mahbubur Rahman"
                             value={form.name}
                             onChange={handleChange}
                             className={errors.name ? inputError : inputNormal}
@@ -296,15 +372,12 @@ export default function ContactClientPage() {
                             <p className="text-[10px] text-rose-500 font-bold">{errors.name}</p>
                           )}
                         </div>
-
                         <div className="space-y-1.5">
-                          <label htmlFor="email" className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                          <label htmlFor="email" className="text-[10px] font-black text-slate-400 uppercase tracking-[.1em]">
                             Email Address <span className="text-[#FF6014]">*</span>
                           </label>
                           <input
-                            id="email"
-                            name="email"
-                            type="email"
+                            id="email" name="email" type="email"
                             placeholder="yourname@gmail.com"
                             value={form.email}
                             onChange={handleChange}
@@ -319,32 +392,30 @@ export default function ContactClientPage() {
                       {/* Phone & Subject */}
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label htmlFor="phone" className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                            Phone Number <span className="text-slate-350 font-medium normal-case tracking-normal">(optional)</span>
+                          <label htmlFor="phone" className="text-[10px] font-black text-slate-400 uppercase tracking-[.1em]">
+                            Phone{" "}
+                            <span className="normal-case tracking-normal font-medium text-slate-300">(optional)</span>
                           </label>
                           <input
-                            id="phone"
-                            name="phone"
-                            type="tel"
+                            id="phone" name="phone" type="tel"
                             placeholder="+880 17XXXXXXXX"
                             value={form.phone}
                             onChange={handleChange}
                             className={inputNormal}
                           />
                         </div>
-
                         <div className="space-y-1.5">
-                          <label htmlFor="subject" className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                          <label htmlFor="subject" className="text-[10px] font-black text-slate-400 uppercase tracking-[.1em]">
                             Subject Topic <span className="text-[#FF6014]">*</span>
                           </label>
                           <select
-                            id="subject"
-                            name="subject"
+                            id="subject" name="subject"
                             value={form.subject}
                             onChange={handleChange}
                             className={errors.subject ? inputError : inputNormal}
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px', appearance: 'none' }}
                           >
-                            <option value="" disabled>Select inquiry type...</option>
+                            <option value="" disabled>Select inquiry type…</option>
                             <option value="Booking Assistance">Booking Assistance</option>
                             <option value="Billing / Refund Claim">Billing / Refund Claim</option>
                             <option value="Technician Vetting Feedback">Technician Vetting Feedback</option>
@@ -357,19 +428,17 @@ export default function ContactClientPage() {
                         </div>
                       </div>
 
-                      {/* Message Box */}
+                      {/* Message */}
                       <div className="space-y-1.5">
-                        <label htmlFor="message" className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                        <label htmlFor="message" className="text-[10px] font-black text-slate-400 uppercase tracking-[.1em]">
                           Details & Context <span className="text-[#FF6014]">*</span>
                         </label>
                         <textarea
-                          id="message"
-                          name="message"
-                          rows={4}
-                          placeholder="Please provide details about your issue or required service slot..."
+                          id="message" name="message" rows={4}
+                          placeholder="Describe your issue or required service slot in detail…"
                           value={form.message}
                           onChange={handleChange}
-                          className={`${errors.message ? inputError : inputNormal} resize-none`}
+                          className={`${errors.message ? inputError : inputNormal} resize-none leading-relaxed`}
                         />
                         {errors.message && (
                           <p className="text-[10px] text-rose-500 font-bold">{errors.message}</p>
@@ -379,30 +448,50 @@ export default function ContactClientPage() {
                       <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#FF6014] hover:bg-[#e84e53] disabled:opacity-60 text-white text-xs font-extrabold py-3.5 h-auto rounded-xl border-none transition-colors shadow-sm flex items-center justify-center gap-2"
+                        className="w-full relative bg-[#FF6014] hover:bg-[#E8520F] disabled:opacity-60 text-white text-[11px] font-extrabold tracking-wide py-3.5 h-auto rounded-xl border-none transition-all duration-200 shadow-[0_4px_16px_rgba(255,96,20,0.3)] hover:shadow-[0_6px_20px_rgba(255,96,20,0.4)] hover:-translate-y-0.5 flex items-center justify-center gap-2 active:translate-y-0"
                       >
-                        {loading ? "Sending Enquiry..." : "Submit Inquiry"}
-                        <Send className="w-3.5 h-3.5" />
+                        {loading ? (
+                          <>
+                            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            Sending Enquiry…
+                          </>
+                        ) : (
+                          <>
+                            Submit Inquiry
+                            <Send className="w-3.5 h-3.5" />
+                          </>
+                        )}
                       </Button>
-                    </form>
+
+                      <p className="text-center text-[10px] text-slate-300 font-medium pt-1">
+                        Your data is encrypted and never shared with third parties.
+                      </p>
+                    </motion.form>
                   ) : (
                     <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.96 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="text-center space-y-4 py-8"
+                      exit={{ opacity: 0 }}
+                      className="text-center space-y-4 py-10"
                     >
-                      <div className="mx-auto w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-100">
-                        <CheckCircle className="w-6 h-6 text-emerald-500" />
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-sm font-black text-slate-900">Enquiry Submitted!</h3>
-                        <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                          We have received your message and will email a response back within 4 hours.
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
+                        className="mx-auto w-14 h-14 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center"
+                      >
+                        <CheckCircle className="w-7 h-7 text-emerald-500" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-[15px] font-black text-slate-900 mb-1">Inquiry Submitted!</h3>
+                        <p className="text-[12px] text-slate-400 font-medium max-w-xs mx-auto leading-relaxed">
+                          We've received your message and will email a response within 4 hours.
                         </p>
                       </div>
                       <Button
                         onClick={() => setSubmitted(false)}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold px-5 py-2.5 h-auto rounded-lg border-none"
+                        className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-[11px] font-bold px-6 py-2.5 h-auto rounded-xl border border-slate-100 shadow-none transition-colors"
                       >
                         Send another message
                       </Button>
@@ -412,10 +501,11 @@ export default function ContactClientPage() {
               </div>
             </RevealSection>
 
-            {/* Sidebar Columns */}
-            <RevealSection className="lg:col-span-5 flex flex-col gap-4">
-              {/* HQ Office Photo */}
-              <div className="relative rounded-2xl overflow-hidden min-h-[220px] border border-slate-100 shadow-xs flex flex-col justify-end">
+            {/* ── Sidebar ── */}
+            <RevealSection className="lg:col-span-5 flex flex-col gap-4" delay={0.1}>
+
+              {/* HQ Photo */}
+              <div className="relative rounded-2xl overflow-hidden h-[210px] border border-slate-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <Image
                   src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop"
                   alt="Rajseba HQ Banani"
@@ -423,45 +513,52 @@ export default function ContactClientPage() {
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 40vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent" />
-                <div className="relative z-10 p-5 space-y-1 text-white">
-                  <span className="inline-block text-[9px] font-black tracking-widest text-[#FF6014] bg-white/95 px-2 py-0.5 rounded-full uppercase">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
+                <div className="relative z-10 p-5 h-full flex flex-col justify-end">
+                  <span className="inline-block text-[9px] font-black tracking-[.1em] text-[#FF6014] bg-white/95 px-2.5 py-1 rounded-full uppercase mb-2 w-fit">
                     Headquarters
                   </span>
-                  <h3 className="font-extrabold text-sm">Banani Operations Center</h3>
-                  <p className="text-slate-300 text-[10px] font-medium">
+                  <h3 className="font-black text-[13px] text-white mb-0.5">
+                    Banani Operations Center
+                  </h3>
+                  <p className="text-[11px] text-white/55 font-medium">
                     Level 4, House 24, Road 12, Banani, Dhaka-1213
                   </p>
                 </div>
               </div>
 
-              {/* Office Hours Card */}
-              <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#FF6014]" />
-                  <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider">
+              {/* Office Hours */}
+              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-1.5 rounded-lg bg-[#FFF4EE]">
+                    <Clock className="w-3.5 h-3.5 text-[#FF6014]" />
+                  </div>
+                  <h4 className="font-black text-[10px] text-slate-800 uppercase tracking-[.1em]">
                     Office Hours
                   </h4>
                 </div>
-                <ul className="space-y-2 text-xs text-slate-600">
+                <ul className="space-y-2.5">
                   {[
                     ["Saturday – Thursday", "9:00 AM – 6:00 PM"],
                     ["Friday Hotline Support", "10:00 AM – 2:00 PM"],
-                    ["Urgent Appliance Repairs", "24/7 Dispatch Availability"],
+                    ["Urgent Appliance Repairs", "24/7 Dispatch"],
                   ].map(([day, time], idx) => (
-                    <li key={idx} className="flex justify-between border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
-                      <span className="font-semibold text-slate-500">{day}</span>
-                      <span className="font-extrabold text-slate-800">{time}</span>
+                    <li
+                      key={idx}
+                      className="flex justify-between items-center text-[11px] pb-2.5 border-b border-slate-50 last:border-0 last:pb-0"
+                    >
+                      <span className="text-slate-400 font-medium">{day}</span>
+                      <span className="font-black text-slate-800">{time}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Social Channels */}
-              <div className="bg-[#FFF8F4] border border-rose-100 rounded-2xl p-5 space-y-3">
-                <h4 className="font-black text-slate-900 text-xs">Join Our Community</h4>
-                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
-                  Get updates about discount offers, appliance safety codes, and local technician audits.
+              {/* Social */}
+              <div className="bg-[#FFF4EE] border border-[#FF6014]/10 rounded-2xl p-5">
+                <h4 className="font-black text-[11px] text-slate-800 mb-1.5">Join Our Community</h4>
+                <p className="text-[11px] text-slate-400 font-medium leading-relaxed mb-4">
+                  Get updates on discount offers, appliance safety, and local technician audits.
                 </p>
                 <div className="flex gap-2">
                   {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
@@ -470,62 +567,76 @@ export default function ContactClientPage() {
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-8 h-8 rounded-full bg-white border border-rose-100 text-[#FF6014] flex items-center justify-center hover:bg-[#FF6014] hover:text-white transition-colors duration-200"
+                      aria-label={label}
+                      className="w-8 h-8 rounded-full bg-white border border-[#FF6014]/15 text-[#FF6014] flex items-center justify-center hover:bg-[#FF6014] hover:text-white hover:border-[#FF6014] transition-all duration-200 hover:scale-110"
                     >
                       <Icon className="w-3.5 h-3.5" />
                     </a>
                   ))}
                 </div>
               </div>
-            </RevealSection>
 
+            </RevealSection>
           </div>
         </div>
       </section>
 
-      {/* ══ FAQ SECTION ══════════════════════════════════════════ */}
-      <section className="bg-white border-t border-slate-100/80 py-8 md:py-10">
+      {/* ══════════════════════════════════════════════════════════
+          FAQ SECTION
+      ══════════════════════════════════════════════════════════ */}
+      <section className="bg-[#FAFAF9] border-t border-slate-100 py-10 md:py-14">
         <div className="max-w-3xl mx-auto px-4 md:px-6">
-          <RevealSection className="text-center mb-6">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100/50 mb-2">
-              <HelpCircle className="w-3.5 h-3.5" />
+          <RevealSection className="text-center mb-8">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/20 mb-4">
+              <HelpCircle className="w-3 h-3" />
               General Help
             </span>
-            <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">
-              Inquiries FAQ
+            <h2 className="text-[20px] md:text-[24px] font-black text-slate-900 tracking-tight mb-2">
+              Frequently asked questions
             </h2>
-            <p className="text-xs text-slate-400 font-semibold mt-1">
-              Need immediate answers? Read our most common service desk responses.
+            <p className="text-[12px] text-slate-400 font-medium">
+              Quick answers to common support queries.
             </p>
           </RevealSection>
 
-          <RevealSection>
+          <RevealSection delay={0.05}>
             <div className="space-y-2">
               {FAQS.map((faq, i) => {
                 const isOpen = activeFaq === i;
                 return (
                   <div
                     key={i}
-                    className="bg-white border border-slate-100 rounded-xl overflow-hidden transition-all"
+                    className={`bg-white border rounded-xl overflow-hidden transition-all duration-200 ${isOpen ? "border-[#FF6014]/20 shadow-[0_2px_12px_rgba(255,96,20,0.06)]" : "border-slate-100"
+                      }`}
                   >
                     <button
                       type="button"
                       onClick={() => setActiveFaq(isOpen ? null : i)}
-                      className="w-full flex items-center justify-between p-4 text-left outline-none font-bold text-slate-800 text-xs md:text-sm"
+                      className="w-full flex items-center justify-between gap-3 p-4 text-left outline-none"
                     >
-                      <span>{faq.question}</span>
+                      <span className={`text-[12px] font-bold transition-colors ${isOpen ? "text-[#FF6014]" : "text-slate-800"}`}>
+                        {faq.question}
+                      </span>
                       <ChevronDown
-                        className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
-                          isOpen ? "rotate-180 text-[#FF6014]" : ""
-                        }`}
+                        className={`w-4 h-4 flex-shrink-0 transition-all duration-300 ${isOpen ? "rotate-180 text-[#FF6014]" : "text-slate-300"
+                          }`}
                       />
                     </button>
-                    
-                    {isOpen && (
-                      <div className="px-4 pb-4 pt-0 text-xs text-slate-500 font-semibold leading-relaxed border-t border-slate-50 pt-2.5">
-                        {faq.answer}
-                      </div>
-                    )}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 pt-0 text-[12px] text-slate-400 font-medium leading-relaxed border-t border-slate-50 pt-3">
+                            {faq.answer}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}
@@ -534,34 +645,46 @@ export default function ContactClientPage() {
         </div>
       </section>
 
-      {/* ══ CTA STRIP SECTION ════════════════════════════════════ */}
+      {/* ══════════════════════════════════════════════════════════
+          CTA STRIP
+      ══════════════════════════════════════════════════════════ */}
       <RevealSection>
-        <section className="bg-[#FF6014] py-8 md:py-10 relative overflow-hidden">
-          <div className="max-w-4xl mx-auto px-4 md:px-6 text-center space-y-4 relative z-10">
-            <h2 className="text-lg md:text-xl font-black text-white tracking-tight">
-              Ready to Book an Expert Technician?
+        <section className="relative bg-[#FF6014] py-10 md:py-14 overflow-hidden">
+          {/* Decorative circles */}
+          <div className="pointer-events-none absolute -top-16 -right-12 w-56 h-56 rounded-full bg-white/5 border border-white/8" />
+          <div className="pointer-events-none absolute -bottom-10 -left-8 w-40 h-40 rounded-full bg-white/5 border border-white/8" />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-white/3" />
+
+          <div className="max-w-4xl mx-auto px-4 md:px-6 text-center space-y-5 relative z-10">
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-white/70 uppercase tracking-[.1em] bg-white/10 border border-white/15 px-3 py-1.5 rounded-full mb-1">
+              <Sparkles className="w-3 h-3" />
+              Verified Professionals
+            </div>
+            <h2 className="text-[20px] md:text-[26px] font-black text-white tracking-tight leading-tight">
+              Ready to book an expert technician?
             </h2>
-            <p className="text-xs text-rose-100 max-w-md mx-auto font-medium">
+            <p className="text-[12px] text-white/65 max-w-md mx-auto font-medium leading-relaxed">
               Explore rates, choose a calendar slot, and get matched with background-verified professionals in Dhaka.
             </p>
-            <div className="flex flex-wrap gap-2.5 justify-center">
+            <div className="flex flex-wrap gap-3 justify-center pt-1">
               <a
                 href="/services"
-                className="inline-flex items-center gap-2 bg-white text-[#FF6014] text-[10px] font-extrabold px-5 py-3 rounded-xl hover:bg-rose-50 transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 bg-white text-[#FF6014] text-[11px] font-extrabold px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors shadow-[0_4px_16px_rgba(0,0,0,0.12)]"
               >
                 Explore Services
               </a>
               <a
                 href="tel:+8809612725732"
-                className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white text-[10px] font-extrabold px-5 py-3 rounded-xl hover:bg-white/20 transition-colors"
+                className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-[11px] font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-colors backdrop-blur-sm"
               >
-                <Phone className="w-3 h-3" />
+                <Phone className="w-3.5 h-3.5" />
                 Call Hotline
               </a>
             </div>
           </div>
         </section>
       </RevealSection>
+
     </div>
   );
 }

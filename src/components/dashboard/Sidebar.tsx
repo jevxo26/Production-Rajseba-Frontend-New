@@ -26,7 +26,8 @@ import {
   Package,
   MapPin,
   History,
-  MessageSquare
+  MessageSquare,
+  X
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -169,8 +170,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               </div>
             )}
           </Link>
-          <button onClick={() => setCollapsed(!collapsed)} className="md:hidden text-slate-400 hover:text-slate-700 p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
-            <Menu size={18} />
+          <button onClick={onClose} className="md:hidden text-slate-400 hover:text-slate-700 p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
+            <X size={18} />
           </button>
         </div>
 
@@ -182,6 +183,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               <Link
                 key={index}
                 href={item.href}
+                onClick={onClose}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 group border ${isActive
                   ? "bg-white border-slate-100/60 text-[#FF6014] font-extrabold shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08)] scale-[1.01]"
                   : "border-transparent text-slate-500 hover:bg-slate-50/60 hover:text-slate-900"

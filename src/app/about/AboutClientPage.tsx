@@ -39,7 +39,7 @@ const PILLARS = [
     description:
       "Every technician undergoes biometric NID check, police verification, and a rigorous skills assessment.",
     icon: ShieldCheck,
-    bg: "bg-blue-50 text-blue-600",
+    bg: "bg-[#FFF8F4] text-[#FF6014]",
   },
   {
     title: "Transparent Fixed Pricing",
@@ -184,7 +184,7 @@ export default function AboutClientPage() {
         />
         <motion.div
           style={{ y: useTransform(scrollYProgress, [0, 1], [0, 30]) }}
-          className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-blue-500/3 blur-[90px] rounded-full pointer-events-none"
+          className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-[#FF6014]/3 blur-[90px] rounded-full pointer-events-none"
         />
 
         <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
@@ -198,7 +198,7 @@ export default function AboutClientPage() {
             >
               <motion.span
                 variants={cardVariant}
-                className="inline-block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100/50"
+                className="inline-block text-[10px] font-extrabold text-[#FF6014] uppercase tracking-widest bg-[#FFF8F4] px-3 py-1 rounded-full border border-[#FF6014]/20"
               >
                 About Rajseba
               </motion.span>
@@ -223,32 +223,31 @@ export default function AboutClientPage() {
                 and background-checked service professionals, delivering premium quality service directly to your doorstep.
               </motion.p>
 
-              {/* Bullet Highlights */}
               <motion.div
                 variants={cardVariant}
                 className="grid sm:grid-cols-2 gap-3 max-w-xl mx-auto lg:mx-0 pt-1"
               >
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 justify-center lg:justify-start">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-blue-600" />
+                  <div className="w-5 h-5 rounded-full bg-[#FFF8F4] flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[#FF6014]" />
                   </div>
                   <span>NID & Police-Verified Experts</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 justify-center lg:justify-start">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-blue-600" />
+                  <div className="w-5 h-5 rounded-full bg-[#FFF8F4] flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[#FF6014]" />
                   </div>
                   <span>100% Fixed & Honest Rates</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 justify-center lg:justify-start">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-blue-600" />
+                  <div className="w-5 h-5 rounded-full bg-[#FFF8F4] flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[#FF6014]" />
                   </div>
                   <span>Service Warranty Covered</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700 justify-center lg:justify-start">
-                  <div className="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Check className="w-3.5 h-3.5 text-blue-600" />
+                  <div className="w-5 h-5 rounded-full bg-[#FFF8F4] flex items-center justify-center shrink-0">
+                    <Check className="w-3.5 h-3.5 text-[#FF6014]" />
                   </div>
                   <span>Dedicated Support Managers</span>
                 </div>
@@ -288,7 +287,7 @@ export default function AboutClientPage() {
             >
               <motion.div style={{ scale: imgScale }} className="absolute inset-0">
                 <Image
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800&auto=format&fit=crop"
+                  src="/rajseba_about_banner.png"
                   alt="Premium Home Service Representation"
                   fill
                   className="object-cover"
@@ -333,7 +332,7 @@ export default function AboutClientPage() {
       <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <Reveal variants={stagger} className="text-center max-w-2xl mx-auto mb-8">
-            <span className="inline-block text-[10px] font-extrabold text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full border border-blue-100/50">
+            <span className="inline-block text-[10px] font-extrabold text-[#FF6014] uppercase tracking-widest bg-[#FFF8F4] px-3 py-1 rounded-full border border-[#FF6014]/20">
               Our Pillars
             </span>
             <h2 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-slate-900 mt-2 tracking-tight">
@@ -366,8 +365,8 @@ export default function AboutClientPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 uppercase tracking-wider pt-4 border-t border-slate-50/50 mt-4">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#FF6014] uppercase tracking-wider pt-4 border-t border-slate-50/50 mt-4">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#FF6014]" />
                     Vetted Standard
                   </div>
                 </motion.div>
@@ -412,7 +411,7 @@ export default function AboutClientPage() {
             <Reveal variants={fadeRight} className="grid grid-cols-2 gap-4">
               <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between gap-3">
                 <div className="space-y-2">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-[#FFF8F4] text-[#FF6014] flex items-center justify-center">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <h4 className="text-xs font-black text-slate-900">Serving Dhaka City</h4>
@@ -443,8 +442,8 @@ export default function AboutClientPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
             <Reveal variants={fadeLeft}>
-              <div className="bg-slate-50/45 border border-slate-100 rounded-3xl p-6 md:p-8 space-y-3 hover:border-blue-500/10 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <div className="bg-slate-50/45 border border-slate-100 rounded-3xl p-6 md:p-8 space-y-3 hover:border-[#FF6014]/10 transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-[#FFF8F4] text-[#FF6014] flex items-center justify-center shrink-0">
                   <Target className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-extrabold text-slate-900 tracking-wide">

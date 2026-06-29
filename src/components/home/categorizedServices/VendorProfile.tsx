@@ -84,32 +84,6 @@ export function VendorProfile({ vendor, serviceRating = "0.0" }: { vendor?: Vend
 
         {/* Right Column: Contact & Action */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 lg:gap-6 z-10">
-          <div className="space-y-2">
-            {vendor.phone && (
-              <a
-                href={`tel:${vendor.phone}`}
-                className="flex items-center gap-2.5 text-xs font-bold text-slate-500 hover:text-[#FF6014] transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Phone className="w-3.5 h-3.5" />
-                </div>
-                {vendor.phone}
-              </a>
-            )}
-            {vendor.email && (
-              <a
-                href={`mailto:${vendor.email}`}
-                className="flex items-center gap-2.5 text-xs font-bold text-slate-500 hover:text-[#FF6014] transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Mail className="w-3.5 h-3.5" />
-                </div>
-                {vendor.email}
-              </a>
-            )}
-          </div>
-
-          <div className="h-px sm:h-10 w-full sm:w-px bg-slate-100 self-stretch my-1 sm:my-0" />
 
           <motion.button
             whileHover={{ scale: 1.02 }}

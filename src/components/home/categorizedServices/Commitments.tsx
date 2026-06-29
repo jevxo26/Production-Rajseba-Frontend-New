@@ -1,11 +1,11 @@
 "use client";
 
-import { Shield, Award, Wrench, Clock } from "lucide-react";
+import { Shield, Award, Wrench, Clock, HardHat } from "lucide-react";
 import { motion } from "framer-motion";
 
 const safetyFeatures = [
   { icon: Shield, label: "Insured Work" },
-  { icon: Shield, label: "PPE Mandatory" },
+  { icon: HardHat, label: "PPE Mandatory" },
   { icon: Award, label: "License Verified" },
   { icon: Wrench, label: "Code Compliant" },
   { icon: Clock, label: "On-Time Arrival" },
@@ -19,7 +19,7 @@ export function Commitments() {
           Committed to Zero-Risk Safety
         </h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+        <div className="flex flex-wrap justify-center items-start gap-x-8 gap-y-6 sm:gap-x-12 md:gap-x-16">
           {safetyFeatures.map((feature, index) => (
             <motion.div
               key={index}
@@ -27,12 +27,12 @@ export function Commitments() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.08 }}
-              className="flex flex-col items-center text-center group"
+              className="flex flex-col items-center text-center group min-w-[90px] sm:min-w-[120px]"
             >
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-3 group-hover:scale-105 transition-transform shadow-xs border border-rose-100/50">
+              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300 shadow-[0_4px_12px_rgba(255,96,20,0.08)] border border-[#FF6014]/10">
                 <feature.icon className="w-6 h-6 text-[#FF6014]" />
               </div>
-              <p className="font-bold text-slate-700 text-xs">{feature.label}</p>
+              <p className="font-bold text-slate-700 text-xs tracking-tight group-hover:text-[#FF6014] transition-colors">{feature.label}</p>
             </motion.div>
           ))}
         </div>

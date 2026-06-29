@@ -255,7 +255,7 @@ export function SpecializedServices({
                         : "bg-slate-50/65 text-slate-500 border-slate-100 hover:bg-rose-50 hover:text-[#FF6014] hover:border-[#FF6014]/20"
                       }`}
                     >
-                      {isExpanded ? "Close" : "Explore"}
+                      {isExpanded ? "Hide Options" : "View Options"}
                       {isExpanded ? (
                         <ChevronUp size={14} />
                       ) : (

@@ -45,10 +45,11 @@ export default function ProfilePage() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   useEffect(() => {
-    if (user?.avatar) {
-      setAvatarUrl(user.avatar);
+    const img = profile?.images?.[0] || profile?.picture || profile?.avatar || user?.avatar;
+    if (img) {
+      setAvatarUrl(img);
     }
-  }, [user?.avatar]);
+  }, [profile, user?.avatar]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,15 +60,21 @@ export default function ProfilePage() {
       const url = await uploadImage(file);
       setAvatarUrl(url);
 
-      if (user.id || user._id) {
-        await updateUserMut({
-          id: user.id || user._id,
+      if (hasProfile && profile?.id) {
+        await updateProfileMut({
+          id: profile.id,
           data: { avatar: url },
         }).unwrap();
-        toast.success("Avatar updated successfully!");
+        toast.success("Profile image updated successfully!");
         refetch();
       } else {
-        toast.error("User ID not found. Save form to apply changes.");
+        await createProfileMut({
+          user_id: user.id || user._id,
+          type: selectedType || "personal",
+          avatar: url,
+        }).unwrap();
+        toast.success("Profile image uploaded successfully!");
+        refetch();
       }
     } catch (err: any) {
       console.error(err);
@@ -99,7 +106,6 @@ export default function ProfilePage() {
     const updatedUserData = {
       name: formData.get("name") as string,
       phone: formData.get("phone") as string,
-      avatar: avatarUrl || undefined,
     };
 
     const primaryAddress = formData.get("address")?.toString().trim() || "";
@@ -121,6 +127,7 @@ export default function ProfilePage() {
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
       google_map_link: formData.get("google_map_link")?.toString() || "",
+      avatar: avatarUrl || undefined,
     };
 
     try {

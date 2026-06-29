@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "./Navbar";
 import Footer from "./Footer";
+import { AiChatBot } from "./AiChatBot";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {!hideLayout && <Footer />}
+      {!hideLayout && <AiChatBot />}
     </>
   );
 }

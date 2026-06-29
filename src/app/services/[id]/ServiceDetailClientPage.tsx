@@ -474,19 +474,19 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
             className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+82px)] pointer-events-none md:hidden"
           >
             <div
-              className="pointer-events-auto bg-white/95 backdrop-blur-md border border-slate-200/80
-                shadow-[0_-8px_30px_rgba(0,0,0,0.08)] rounded-2xl p-4
+              className="pointer-events-auto bg-white/90 backdrop-blur-xl border border-white/60
+                shadow-[0_12px_40px_rgba(255,96,20,0.15)] rounded-[28px] p-4 px-5
                 flex items-center justify-between gap-3"
             >
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-[#FFF8F4] text-[#FF6014] flex items-center justify-center shrink-0 border border-[#FF6014]/10">
-                  <ShoppingCart size={18} />
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="w-12 h-12 rounded-[18px] bg-gradient-to-br from-[#FFF8F4] to-[#FFEFE6] text-[#FF6014] flex items-center justify-center shrink-0 border border-[#FF6014]/20 shadow-inner">
+                  <ShoppingCart size={20} className="stroke-[2.2]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-black text-slate-900 leading-tight">
+                  <p className="text-xs font-extrabold text-slate-500 leading-none">
                     {cartItemCount} service{cartItemCount === 1 ? "" : "s"}
                   </p>
-                  <p className="text-xs font-black text-[#FF6014] mt-0.5">
+                  <p className="text-[17px] font-black text-slate-900 mt-1 leading-none">
                     ৳{payableTotal.toLocaleString()}
                   </p>
                 </div>
@@ -495,8 +495,9 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="px-6 py-3 rounded-xl text-sm font-bold text-white
-                  bg-[#FF6014] hover:bg-[#E0530A] transition shadow-md cursor-pointer active:scale-95 shrink-0"
+                className="px-6 py-3.5 rounded-[20px] text-sm font-extrabold text-white
+                  bg-gradient-to-r from-[#FF6014] to-[#FF7C71] hover:opacity-95
+                  transition-all duration-200 shadow-md shadow-[#FF6014]/25 hover:shadow-lg hover:shadow-[#FF6014]/30 cursor-pointer active:scale-95 shrink-0"
               >
                 Book Now
               </button>

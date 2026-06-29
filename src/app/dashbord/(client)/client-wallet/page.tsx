@@ -59,8 +59,8 @@ export default function WalletPage() {
   }
 
   return (
-    <div className="w-full animate-in fade-in duration-200">
-      <div className="w-full space-y-6 md:space-y-8 relative z-10">
+    <div className="w-full animate-in fade-in duration-200 flex justify-center">
+      <div className="w-full max-w-5xl space-y-6 md:space-y-8 relative z-10">
 
         {/* Premium Header Card */}
         <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-6 md:p-8 text-white shadow-xl shadow-slate-950/15 animate-in fade-in duration-300">
@@ -86,9 +86,9 @@ export default function WalletPage() {
         {/* Top Balance & Quick Manage Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Balance Display Card Wrapper */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 flex flex-col items-center lg:items-start">
             {/* Premium Virtual Card */}
-            <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 via-slate-800 to-[#E0530A] p-6 sm:p-8 text-white shadow-xl shadow-slate-950/20 border border-slate-800 flex flex-col justify-between aspect-[1.75/1] max-w-[420px] sm:max-w-full group hover:shadow-2xl hover:shadow-[#FF6014]/5 transition-all duration-300">
+            <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 via-slate-800 to-[#E0530A] p-6 sm:p-8 text-white shadow-xl shadow-slate-950/20 border border-slate-800 flex flex-col justify-between aspect-[1.75/1] w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[520px] group hover:shadow-2xl hover:shadow-[#FF6014]/5 transition-all duration-300">
               {/* Mesh/Grid Background Overlay */}
               <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
               <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-[#FF6014]/20 blur-3xl pointer-events-none" />
@@ -118,12 +118,12 @@ export default function WalletPage() {
                 </span>
               </div>
 
-              {/* Card Middle Row (Wallet Balance) */}
+              {/* Card Middle Row (Total Expenses) */}
               <div className="relative z-10 space-y-1 mt-6 sm:mt-8">
-                <span className="text-[9px] font-bold text-slate-300 tracking-widest uppercase block">Wallet Balance</span>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white flex items-baseline gap-1.5">
-                  <span>৳</span>
-                  <span>{Number(walletBalance).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</span>
+                <span className="text-[9px] sm:text-[11px] font-bold text-slate-300 tracking-widest uppercase block">Total Expenses</span>
+                <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white flex items-baseline gap-1.5 sm:gap-2">
+                  <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl opacity-90">৳</span>
+                  <span className="drop-shadow-lg">{Number(totalExpense).toLocaleString("en-BD", { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
@@ -137,21 +137,21 @@ export default function WalletPage() {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">Total Expenses</span>
+                  <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">Current Balance</span>
                   <span className="text-xs font-bold text-white block mt-0.5 tracking-wide">
-                    ৳ {Number(totalExpense).toLocaleString("en-BD")}
+                    ৳ {Number(walletBalance).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 max-w-[420px] sm:max-w-full">
-              <button className="bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-bold px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-sm shadow-[#FF6014]/10 active:scale-[0.98] transition-all w-full sm:w-auto">
-                <Plus size={16} /> Add Funds
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-4 w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[520px]">
+              <button className="bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs sm:text-sm font-bold px-8 py-3.5 sm:py-4 rounded-2xl flex items-center justify-center gap-2 shadow-sm shadow-[#FF6014]/10 active:scale-[0.98] transition-all w-full sm:w-auto flex-1">
+                <Plus size={18} /> Add Funds
               </button>
-              <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold px-8 py-3.5 rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all w-full sm:w-auto">
-                <FileText size={16} /> Withdraw
+              <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold px-8 py-3.5 sm:py-4 rounded-2xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all w-full sm:w-auto flex-1">
+                <FileText size={18} /> Withdraw
               </button>
             </div>
           </div>
