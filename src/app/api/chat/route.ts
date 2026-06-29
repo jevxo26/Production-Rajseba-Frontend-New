@@ -170,7 +170,7 @@ Instructions:
 
     // 6. Call OpenRouter API using google/gemini-2.5-flash as the primary fast/cheap model
     const openrouterUrl = "https://openrouter.ai/api/v1/chat/completions";
-    
+
     let response = await fetch(openrouterUrl, {
       method: "POST",
       headers: {
