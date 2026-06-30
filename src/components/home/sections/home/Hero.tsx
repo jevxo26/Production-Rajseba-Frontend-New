@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
+import { useGetAllHeroesQuery } from "@/redux/features/admin/hero";
 
 const HERO_CONTENT = {
   titleText: "Expert Home",
@@ -55,6 +56,41 @@ const Hero = () => {
   );
 
   const searchResults = searchRes?.data || [];
+
+  const { data: apiHeroesRes } = useGetAllHeroesQuery();
+  const heroes = apiHeroesRes?.data || (Array.isArray(apiHeroesRes) ? apiHeroesRes : []);
+
+  const slides = heroes.flatMap((hero: any) => {
+    const imgs = Array.isArray(hero.images)
+      ? hero.images
+      : typeof hero.images === 'string'
+        ? hero.images.split(',').filter(Boolean)
+        : [];
+    return imgs.map((img: string) => ({
+      image: img,
+      hero: hero,
+    }));
+  });
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (currentSlideIndex >= slides.length) {
+      setCurrentSlideIndex(0);
+    }
+  }, [slides.length, currentSlideIndex]);
+
+  const activeSlide = slides[currentSlideIndex];
+  const activeHero = activeSlide?.hero || heroes[0];
+  const activeImage = activeSlide?.image;
 
   const { scrollY } = useScroll();
 
@@ -105,19 +141,27 @@ const Hero = () => {
   return (
     <div className="relative w-full min-h-0 sm:min-h-[60vh] md:min-h-[66vh] lg:min-h-[70vh] flex items-center justify-center py-10 md:py-24">
       <div className="absolute inset-0 z-0 bg-[#FFF8F4] overflow-hidden">
-        <div className="absolute inset-0 w-full h-full opacity-15 md:opacity-20 pointer-events-none select-none">
-          <Image
-            src="/bg-icons-design.png"
-            alt="Service Icons Background"
-            fill
-            className="object-cover object-center"
-            priority
-          />
-        </div>
+        {/* Sliding images background */}
+        {slides.length > 0 && activeImage && (
+          <div className="absolute inset-0 w-full h-full overflow-hidden">
+            <AnimatePresence initial={false}>
+              <motion.img
+                key={currentSlideIndex}
+                src={activeImage}
+                alt="Hero Slide Background"
+                initial={{ x: "100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "tween", ease: "easeInOut", duration: 1.0 }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </AnimatePresence>
+          </div>
+        )}
 
-        <div className="absolute inset-0 bg-gradient-to-b from-white/55 sm:from-white/40 via-white/70 sm:via-white/55 to-background backdrop-blur-[1.5px] sm:backdrop-blur-[1px] md:hidden" />
-        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#FFF8F4]/60 via-[#FFF8F4]/40 to-transparent pointer-events-none" />
-        <div className="hidden md:block absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background pointer-events-none" />
+
+
+
       </div>
 
       <motion.div
@@ -126,25 +170,54 @@ const Hero = () => {
         animate="visible"
         className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-6 text-center"
       >
-        <motion.h1
-          variants={itemVariants}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight md:leading-[1.15] mb-4 sm:mb-5"
-        >
-          {HERO_CONTENT.titleText}{" "}
-          <span className="text-[#FF6014]">{HERO_CONTENT.accentTitleText}</span>
-          <br />
-          {HERO_CONTENT.subtitleText}
-        </motion.h1>
+        {/* Desktop View: Title & Subtitle */}
+        <div className="hidden md:block">
+          <motion.h1
+            variants={itemVariants}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight md:leading-[1.15] mb-4 sm:mb-5"
+          >
+            {HERO_CONTENT.titleText}{" "}
+            <span className="text-[#FF6014]">{HERO_CONTENT.accentTitleText}</span>
+            <br />
+            {HERO_CONTENT.subtitleText}
+          </motion.h1>
 
-        <motion.p
-          variants={itemVariants}
-          className="text-sm sm:text-base md:text-lg text-[#FF6014] font-bold max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 leading-relaxed"
-        >
-          {HERO_CONTENT.description}
-        </motion.p>
+          <motion.p
+            variants={itemVariants}
+            className="text-sm sm:text-base md:text-lg text-[#FF6014] font-bold max-w-2xl mx-auto mb-6 sm:mb-8 md:mb-12 leading-relaxed"
+          >
+            {HERO_CONTENT.description}
+          </motion.p>
+        </div>
 
-        {/* Search Bar with Round Button on Right */}
-        <div className="relative w-full max-w-2xl mx-auto mb-10" ref={dropdownRef}>
+        {/* Mobile View: API-provided text and CTA button */}
+        <div className="md:hidden flex flex-col items-center gap-3.5 px-4 mb-6">
+          <motion.h1
+            variants={itemVariants}
+            className="text-xl font-black text-slate-900 tracking-tight leading-tight"
+          >
+            {activeHero?.text || "Expert Home Services, Simplified."}
+          </motion.h1>
+
+          <motion.p
+            variants={itemVariants}
+            className="text-xs text-slate-500 font-bold max-w-xs leading-relaxed"
+          >
+            {activeHero?.subtext || "Premium marketplace for all your household needs in Bangladesh."}
+          </motion.p>
+
+          <motion.div variants={itemVariants} className="mt-1">
+            <Link
+              href={activeHero?.link || "/services"}
+              className="inline-flex items-center justify-center bg-[#FF6014] hover:bg-[#E0530A] text-white py-2.5 px-5 rounded-full font-bold text-xs transition-all shadow-md active:scale-95"
+            >
+              Get Started
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Search Bar - Desktop Only */}
+        <div className="hidden md:block relative w-full max-w-2xl mx-auto mb-10" ref={dropdownRef}>
           <motion.form
             variants={itemVariants}
             style={{
@@ -221,10 +294,10 @@ const Hero = () => {
           )}
         </div>
 
-        {/* Trust Badges */}
+        {/* Trust Badges - Desktop Only */}
         <motion.div
           variants={itemVariants}
-          className="grid grid-cols-2 lg:flex items-center justify-center gap-2.5 sm:gap-6 md:gap-8 mt-8 sm:mt-10 text-slate-500 font-semibold text-[10px] sm:text-xs md:text-sm w-full max-w-sm lg:max-w-none mx-auto"
+          className="hidden md:grid lg:flex items-center justify-center gap-2.5 sm:gap-6 md:gap-8 mt-8 sm:mt-10 text-slate-500 font-semibold text-[10px] sm:text-xs md:text-sm w-full max-w-sm lg:max-w-none mx-auto"
         >
           <div className="flex items-center gap-2 bg-[#FF6014]/5 backdrop-blur-md px-3.5 py-2 rounded-full border border-[#FF6014]/15 shadow-xs justify-center w-full lg:w-auto transition-all duration-200 hover:bg-[#FF6014]/10 hover:border-[#FF6014]/30">
             <span className="text-[#FF6014] text-xs sm:text-sm">★</span>

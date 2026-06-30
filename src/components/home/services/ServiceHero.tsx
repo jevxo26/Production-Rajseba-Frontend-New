@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search } from "lucide-react";
 import Link from "next/link";
@@ -9,37 +9,41 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useGetPublicCategoriesQuery } from "@/redux/features/landing/landingApi";
 import { useGetAllDevisionsQuery } from "@/redux/features/admin/location";
 import { CustomSelect } from "@/components/ui/select";
-import { TbAirConditioning, TbScissors, TbTruck } from "react-icons/tb";
+import { TbAirConditioning, TbTruck } from "react-icons/tb";
 import {
   FaFaucet,
   FaBolt,
-  FaTv,
+  FaCouch,
   FaPaintRoller,
-  FaLeaf,
-  FaBug,
-  FaHammer,
+  FaTint,
+  FaHotTub,
+  FaHouseDamage,
+  FaHeadset,
 } from "react-icons/fa";
-import { MdOutlineCleaningServices, MdOutlineSecurity } from "react-icons/md";
+import { MdOutlineCleaningServices, MdLocalLaundryService } from "react-icons/md";
 import { LayoutGrid } from "lucide-react";
 
-// Category Icon Map for Hero Pills
+// ─── Manual icon map: exact backend category name → icon ────────────────────
+// ExploreCategories.tsx এবং Navbar.tsx এর সাথে EXACT same map, যাতে homepage
+// grid, navbar dropdown, এবং এই hero pills — সব জায়গায় same icon দেখায়।
+// কোনো dynamic/partial (.includes()) matching নেই — শুধু exact name match।
 const CATEGORY_ICON_MAP: Record<string, React.ComponentType<any>> = {
-  "AC Repair": TbAirConditioning,
-  "AC": TbAirConditioning,
-  Plumbing: FaFaucet,
-  Cleaning: MdOutlineCleaningServices,
-  Electrical: FaBolt,
-  Shifting: TbTruck,
-  CCTV: MdOutlineSecurity,
-  Security: MdOutlineSecurity,
-  "Appliance Repair": FaTv,
-  Appliance: FaTv,
-  Painting: FaPaintRoller,
-  Gardening: FaLeaf,
-  "Pest Control": FaBug,
-  Salon: TbScissors,
-  "Home Salon": TbScissors,
-  Carpentry: FaHammer,
+  "AC Service & Repair": TbAirConditioning,
+  "AC Service & Cleaning": TbAirConditioning,
+  "Home & Office Shifting": TbTruck,
+  "Plumbing Service": FaFaucet,
+  "Home Appliance Repair": MdLocalLaundryService,
+  "Home & Office Cleaning": MdOutlineCleaningServices,
+  "Home & Office Deep Cleaning": MdOutlineCleaningServices,
+  "Water Purifier Installation": FaTint,
+  "Home & Office Painting": FaPaintRoller,
+  "Geyser Installation & Repair": FaHotTub,
+  "Electrical Service": FaBolt,
+  "Home & Office Renovation": FaHouseDamage,
+  "PPM Service": FaHeadset,
+  "PPM Service (Planned Preventive Maintenance)": FaHeadset,
+  "Planned Preventive Maintenance": FaHeadset,
+  "Sofa & Carpet Deep Cleaning": FaCouch,
 };
 
 const FALLBACK_ICON = LayoutGrid;
@@ -84,6 +88,76 @@ const ServiceHero = () => {
 
     router.push(`/services?${params.toString()}`);
   };
+
+  // ─── Mobile auto-slide + swipe carousel for category pills ────────────────
+  const trackRef = useRef<HTMLDivElement>(null);
+  const autoSlideTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInteracting = useRef(false);
+
+  const stopAutoSlide = useCallback(() => {
+    if (autoSlideTimer.current) {
+      clearInterval(autoSlideTimer.current);
+      autoSlideTimer.current = null;
+    }
+  }, []);
+
+  const startAutoSlide = useCallback(() => {
+    stopAutoSlide();
+    autoSlideTimer.current = setInterval(() => {
+      const el = trackRef.current;
+      if (!el || isInteracting.current) return;
+
+      const maxScroll = el.scrollWidth - el.clientWidth;
+      if (maxScroll <= 0) return;
+
+      const pillWidth = (el.firstElementChild as HTMLElement)?.offsetWidth || 140;
+      const step = pillWidth + 10; // pill width + gap
+
+      const nextScroll =
+        el.scrollLeft + step >= maxScroll - 4 ? 0 : el.scrollLeft + step;
+
+      el.scrollTo({ left: nextScroll, behavior: "smooth" });
+    }, 2000);
+  }, [stopAutoSlide]);
+
+  // Pause on user touch/drag/wheel, resume shortly after they stop
+  const handleUserInteractionStart = useCallback(() => {
+    isInteracting.current = true;
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+  }, []);
+
+  const handleUserInteractionEnd = useCallback(() => {
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(() => {
+      isInteracting.current = false;
+    }, 2500);
+  }, []);
+
+  useEffect(() => {
+    if (isCategoriesLoading || apiCategories.length === 0) return;
+
+    // Only auto-slide on mobile / small viewports
+    const mql = window.matchMedia("(max-width: 767px)");
+    if (mql.matches) {
+      startAutoSlide();
+    }
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        startAutoSlide();
+      } else {
+        stopAutoSlide();
+      }
+    };
+    mql.addEventListener("change", handleChange);
+
+    return () => {
+      stopAutoSlide();
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+      mql.removeEventListener("change", handleChange);
+    };
+  }, [isCategoriesLoading, apiCategories.length, startAutoSlide, stopAutoSlide]);
 
   return (
     <section className="bg-white pt-6 pb-6 md:py-16 px-4 sm:px-6 overflow-hidden">
@@ -143,51 +217,90 @@ const ServiceHero = () => {
         </motion.form>
 
         {/* Quick-nav Category Pills */}
-        <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mx-auto">
-          {isCategoriesLoading ? (
-            Array.from({ length: 6 }).map((_, idx) => (
+        {isCategoriesLoading ? (
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-4xl mx-auto">
+            {Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
                 className="h-8 w-24 bg-slate-100 animate-pulse rounded-full border border-slate-50"
               />
-            ))
-          ) : (
-            apiCategories.map((cat: any) => {
-              const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
-              const label = cat.name || cat.label || "";
-              
-              // Find matching icon
-              const Icon =
-                CATEGORY_ICON_MAP[label] ||
-                CATEGORY_ICON_MAP[Object.keys(CATEGORY_ICON_MAP).find((k) =>
-                  label.toLowerCase().includes(k.toLowerCase())
-                ) || ""] ||
-                FALLBACK_ICON;
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Desktop / tablet — centered wrapping pills */}
+            <div className="hidden md:flex flex-wrap justify-center gap-2.5 max-w-4xl mx-auto">
+              {apiCategories.map((cat: any) => {
+                const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
+                const label = cat.name || cat.label || "";
+                const Icon = CATEGORY_ICON_MAP[label?.trim()] || FALLBACK_ICON;
+                const isActive = activeCategory === slug;
 
-              const isActive = activeCategory === slug;
+                return (
+                  <Link
+                    key={cat.id}
+                    href={`/categories/${cat.id}`}
+                    className={`group flex items-center gap-2 px-4 py-2 rounded-full border font-extrabold text-xs transition-all duration-200 hover:-translate-y-0.5 no-underline cursor-pointer shadow-sm ${isActive
+                      ? "border-[#FF6014] text-[#FF6014] bg-gradient-to-br from-[#FFF8F4] to-[#FFEDE3]"
+                      : "border-slate-100 text-slate-600 bg-white hover:border-[#FF6014]/40 hover:text-slate-800 hover:shadow-md"
+                      }`}
+                  >
+                    <span
+                      className={`flex items-center justify-center w-5 h-5 rounded-full transition-colors duration-200 ${isActive ? "bg-[#FF6014]/15" : "bg-slate-50 group-hover:bg-[#FF6014]/10"
+                        }`}
+                    >
+                      <Icon size={12} className={isActive ? "text-[#FF6014]" : "text-slate-400 group-hover:text-[#FF6014]"} />
+                    </span>
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
 
-              // Toggle category selection
-              const pillHref = isActive
-                ? `/services?devision=${encodeURIComponent(selectedDivision)}&q=${encodeURIComponent(searchQuery)}`
-                : `/services?category=${slug}&devision=${encodeURIComponent(selectedDivision)}&q=${encodeURIComponent(searchQuery)}`;
+            {/* Mobile — premium auto-sliding + swipeable carousel */}
+            <div className="md:hidden relative -mx-4 px-4">
+              {/* Edge fade gradients */}
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
 
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/categories/${cat.id}`}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full border font-extrabold text-xs transition-all duration-200 hover:-translate-y-0.5 no-underline cursor-pointer shadow-sm ${
-                    isActive
-                      ? "border-[#FF6014] text-[#FF6014] bg-[#FFF8F4]"
-                      : "border-slate-100 text-slate-600 bg-white hover:border-[#FF6014]/40 hover:text-slate-800"
-                  }`}
-                >
-                  <Icon size={14} className={isActive ? "text-[#FF6014]" : "text-slate-400"} />
-                  {label}
-                </Link>
-              );
-            })
-          )}
-        </div>
+              <div
+                ref={trackRef}
+                onTouchStart={handleUserInteractionStart}
+                onTouchEnd={handleUserInteractionEnd}
+                onPointerDown={handleUserInteractionStart}
+                onPointerUp={handleUserInteractionEnd}
+                onScroll={handleUserInteractionStart}
+                className="flex gap-2.5 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {apiCategories.map((cat: any) => {
+                  const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, "-") || String(cat.id);
+                  const label = cat.name || cat.label || "";
+                  const Icon = CATEGORY_ICON_MAP[label?.trim()] || FALLBACK_ICON;
+                  const isActive = activeCategory === slug;
+
+                  return (
+                    <Link
+                      key={cat.id}
+                      href={`/categories/${cat.id}`}
+                      className={`group snap-start flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full border font-extrabold text-xs transition-all duration-200 active:scale-95 no-underline cursor-pointer shadow-sm ${isActive
+                        ? "border-[#FF6014] text-[#FF6014] bg-gradient-to-br from-[#FFF8F4] to-[#FFEDE3]"
+                        : "border-slate-100 text-slate-600 bg-white"
+                        }`}
+                    >
+                      <span
+                        className={`flex items-center justify-center w-5 h-5 rounded-full transition-colors duration-200 ${isActive ? "bg-[#FF6014]/15" : "bg-slate-50"
+                          }`}
+                      >
+                        <Icon size={12} className={isActive ? "text-[#FF6014]" : "text-slate-400"} />
+                      </span>
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

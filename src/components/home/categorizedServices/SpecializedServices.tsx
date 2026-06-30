@@ -187,7 +187,7 @@ export function SpecializedServices({
           }
 
           /* Normal service card */
-           return (
+          return (
             <div key={service.id} className="flex flex-col gap-3">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
