@@ -6,7 +6,7 @@ import { CustomSelect } from "@/components/ui/select";
 
 import { useQuickBooking } from "./hooks/useQuickBooking";
 import { DesktopBookingSidebar } from "@/components/home/booking/DesktopBookingSidebar";
-import AccessDenied from "../../components/AccessDenied";
+import AccessDenied from "../(client)/components/AccessDenied";
 
 export default function AgentQuickBookingPage() {
   const state = useQuickBooking();
@@ -34,6 +34,18 @@ export default function AgentQuickBookingPage() {
         {/* Left Column: Selection */}
         <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm space-y-6">
           <h3 className="text-base font-bold text-slate-800 border-b border-slate-50 pb-2">1. Select Service</h3>
+
+          {(state.role === "admin" || state.role === "superadmin") && (
+            <div className="mb-4">
+              <CustomSelect
+                label="Select Client (Optional)"
+                options={state.clientOptions}
+                value={state.selectedClientId}
+                onChange={(val) => state.setSelectedClientId(val)}
+                placeholder="-- Choose a Client --"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <CustomSelect

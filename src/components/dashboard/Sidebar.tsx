@@ -77,6 +77,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             icon: Calendar,
             children: [
               { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
+              { label: "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
               { label: "Withdraw Requests", href: "/dashbord/withdraw", icon: Wallet }
             ]
           },
@@ -136,6 +137,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             icon: Calendar,
             children: [
               { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
+              { label: "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
               { label: "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
             ]
           },

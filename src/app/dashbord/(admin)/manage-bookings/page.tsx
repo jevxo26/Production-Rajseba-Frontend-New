@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, Search } from "lucide-react";
-import BookingModal from "./components/BookingModal";
+import Link from "next/link";
 import DeleteBookingModal from "./components/DeleteBookingModal";
 import BookingTable from "./components/BookingTable";
 import { useBookingState } from "./hooks/useBookingState";
@@ -47,19 +47,13 @@ export default function BookingsManagementPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => {
-              setNewBooking({
-                ...newBooking,
-                vendor_id: roleName === "vendor" ? String(currentUser?.id || "") : "",
-              });
-              setIsAddModalOpen(true);
-            }}
+          <Link
+            href="/dashbord/quick-booking"
             className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2"
           >
             <Calendar size={18} />
             Create Booking
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -110,23 +104,6 @@ export default function BookingsManagementPage() {
           <BookingTable filteredBookings={filteredBookings} setDeleteModalBookingId={setDeleteModalBookingId} />
         )}
       </div>
-
-      {isAddModalOpen && (
-        <BookingModal
-          setIsAddModalOpen={setIsAddModalOpen}
-          handleCreateSubmit={handleCreateSubmit}
-          isCreating={isCreating}
-          newBooking={newBooking}
-          setNewBooking={setNewBooking}
-          clients={clients}
-          vendors={vendors}
-          roleName={roleName}
-          selectedVendorServices={selectedVendorServices}
-          selectedService={selectedService}
-          selectedNestedService={selectedNestedService}
-          estimatedTotalPrice={estimatedTotalPrice}
-        />
-      )}
 
       <DeleteBookingModal
         deleteModalBookingId={deleteModalBookingId}
