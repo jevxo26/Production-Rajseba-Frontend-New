@@ -61,10 +61,10 @@ export default function TrackingPage() {
   const serviceLabel = booking.service?.name || booking.pkg?.name || booking.subServices?.map((s: any) => s.name).join(', ') || 'Service';
 
   const steps = [
-    { id: 'pending', label: 'Pending' },
-    { id: 'assigned', label: 'Assigned' },
-    { id: 'on_the_way', label: 'On The Way' },
-    { id: 'completed', label: 'Completed' }
+    { id: 'pending', label: 'Pending', time: booking.createdAt },
+    { id: 'assigned', label: 'Assigned', time: booking.assignedAt },
+    { id: 'on_the_way', label: 'On The Way', time: booking.onTheWayAt },
+    { id: 'completed', label: 'Completed', time: booking.completedAt }
   ];
   const statusMap: Record<string, number> = {
     pending: 0,
@@ -73,6 +73,12 @@ export default function TrackingPage() {
     completed: 3
   };
   const currentStepIndex = statusMap[booking.status] ?? 0;
+
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -118,7 +124,7 @@ export default function TrackingPage() {
                 
                 return (
                   <React.Fragment key={step.id}>
-                    <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-1.5">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                         isActive ? 'bg-primary text-white ring-4 ring-primary/20' :
                         isCompleted ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'
@@ -131,13 +137,20 @@ export default function TrackingPage() {
                           index + 1
                         )}
                       </div>
-                      <span className={`text-xs font-medium ${isActive ? 'text-primary' : isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>
-                        {step.label}
-                      </span>
+                      <div className="text-center mt-1">
+                        <span className={`block text-xs font-medium ${isActive ? 'text-primary' : isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>
+                          {step.label}
+                        </span>
+                        {step.time && (
+                          <span className={`block text-[10px] mt-0.5 font-medium ${isActive ? 'text-primary/70' : isCompleted ? 'text-gray-500' : 'text-gray-400'}`}>
+                            {formatTime(step.time)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
                     {index < steps.length - 1 && (
-                      <div className={`flex-1 flex items-center justify-center -mt-5 ${isCompleted && index < currentStepIndex ? 'text-primary' : 'text-gray-200'}`}>
+                      <div className={`flex-1 flex items-center justify-center -mt-8 ${isCompleted && index < currentStepIndex ? 'text-primary' : 'text-gray-200'}`}>
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -157,7 +170,7 @@ export default function TrackingPage() {
           <div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Service Details</h3>
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-              <p className="font-medium text-gray-900">{booking.service?.name || booking.pkg?.name || 'Service'}</p>
+              <p className="font-medium text-gray-900">{serviceLabel}</p>
               
               {booking.subServices && booking.subServices.length > 0 && (
                 <div className="mt-3 mb-1 space-y-2">
