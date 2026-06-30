@@ -142,5 +142,17 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
     },
   ];
 
-  return <CustomTable columns={columns} data={filteredBookings} />;
+  const getRowClassName = (row: any) => {
+    // Only apply a subtle background if we want to differentiate by status
+    switch (row.status?.toLowerCase()) {
+      case "pending": return "bg-amber-50/40 hover:bg-amber-50/60";
+      case "assigned": return "bg-blue-50/40 hover:bg-blue-50/60";
+      case "on_the_way": return "bg-purple-50/40 hover:bg-purple-50/60";
+      case "completed": return "bg-emerald-50/40 hover:bg-emerald-50/60";
+      case "cancelled": return "bg-rose-50/40 hover:bg-rose-50/60";
+      default: return "";
+    }
+  };
+
+  return <CustomTable columns={columns} data={filteredBookings} rowClassName={getRowClassName} />;
 }

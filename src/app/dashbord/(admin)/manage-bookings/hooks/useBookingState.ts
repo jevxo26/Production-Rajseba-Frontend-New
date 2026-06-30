@@ -168,6 +168,9 @@ export function useBookingState() {
       b.location?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === "all" || b.status === filterStatus;
     return matchesSearch && matchesStatus;
+  }).sort((a: any, b: any) => {
+    if (a.id && b.id) return b.id - a.id;
+    return new Date(b.created_at || b.createdAt || 0).getTime() - new Date(a.created_at || a.createdAt || 0).getTime();
   });
 
   return {

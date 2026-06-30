@@ -142,6 +142,7 @@ export interface CustomTableProps<T> {
   filterOptions?: { label: string; value: string }[];
   pageSize?: number;
   className?: string;
+  rowClassName?: (row: T) => string;
 }
 
 export function CustomTable<T extends { id?: string | number;[key: string]: any }>({
@@ -155,6 +156,7 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
   filterOptions = [],
   pageSize = 5,
   className,
+  rowClassName,
 }: CustomTableProps<T>) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [activeFilter, setActiveFilter] = React.useState("ALL")
@@ -265,7 +267,7 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
               paginatedData.map((row, idx) => {
                 const uniqueRowId = row.id ?? idx
                 return (
-                  <TableRow key={uniqueRowId}>
+                  <TableRow key={uniqueRowId} className={rowClassName ? rowClassName(row) : undefined}>
                     {columns.map((col) => (
                       <TableCell key={col.key}>
                         {col.render ? col.render(row) : row[col.key]}
