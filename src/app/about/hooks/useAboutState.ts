@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { getAccessToken } from "@/lib/token";
 import { getRoleName } from "@/redux/features/auth/authSlice";
 
+import { useGetPublicStatsQuery } from "@/redux/features/landing/landingApi";
+
 const TEAM_MEMBERS_FALLBACK = [
   { name: "Mahbubur Rahman", role: "Founder & CEO", bio: "Pioneering digital logistics for urban home maintenance, driven to establish job security and dignity for service professionals.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
   { name: "Farhana Yasmin", role: "Head of Customer Experience", bio: "Setting strict SLA protocols and service compliance measures to ensure every customer is delighted on every visit.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" },
@@ -11,15 +13,11 @@ const TEAM_MEMBERS_FALLBACK = [
 ];
 
 export function useAboutState() {
-  const [statsData, setStatsData] = useState<any>(null);
+  const { data: statsRes } = useGetPublicStatsQuery();
+  const statsData = statsRes?.data || {};
   const [teamMembers, setTeamMembers] = useState<any[]>(TEAM_MEMBERS_FALLBACK);
 
   useEffect(() => {
-    fetch("https://api.rajseba.com/stats")
-      .then((res) => res.json())
-      .then((json) => { if (json.success && json.data) setStatsData(json.data); })
-      .catch((err) => console.error("Error fetching stats:", err));
-
     const token = getAccessToken();
     const headers: any = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -53,10 +51,10 @@ export function useAboutState() {
   }, []);
 
   const displayStats = [
-    { value: statsData?.servicesCompleted ? `${statsData.servicesCompleted.toLocaleString()}+` : "120,000+", label: "Bookings Done", desc: "Across Dhaka City" },
-    { value: statsData?.verifiedExperts ? `${statsData.verifiedExperts.toLocaleString()}+` : "2,500+", label: "Verified Experts", desc: "Background screened" },
-    { value: statsData?.averageRating ? `${statsData.averageRating.toFixed(1)}/5.0` : "4.0/5.0", label: "Average Rating", desc: "From real clients" },
-    { value: statsData?.happyCustomers ? `${statsData.happyCustomers.toLocaleString()}+` : "50,000+", label: "Happy Customers", desc: "Rajseba Guarantee" },
+    { value: statsData?.servicesCompleted ? `${Number(statsData.servicesCompleted).toLocaleString()}+` : "120,000+", label: "Bookings Done", desc: "Across Dhaka City" },
+    { value: statsData?.verifiedExperts ? `${Number(statsData.verifiedExperts).toLocaleString()}+` : "2,500+", label: "Verified Experts", desc: "Background screened" },
+    { value: typeof statsData?.averageRating === "number" ? `${statsData.averageRating.toFixed(1)}/5.0` : "4.8/5.0", label: "Average Rating", desc: "From real clients" },
+    { value: statsData?.happyCustomers ? `${Number(statsData.happyCustomers).toLocaleString()}+` : "50,000+", label: "Happy Customers", desc: "Rajseba Guarantee" },
   ];
 
   return { displayStats, teamMembers };

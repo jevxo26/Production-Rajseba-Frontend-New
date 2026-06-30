@@ -42,7 +42,7 @@ export default function AboutClientPage() {
               Rajseba was built with a single mission — to bring reliable, transparent, and affordable home services to every household in Bangladesh.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/services"><Button className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-6 py-3 h-auto rounded-xl text-sm flex items-center gap-2">Explore Services<ArrowRight className="w-4 h-4" /></Button></Link>
+              <Link href="/services"><Button variant="outline" className="border-[#FF6014] text-[#FF6014] hover:bg-[#FF6014]/5 font-bold px-6 py-3 h-auto rounded-xl text-sm flex items-center gap-2">Explore Services<ArrowRight className="w-4 h-4" /></Button></Link>
               <Link href="/opportunity"><Button variant="outline" className="border-slate-200 text-slate-600 font-bold px-6 py-3 h-auto rounded-xl text-sm flex items-center gap-2">Become a Partner<TrendingUp className="w-4 h-4" /></Button></Link>
             </div>
           </RevealSection>
@@ -183,7 +183,7 @@ export default function AboutClientPage() {
             <h2 className="text-[clamp(22px,4vw,42px)] font-black text-slate-900 tracking-tight leading-tight mb-4">Experience the Rajseba Difference</h2>
             <p className="text-[13px] text-slate-400 font-medium max-w-md mx-auto leading-relaxed mb-8">Join 50,000+ households who rely on Rajseba for professional, reliable home maintenance.</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/services"><Button className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-8 py-4 h-auto rounded-xl text-sm flex items-center gap-2 shadow-lg">Book a Service<ArrowRight className="w-4 h-4" /></Button></Link>
+              <Link href="/services"><Button variant="outline" className="border-[#FF6014] text-[#FF6014] hover:bg-[#FF6014]/5 font-bold px-8 py-4 h-auto rounded-xl text-sm flex items-center gap-2 shadow-lg">Book a Service<ArrowRight className="w-4 h-4" /></Button></Link>
               <Link href="/opportunity"><Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50 font-bold px-8 py-4 h-auto rounded-xl text-sm flex items-center gap-2">Join as Partner<TrendingUp className="w-4 h-4" /></Button></Link>
             </div>
           </RevealSection>
