@@ -263,6 +263,7 @@ export function SpecializedServices({
                       )}
                     </div>
                   )}
+
                 </div>
               </motion.div>
 
@@ -275,12 +276,7 @@ export function SpecializedServices({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="bg-[#FFF8F4]/30 border border-slate-100 p-5 rounded-[28px] space-y-4 shadow-xs mt-3">
-                      <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 px-1">
-                        <Info size={13} className="text-[#FF6014]" />
-                        Select options to add to cart
-                      </div>
-
+                    <div className="bg-[#FFF8F4]/30 border border-slate-100 p-5 rounded-[28px] shadow-xs mt-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {service.subServices?.map((sub) => {
                           const isAdded = isInCart(sub.id);
@@ -304,43 +300,31 @@ export function SpecializedServices({
 
                               <div className="shrink-0 w-full sm:w-28">
                                 {isAdded ? (
-                                  <div className="flex flex-col items-center">
-                                    <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#FF6014]/20 rounded-xl p-0.5 w-full justify-between">
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onUpdateQuantity(sub.id, -1);
-                                        }}
-                                        className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
-                                        aria-label="Decrease"
-                                      >
-                                        <Minus size={11} strokeWidth={3} />
-                                      </button>
-                                      <span className="text-xs font-black text-slate-800">
-                                        {quantity}
-                                      </span>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onUpdateQuantity(sub.id, 1);
-                                        }}
-                                        className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
-                                        aria-label="Increase"
-                                      >
-                                        <Plus size={11} strokeWidth={3} />
-                                      </button>
-                                    </div>
+                                  <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#FF6014]/20 rounded-xl p-0.5 w-full justify-between">
                                     <button
                                       type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        onRemoveFromCart(sub.id);
+                                        onUpdateQuantity(sub.id, -1);
                                       }}
-                                      className="text-[10px] font-bold text-slate-400 hover:text-rose-500 transition cursor-pointer mt-1"
+                                      className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
+                                      aria-label="Decrease"
                                     >
-                                      Remove
+                                      <Minus size={11} strokeWidth={3} />
+                                    </button>
+                                    <span className="text-xs font-black text-slate-800">
+                                      {quantity}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onUpdateQuantity(sub.id, 1);
+                                      }}
+                                      className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
+                                      aria-label="Increase"
+                                    >
+                                      <Plus size={11} strokeWidth={3} />
                                     </button>
                                   </div>
                                 ) : (
@@ -361,39 +345,6 @@ export function SpecializedServices({
                             </div>
                           );
                         })}
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
-                        {(() => {
-                          const hasSelection = service.subServices?.some((sub) =>
-                            isInCart(sub.id)
-                          );
-                          const selectedCount =
-                            service.subServices?.reduce(
-                              (sum, sub) => sum + getQuantity(sub.id),
-                              0
-                            ) || 0;
-                          return (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleInitiateBooking(service);
-                              }}
-                              className={`px-7 py-3 rounded-full text-xs font-bold transition cursor-pointer w-full sm:w-auto
-                                flex items-center justify-center gap-2
-                                ${hasSelection
-                                  ? "bg-[#FF6014] hover:bg-[#E0530A] text-white shadow-md shadow-rose-100"
-                                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
-                                }`}
-                              disabled={!hasSelection}
-                            >
-                              <Calendar className="w-4 h-4" />
-                              {hasSelection
-                                ? `Book Selected (${selectedCount})`
-                                : "Add services to book"}
-                            </button>
-                          );
-                        })()}
                       </div>
                     </div>
                   </motion.div>
