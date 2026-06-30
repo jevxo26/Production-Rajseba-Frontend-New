@@ -26,19 +26,19 @@ import {
   PhoneCall,
   MapPin,
   TrendingUp,
-  Truck,
-  Flame,
-  Sparkles,
-  Wind,
-  Droplet,
-  Zap,
-  Paintbrush,
-  Laptop,
-  Scissors,
-  Car,
-  Hammer,
-  HeartPulse
 } from "lucide-react";
+import { TbAirConditioning, TbTruck } from "react-icons/tb";
+import {
+  FaFaucet,
+  FaBolt,
+  FaCouch,
+  FaPaintRoller,
+  FaTint,
+  FaHotTub,
+  FaHouseDamage,
+  FaHeadset,
+} from "react-icons/fa";
+import { MdOutlineCleaningServices, MdLocalLaundryService } from "react-icons/md";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useGetPublicCategoriesQuery, useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -51,21 +51,33 @@ interface NavLink {
   hasDropdown?: boolean;
 }
 
-function getCategoryIcon(name: string): LucideIcon {
-  const cleanName = (name || "").toLowerCase().trim();
-  if (cleanName.includes("shift")) return Truck;
-  if (cleanName.includes("clean")) return Sparkles;
-  if (cleanName.includes("ac ") || cleanName.includes("air condition") || cleanName.includes("cooling")) return Wind;
-  if (cleanName.includes("oven") || cleanName.includes("gas") || cleanName.includes("stove")) return Flame;
-  if (cleanName.includes("plumb") || cleanName.includes("water") || cleanName.includes("pipe")) return Droplet;
-  if (cleanName.includes("electr") || cleanName.includes("power") || cleanName.includes("wiring") || cleanName.includes("generator")) return Zap;
-  if (cleanName.includes("paint") || cleanName.includes("decorat")) return Paintbrush;
-  if (cleanName.includes("comput") || cleanName.includes("laptop") || cleanName.includes("device") || cleanName.includes("mobile")) return Laptop;
-  if (cleanName.includes("salon") || cleanName.includes("beauty") || cleanName.includes("hair") || cleanName.includes("cut")) return Scissors;
-  if (cleanName.includes("car") || cleanName.includes("driver") || cleanName.includes("vehic")) return Car;
-  if (cleanName.includes("carpenter") || cleanName.includes("wood") || cleanName.includes("furnit") || cleanName.includes("repair")) return Hammer;
-  if (cleanName.includes("health") || cleanName.includes("doctor") || cleanName.includes("care") || cleanName.includes("nurse")) return HeartPulse;
-  return LayoutGrid;
+// ─── Manual icon map: exact backend category name → icon ────────────────────
+// এটা ExploreCategories.tsx এর সাথে EXACT same map, যাতে homepage grid,
+// desktop hover dropdown, এবং mobile accordion menu — সব জায়গায় same icon দেখায়।
+// কোনো dynamic/partial (.includes()) matching নেই — শুধু exact name match।
+const CATEGORY_ICON_MAP: Record<string, React.ComponentType<any>> = {
+  "AC Service & Repair": TbAirConditioning,
+  "AC Service & Cleaning": TbAirConditioning,
+  "Home & Office Shifting": TbTruck,
+  "Plumbing Service": FaFaucet,
+  "Home Appliance Repair": MdLocalLaundryService,
+  "Home & Office Cleaning": MdOutlineCleaningServices,
+  "Home & Office Deep Cleaning": MdOutlineCleaningServices,
+  "Water Purifier Installation": FaTint,
+  "Home & Office Painting": FaPaintRoller,
+  "Geyser Installation & Repair": FaHotTub,
+  "Electrical Service": FaBolt,
+  "Home & Office Renovation": FaHouseDamage,
+  "PPM Service": FaHeadset,
+  "PPM Service (Planned Preventive Maintenance)": FaHeadset,
+  "Planned Preventive Maintenance": FaHeadset,
+  "Sofa & Carpet Deep Cleaning": FaCouch,
+};
+
+const FALLBACK_ICON = LayoutGrid;
+
+function getCategoryIcon(name: string): React.ComponentType<any> {
+  return CATEGORY_ICON_MAP[(name || "").trim()] || FALLBACK_ICON;
 }
 
 const LEFT_NAV_LINKS: NavLink[] = [
@@ -227,7 +239,7 @@ export function Navbar() {
     <>
       <motion.nav
         style={{ boxShadow: headerShadow, borderBottomColor: borderColor }}
-        className="bg-[#FFF8F4]/50 backdrop-blur-lg border-b sticky top-0 z-50"
+        className="bg-[#FFF8F4]/95 md:bg-[#FFF8F4]/50 backdrop-blur-lg border-b sticky top-0 z-50 transition-colors duration-300"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* ─── TOP BAR ─── */}
@@ -307,26 +319,24 @@ export function Navbar() {
                               </div>
                             ) : (
                               <div className="grid grid-cols-2 gap-2">
-                                {apiCategories.map((cat: any) => (
-                                  <Link
-                                    key={cat.id}
-                                    href={`/categories/${cat.id}`}
-                                    className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-rose-50/60 group/item transition-all duration-200"
-                                    onClick={() => setShowMenuDropdown(false)}
-                                  >
-                                    <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover/item:bg-[#FF6014]/10 group-hover/item:border-rose-100 transition-all duration-200 shrink-0">
-                                      {(() => {
-                                        const CatIcon = getCategoryIcon(cat.name);
-                                        return (
-                                          <CatIcon className="w-5 h-5 text-slate-400 group-hover/item:text-[#FF6014] transition-colors duration-200" />
-                                        );
-                                      })()}
-                                    </div>
-                                    <span className="font-semibold text-sm text-slate-700 group-hover/item:text-[#FF6014] transition-colors line-clamp-2 leading-snug">
-                                      {cat.name}
-                                    </span>
-                                  </Link>
-                                ))}
+                                {apiCategories.map((cat: any) => {
+                                  const CatIcon = getCategoryIcon(cat.name);
+                                  return (
+                                    <Link
+                                      key={cat.id}
+                                      href={`/categories/${cat.id}`}
+                                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-rose-50/60 group/item transition-all duration-200"
+                                      onClick={() => setShowMenuDropdown(false)}
+                                    >
+                                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover/item:bg-[#FF6014]/10 group-hover/item:border-rose-100 transition-all duration-200 shrink-0">
+                                        <CatIcon className="w-5 h-5 text-slate-400 group-hover/item:text-[#FF6014] transition-colors duration-200" />
+                                      </div>
+                                      <span className="font-semibold text-sm text-slate-700 group-hover/item:text-[#FF6014] transition-colors line-clamp-2 leading-snug">
+                                        {cat.name}
+                                      </span>
+                                    </Link>
+                                  );
+                                })}
                               </div>
                             )}
                           </motion.div>
@@ -461,32 +471,32 @@ export function Navbar() {
             )}
 
             {/* Mobile Right Controls */}
-            <div className="flex md:hidden items-center gap-1">
-              <Button
-                variant="ghost"
+            <div className="flex md:hidden items-center gap-2">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={handleMobileSearchToggle}
-                className={`p-2.5 h-auto rounded-lg transition-colors ${mobileSearchOpen
-                  ? "text-[#FF6014] bg-rose-50 hover:bg-rose-50 hover:text-[#FF6014]"
-                  : "text-slate-600 hover:text-[#FF6014] hover:bg-slate-50"
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all border outline-none ${mobileSearchOpen
+                  ? "text-[#FF6014] bg-rose-50/80 border-[#FF6014]/20 shadow-[0_2px_10px_-2px_rgba(255,96,20,0.15)]"
+                  : "text-slate-600 bg-white/70 backdrop-blur-md border-slate-100 hover:text-[#FF6014] hover:bg-slate-50 shadow-sm"
                   }`}
                 aria-label={mobileSearchOpen ? "Close search" : "Open search"}
                 aria-expanded={mobileSearchOpen}
               >
-                {mobileSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
-              </Button>
-              <Button
-                variant="ghost"
+                {mobileSearchOpen ? <X className="w-[18px] h-[18px]" /> : <Search className="w-[18px] h-[18px]" />}
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={handleMenuToggle}
-                className={`p-2.5 h-auto rounded-lg transition-colors ${isOpen
-                  ? "text-[#FF6014] bg-rose-50 hover:bg-rose-50 hover:text-[#FF6014]"
-                  : "text-slate-600 hover:text-[#FF6014] hover:bg-slate-50"
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all border outline-none ${isOpen
+                  ? "text-[#FF6014] bg-rose-50/80 border-[#FF6014]/20 shadow-[0_2px_10px_-2px_rgba(255,96,20,0.15)]"
+                  : "text-slate-600 bg-white/70 backdrop-blur-md border-slate-100 hover:text-[#FF6014] hover:bg-slate-50 shadow-sm"
                   }`}
                 aria-label={isOpen ? "Close menu" : "Open menu"}
                 aria-expanded={isOpen}
                 aria-controls="mobile-menu"
               >
-                {isOpen ? <X className="w-[22px] h-[22px]" /> : <Menu className="w-[22px] h-[22px]" />}
-              </Button>
+                {isOpen ? <X className="w-[18px] h-[18px]" /> : <Menu className="w-[18px] h-[18px]" />}
+              </motion.button>
             </div>
           </div>
 
@@ -632,6 +642,7 @@ export function Navbar() {
                                   ))
                                 ) : apiCategories.map((cat: any) => {
                                   const isCategoryActive = pathname === `/categories/${cat.id}`;
+                                  const CatIcon = getCategoryIcon(cat.name);
                                   return (
                                     <Link
                                       key={cat.id}
@@ -643,12 +654,7 @@ export function Navbar() {
                                       onClick={() => { setIsOpen(false); setShowMobileAccordion(false); }}
                                     >
                                       <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                                        {(() => {
-                                          const CatIcon = getCategoryIcon(cat.name);
-                                          return (
-                                            <CatIcon className={`w-5 h-5 ${isCategoryActive ? "text-[#FF6014]" : "text-slate-400"}`} />
-                                          );
-                                        })()}
+                                        <CatIcon className={`w-5 h-5 ${isCategoryActive ? "text-[#FF6014]" : "text-slate-400"}`} />
                                       </div>
                                       <span className="line-clamp-2 text-center text-xs leading-snug">{cat.name}</span>
                                       {isCategoryActive && (
