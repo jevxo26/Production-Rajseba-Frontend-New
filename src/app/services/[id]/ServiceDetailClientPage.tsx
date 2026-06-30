@@ -81,7 +81,7 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
       <div className="relative z-10">
         <CategorizedHero id={service.id} name={service.name} description={service.description} image={service.image} rating={rating} bookingsCount={bookingsCount} reviewsCount={reviewsCount} categoryName={service.category?.name} />
 
-        <div className="sticky top-[72px] z-30 bg-[#FFF8F4]/50 backdrop-blur-lg border-b border-slate-100 shadow-[0_4px_24px_-6px_rgba(0,0,0,0.02)] hidden md:block">
+        <div className="sticky top-[72px] z-30 max-w-7xl mx-auto bg-[#FFF8F4]/50 backdrop-blur-lg border-b border-slate-100 shadow-[0_4px_24px_-6px_rgba(0,0,0,0.02)] hidden md:block">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 flex gap-2">
             {[{ id: "specialized-services", label: "Services" }, { id: "packages", label: "Packages" }, { id: "experts", label: "Experts" }, { id: "vendor", label: "Vendor Profile" }, { id: "reviews", label: "Reviews" }].map((tab) => (
               <button key={tab.id} onClick={() => state.scrollToSection(tab.id)} className={`text-xs font-bold px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer ${state.activeTab === tab.id ? "text-white bg-[#FF6014] shadow-md shadow-rose-100" : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"}`}>{tab.label}</button>
