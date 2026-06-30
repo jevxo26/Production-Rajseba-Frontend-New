@@ -1,12 +1,12 @@
 "use client";
 
-import React, { use } from 'react';
+import React from 'react';
 import { useGetBookingTrackingQuery } from '@/redux/features/admin/booking';
+import { useParams } from 'next/navigation';
 
-export default function TrackingPage({ params }: { params: Promise<{ bookingId: string }> }) {
-  // Unwrap params using React.use if it's a promise (Next.js 15+ handling).
-  const resolvedParams = React.use(params);
-  const bookingId = resolvedParams.bookingId;
+export default function TrackingPage() {
+  const params = useParams();
+  const bookingId = params.bookingId as string;
   
   const { data: response, isLoading, isError } = useGetBookingTrackingQuery(bookingId, {
     refetchOnMountOrArgChange: true,
