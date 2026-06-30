@@ -143,7 +143,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative w-full min-h-[240px] md:min-h-[66vh] lg:min-h-[70vh] flex items-center justify-center py-8 md:py-24">
+    <div className="relative w-full min-h-[240px] lg:min-h-[50vh] flex items-center max-w-7xl mx-auto pt-0 md:pt-6 ounded-[0px]  md:rounded-[26px] overflow-hidden justify-center py-8 md:py-24">
       <div className="absolute inset-0 z-0 bg-[#FFF8F4] overflow-hidden">
         {/* Sliding images background */}
         {slides.length > 0 && activeImage && (
