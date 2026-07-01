@@ -175,8 +175,11 @@ const ExploreCategories = () => {
                           flex flex-col items-center justify-center
                           h-full rounded-2xl md:rounded-[28px] p-3 md:p-8
                           bg-gradient-to-br from-white to-[#e8eaed]
-                          border border-white/80
+                          border-[2px] border-blue-500/30 hover:border-blue-500/80
                           cursor-pointer
+                          transition-all duration-350 ease-out
+                          hover:shadow-[0_12px_28px_rgba(59,130,246,0.18),0_0_0_4px_rgba(59,130,246,0.15)]
+                          hover:-translate-y-[3px]
                           category-card-blue-animated
                         "
                       >
@@ -254,8 +257,11 @@ const ExploreCategories = () => {
                             flex flex-col items-center justify-center
                             h-full rounded-2xl p-3
                             bg-gradient-to-br from-white to-[#e8eaed]
-                            border border-white/80
+                            border-[1.5px] border-blue-500/30 hover:border-blue-500/80
                             cursor-pointer
+                            transition-all duration-350 ease-out
+                            hover:shadow-[0_12px_28px_rgba(59,130,246,0.18),0_0_0_4px_rgba(59,130,246,0.15)]
+                            hover:-translate-y-[3px]
                             category-card-blue-animated
                           "
                         >
@@ -323,8 +329,11 @@ const ExploreCategories = () => {
                             flex flex-col items-center justify-center
                             h-full rounded-2xl p-3
                             bg-gradient-to-br from-white to-[#e8eaed]
-                            border border-white/80
+                            border-[1.5px] border-blue-500/30 hover:border-blue-500/80
                             cursor-pointer
+                            transition-all duration-350 ease-out
+                            hover:shadow-[0_12px_28px_rgba(59,130,246,0.18),0_0_0_4px_rgba(59,130,246,0.15)]
+                            hover:-translate-y-[3px]
                             category-card-blue-animated
                           "
                         >

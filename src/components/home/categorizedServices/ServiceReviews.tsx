@@ -15,7 +15,9 @@ interface Review {
 }
 
 export function ServiceReviews({ reviews = [] }: { reviews?: Review[] }) {
+  const [showAll, setShowAll] = React.useState(false);
   const totalReviews = reviews.length;
+  const visibleReviews = showAll ? reviews : reviews.slice(0, 2);
   const averageRating =
     totalReviews > 0
       ? (reviews.reduce((acc, curr) => acc + (curr.rating || 5), 0) / totalReviews).toFixed(1)
@@ -153,7 +155,7 @@ export function ServiceReviews({ reviews = [] }: { reviews?: Review[] }) {
             </div>
           ) : (
             <div className="space-y-3.5">
-              {reviews.map((review, index) => {
+              {visibleReviews.map((review, index) => {
                 const dateStr = new Date(review.createdAt).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
@@ -253,6 +255,18 @@ export function ServiceReviews({ reviews = [] }: { reviews?: Review[] }) {
                   </motion.div>
                 );
               })}
+
+              {reviews.length > 2 && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAll(!showAll)}
+                    className="px-6 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm active:scale-[0.98]"
+                  >
+                    {showAll ? "See Less" : `See More (${reviews.length - 2} more)`}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

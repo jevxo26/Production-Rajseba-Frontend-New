@@ -167,7 +167,20 @@ export default function TopServices() {
             const colors = COLOR_PAIRS[i % COLOR_PAIRS.length];
             const slug = service.slug || String(service.id);
             const categoryName = service.category?.name || "";
-            const price = service.price ? Number(service.price) : null;
+            
+            // Calculate starting price from service.price, or fall back to minimum price of nestedServices
+            let price = service.price ? Number(service.price) : null;
+            if (!price && service.nestedServices && service.nestedServices.length > 0) {
+              const prices = service.nestedServices
+                .map((ns: any) => Number(ns.starting_price || ns.price || 0))
+                .filter((p: number) => p > 0);
+              if (prices.length > 0) {
+                price = Math.min(...prices);
+              }
+            }
+            
+            // Calculate original price (before discount)
+            const originalPrice = price ? Math.round(price * 1.18) : null;
 
             const totalReviews = service.reviews?.length || 0;
             const averageRating = totalReviews > 0
@@ -255,7 +268,14 @@ export default function TopServices() {
                       {price ? (
                         <>
                           <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Starting at</span>
-                          <span>৳{price.toLocaleString()}</span>
+                          <div className="flex items-baseline gap-1.5 mt-0.5">
+                            <span className="text-base font-black text-slate-900">৳{price.toLocaleString()}</span>
+                            {originalPrice && (
+                              <span className="text-[11px] text-slate-400 font-medium line-through">
+                                ৳{originalPrice.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
                         </>
                       ) : (
                         <span className="text-xs text-slate-400 font-semibold">Contact for price</span>
