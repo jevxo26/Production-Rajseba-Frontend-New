@@ -100,7 +100,7 @@ export default function FeaturedProviders() {
   });
 
   return (
-    <section className="py-5 md:py-16 lg:py-20 overflow-hidden">
+    <section className="py-5 md:py-8 lg:py-10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Header */}
@@ -109,7 +109,7 @@ export default function FeaturedProviders() {
             <BadgeCheck size={13} />
             Verified Professionals
           </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-slate-900 tracking-tight flex items-center justify-center gap-2">
             <ThumbsUp className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
             Our Top Providers
           </h2>

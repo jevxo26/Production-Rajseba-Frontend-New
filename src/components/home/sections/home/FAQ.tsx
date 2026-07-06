@@ -30,7 +30,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="pt-5 pb-2 md:py-16 lg:py-20 bg-transparent">
+    <div className="pt-5 pb-2 md:py-8 lg:py-10 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -45,7 +45,8 @@ export default function FAQ() {
             <span className="inline-flex items-center gap-2 bg-[#FF6014]/10 border border-[#FF6014]/20 text-[#FF6014] px-3.5 py-1.5 rounded-full text-xs font-bold mb-4">
               Got questions?
             </span>
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 flex items-center justify-center md:justify-start gap-2">
+              <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
               Frequently Asked Questions
             </h2>
             <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-8">

@@ -91,7 +91,7 @@ export default function Stats() {
   }, []);
 
   return (
-    <div className="py-5 md:py-16 lg:py-20 bg-transparent relative" ref={ref}>
+    <div className="py-5 md:py-8 lg:py-10 bg-transparent relative" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Header */}
@@ -100,7 +100,7 @@ export default function Stats() {
             <TrendingUp size={13} />
             Our Impact
           </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-slate-900 tracking-tight flex items-center justify-center gap-2">
             <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
             Our Platform Impact
           </h2>

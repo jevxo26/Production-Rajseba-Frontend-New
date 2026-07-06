@@ -50,7 +50,7 @@ export default function ServiceAreas() {
   const isLoading = isDivisionsLoading || isDistrictsLoading;
 
   return (
-    <section className="py-5 md:py-16 lg:py-20 overflow-hidden relative">
+    <section className="py-5 md:py-8 lg:py-10 overflow-hidden relative">
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
 
         {/* Header */}
@@ -59,7 +59,8 @@ export default function ServiceAreas() {
             <Globe className="w-3.5 h-3.5" />
             Coverage Areas
           </div>
-          <h2 className="text-[clamp(24px,4vw,38px)] font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-[clamp(24px,4vw,38px)] font-semibold md:font-bold text-slate-900 tracking-tight leading-tight flex items-center justify-center gap-2">
+            <Globe className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
             We Serve Across Bangladesh
           </h2>
           <p className="mt-3.5 text-slate-400 text-sm md:text-base font-medium max-w-2xl mx-auto leading-relaxed">

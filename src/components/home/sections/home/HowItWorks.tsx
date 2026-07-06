@@ -58,7 +58,7 @@ const nodeVariants = {
 
 const HowItWorks = () => {
   return (
-    <div className="py-5 md:py-16 lg:py-20 overflow-hidden relative">
+    <div className="py-5 md:py-8 lg:py-10 overflow-hidden relative">
       {/* Decorative light blurs */}
       {/* <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-[#FF6014]/5 blur-[90px] rounded-full pointer-events-none" /> */}
 
@@ -69,7 +69,8 @@ const HowItWorks = () => {
             <Workflow size={13} />
             Timeline
           </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+            <Workflow className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
             {HOW_IT_WORKS_CONTENT.title}
           </h2>
           <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">

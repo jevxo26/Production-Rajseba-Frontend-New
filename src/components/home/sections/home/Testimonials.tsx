@@ -68,7 +68,8 @@ const Testimonials = () => {
         <MessageSquare size={13} />
         Customer Reviews
       </div>
-      <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+      <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight flex items-center justify-center gap-2">
+        <MessageSquare className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014]" />
         What our clients <span className="text-[#FF6014]">say about us</span>
       </h2>
       <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
@@ -79,7 +80,7 @@ const Testimonials = () => {
 
   if (!mounted) {
     return (
-      <div className="py-5 md:py-16 lg:py-24 relative overflow-hidden bg-transparent">
+    <div className="py-5 md:py-8 lg:py-10 relative overflow-hidden bg-transparent">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <Header />
           <div className="flex justify-center py-12">
@@ -93,7 +94,7 @@ const Testimonials = () => {
   if (reviews.length === 0 && !isLoading) return null;
 
   return (
-    <div className="py-5 md:py-16 lg:py-24 relative overflow-hidden bg-transparent">
+    <div className="py-5 md:py-8 lg:py-10 relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <Header />
 

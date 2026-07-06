@@ -71,7 +71,7 @@ export default function TopServices() {
   // Show skeleton if loading
   if (isLoading) {
     return (
-      <section className="py-5 md:py-16 lg:py-20 bg-white">
+      <section className="py-5 md:py-8 lg:py-10 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-16">
             <div className="w-12 h-12 rounded-2xl bg-slate-100 animate-pulse" />
@@ -135,7 +135,7 @@ export default function TopServices() {
   };
 
   return (
-    <section className="py-5 md:py-16 lg:py-20  relative overflow-hidden">
+    <section className="py-5 md:py-8 lg:py-10  relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-1/3 h-[500px]  rounded-bl-full pointer-events-none" />
       <div className="absolute -left-32 bottom-0 w-96 h-96 bg-blue-50/50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />
@@ -148,7 +148,8 @@ export default function TopServices() {
             <Star size={13} className="fill-[#FF6014]" />
             Most Booked
           </div>
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+            <Star className="w-6 h-6 md:w-8 md:h-8 text-[#FF6014] fill-[#FF6014]" />
             Top Rated Services
           </h2>
           <p className="mt-3 text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
@@ -256,7 +257,9 @@ export default function TopServices() {
                       </div>
                     </div>
                     {service.description && (
-                      <p className="text-xs font-semibold text-slate-400 line-clamp-2">{service.description}</p>
+                      <p className="text-xs font-semibold text-slate-400 line-clamp-2">
+                        {service.description.replace(/<[^>]*>/g, "")}
+                      </p>
                     )}
                     <p className="text-[10px] text-slate-500 font-semibold pt-1">
                       <span className="text-emerald-500 font-bold">{totalBookings}</span> bookings completed
