@@ -377,7 +377,7 @@ export default function ServiceListing({
         {/* Results count heading — shown only when a category name is provided (e.g. from category page) */}
         {categoryName && (
           <div className="mb-5">
-            <p className="text-lg md:text-2xl font-black text-slate-900">
+            <p className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900">
               <span className="text-slate-500 font-semibold">
                 {filteredListings.length} results found for{" "}
               </span>
@@ -391,7 +391,7 @@ export default function ServiceListing({
 
         {vendorId && vendorName && !categoryName && (
           <div className="mb-5">
-            <p className="text-lg md:text-2xl font-black text-slate-900">
+            <p className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900">
               <span className="text-slate-500 font-semibold">
                 {filteredListings.length} service{filteredListings.length === 1 ? "" : "s"} from{" "}
               </span>
@@ -528,7 +528,7 @@ export default function ServiceListing({
                 <div className="w-12 h-12 rounded-full bg-[#FFF8F4] flex items-center justify-center text-[#FF6014] mb-4">
                   <SlidersHorizontal size={20} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-base font-bold text-slate-800 mb-1">
+                <h3 className="text-base font-medium text-slate-800 mb-1">
                   No services found
                 </h3>
                 <p className="text-sm text-slate-400 mb-5 max-w-xs font-semibold">

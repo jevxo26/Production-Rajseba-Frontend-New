@@ -32,7 +32,7 @@ const itemVariants = {
 const SectionHeader = ({ title, viewAllHref }: { title: string; viewAllHref?: string }) => (
   <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-100">
     <div className="relative">
-      <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight capitalize">
+      <h3 className="text-lg md:text-xl font-medium text-slate-800 tracking-tight capitalize">
         {title}
       </h3>
       <div className="absolute -bottom-[3px] left-0 w-12 h-[3px] bg-[#FF6014] rounded-full" />
@@ -121,7 +121,7 @@ export default function CategorizedSections() {
           <Sparkles size={13} />
           Explore By Category
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight mb-8">
+        <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900 tracking-tight mb-8">
           Services Category
         </h2>
       </div>

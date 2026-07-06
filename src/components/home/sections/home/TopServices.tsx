@@ -148,7 +148,7 @@ export default function TopServices() {
             <Star size={13} className="fill-[#FF6014]" />
             Most Booked
           </div>
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900 tracking-tight flex items-center justify-center gap-2">
             <Star className="w-5 h-5 md:w-6 md:h-6 text-[#FF6014] fill-[#FF6014]" />
             Top Rated <span className="text-[#FF6014]">Services</span>
           </h2>

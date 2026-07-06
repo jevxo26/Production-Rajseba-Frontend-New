@@ -128,10 +128,10 @@ const Testimonials = () => {
                   exit="exit"
                   transition={{ type: "spring", stiffness: 280, damping: 30 }}
                   className={`grid gap-5 ${visibleCount === 1
-                      ? "grid-cols-1"
-                      : visibleCount === 2
-                        ? "grid-cols-2"
-                        : "grid-cols-3"
+                    ? "grid-cols-1"
+                    : visibleCount === 2
+                      ? "grid-cols-2"
+                      : "grid-cols-3"
                     }`}
                 >
                   {visibleReviews.map((review, idx) => (

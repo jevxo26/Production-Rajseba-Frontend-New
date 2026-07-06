@@ -59,7 +59,7 @@ export default function ServiceAreas() {
             <Globe className="w-3.5 h-3.5" />
             Coverage Areas
           </div>
-          <h2 className="text-[clamp(20px,3.5vw,30px)] font-semibold text-slate-900 tracking-tight leading-tight flex items-center justify-center gap-2">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900 tracking-tight leading-tight flex items-center justify-center gap-2">
             <Globe className="w-5 h-5 md:w-6 md:h-6 text-[#FF6014]" />
             We Serve Across <span className="text-[#FF6014]">Bangladesh</span>
           </h2>

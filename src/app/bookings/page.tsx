@@ -51,7 +51,7 @@ export default function BookingsPage() {
           <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 120 }} className="inline-flex p-4.5 bg-[#FFF8F4] text-[#FF6014] rounded-3xl border border-[#FF6014]/15 shadow-sm shadow-[#FF6014]/5 mb-2">
             <Lock className="w-8 h-8" />
           </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+          <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-xl md:text-2xl lg:text-3xl font-medium text-slate-900 tracking-tight leading-tight">
             Manage Your <span className="text-[#FF6014]">Schedules</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto leading-relaxed font-semibold">
@@ -106,7 +106,7 @@ export default function BookingsPage() {
               <Calendar className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">My Bookings</h1>
+              <h1 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight">My Bookings</h1>
               <p className="text-[11px] font-semibold text-slate-400 mt-0.5">View your schedule times, order status, and booking history</p>
             </div>
           </div>

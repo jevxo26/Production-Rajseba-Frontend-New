@@ -109,7 +109,7 @@ export default function FeaturedProviders() {
             <BadgeCheck size={13} />
             Verified Professionals
           </div>
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900 tracking-tight flex items-center justify-center gap-2">
             <ThumbsUp className="w-5 h-5 md:w-6 md:h-6 text-[#FF6014]" />
             Our Top <span className="text-[#FF6014]">Providers</span>
           </h2>

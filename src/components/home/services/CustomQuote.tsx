@@ -37,7 +37,7 @@ export default function CustomQuote({
       >
         {/* Left Content */}
         <div className="flex-1 space-y-4">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#FF6014] leading-tight">
+          <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-[#FF6014] leading-tight">
             {title}
           </h2>
           <p className="text-slate-600 leading-relaxed max-w-md text-[15px]">

@@ -37,7 +37,7 @@ function OpportunityPageContent() {
             <div className="inline-flex items-center gap-2 text-[10px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/20">
               <Sparkles className="w-3.5 h-3.5" />Partnership Opportunities
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Join <span className="text-[#FF6014]">Rajseba</span> Platform</h1>
+            <h1 className="text-xl md:text-3xl lg:text-4xl font-medium text-slate-900 tracking-tight leading-tight">Join <span className="text-[#FF6014]">Rajseba</span> Platform</h1>
             <p className="text-slate-400 text-sm md:text-base font-semibold max-w-xl mx-auto leading-relaxed">Partner with Bangladesh's leading home service marketplace and grow your business or operations network.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -48,7 +48,7 @@ function OpportunityPageContent() {
               <button key={role} onClick={() => handleSelectRole(role)} className="bg-white border border-slate-100/90 rounded-3xl p-8 hover:border-[#FF6014]/20 hover:shadow-[0_12px_40px_rgba(255,96,20,0.06)] hover:-translate-y-1 transition-all duration-300 text-left group cursor-pointer relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#FF6014]/[0.01] to-transparent pointer-events-none" />
                 <div className="w-14 h-14 bg-[#FFF4EE] border border-[#FF6014]/15 rounded-2xl flex items-center justify-center text-[#FF6014] mb-6 group-hover:scale-110 transition-transform"><Icon size={26} /></div>
-                <div className="text-xl font-black text-slate-900 mb-2.5">{title}</div>
+                <div className="text-lg font-medium text-slate-900 mb-2.5">{title}</div>
                 <p className="text-slate-400 text-xs font-semibold leading-relaxed mb-6">{desc}</p>
                 <div className="flex items-center text-[#FF6014] font-extrabold text-xs uppercase tracking-wider">{label} <ArrowRight size={14} className="ml-1.5 group-hover:translate-x-1 transition-transform" /></div>
               </button>
@@ -78,19 +78,19 @@ function OpportunityPageContent() {
                 <div className="inline-flex items-center gap-2 text-[9px] font-extrabold text-[#FF6014] uppercase tracking-wider bg-[#FF6014]/10 border border-[#FF6014]/20 px-3 py-1 rounded-full mb-4">
                   <Sparkles className="w-3 h-3" />Onboarding Step {step} of 2
                 </div>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-3">Join as {selectedRole === "Vendor" ? "a Vendor" : "an Agent"}</h2>
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-slate-900 leading-tight mb-3">Join as {selectedRole === "Vendor" ? "a Vendor" : "an Agent"}</h2>
                 <p className="text-slate-500 text-sm font-semibold max-w-md leading-relaxed">Complete your registration information to launch your service profile on Bangladesh's leading marketplace.</p>
               </div>
             </div>
             <div className="space-y-5 my-6">
-              <h4 className="text-sm font-extrabold uppercase tracking-widest text-[#FF6014] border-b border-slate-100 pb-2.5 mb-2">{selectedRole === "Vendor" ? "Vendor Benefits & Revenue" : "Agent Opportunities & Commissions"}</h4>
+              <h4 className="text-sm font-medium uppercase tracking-widest text-[#FF6014] border-b border-slate-100 pb-2.5 mb-2">{selectedRole === "Vendor" ? "Vendor Benefits & Revenue" : "Agent Opportunities & Commissions"}</h4>
               {benefits.map((b: any, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#FF6014]/10 border border-[#FF6014]/20 flex items-center justify-center text-[#FF6014] shrink-0 font-black text-sm">
                     {b.val ? b.val : <b.icon size={18} />}
                   </div>
                   <div>
-                    <p className="text-slate-900 text-sm md:text-base font-extrabold">{b.title}</p>
+                    <p className="text-slate-900 text-sm md:text-base font-medium">{b.title}</p>
                     <p className="text-slate-500 text-xs font-semibold mt-0.5 leading-relaxed">{b.desc}</p>
                   </div>
                 </div>
@@ -102,7 +102,7 @@ function OpportunityPageContent() {
           <div className="md:col-span-7 flex flex-col justify-center py-4">
             <div className="max-w-md w-full mx-auto space-y-6 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-100/40 bg-white">
               <div className="space-y-1">
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{step === 1 ? "Basic Credentials" : "Business Details"}</h3>
+                <h3 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight">{step === 1 ? "Basic Credentials" : "Business Details"}</h3>
                 <p className="text-xs text-slate-400 font-semibold">{step === 1 ? "Provide your login contact information" : "Add service offerings and location details"}</p>
               </div>
               <div className="flex gap-2">

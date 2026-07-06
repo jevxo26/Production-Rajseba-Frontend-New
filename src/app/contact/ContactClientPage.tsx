@@ -26,7 +26,7 @@ export default function ContactClientPage() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="inline-flex items-center gap-2 text-[10px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/20 mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF6014] animate-pulse" />Support Center
           </motion.div>
-          <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.08 }} className="text-[clamp(28px,5vw,44px)] font-black text-slate-900 tracking-[-0.03em] leading-[1.12] mb-4">
+          <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.08 }} className="text-2xl md:text-3xl lg:text-4xl font-medium text-slate-900 tracking-[-0.03em] leading-[1.12] mb-4">
             How can we <span className="relative inline-block text-[#FF6014]">help you today?<span className="absolute bottom-1 left-0 w-full h-[3px] bg-[#FF6014]/15 rounded-full" /></span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.16 }} className="text-[13px] text-slate-400 font-medium max-w-md mx-auto leading-[1.75] mb-7">
@@ -113,7 +113,7 @@ export default function ContactClientPage() {
         <div className="max-w-3xl mx-auto px-4 md:px-6">
           <RevealSection className="text-center mb-8">
             <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/20 mb-4"><HelpCircle className="w-3 h-3" />General Help</span>
-            <h2 className="text-[20px] md:text-[24px] font-black text-slate-900 tracking-tight mb-2">Frequently asked questions</h2>
+            <h2 className="text-lg md:text-xl font-medium text-slate-900 tracking-tight mb-2">Frequently asked questions</h2>
             <p className="text-[12px] text-slate-400 font-medium">Quick answers to common support queries.</p>
           </RevealSection>
           <RevealSection delay={0.05}>

@@ -163,7 +163,7 @@ const ServiceHero = () => {
     <section className="bg-white pt-6 pb-6 md:py-16 px-4 sm:px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
         {/* Title */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 leading-tight mb-4 max-w-3xl mx-auto">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-slate-900 leading-tight mb-4 max-w-3xl mx-auto">
           Find the best home <span className="text-[#FF6014]">services</span>
         </h1>
         <p className="text-sm md:text-base text-slate-500 max-w-xl mx-auto mb-5 md:mb-8 font-medium leading-relaxed">

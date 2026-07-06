@@ -160,7 +160,7 @@ export default function TrendingServices() {
     return (
       <section className="py-14 bg-transparent relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center py-12">
-          <h2 className="text-xl font-extrabold text-slate-800 mb-2">Trending Services</h2>
+          <h2 className="text-lg font-medium text-slate-800 mb-2">Trending Services</h2>
           <p className="text-sm text-slate-500 font-medium">No trending services available at the moment.</p>
         </div>
       </section>
@@ -175,7 +175,7 @@ export default function TrendingServices() {
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center md:items-start md:text-left mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+            <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-800 tracking-tight">
               Trending Services
             </h2>
             <p className="text-xs font-semibold text-slate-400 mt-2 uppercase tracking-wider">
