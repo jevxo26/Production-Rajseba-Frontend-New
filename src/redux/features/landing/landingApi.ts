@@ -99,6 +99,11 @@ export const landingApi = baseApi.injectEndpoints({
       query: () => '/profiles',
     }),
 
+    // GET /sub-services/:id — public, returns full sub-service details (description, image1, image2, faq)
+    getPublicSubServiceById: builder.query<any, number>({
+      query: (id) => `/sub-services/${id}`,
+    }),
+
     // POST /contact — public, for submitting contact form
     submitContact: builder.mutation<any, { name: string; email: string; phone?: string; subject: string; message: string }>({
       query: (data) => ({
@@ -128,5 +133,6 @@ export const {
   useGetPublicPackagesByServiceQuery,
   useGetPublicStatsQuery,
   useGetPublicProfilesQuery,
+  useGetPublicSubServiceByIdQuery,
   useSubmitContactMutation,
 } = landingApi;

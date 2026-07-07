@@ -85,6 +85,13 @@ export function SpecializedServices({
       ? nestedServices.map((ns, idx) => {
         const isEmergency =
           nestedServices.length > 2 && idx === nestedServices.length - 1;
+
+        // Filter sub-services so we only show the ones belonging to this nested service (ns.id)
+        const filteredSubs = (ns.subServices || ns.sub_services || []).filter((sub: any) => {
+          const parentId = sub.nested_service_id || sub.nestedServiceId || sub.nestedService?.id;
+          return !parentId || Number(parentId) === Number(ns.id);
+        });
+
         return {
           id: String(ns.id),
           title: ns.name,
@@ -92,7 +99,7 @@ export function SpecializedServices({
             ns.description || "Expert service technician ready to assist you.",
           price: ns.starting_price || ns.price,
           image: ns.image,
-          subServices: ns.subServices || [],
+          subServices: filteredSubs,
           type: isEmergency ? ("emergency" as const) : ("normal" as const),
         };
       })
@@ -297,8 +304,8 @@ export function SpecializedServices({
                                 ${isSelected
                                   ? "border-[#FF6014]/50 shadow-md ring-2 ring-[#FF6014]/10 bg-gradient-to-br from-white to-[#FFF8F4]/50"
                                   : isAdded
-                                  ? "border-[#FF6014]/30 shadow-xs bg-gradient-to-br from-white to-[#FFF8F4]/20 hover:border-[#FF6014]/50"
-                                  : "border-slate-100 hover:border-[#FF6014]/30 hover:shadow-sm"
+                                    ? "border-[#FF6014]/30 shadow-xs bg-gradient-to-br from-white to-[#FFF8F4]/20 hover:border-[#FF6014]/50"
+                                    : "border-slate-100 hover:border-[#FF6014]/30 hover:shadow-sm"
                                 }`}
                             >
                               <div className="min-w-0 flex-1">
@@ -342,6 +349,7 @@ export function SpecializedServices({
                                   </button>
                                 )}
                               </div>
+
                             </div>
                           );
                         })}

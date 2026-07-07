@@ -66,17 +66,21 @@ export function useOpportunityState() {
     const roleObj = roles.find((r: any) => r.name === selectedRole);
     if (!roleObj) { toast.error("Role not found in the system. Please try again later."); return; }
     try {
+      const toastId = toast.loading("Creating your partner account...");
       const response = await register({
         name: formData.name, phone: formData.phone, email: formData.email,
         roleId: roleObj.id, status: "inactive",
       }).unwrap();
+      
+      toast.dismiss(toastId);
+
       if (response.access_token || response.token) {
         const token = response.access_token || response.token;
         localStorage.setItem("token", token);
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
         document.cookie = `token=${token}; expires=${expires}; path=/; SameSite=Lax`;
       }
-      const newUserId = response.data?.id || response.id || response.user?.id;
+      const newUserId = response.data?.id || response.id || response.user?.id || (response as any).data?.user?.id;
       if (newUserId) {
         setCreatedUserId(newUserId);
         toast.success("Account created! Please complete your profile.");
@@ -120,6 +124,7 @@ export function useOpportunityState() {
 
     try {
       setIsUploading(true);
+      toast.loading("Uploading documents & images...", { id: "profile-submit" });
       
       const pictureUrl = await uploadImage(pictureFile);
       
@@ -143,7 +148,7 @@ export function useOpportunityState() {
         nidBackUrl = await uploadImage(nidBackFile);
       }
       
-      setIsUploading(false);
+      toast.loading("Submitting your application profile...", { id: "profile-submit" });
       
       await createProfile({
         user_id: createdUserId, type: "business",
@@ -165,10 +170,12 @@ export function useOpportunityState() {
         nid_back: nidBackUrl || undefined,
       }).unwrap();
       
-      toast.success("Application submitted successfully! Please wait for admin approval.");
+      setIsUploading(false);
+      toast.success("Application submitted successfully! Please wait for admin approval.", { id: "profile-submit" });
       router.push("/");
     } catch (err: any) {
       setIsUploading(false);
+      toast.dismiss("profile-submit");
       toast.error(err.data?.message || err.message || "Failed to save profile. Please try again.");
     }
   };

@@ -29,7 +29,8 @@ import {
   Mail,
   Search,
   X,
-  ChevronDown
+  ChevronDown,
+  Bot
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -118,7 +119,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             icon: Mail,
             children: [
               { label: "Contacts", href: "/dashbord/contacts", icon: Mail },
-              { label: "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare }
+              { label: "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
+              { label: "AI Chat Log", href: "/dashbord/ai-chat-log", icon: Bot }
             ]
           },
           {

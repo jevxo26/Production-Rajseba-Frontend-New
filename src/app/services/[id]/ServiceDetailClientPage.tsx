@@ -82,7 +82,7 @@ import { Commitments } from '@/components/home/categorizedServices/Commitments';
 import { VendorProfile } from '@/components/home/categorizedServices/VendorProfile';
 import { ServiceReviews } from '@/components/home/categorizedServices/ServiceReviews';
 import { SubServiceDetailCard, SubServiceDetailDrawer } from '@/components/home/categorizedServices/SubServiceDetailComponents';
-import { useGetPublicServiceByIdQuery, useGetPublicServicesQuery, useGetPublicReviewsByServiceQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicServiceByIdQuery, useGetPublicServicesQuery, useGetPublicReviewsByServiceQuery, useGetPublicNestedServicesByServiceQuery, useGetPublicSubServiceByIdQuery } from "@/redux/features/landing/landingApi";
 import { Loader2, ArrowLeft, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -107,28 +107,73 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
     { skip: !matchedId }
   );
 
+  const { data: nestedServicesRes } = useGetPublicNestedServicesByServiceQuery(
+    matchedId || 0,
+    { skip: !matchedId }
+  );
+
   const { data: reviewsRes } = useGetPublicReviewsByServiceQuery(
     matchedId || 0,
     { skip: !matchedId }
   );
 
   const service = serviceRes?.data;
+  const nestedServices = nestedServicesRes?.data || nestedServicesRes || [];
   const isLoading = isNumericId ? isServiceLoading : isPublicLoading || isServiceLoading;
 
-  const state = useBookingCartState({ service, isLoading });
+  const state = useBookingCartState({ service, isLoading, nestedServices });
 
   // ── Sub-service detail panel state ────────────────────────────────────────
-  const [selectedSubService, setSelectedSubService] = useState<any | null>(null);
+  // We only track the ID; full details are fetched from the API
+  const [selectedSubServiceId, setSelectedSubServiceId] = useState<number | null>(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
+  // Fetch full sub-service details (description, image1, image2, faq) by ID
+  const { data: subServiceDetailRes, isFetching: isSubServiceFetching } = useGetPublicSubServiceByIdQuery(
+    selectedSubServiceId ?? 0,
+    { skip: !selectedSubServiceId }
+  );
+
+  // Build the selectedSubService object — merge API detail with parent info from nestedServices
+  const selectedSubService = React.useMemo(() => {
+    if (!selectedSubServiceId) return null;
+    const fullDetail = subServiceDetailRes?.data || subServiceDetailRes;
+    if (!fullDetail) return null;
+    // Find parent nested service for title context
+    const displayNested = nestedServices && nestedServices.length > 0 ? nestedServices : service?.nestedServices;
+    const parentNested = displayNested?.find((ns: any) =>
+      [...(ns.subServices || []), ...(ns.sub_services || [])].some((s: any) => s.id === selectedSubServiceId)
+    );
+    return {
+      ...fullDetail,
+      parentTitle: parentNested?.name || service?.name,
+      parentService: parentNested || service,
+    };
+  }, [selectedSubServiceId, subServiceDetailRes, nestedServices, service]);
+
+  const openSubServicePanel = (subId: number) => {
+    setSelectedSubServiceId(subId);
+    setMobileDrawerOpen(true);
+  };
+
+  const handleAddToCart = (svc: any, subId: number) => {
+    state.handleAddToCart(svc, subId);
+    openSubServicePanel(subId);
+  };
+
+  const handleUpdateQuantity = (subId: number, delta: number) => {
+    state.handleUpdateQuantity(subId, delta);
+    if (delta > 0) {
+      openSubServicePanel(subId);
+    }
+  };
+
   const handleSubServiceClick = (sub: any) => {
-    if (selectedSubService?.id === sub.id) {
-      // toggle off on desktop
-      setSelectedSubService(null);
+    if (selectedSubServiceId === sub.id) {
+      setSelectedSubServiceId(null);
       setMobileDrawerOpen(false);
     } else {
-      setSelectedSubService(sub);
-      setMobileDrawerOpen(true);
+      openSubServicePanel(sub.id);
     }
   };
 
@@ -198,14 +243,14 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
             <div className="space-y-6 md:space-y-8 min-w-0">
               <div id="specialized-services">
                 <SpecializedServices
-                  nestedServices={service.nestedServices}
+                  nestedServices={nestedServices && nestedServices.length > 0 ? nestedServices : service.nestedServices}
                   serviceId={service.id}
                   vendorId={service.vendor?.id}
                   serviceImage={service.image}
                   serviceName={service.name}
                   cartQuantities={state.cartItems.reduce((acc: any, i: any) => ({ ...acc, [i.id]: i.quantity }), {})}
-                  onUpdateQuantity={state.handleUpdateQuantity}
-                  onAddToCart={state.handleAddToCart}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onAddToCart={handleAddToCart}
                   onRemoveFromCart={state.handleRemoveFromCart}
                   onInitiateBooking={state.handleInitiateBooking}
                   onSubServiceClick={handleSubServiceClick}
@@ -260,11 +305,11 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
                   <div className="hidden lg:block">
                     <SubServiceDetailCard
                       subService={selectedSubService}
-                      onClose={() => setSelectedSubService(null)}
+                      onClose={() => setSelectedSubServiceId(null)}
                       isAdded={(state.cartItems.reduce((acc: any, i: any) => ({ ...acc, [i.id]: i.quantity }), {})[selectedSubService?.id] || 0) > 0}
                       quantity={state.cartItems.reduce((acc: any, i: any) => ({ ...acc, [i.id]: i.quantity }), {})[selectedSubService?.id] || 0}
-                      onAddToCart={state.handleAddToCart}
-                      onUpdateQuantity={state.handleUpdateQuantity}
+                      onAddToCart={handleAddToCart}
+                      onUpdateQuantity={handleUpdateQuantity}
                     />
                   </div>
                   {/* Always show Commitments below the detail card */}
@@ -303,12 +348,12 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
       {/* Mobile Bottom Drawer for sub-service details */}
       <SubServiceDetailDrawer
         isOpen={mobileDrawerOpen}
-        onClose={() => { setMobileDrawerOpen(false); setSelectedSubService(null); }}
+        onClose={() => { setMobileDrawerOpen(false); setSelectedSubServiceId(null); }}
         subService={selectedSubService}
         isAdded={(state.cartItems.reduce((acc: any, i: any) => ({ ...acc, [i.id]: i.quantity }), {})[selectedSubService?.id] || 0) > 0}
         quantity={state.cartItems.reduce((acc: any, i: any) => ({ ...acc, [i.id]: i.quantity }), {})[selectedSubService?.id] || 0}
-        onAddToCart={state.handleAddToCart}
-        onUpdateQuantity={state.handleUpdateQuantity}
+        onAddToCart={handleAddToCart}
+        onUpdateQuantity={handleUpdateQuantity}
       />
 
       {/* Floating Sticky Bottom CTA Bar */}

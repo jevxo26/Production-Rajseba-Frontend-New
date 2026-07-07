@@ -26,9 +26,10 @@ const fallbackServices = [
 interface UseBookingCartStateProps {
   service: any;
   isLoading: boolean;
+  nestedServices?: any[];
 }
 
-export function useBookingCartState({ service, isLoading }: UseBookingCartStateProps) {
+export function useBookingCartState({ service, isLoading, nestedServices }: UseBookingCartStateProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authUser = useAppSelector((state) => state.auth.user);
@@ -45,25 +46,55 @@ export function useBookingCartState({ service, isLoading }: UseBookingCartStateP
   const [activeTab, setActiveTab] = useState("specialized-services");
   const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
   const hasAutoBooked = useRef(false);
+  // Guard: prevent saving an empty cart to localStorage before we've loaded the persisted one
+  const hasLoadedFromStorage = useRef(false);
+
+  // Load initial cart quantities from localStorage once service.id is available
+  useEffect(() => {
+    if (typeof window !== "undefined" && service?.id) {
+      const saved = window.localStorage.getItem(`rajseba_cart_${service.id}`);
+      if (saved) {
+        try {
+          setCartQuantities(JSON.parse(saved));
+        } catch (e) {
+          // ignore malformed JSON
+        }
+      }
+      // Mark load as complete so the save effect can safely write
+      hasLoadedFromStorage.current = true;
+    }
+  }, [service?.id]);
+
+  // Save cart quantities to localStorage whenever they change (only after initial load)
+  useEffect(() => {
+    if (typeof window !== "undefined" && service?.id && hasLoadedFromStorage.current) {
+      window.localStorage.setItem(`rajseba_cart_${service.id}`, JSON.stringify(cartQuantities));
+    }
+  }, [cartQuantities, service?.id]);
 
   const displayServices = useMemo(() => {
-    const nested = service?.nestedServices;
+    const nested = nestedServices && nestedServices.length > 0 ? nestedServices : service?.nestedServices;
     if (nested && nested.length > 0) {
       return nested.map((ns: any, idx: number) => {
         const isEmergency = nested.length > 2 && idx === nested.length - 1;
+        // Filter sub-services so we only show the ones belonging to this nested service (ns.id)
+        const filteredSubs = (ns.subServices || ns.sub_services || []).filter((sub: any) => {
+          const parentId = sub.nested_service_id || sub.nestedServiceId || sub.nestedService?.id;
+          return !parentId || Number(parentId) === Number(ns.id);
+        });
         return {
           id: String(ns.id),
           title: ns.name,
           description: ns.description || "Expert service technician ready to assist you.",
           price: ns.starting_price || ns.price,
           image: ns.image,
-          subServices: ns.subServices || [],
+          subServices: filteredSubs,
           type: isEmergency ? "emergency" : "normal",
         };
       });
     }
     return fallbackServices;
-  }, [service]);
+  }, [service, nestedServices]);
 
   const cartItems = useMemo(
     () =>
@@ -107,6 +138,9 @@ export function useBookingCartState({ service, isLoading }: UseBookingCartStateP
   const handleClearCart = () => {
     setCartQuantities({});
     setAppliedCoupon(null);
+    if (typeof window !== "undefined" && service?.id) {
+      window.localStorage.removeItem(`rajseba_cart_${service.id}`);
+    }
   };
 
   const handleAddToCart = (item: any, subId: number) => {
@@ -179,6 +213,9 @@ export function useBookingCartState({ service, isLoading }: UseBookingCartStateP
       setCartQuantities({});
       setAppliedCoupon(null);
       setBookingDetails({ date: "", time: "", location: "", notes: "" });
+      if (typeof window !== "undefined" && service?.id) {
+        window.localStorage.removeItem(`rajseba_cart_${service.id}`);
+      }
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to place booking. Please try again.");
     }

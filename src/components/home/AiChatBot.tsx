@@ -11,9 +11,51 @@ interface Message {
   text: string;
 }
 
+interface ChatSession {
+  sessionId: string;
+  startedAt: string;
+  updatedAt: string;
+  messages: { role: "user" | "model"; text: string; time: string }[];
+  user?: { name: string; email: string } | null;
+}
+
+const CHAT_LOG_KEY = "rajseba_ai_chat_logs";
+const MAX_SESSIONS = 100;
+
+function getOrCreateSessionId(): string {
+  if (typeof window === "undefined") return "server";
+  let sid = sessionStorage.getItem("rajseba_chat_session_id");
+  if (!sid) {
+    sid = `CS-${Math.random().toString(36).substr(2, 9).toUpperCase()}-${Date.now()}`;
+    sessionStorage.setItem("rajseba_chat_session_id", sid);
+  }
+  return sid;
+}
+
+function saveSessionLog(sessionId: string, messages: Message[], user?: any) {
+  if (typeof window === "undefined") return;
+  try {
+    const existing: ChatSession[] = JSON.parse(localStorage.getItem(CHAT_LOG_KEY) || "[]");
+    const idx = existing.findIndex((s) => s.sessionId === sessionId);
+    const entry: ChatSession = {
+      sessionId,
+      startedAt: existing[idx]?.startedAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      messages: messages.map((m) => ({ role: m.role, text: m.text, time: new Date().toISOString() })),
+      user: user ? { name: user.name || "Guest", email: user.email || "" } : null,
+    };
+    if (idx >= 0) existing[idx] = entry;
+    else existing.unshift(entry);
+    localStorage.setItem(CHAT_LOG_KEY, JSON.stringify(existing.slice(0, MAX_SESSIONS)));
+  } catch { /* ignore */ }
+}
+
 export function AiChatBot() {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
+  const [sessionId] = useState(() =>
+    typeof window !== "undefined" ? getOrCreateSessionId() : "server"
+  );
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "model",
@@ -119,7 +161,10 @@ export function AiChatBot() {
       const data = await response.json();
       const replyText = data.reply || "Sorry, I couldn't understand that. Please try again or call our hotline: +8801613410880.";
 
-      setMessages((prev) => [...prev, { role: "model", text: replyText }]);
+      const finalMessages = [...updatedMessages, { role: "model" as const, text: replyText }];
+      setMessages(finalMessages);
+      // 📊 Save to localStorage for admin AI Chat Log
+      saveSessionLog(sessionId, finalMessages, isAuthenticated && user ? user : null);
     } catch (error) {
       console.error("Chat API error:", error);
       setMessages((prev) => [
