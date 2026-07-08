@@ -33,11 +33,16 @@ export function CouponApply({
   const matchingCoupons = coupons.filter((coupon) => {
     if (!coupon.is_active) return false;
 
-    // Check validity date
-    if (coupon.valid_until) {
-      const now = new Date();
-      const validUntil = new Date(coupon.valid_until);
-      if (validUntil < now) return false;
+    // Check validity date using string comparison to avoid timezone mismatches (matching backend logic)
+    const today = new Date().toISOString().slice(0, 10);
+    if (coupon.valid_from && coupon.valid_from > today) return false;
+    if (coupon.valid_until && coupon.valid_until < today) return false;
+
+    // Check usage limit
+    if (coupon.usage_limit !== null && coupon.usage_limit !== undefined) {
+      if (coupon.used_count >= coupon.usage_limit) {
+        return false;
+      }
     }
 
     // Check minimum order amount if subtotal is available
@@ -100,6 +105,14 @@ export function CouponApply({
     setApplied(null);
     onApplied(null);
   };
+
+  if (isLoadingCoupons) {
+    return null;
+  }
+
+  if (matchingCoupons.length === 0 && !applied) {
+    return null;
+  }
 
   return (
     <div className="space-y-3">
