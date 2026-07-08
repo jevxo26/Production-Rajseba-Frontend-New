@@ -56,7 +56,7 @@ export function CouponApply({
         return true;
       }
     }
-    
+
     if (serviceId) {
       if (coupon.applicable_to === "service" && coupon.service?.id === serviceId) {
         return true;
@@ -149,7 +149,7 @@ export function CouponApply({
           </button>
         )}
       </div>
-      
+
       {applied && (
         <p className="text-xs font-semibold text-emerald-600">
           {applied.coupon.code} applied — ৳{Number(applied.discount_amount).toLocaleString()} off
