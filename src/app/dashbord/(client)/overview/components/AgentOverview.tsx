@@ -9,6 +9,7 @@ import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
 
 export default function AgentOverview() {
   const authUser = useAppSelector((state) => state.auth.user);
+  const lang = useAppSelector((state) => state.lang.value);
   const { data: bookingsRes, isLoading } = useGetAllBookingsQuery();
   const allBookings = (bookingsRes?.data || []) as any[];
 
@@ -19,32 +20,49 @@ export default function AgentOverview() {
     return created.toDateString() === today.toDateString();
   }).length;
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "pending":
+        return lang === "bn" ? "পেন্ডিং" : "Pending";
+      case "assigned":
+        return lang === "bn" ? "নিযুক্ত" : "Assigned";
+      case "on_the_way":
+        return lang === "bn" ? "চলমান" : "On The Way";
+      case "completed":
+        return lang === "bn" ? "সম্পন্ন" : "Completed";
+      case "cancelled":
+        return lang === "bn" ? "বাতিল" : "Cancelled";
+      default:
+        return status;
+    }
+  };
+
   const stats = [
     {
-      label: "Total Bookings",
+      label: lang === "bn" ? "মোট বুকিং" : "Total Bookings",
       value: isLoading ? "—" : `${totalOrders}`,
-      desc: "All time bookings",
+      desc: lang === "bn" ? "সর্বকালের বুকিং" : "All time bookings",
       icon: Briefcase,
       color: "text-[#E0530A] bg-[#FFF8F4]",
     },
     {
-      label: "Today's Bookings",
+      label: lang === "bn" ? "আজকের বুকিং" : "Today's Bookings",
       value: isLoading ? "—" : `${todayOrders}`,
-      desc: "Placed today",
+      desc: lang === "bn" ? "আজ অর্ডার করা হয়েছে" : "Placed today",
       icon: Zap,
       color: "text-amber-600 bg-amber-50",
     },
     {
-      label: "Completed",
+      label: lang === "bn" ? "সম্পন্ন" : "Completed",
       value: isLoading ? "—" : `${allBookings.filter((b: any) => b.status === "completed").length}`,
-      desc: "Total completed orders",
+      desc: lang === "bn" ? "মোট সম্পন্ন অর্ডার" : "Total completed orders",
       icon: DollarSign,
       color: "text-emerald-600 bg-emerald-50",
     },
     {
-      label: "Pending",
+      label: lang === "bn" ? "পেন্ডিং" : "Pending",
       value: isLoading ? "—" : `${allBookings.filter((b: any) => b.status === "pending").length}`,
-      desc: "Awaiting assignment",
+      desc: lang === "bn" ? "নিযুক্তির অপেক্ষায়" : "Awaiting assignment",
       icon: Clock,
       color: "text-indigo-600 bg-indigo-50",
     },
@@ -53,40 +71,40 @@ export default function AgentOverview() {
   const columns = [
     {
       key: "id",
-      header: "Booking ID",
+      header: lang === "bn" ? "বুকিং আইডি" : "Booking ID",
       render: (o: any) => <span className="font-bold text-brand-primary">#{o.id}</span>,
     },
     {
       key: "user",
-      header: "Client Name",
+      header: lang === "bn" ? "গ্রাহকের নাম" : "Client Name",
       render: (o: any) => <span>{o.user?.name || "—"}</span>,
     },
     {
       key: "nestedService",
-      header: "Service Booked",
+      header: lang === "bn" ? "বুক করা সার্ভিস" : "Service Booked",
       render: (o: any) => <span>{o.nestedService?.name || o.pkg?.name || "—"}</span>,
     },
     {
       key: "vendor",
-      header: "Vendor",
+      header: lang === "bn" ? "ভেন্ডর" : "Vendor",
       render: (o: any) => <span>{o.vendor?.name || "—"}</span>,
     },
     {
       key: "status",
-      header: "Status",
+      header: lang === "bn" ? "অবস্থা" : "Status",
       render: (o: any) => (
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
             o.status === "completed" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-700"
           }`}
         >
-          {o.status}
+          {getStatusText(o.status)}
         </span>
       ),
     },
     {
       key: "createdAt",
-      header: "Date",
+      header: lang === "bn" ? "তারিখ" : "Date",
       render: (o: any) => <span>{new Date(o.createdAt).toLocaleDateString("en-BD")}</span>,
     },
   ];
@@ -100,9 +118,13 @@ export default function AgentOverview() {
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Agent Overview</h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Hello, {authUser?.name || "Agent"}! Manage bookings and track activity.
+            <h1 className="text-xl font-extrabold text-slate-900">
+              {lang === "bn" ? "এজেন্ট ওভারভিউ" : "Agent Overview"}
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5 font-medium">
+              {lang === "bn"
+                ? `হ্যালো, ${authUser?.name || "এজেন্ট"}! বুকিং পরিচালনা ও কার্যক্রম ট্র্যাক করুন।`
+                : `Hello, ${authUser?.name || "Agent"}! Manage bookings and track activity.`}
             </p>
           </div>
         </div>
@@ -110,7 +132,7 @@ export default function AgentOverview() {
           href="/dashbord/quick-booking"
           className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-semibold px-6 py-3 rounded-2xl shadow-lg shadow-[#FF6014]/20 text-sm transition-all active:scale-[0.985] text-center"
         >
-          Book a New Lead
+          {lang === "bn" ? "নতুন লিড বুক করুন" : "Book a New Lead"}
         </Link>
       </div>
 
@@ -136,9 +158,11 @@ export default function AgentOverview() {
       {/* Recent Bookings Table */}
       <div className="space-y-4">
         <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-          <h3 className="text-lg font-bold text-slate-900">Recent Lead Orders</h3>
+          <h3 className="text-lg font-bold text-slate-900">
+            {lang === "bn" ? "সাম্প্রতিক লিড অর্ডার" : "Recent Lead Orders"}
+          </h3>
           <Link href="/dashbord/orders" className="text-xs font-bold text-[#FF6014] hover:underline">
-            View All &rarr;
+            {lang === "bn" ? "সব দেখুন" : "View All"} &rarr;
           </Link>
         </div>
 
@@ -151,7 +175,7 @@ export default function AgentOverview() {
             columns={columns}
             data={allBookings}
             searchKey="id"
-            searchPlaceholder="Search bookings..."
+            searchPlaceholder={lang === "bn" ? "বুকিং খুঁজুন..." : "Search bookings..."}
             pageSize={5}
           />
         )}

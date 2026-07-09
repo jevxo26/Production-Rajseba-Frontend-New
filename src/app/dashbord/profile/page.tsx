@@ -6,12 +6,18 @@ import { LocationCascader } from "@/components/ui/LocationCascader";
 import { CustomSelect } from "@/components/ui/select";
 import { useProfileState } from "./hooks/useProfileState";
 import ProfileCard from "./components/ProfileCard";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function ProfilePage() {
   const state = useProfileState();
+  const lang = useAppSelector((state) => state.lang.value);
 
   if (state.isUserLoading && !state.user) {
-    return <div className="p-8 text-center text-slate-500 animate-pulse">প্রোফাইল লোড হচ্ছে...</div>;
+    return (
+      <div className="p-8 text-center text-slate-500 animate-pulse font-semibold">
+        {lang === "bn" ? "প্রোফাইল লোড হচ্ছে..." : "Loading profile..."}
+      </div>
+    );
   }
 
   return (
@@ -33,10 +39,16 @@ export default function ProfilePage() {
             </div>
             <div>
               <span className="text-[10px] font-bold text-[#FF6014] tracking-widest uppercase bg-[#FF6014]/10 px-2.5 py-1 rounded-md border border-[#FF6014]/20">
-                ইউজার প্রোফাইল
+                {lang === "bn" ? "ইউজার প্রোফাইল" : "User Profile"}
               </span>
-              <h1 className="text-xl md:text-2xl font-black tracking-tight text-white mt-2">আমার প্রোফাইল</h1>
-              <p className="text-xs text-slate-300 mt-1">ব্যক্তিগত কন্টাক্ট কার্ড, ঠিকানা এবং অ্যাকাউন্টের বিবরণ পরিচালনা করুন।</p>
+              <h1 className="text-xl md:text-2xl font-black tracking-tight text-white mt-2">
+                {lang === "bn" ? "আমার প্রোফাইল" : "My Profile"}
+              </h1>
+              <p className="text-xs text-slate-300 mt-1">
+                {lang === "bn"
+                  ? "ব্যক্তিগত কন্টাক্ট কার্ড, ঠিকানা এবং অ্যাকাউন্টের বিবরণ পরিচালনা করুন।"
+                  : "Manage personal contact card, address, and account details."}
+              </p>
             </div>
           </div>
         </div>
@@ -53,16 +65,21 @@ export default function ProfilePage() {
           avatarUrl={state.avatarUrl}
           isUploadingAvatar={state.isUploadingAvatar}
           handleAvatarUpload={state.handleAvatarUpload}
+          lang={lang}
         />
 
         {/* Right Column: Update Forms */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
           <form onSubmit={state.handleSave} className="space-y-6">
-            <h3 className="text-lg font-bold text-slate-900">বিবরণ এডিট করুন</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {lang === "bn" ? "বিবরণ এডিট করুন" : "Edit Details"}
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">পুরো নাম</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
+                  {lang === "bn" ? "পুরো নাম" : "Full Name"}
+                </label>
                 <input
                   name="name"
                   type="text"
@@ -73,7 +90,9 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">কন্টাক্ট নম্বর</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
+                  {lang === "bn" ? "কন্টাক্ট নম্বর" : "Contact Number"}
+                </label>
                 <input
                   name="phone"
                   type="tel"
@@ -84,7 +103,7 @@ export default function ProfilePage() {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  প্রাথমিক ডেলিভারি ঠিকানা
+                  {lang === "bn" ? "প্রাথমিক ডেলিভারি ঠিকানা" : "Primary Delivery Address"}
                 </label>
                 <input
                   name="address"
@@ -97,7 +116,7 @@ export default function ProfilePage() {
 
               <div className="sm:col-span-2 pt-6 pb-2">
                 <h4 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">
-                  পেশাগত ও পাবলিক বিবরণ
+                  {lang === "bn" ? "পেশাগত ও পাবলিক বিবরণ" : "Professional & Public Details"}
                 </h4>
                 <div className="flex flex-wrap gap-1 mt-4">
                   {state.profile?.categories?.length > 0 ? (
@@ -117,24 +136,38 @@ export default function ProfilePage() {
 
               <div>
                 <CustomSelect
-                  label="প্রোফাইলের ধরন"
+                  label={lang === "bn" ? "প্রোফাইলের ধরন" : "Profile Type"}
                   options={[
-                    { value: "personal", label: "ব্যক্তিগত / ফ্রিল্যান্সার" },
-                    { value: "company", label: "কোম্পানি / এজেন্সি" },
+                    {
+                      value: "personal",
+                      label: lang === "bn" ? "ব্যক্তিগত / ফ্রিল্যান্সার" : "Personal / Freelancer",
+                    },
+                    {
+                      value: "company",
+                      label: lang === "bn" ? "কোম্পানি / এজেন্সি" : "Company / Agency",
+                    },
                   ]}
                   value={state.selectedType}
                   onChange={state.setSelectedType}
-                  placeholder="ধরন নির্বাচন করুন"
+                  placeholder={lang === "bn" ? "ধরন নির্বাচন করুন" : "Select Type"}
                 />
               </div>
 
               <div>
                 <CustomSelect
-                  label="ক্যাটাগরি (একাধিক)"
+                  label={lang === "bn" ? "ক্যাটাগরি (একাধিক)" : "Categories (Multiple)"}
                   options={state.allCategories.map((c: any) => ({ value: c.id.toString(), label: c.name }))}
                   value={state.selectedCategories}
                   onChange={state.setSelectedCategories}
-                  placeholder={state.isCategoriesLoading ? "লোড হচ্ছে..." : "ক্যাটাগরি নির্বাচন করুন"}
+                  placeholder={
+                    state.isCategoriesLoading
+                      ? lang === "bn"
+                        ? "লোড হচ্ছে..."
+                        : "Loading..."
+                      : lang === "bn"
+                      ? "ক্যাটাগরি নির্বাচন করুন"
+                      : "Select Categories"
+                  }
                   isMulti={true}
                   disabled={state.isCategoriesLoading}
                 />
@@ -142,14 +175,14 @@ export default function ProfilePage() {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  কোম্পানি / ব্যবসার নাম (ঐচ্ছিক)
+                  {lang === "bn" ? "কোম্পানি / ব্যবসার নাম (ঐচ্ছিক)" : "Company / Business Name (Optional)"}
                 </label>
                 <input
                   name="company_name"
                   type="text"
                   defaultValue={state.profile?.company_name || ""}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                  placeholder="ব্যক্তিগত হলে খালি রাখুন"
+                  placeholder={lang === "bn" ? "ব্যক্তিগত হলে খালি রাখুন" : "Leave blank if personal"}
                 />
               </div>
 
@@ -166,32 +199,38 @@ export default function ProfilePage() {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  নির্দিষ্ট ঠিকানা / বিল্ডিং (ঐচ্ছিক)
+                  {lang === "bn" ? "নির্দিষ্ট ঠিকানা / বিল্ডিং (ঐচ্ছিক)" : "Specific Address / Building (Optional)"}
                 </label>
                 <input
                   name="location"
                   type="text"
                   defaultValue={state.profile?.location || ""}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all font-medium"
-                  placeholder="যেমন: ব্লক সি, বাড়ি ১২"
+                  placeholder={lang === "bn" ? "যেমন: ব্লক সি, বাড়ি ১২" : "e.g. Block C, House 12"}
                 />
               </div>
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  পেশাগত বিবরণ
+                  {lang === "bn" ? "পেশাগত বিবরণ" : "Professional Description"}
                 </label>
                 <textarea
                   name="description"
                   rows={4}
                   defaultValue={state.profile?.description || ""}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all resize-none font-medium"
-                  placeholder="সার্ভিস এবং দক্ষতা সম্পর্কে লিখুন..."
+                  placeholder={
+                    lang === "bn"
+                      ? "সার্ভিস এবং দক্ষতা সম্পর্কে লিখুন..."
+                      : "Write about services and skills..."
+                  }
                 ></textarea>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">শুরুর সর্বনিম্ন মূল্য</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
+                  {lang === "bn" ? "শুরুর সর্বনিম্ন মূল্য" : "Min Starting Price"}
+                </label>
                 <input
                   name="min_starting_price"
                   type="number"
@@ -203,7 +242,9 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">গুগল ম্যাপ লিংক</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
+                  {lang === "bn" ? "গুগল ম্যাপ লিংক" : "Google Map Link"}
+                </label>
                 <input
                   name="google_map_link"
                   type="url"
@@ -220,7 +261,14 @@ export default function ProfilePage() {
                 disabled={state.isSaving}
                 className="w-full sm:w-auto bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-6 py-3 sm:py-2.5 rounded-xl text-sm flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Save size={16} /> {state.isSaving ? "সেভ হচ্ছে..." : "পরিবর্তনগুলো সেভ করুন"}
+                <Save size={16} />{" "}
+                {state.isSaving
+                  ? lang === "bn"
+                    ? "সেভ হচ্ছে..."
+                    : "Saving..."
+                  : lang === "bn"
+                  ? "পরিবর্তনগুলো সেভ করুন"
+                  : "Save Changes"}
               </button>
             </div>
           </form>

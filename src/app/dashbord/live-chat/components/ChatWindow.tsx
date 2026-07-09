@@ -19,6 +19,7 @@ interface ChatWindowProps {
   handleSendMessage: (e: React.FormEvent) => void;
   setImageFile: (val: File | null) => void;
   setImagePreview: (val: string | null) => void;
+  lang?: string;
 }
 
 export default function ChatWindow({
@@ -37,6 +38,7 @@ export default function ChatWindow({
   handleSendMessage,
   setImageFile,
   setImagePreview,
+  lang = "bn",
 }: ChatWindowProps) {
   return (
     <>
@@ -68,7 +70,7 @@ export default function ChatWindow({
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-              {activeChatUser.role?.name || "User"} • অনলাইন
+              {activeChatUser.role?.name || "User"} • {lang === "bn" ? "অনলাইন" : "Online"}
             </p>
           </div>
         </div>
@@ -82,7 +84,7 @@ export default function ChatWindow({
               <MessageSquare size={36} className="text-[#FF6014]/25" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              কোনো মেসেজ নেই। কথোপকথন শুরু করুন!
+              {lang === "bn" ? "কোনো মেসেজ নেই। কথোপকথন শুরু করুন!" : "No messages yet. Start conversation!"}
             </p>
           </div>
         ) : (
@@ -107,7 +109,7 @@ export default function ChatWindow({
                   }`}
                 >
                   <div className={`flex items-baseline gap-2 mb-1 ${isMe ? "justify-end text-white/90" : "justify-start text-slate-550"}`}>
-                    <span className="font-extrabold text-[10px]">{isMe ? "আপনি" : msg.sender?.name}</span>
+                    <span className="font-extrabold text-[10px]">{isMe ? (lang === "bn" ? "আপনি" : "You") : msg.sender?.name}</span>
                     {senderRoleName && (
                       <span className="text-[9px] opacity-75 font-bold capitalize">({senderRoleName})</span>
                     )}
@@ -176,7 +178,15 @@ export default function ChatWindow({
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
-            placeholder={isUploading ? "ছবি আপলোড হচ্ছে..." : "আপনার মেসেজ লিখুন..."}
+            placeholder={
+              isUploading
+                ? lang === "bn"
+                  ? "ছবি আপলোড হচ্ছে..."
+                  : "Uploading image..."
+                : lang === "bn"
+                ? "আপনার মেসেজ লিখুন..."
+                : "Type your message..."
+            }
             className="flex-1 bg-slate-550/5 border border-slate-200/80 rounded-full px-4 py-2.5 text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FF6014]/5 transition-all"
             disabled={isUploading}
           />

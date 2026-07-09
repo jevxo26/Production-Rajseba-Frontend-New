@@ -7,9 +7,11 @@ import SettingsHeader from "./components/SettingsHeader";
 import PersonalInfoCard from "./components/PersonalInfoCard";
 import SecurityCard from "./components/SecurityCard";
 import NotificationsCard from "./components/NotificationsCard";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function SettingsPage() {
   const state = useSettingsState();
+  const lang = useAppSelector((state) => state.lang.value);
 
   // Custom Toggle Switch Component
   const Switch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
@@ -49,12 +51,13 @@ export default function SettingsPage() {
             activeTab={state.activeTab}
             handleTabClick={state.handleTabClick}
             router={state.router}
+            lang={lang}
           />
 
           {/* Right Column content area */}
           <div className="lg:col-span-3 space-y-6">
             {/* Top User Profile Header Card */}
-            <SettingsHeader email={state.personalInfo.email} />
+            <SettingsHeader email={state.personalInfo.email} lang={lang} />
 
             {/* Render Main Stack (Personal Info, Security, Notifications) */}
             {(state.activeTab === "personal" || state.activeTab === "security" || state.activeTab === "notifications") && (
@@ -63,6 +66,7 @@ export default function SettingsPage() {
                   personalInfo={state.personalInfo}
                   setPersonalInfo={state.setPersonalInfo}
                   handleSave={state.handleSave}
+                  lang={lang}
                 />
 
                 <SecurityCard
@@ -71,6 +75,7 @@ export default function SettingsPage() {
                     state.setToggles({ ...state.toggles, twoFactor: !state.toggles.twoFactor })
                   }
                   Switch={Switch}
+                  lang={lang}
                 />
 
                 <NotificationsCard
@@ -87,6 +92,7 @@ export default function SettingsPage() {
                     state.setToggles({ ...state.toggles, promotions: !state.toggles.promotions })
                   }
                   Switch={Switch}
+                  lang={lang}
                 />
               </div>
             )}
@@ -95,9 +101,13 @@ export default function SettingsPage() {
             {state.activeTab === "linked" && (
               <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Linked Accounts</h3>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    {lang === "bn" ? "সংযুক্ত অ্যাকাউন্টসমূহ" : "Linked Accounts"}
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1 font-semibold">
-                    Manage your linked social accounts and login authenticators.
+                    {lang === "bn"
+                      ? "আপনার সংযুক্ত সোশ্যাল অ্যাকাউন্ট এবং লগইন প্রমাণীকরণকারী পরিচালনা করুন।"
+                      : "Manage your linked social accounts and login authenticators."}
                   </p>
                 </div>
 
@@ -109,11 +119,13 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <h5 className="text-sm font-bold text-slate-800">Google</h5>
-                        <p className="text-xs text-emerald-600 font-semibold mt-0.5">Connected</p>
+                        <p className="text-xs text-emerald-600 font-semibold mt-0.5">
+                          {lang === "bn" ? "সংযুক্ত" : "Connected"}
+                        </p>
                       </div>
                     </div>
                     <button className="text-slate-400 hover:text-[#FF6014] text-xs font-bold transition-colors">
-                      Disconnect
+                      {lang === "bn" ? "সংযোগ বিচ্ছিন্ন করুন" : "Disconnect"}
                     </button>
                   </div>
 
@@ -124,11 +136,13 @@ export default function SettingsPage() {
                       </div>
                       <div>
                         <h5 className="text-sm font-bold text-slate-800">Facebook</h5>
-                        <p className="text-xs text-slate-400 font-semibold mt-0.5">Not Connected</p>
+                        <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                          {lang === "bn" ? "সংযুক্ত নয়" : "Not Connected"}
+                        </p>
                       </div>
                     </div>
                     <button className="text-[#FF6014] hover:text-[#E0530A] text-xs font-bold transition-colors">
-                      Connect
+                      {lang === "bn" ? "সংযুক্ত করুন" : "Connect"}
                     </button>
                   </div>
                 </div>
@@ -139,9 +153,13 @@ export default function SettingsPage() {
             {state.activeTab === "payment" && (
               <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">Payment Methods</h3>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    {lang === "bn" ? "পেমেন্ট পদ্ধতি" : "Payment Methods"}
+                  </h3>
                   <p className="text-xs text-slate-400 mt-1 font-semibold">
-                    Configure your saved wallets and cards for seamless checkouts.
+                    {lang === "bn"
+                      ? "নিরবচ্ছিন্ন চেকআউটের জন্য আপনার সংরক্ষিত ওয়ালেট এবং কার্ড কনফিগার করুন।"
+                      : "Configure your saved wallets and cards for seamless checkouts."}
                   </p>
                 </div>
 
@@ -152,11 +170,13 @@ export default function SettingsPage() {
                       <div>
                         <h5 className="text-sm font-bold text-slate-800">01712 ****78</h5>
                         <span className="text-[10px] text-[#FF6014] font-bold block mt-0.5">
-                          Primary Payment Option
+                          {lang === "bn" ? "প্রাথমিক পেমেন্ট অপশন" : "Primary Payment Option"}
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs text-[#FF6014] font-extrabold uppercase">Active</span>
+                    <span className="text-xs text-[#FF6014] font-extrabold uppercase">
+                      {lang === "bn" ? "সক্রিয়" : "Active"}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between p-4 border border-slate-100 rounded-2xl">
@@ -164,11 +184,13 @@ export default function SettingsPage() {
                       <span className="text-xs font-black bg-indigo-600 text-white px-2 py-1 rounded">Visa</span>
                       <div>
                         <h5 className="text-sm font-bold text-slate-800">**** **** **** 4812</h5>
-                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Expires 12/28</span>
+                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
+                          {lang === "bn" ? "মেয়াদোত্তীর্ণ ১২/২৮" : "Expires 12/28"}
+                        </span>
                       </div>
                     </div>
                     <button className="text-xs font-semibold text-slate-400 hover:text-[#FF6014] transition-colors">
-                      Delete
+                      {lang === "bn" ? "মুছে ফেলুন" : "Delete"}
                     </button>
                   </div>
                 </div>

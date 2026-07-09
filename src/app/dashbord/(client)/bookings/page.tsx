@@ -2,12 +2,14 @@
 
 import React from "react";
 import { Calendar, Loader2 } from "lucide-react";
+import { useAppSelector } from "@/redux/hooks";
 import AccessDenied from "../components/AccessDenied";
 import BookingItem from "./components/BookingItem";
-import { useClientBookingsState, BookingStatus } from "./hooks/useClientBookingsState";
+import { useClientBookingsState } from "./hooks/useClientBookingsState";
 
 export default function BookingsPage() {
   const { role, filter, setFilter, isLoading, filteredBookings } = useClientBookingsState();
+  const lang = useAppSelector((state) => state.lang.value);
 
   if (role !== "client") {
     return <AccessDenied roleRequired="Customer" />;
@@ -20,6 +22,18 @@ export default function BookingsPage() {
       </div>
     );
   }
+
+  const langFilterName = (f: string) => {
+    switch (f) {
+      case "All": return lang === "bn" ? "সব" : "All";
+      case "Pending": return lang === "bn" ? "পেন্ডিং" : "Pending";
+      case "Assigned": return lang === "bn" ? "নিযুক্ত" : "Assigned";
+      case "On The Way": return lang === "bn" ? "চলমান" : "On The Way";
+      case "Completed": return lang === "bn" ? "সম্পন্ন" : "Completed";
+      case "Cancelled": return lang === "bn" ? "বাতিল" : "Cancelled";
+      default: return f;
+    }
+  };
 
   return (
     <div className="w-full animate-in fade-in duration-200">
@@ -35,9 +49,13 @@ export default function BookingsPage() {
                 <Calendar className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl md:text-2xl font-black tracking-tight text-white">My Bookings</h1>
+                <h1 className="text-xl md:text-2xl font-black tracking-tight text-white">
+                  {lang === "bn" ? "আমার বুকিংস" : "My Bookings"}
+                </h1>
                 <p className="text-xs md:text-sm text-slate-300 mt-1 font-semibold leading-relaxed">
-                  Manage, track, and chat about your service requests at Rajseba.
+                  {lang === "bn"
+                    ? "রাজসেবায় আপনার সার্ভিস অনুরোধগুলো পরিচালনা ও ট্র্যাক করুন এবং চ্যাট করুন।"
+                    : "Manage, track, and chat about your service requests at Rajseba."}
                 </p>
               </div>
             </div>
@@ -59,7 +77,7 @@ export default function BookingsPage() {
                       : "text-slate-500 hover:text-slate-800 hover:bg-slate-50/50"
                   }`}
                 >
-                  {tab}
+                  {langFilterName(tab)}
                 </button>
               );
             })}
@@ -71,8 +89,10 @@ export default function BookingsPage() {
           {filteredBookings.length > 0 ? (
             filteredBookings.map((booking: any) => <BookingItem key={booking.id} booking={booking} />)
           ) : (
-            <div className="bg-white p-12 text-center border border-slate-100 rounded-2xl shadow-sm text-slate-400">
-              No {filter.toLowerCase()} bookings found.
+            <div className="bg-white p-12 text-center border border-slate-100 rounded-2xl shadow-sm text-slate-400 font-semibold text-xs">
+              {lang === "bn"
+                ? `${langFilterName(filter)} বুকিং পাওয়া যায়নি।`
+                : `No ${filter.toLowerCase()} bookings found.`}
             </div>
           )}
         </div>

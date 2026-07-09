@@ -18,17 +18,27 @@ interface PersonalInfoCardProps {
     }>
   >;
   handleSave: (e: React.FormEvent) => void;
+  lang?: string;
 }
 
-export default function PersonalInfoCard({ personalInfo, setPersonalInfo, handleSave }: PersonalInfoCardProps) {
+export default function PersonalInfoCard({
+  personalInfo,
+  setPersonalInfo,
+  handleSave,
+  lang = "bn",
+}: PersonalInfoCardProps) {
   return (
     <div id="personal" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
-      <h3 className="text-lg font-bold text-slate-900">Personal Info</h3>
+      <h3 className="text-lg font-bold text-slate-900">
+        {lang === "bn" ? "ব্যক্তিগত তথ্য" : "Personal Info"}
+      </h3>
 
       <form onSubmit={handleSave} className="space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">
+              {lang === "bn" ? "পুরো নাম" : "Full Name"}
+            </label>
             <input
               type="text"
               value={personalInfo.fullName}
@@ -39,7 +49,9 @@ export default function PersonalInfoCard({ personalInfo, setPersonalInfo, handle
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">
+              {lang === "bn" ? "ইমেইল এড্রেস" : "Email Address"}
+            </label>
             <input
               type="email"
               value={personalInfo.email}
@@ -50,7 +62,9 @@ export default function PersonalInfoCard({ personalInfo, setPersonalInfo, handle
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Phone Number</label>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">
+              {lang === "bn" ? "ফোন নম্বর" : "Phone Number"}
+            </label>
             <input
               type="tel"
               value={personalInfo.phone}
@@ -60,7 +74,9 @@ export default function PersonalInfoCard({ personalInfo, setPersonalInfo, handle
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Location</label>
+            <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">
+              {lang === "bn" ? "অবস্থান" : "Location"}
+            </label>
             <input
               type="text"
               value={personalInfo.location}
@@ -75,7 +91,7 @@ export default function PersonalInfoCard({ personalInfo, setPersonalInfo, handle
             type="submit"
             className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-6 py-2.5 rounded-full text-xs shadow-md shadow-[#FF6014]/10 transition-all active:scale-[0.98]"
           >
-            Save Changes
+            {lang === "bn" ? "পরিবর্তনগুলো সেভ করুন" : "Save Changes"}
           </button>
         </div>
       </form>

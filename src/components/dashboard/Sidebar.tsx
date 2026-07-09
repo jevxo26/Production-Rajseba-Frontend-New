@@ -32,12 +32,15 @@ import {
   ChevronDown,
   Bot,
   Languages,
-  Truck
+  Truck,
+  Coins,
+  Ticket
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { UserRole, getRoleName, logout as authLogout } from "@/redux/features/auth/authSlice";
 import { motion, AnimatePresence } from "framer-motion";
+import { toggleLanguage } from "@/redux/features/shared/langSlice";
 
 interface SidebarGroup {
   label: string;
@@ -66,7 +69,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
     setMounted(true);
   }, []);
 
-  const [lang, setLang] = useState<"bn" | "en">("bn");
+  const lang = useAppSelector((state) => state.lang.value);
 
   // Dynamic grouped menu items based on role (Accordion Tree structure)
   const getSidebarGroups = (userRole: UserRole): SidebarGroup[] => {
@@ -76,92 +79,97 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "superadmin":
         return [
           homeItem,
-          { label: "Overview", icon: LayoutGrid, href: "/dashbord" },
+          { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord" },
           {
-            label: "Operations",
+            label: lang === "bn" ? "অপারেশনস" : "Operations",
             icon: Calendar,
             children: [
-              { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
-              { label: "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
-              { label: "Custom Shifting", href: "/dashbord/custom-shifting", icon: Truck },
-              { label: "Withdraw Requests", href: "/dashbord/withdraw", icon: Wallet }
+              { label: lang === "bn" ? "বুকিং ম্যানেজ করুন" : "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
+              { label: lang === "bn" ? "কুইক বুকিং" : "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
+              { label: lang === "bn" ? "কাস্টম শিফটিং" : "Custom Shifting", href: "/dashbord/custom-shifting", icon: Truck },
+              { label: lang === "bn" ? "উত্তোলনের অনুরোধসমূহ" : "Withdraw Requests", href: "/dashbord/withdraw", icon: Wallet }
             ]
           },
           {
-            label: "User Directory",
+            label: lang === "bn" ? "ইউজার ডিরেক্টরি" : "User Directory",
             icon: Users,
             children: [
-              { label: "Manage Users", href: "/dashbord/users", icon: Users },
-              { label: "Manage Vendors", href: "/dashbord/vendors", icon: Briefcase },
-              { label: "Manage Agents", href: "/dashbord/agents", icon: Zap },
-              { label: "Manage Employees", href: "/dashbord/employees", icon: UserPlus },
-              { label: "Role Management", href: "/dashbord/role", icon: Briefcase }
+              { label: lang === "bn" ? "ইউজার ম্যানেজ করুন" : "Manage Users", href: "/dashbord/users", icon: Users },
+              { label: lang === "bn" ? "ভেন্ডর ম্যানেজ করুন" : "Manage Vendors", href: "/dashbord/vendors", icon: Briefcase },
+              { label: lang === "bn" ? "এজেন্ট ম্যানেজ করুন" : "Manage Agents", href: "/dashbord/agents", icon: Zap },
+              { label: lang === "bn" ? "কর্মচারী ম্যানেজ করুন" : "Manage Employees", href: "/dashbord/employees", icon: UserPlus },
+              { label: lang === "bn" ? "রোল ম্যানেজমেন্ট" : "Role Management", href: "/dashbord/role", icon: Briefcase }
             ]
           },
           {
-            label: "Service Catalog",
+            label: lang === "bn" ? "সার্ভিস ক্যাটালগ" : "Service Catalog",
             icon: Wrench,
             children: [
-              { label: "Categories", href: "/dashbord/category", icon: ClipboardList },
-              { label: "Locations", href: "/dashbord/locations", icon: MapPin },
-              { label: "Services", href: "/dashbord/services", icon: Wrench },
-              { label: "Nested Services", href: "/dashbord/nested-services", icon: Layers },
-              { label: "Packages", href: "/dashbord/packages", icon: Package },
-              { label: "Hero Management", href: "/dashbord/hero", icon: LayoutGrid }
+              { label: lang === "bn" ? "ক্যাটাগরিস" : "Categories", href: "/dashbord/category", icon: ClipboardList },
+              { label: lang === "bn" ? "লোকেশনসমূহ" : "Locations", href: "/dashbord/locations", icon: MapPin },
+              { label: lang === "bn" ? "সার্ভিসেস" : "Services", href: "/dashbord/services", icon: Wrench },
+              { label: lang === "bn" ? "নেস্টেড সার্ভিসেস" : "Nested Services", href: "/dashbord/nested-services", icon: Layers },
+              { label: lang === "bn" ? "প্যাকেজসমূহ" : "Packages", href: "/dashbord/packages", icon: Package },
+              { label: lang === "bn" ? "হিরো ম্যানেজমেন্ট" : "Hero Management", href: "/dashbord/hero", icon: LayoutGrid }
             ]
           },
           {
-            label: "Marketing",
+            label: lang === "bn" ? "মার্কেটিং" : "Marketing",
             icon: Percent,
             children: [
-              { label: "Coupons", href: "/dashbord/coupons", icon: Percent },
-              { label: "Analytics", href: "/dashbord/analytics", icon: BarChart3 }
+              { label: lang === "bn" ? "কুপনসমূহ" : "Coupons", href: "/dashbord/coupons", icon: Percent },
+              { label: lang === "bn" ? "অ্যানালিটিক্স" : "Analytics", href: "/dashbord/analytics", icon: BarChart3 }
             ]
           },
           {
-            label: "Support Desk",
+            label: lang === "bn" ? "সাপোর্ট ডেস্ক" : "Support Desk",
             icon: Mail,
             children: [
-              { label: "Contacts", href: "/dashbord/contacts", icon: Mail },
-              { label: "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
-              { label: "AI Chat Log", href: "/dashbord/ai-chat-log", icon: Bot }
+              { label: lang === "bn" ? "সাপোর্ট ডেস্ক" : "Support Desk", href: "/dashbord/support-desk", icon: Ticket },
+              { label: lang === "bn" ? "যোগাযোগ" : "Contacts", href: "/dashbord/contacts", icon: Mail },
+              { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
+              { label: lang === "bn" ? "এআই চ্যাট লগ" : "AI Chat Log", href: "/dashbord/ai-chat-log", icon: Bot },
+              { label: lang === "bn" ? "সেশন সার্চেস" : "Session Searches", href: "/dashbord/session-searches", icon: Search }
             ]
           },
           {
-            label: "Settings",
+            label: lang === "bn" ? "সেটিংস" : "Settings",
             icon: User,
             children: [
-              { label: "My Profile", href: "/dashbord/profile", icon: User }
+              { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
             ]
           }
         ];
       case "agent":
         return [
           homeItem,
-          { label: "Overview", icon: LayoutGrid, href: "/dashbord" },
+          { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord" },
           {
-            label: "Operations",
+            label: lang === "bn" ? "অপারেশনস" : "Operations",
             icon: Calendar,
             children: [
-              { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
-              { label: "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
+              { label: lang === "bn" ? "বুকিং ম্যানেজ করুন" : "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
+              { label: lang === "bn" ? "কুইক বুকিং" : "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
+              { label: lang === "bn" ? "কমিশনসমূহ" : "Commissions", href: "/dashbord/commissions", icon: Coins },
+              { label: lang === "bn" ? "অর্ডারসমূহ" : "Orders", href: "/dashbord/orders", icon: ClipboardList },
               { label: lang === "bn" ? "ওয়ালেট এবং উপার্জন" : "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
             ]
           },
           {
-            label: "Directories",
+            label: lang === "bn" ? "ডিরেক্টরি" : "Directories",
             icon: Users,
             children: [
-              { label: "Manage Clients", href: "/dashbord/users", icon: Users },
-              { label: "Services", href: "/dashbord/services", icon: Wrench }
+              { label: lang === "bn" ? "ক্লায়েন্ট ম্যানেজ করুন" : "Manage Clients", href: "/dashbord/users", icon: Users },
+              { label: lang === "bn" ? "সার্ভিসেস" : "Services", href: "/dashbord/services", icon: Wrench }
             ]
           },
           {
-            label: "Support & Profile",
+            label: lang === "bn" ? "সাপোর্ট এবং প্রোফাইল" : "Support & Profile",
             icon: MessageSquare,
             children: [
-              { label: "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
-              { label: "My Profile", href: "/dashbord/profile", icon: User }
+              { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
+              { label: lang === "bn" ? "সাপোর্ট ডেস্ক" : "Support Desk", href: "/dashbord/support", icon: HelpCircle },
+              { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
             ]
           }
         ];
@@ -207,11 +215,11 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "client":
         return [
           homeItem,
-          { label: "Overview", icon: LayoutGrid, href: "/dashbord/overview" },
-          { label: "My Bookings", icon: Calendar, href: "/dashbord/bookings" },
-          { label: "Saved Services", icon: Heart, href: "/dashbord/saved" },
-          { label: "Help Center", icon: HelpCircle, href: "/dashbord/help" },
-          { label: "My Profile", icon: User, href: "/dashbord/profile" }
+          { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord/overview" },
+          { label: lang === "bn" ? "আমার বুকিংস" : "My Bookings", icon: Calendar, href: "/dashbord/bookings" },
+          { label: lang === "bn" ? "সংরক্ষিত সার্ভিসেস" : "Saved Services", icon: Heart, href: "/dashbord/saved" },
+          { label: lang === "bn" ? "হেল্প সেন্টার" : "Help Center", icon: HelpCircle, href: "/dashbord/help" },
+          { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", icon: User, href: "/dashbord/profile" }
         ];
       default:
         return [];
@@ -240,7 +248,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         return null;
       })
       .filter((g): g is SidebarGroup => g !== null);
-  }, [role, searchQuery]);
+  }, [role, searchQuery, lang]);
 
   // Auto-expand group that contains active link or matching search
   useEffect(() => {
@@ -261,7 +269,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         setExpandedGroup(activeGroup.label);
       }
     }
-  }, [pathname, role, searchQuery]);
+  }, [pathname, role, searchQuery, lang]);
 
   const handleLogout = () => {
     dispatch(authLogout());
@@ -317,7 +325,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
               <input
                 type="text"
-                placeholder="Search menu..."
+                placeholder={lang === "bn" ? "মেনু খুঁজুন..." : "Search menu..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white border border-slate-200/80 rounded-2xl py-2.5 pl-10 pr-4 text-xs font-bold text-slate-700 placeholder:text-slate-400/80 outline-none focus:border-[#FF6014] focus:ring-4 focus:ring-[#FF6014]/10 transition-all shadow-sm focus:shadow-[0_0_20px_-3px_rgba(255,96,20,0.15)]"
@@ -478,7 +486,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         {/* Bottom Profile/Logout */}
         <div className="p-4 border-t border-slate-100 relative z-10 flex flex-col gap-2">
           <button
-            onClick={() => setLang(lang === "bn" ? "en" : "bn")}
+            onClick={() => dispatch(toggleLanguage())}
             className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-[#FF6014] w-full rounded-xl hover:bg-[#FFF8F4]/30 transition-all duration-200"
           >
             <Languages size={20} />
@@ -490,7 +498,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-[#E0530A] w-full rounded-xl hover:bg-[#FFF8F4]/30 transition-all duration-200"
           >
             <LogOut size={20} />
-            {!collapsed && <span className="text-sm font-semibold">Logout</span>}
+            {!collapsed && <span className="text-sm font-semibold">{lang === "bn" ? "লগআউট" : "Logout"}</span>}
           </button>
         </div>
       </div>

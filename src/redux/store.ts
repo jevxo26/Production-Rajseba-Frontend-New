@@ -4,6 +4,7 @@ import authReducer from './features/auth/authSlice';
 import wishlistReducer from './features/wishlist/wishlistSlice';
 import ticketReducer from './features/admin/ticketSlice';
 import searchLogReducer from './features/admin/searchLogSlice';
+import langReducer from './features/shared/langSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     wishlist: wishlistReducer,
     tickets: ticketReducer,
     searchLogs: searchLogReducer,
+    lang: langReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware),

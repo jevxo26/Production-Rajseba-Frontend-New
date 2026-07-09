@@ -5,16 +5,21 @@ import { ArrowRight, SlidersHorizontal, Sparkles } from "lucide-react";
 
 interface TransactionHistoryProps {
   myCompletedBookings: any[];
+  lang?: string;
 }
 
-export default function TransactionHistory({ myCompletedBookings }: TransactionHistoryProps) {
+export default function TransactionHistory({ myCompletedBookings, lang = "bn" }: TransactionHistoryProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-extrabold text-slate-800 text-lg">Transaction History</h3>
-        <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors flex items-center gap-1.5 focus:outline-none">
+        <h3 className="font-extrabold text-slate-800 text-lg">
+          {lang === "bn" ? "লেনদেনের ইতিহাস" : "Transaction History"}
+        </h3>
+        <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors flex items-center gap-1.5 focus:outline-none cursor-pointer">
           <SlidersHorizontal size={14} />
-          <span className="text-[10px] font-bold text-slate-600">Filter</span>
+          <span className="text-[10px] font-bold text-slate-600">
+            {lang === "bn" ? "ফিল্টার" : "Filter"}
+          </span>
         </button>
       </div>
 
@@ -23,10 +28,18 @@ export default function TransactionHistory({ myCompletedBookings }: TransactionH
           <table className="w-full min-w-[600px] text-left border-collapse">
             <thead>
               <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-50">
-                <th className="px-3 md:px-6 py-3 md:py-4">Service / Description</th>
-                <th className="px-3 md:px-6 py-3 md:py-4">Date</th>
-                <th className="px-3 md:px-6 py-3 md:py-4">Amount</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 pr-6">Status</th>
+                <th className="px-3 md:px-6 py-3 md:py-4">
+                  {lang === "bn" ? "সার্ভিস / বিবরণ" : "Service / Description"}
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4">
+                  {lang === "bn" ? "তারিখ" : "Date"}
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4">
+                  {lang === "bn" ? "পরিমাণ" : "Amount"}
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 pr-6">
+                  {lang === "bn" ? "অবস্থা" : "Status"}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50/50">
@@ -39,9 +52,11 @@ export default function TransactionHistory({ myCompletedBookings }: TransactionH
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-850">
-                          {b.nestedService?.name || b.pkg?.name || "Service Booking"}
+                          {b.nestedService?.name || b.pkg?.name || (lang === "bn" ? "সার্ভিস বুকিং" : "Service Booking")}
                         </h4>
-                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">Order #{b.id}</span>
+                        <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
+                          {lang === "bn" ? `অর্ডার #${b.id}` : `Order #${b.id}`}
+                        </span>
                       </div>
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 text-xs font-semibold text-slate-400">
@@ -56,7 +71,7 @@ export default function TransactionHistory({ myCompletedBookings }: TransactionH
                     </td>
                     <td className="px-3 md:px-6 py-3 md:py-4 pr-6">
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded-lg bg-[#FFF8F4] text-[#FF6014] uppercase">
-                        EXPENSE
+                        {lang === "bn" ? "খরচ" : "EXPENSE"}
                       </span>
                     </td>
                   </tr>
@@ -64,7 +79,7 @@ export default function TransactionHistory({ myCompletedBookings }: TransactionH
               ) : (
                 <tr>
                   <td colSpan={4} className="px-3 md:px-6 py-6 text-center text-xs text-slate-400 font-semibold">
-                    No completed bookings found.
+                    {lang === "bn" ? "কোনো সম্পন্ন বুকিং পাওয়া যায়নি।" : "No completed bookings found."}
                   </td>
                 </tr>
               )}
@@ -73,8 +88,8 @@ export default function TransactionHistory({ myCompletedBookings }: TransactionH
         </div>
 
         <div className="p-4 text-center border-t border-slate-50">
-          <button className="text-xs font-bold text-[#FF6014] hover:underline focus:outline-none flex items-center gap-1 mx-auto">
-            View All Transactions <ArrowRight size={12} />
+          <button className="text-xs font-bold text-[#FF6014] hover:underline focus:outline-none flex items-center gap-1 mx-auto cursor-pointer">
+            {lang === "bn" ? "সব লেনদেন দেখুন" : "View All Transactions"} <ArrowRight size={12} />
           </button>
         </div>
       </div>

@@ -2,35 +2,42 @@
 
 import React from "react";
 import Link from "next/link";
-
-const sideArticles = [
-  {
-    tag: "Refund Policy",
-    title: "Getting your 100% money back",
-    time: "5 min read • Updated yesterday",
-  },
-  {
-    tag: "Insurance",
-    title: "Service Warranty & Coverage",
-    time: "8 min read • Updated 3 days ago",
-  },
-  {
-    tag: "Partnership",
-    title: "Becoming a Rajseba Pro",
-    time: "12 min read • Updated 1 week ago",
-  },
-];
+import { useAppSelector } from "@/redux/hooks";
 
 export default function PopularArticles() {
+  const lang = useAppSelector((state) => state.lang.value);
+
+  const sideArticles = [
+    {
+      tag: lang === "bn" ? "রিফান্ড পলিসি" : "Refund Policy",
+      title: lang === "bn" ? "আপনার ১০০% টাকা ফেরত পাওয়া" : "Getting your 100% money back",
+      time: lang === "bn" ? "৫ মিনিট পাঠ • গতকাল আপডেট করা হয়েছে" : "5 min read • Updated yesterday",
+    },
+    {
+      tag: lang === "bn" ? "ইন্স্যুরেন্স" : "Insurance",
+      title: lang === "bn" ? "সার্ভিস ওয়ারেন্টি ও কভারেজ" : "Service Warranty & Coverage",
+      time: lang === "bn" ? "৮ মিনিট পাঠ • ৩ দিন আগে আপডেট করা হয়েছে" : "8 min read • Updated 3 days ago",
+    },
+    {
+      tag: lang === "bn" ? "পার্টনারশিপ" : "Partnership",
+      title: lang === "bn" ? "রাজসেবা প্রো হওয়া" : "Becoming a Rajseba Pro",
+      time: lang === "bn" ? "১২ মিনিট পাঠ • ১ সপ্তাহ আগে আপডেট করা হয়েছে" : "12 min read • Updated 1 week ago",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Popular Articles</h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-semibold">Most read guides by the Rajseba community</p>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            {lang === "bn" ? "জনপ্রিয় আর্টিকেলসমূহ" : "Popular Articles"}
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5 font-semibold">
+            {lang === "bn" ? "রাজসেবা কমিউনিটির সবচেয়ে বেশি পঠিত নির্দেশিকা" : "Most read guides by the Rajseba community"}
+          </p>
         </div>
         <Link href="#" className="text-xs font-bold text-[#FF6014] hover:underline">
-          View all articles
+          {lang === "bn" ? "সব আর্টিকেল দেখুন" : "View all articles"}
         </Link>
       </div>
 
@@ -48,16 +55,18 @@ export default function PopularArticles() {
 
           <div className="relative z-10 w-fit">
             <span className="bg-[#FF6014] text-white text-[9px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-              Featured Guide
+              {lang === "bn" ? "ফিচারড নির্দেশিকা" : "Featured Guide"}
             </span>
           </div>
 
           <div className="relative z-10 space-y-2">
             <h3 className="text-xl sm:text-2xl font-black text-white leading-snug">
-              New User's Guide to Seamless Home Services
+              {lang === "bn" ? "নতুন গ্রাহকদের জন্য হোম সার্ভিস নির্দেশিকা" : "New User's Guide to Seamless Home Services"}
             </h3>
             <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-2xl">
-              Everything you need to know about your first booking, from selecting the right pro to final inspection.
+              {lang === "bn"
+                ? "আপনার প্রথম বুকিং সম্পর্কে আপনার যা কিছু জানা দরকার, সঠিক কর্মী নির্বাচন থেকে শুরু করে চূড়ান্ত পরিদর্শন পর্যন্ত।"
+                : "Everything you need to know about your first booking, from selecting the right pro to final inspection."}
             </p>
           </div>
         </div>

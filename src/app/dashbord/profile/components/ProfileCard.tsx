@@ -13,6 +13,7 @@ interface ProfileCardProps {
   avatarUrl: string;
   isUploadingAvatar: boolean;
   handleAvatarUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  lang?: string;
 }
 
 export default function ProfileCard({
@@ -24,6 +25,7 @@ export default function ProfileCard({
   avatarUrl,
   isUploadingAvatar,
   handleAvatarUpload,
+  lang = "bn",
 }: ProfileCardProps) {
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center text-center space-y-4">
@@ -39,7 +41,9 @@ export default function ProfileCard({
         {/* Camera Overlay button */}
         <label className="absolute inset-0 bg-black/45 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-10">
           <Camera size={20} className="mb-0.5" />
-          <span className="text-[9px] font-bold tracking-wider uppercase">আপলোড</span>
+          <span className="text-[9px] font-bold tracking-wider uppercase">
+            {lang === "bn" ? "আপলোড" : "Upload"}
+          </span>
           <input
             type="file"
             accept="image/*"

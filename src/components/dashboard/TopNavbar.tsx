@@ -1,12 +1,13 @@
 "use client";
 
-import { Bell, Search, User, ChevronDown, Check, Shield, HardHat, CircleUser, Briefcase, Menu, LogOut, Settings } from "lucide-react";
+import { Bell, Search, User, ChevronDown, Check, Shield, HardHat, CircleUser, Briefcase, Menu, LogOut, Settings, Languages } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { UserRole, setRole as setAuthRole, getRoleName } from "@/redux/features/auth/authSlice";
 import { logout as authLogout } from "@/redux/features/auth/authSlice";
 import Link from "next/link";
 import { useGetNotificationsQuery, useMarkNotificationAsReadMutation } from "@/redux/features/notification/notificationApi";
+import { toggleLanguage } from "@/redux/features/shared/langSlice";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -17,8 +18,9 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
   const authUser = useAppSelector((state) => state.auth.user);
   const role = useAppSelector((state) => state.auth.role) || "client";
+  const lang = useAppSelector((state) => state.lang.value);
   const dispatch = useAppDispatch();
-  const roleName = mounted ? getRoleName(role) : "Client";
+  const roleName = mounted ? getRoleName(role) : (lang === "bn" ? "ক্লায়েন্ট" : "Client");
   const logout = () => dispatch(authLogout());
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -105,7 +107,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#FF6014] transition-colors" size={16} />
           <input
             type="text"
-            placeholder="Search booking ID, service, client..."
+            placeholder={lang === "bn" ? "বুকিং আইডি, সার্ভিস, ক্লায়েন্ট খুঁজুন..." : "Search booking ID, service, client..."}
             className="w-full bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-2xl pl-11 pr-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FFF8F4] transition-all shadow-sm"
           />
         </div>
@@ -113,6 +115,18 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Right Navbar Controls */}
       <div className="flex items-center gap-5">
+
+        {/* Language Toggle Button */}
+        <button
+          onClick={() => dispatch(toggleLanguage())}
+          className="p-2 sm:p-2.5 hover:bg-slate-50 rounded-xl sm:rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm flex items-center gap-1.5 focus:outline-none"
+          title={lang === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
+        >
+          <Languages size={18} />
+          <span className="text-xs font-black uppercase text-slate-600 hidden sm:inline-block">
+            {lang === "bn" ? "EN" : "বাং"}
+          </span>
+        </button>
 
         {/* Notifications Button */}
         <div className="relative" ref={notificationDropdownRef}>
@@ -131,12 +145,12 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
           {notificationDropdownOpen && (
             <div className="absolute right-0 mt-3 w-80 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[400px] overflow-y-auto">
               <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
-                <h3 className="font-semibold text-slate-800">Notifications</h3>
-                <span className="text-xs bg-[#FF6014]/10 text-[#FF6014] px-2 py-1 rounded-full font-medium">{unreadCount} new</span>
+                <h3 className="font-semibold text-slate-800">{lang === "bn" ? "নোটিফিকেশন" : "Notifications"}</h3>
+                <span className="text-xs bg-[#FF6014]/10 text-[#FF6014] px-2 py-1 rounded-full font-medium">{unreadCount} {lang === "bn" ? "নতুন" : "new"}</span>
               </div>
               <div className="divide-y divide-slate-50">
                 {notifications.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-slate-500 text-sm">No notifications yet</div>
+                  <div className="px-4 py-8 text-center text-slate-500 text-sm">{lang === "bn" ? "এখনো কোনো নোটিফিকেশন নেই" : "No notifications yet"}</div>
                 ) : (
                   notifications.map(notification => (
                     <div 
@@ -215,7 +229,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                   <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
                     <User size={16} />
                   </div>
-                  <span className="font-medium">My Profile</span>
+                  <span className="font-medium">{lang === "bn" ? "আমার প্রোফাইল" : "My Profile"}</span>
                 </Link>
 
                 <Link
@@ -226,7 +240,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                   <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
                     <Settings size={16} />
                   </div>
-                  <span className="font-medium">Settings</span>
+                  <span className="font-medium">{lang === "bn" ? "সেটিংস" : "Settings"}</span>
                 </Link>
 
                 <div className="my-1 border-t border-slate-100" />
@@ -241,7 +255,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                   <div className="p-1.5 rounded-lg bg-[#FFF8F4] text-[#FF6014]">
                     <LogOut size={16} />
                   </div>
-                  <span className="font-semibold">Sign Out</span>
+                  <span className="font-semibold">{lang === "bn" ? "লগআউট" : "Sign Out"}</span>
                 </button>
               </div>
             </div>

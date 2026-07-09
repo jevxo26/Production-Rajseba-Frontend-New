@@ -6,9 +6,10 @@ interface VirtualCardProps {
   profileData: any;
   totalExpense: number;
   walletBalance: number;
+  lang?: string;
 }
 
-export default function VirtualCard({ profileData, totalExpense, walletBalance }: VirtualCardProps) {
+export default function VirtualCard({ profileData, totalExpense, walletBalance, lang = "bn" }: VirtualCardProps) {
   return (
     <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-slate-900 via-slate-800 to-[#E0530A] p-6 sm:p-8 text-white shadow-xl shadow-slate-950/20 border border-slate-800 flex flex-col justify-between aspect-[1.75/1] w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[520px] group hover:shadow-2xl hover:shadow-[#FF6014]/5 transition-all duration-300">
       {/* Mesh/Grid Background Overlay */}
@@ -50,7 +51,7 @@ export default function VirtualCard({ profileData, totalExpense, walletBalance }
       {/* Card Middle Row (Total Expenses) */}
       <div className="relative z-10 space-y-1 mt-6 sm:mt-8">
         <span className="text-[9px] sm:text-[11px] font-bold text-slate-300 tracking-widest uppercase block">
-          Total Expenses
+          {lang === "bn" ? "মোট খরচ" : "Total Expenses"}
         </span>
         <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white flex items-baseline gap-1.5 sm:gap-2">
           <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl opacity-90">৳</span>
@@ -63,14 +64,18 @@ export default function VirtualCard({ profileData, totalExpense, walletBalance }
       {/* Card Bottom Row */}
       <div className="relative z-10 flex items-end justify-between border-t border-white/10 pt-4 mt-6">
         <div>
-          <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">Card Holder</span>
+          <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">
+            {lang === "bn" ? "কার্ডধারী" : "Card Holder"}
+          </span>
           <span className="text-xs font-bold text-white block mt-0.5 tracking-wide">
-            {profileData?.data?.name || "Valued Client"}
+            {profileData?.data?.name || (lang === "bn" ? "সম্মানিত গ্রাহক" : "Valued Client")}
           </span>
         </div>
 
         <div className="text-right">
-          <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">Current Balance</span>
+          <span className="text-[7px] font-bold text-slate-300 tracking-wider uppercase block">
+            {lang === "bn" ? "চলতি ব্যালেন্স" : "Current Balance"}
+          </span>
           <span className="text-xs font-bold text-white block mt-0.5 tracking-wide">
             ৳ {Number(walletBalance).toLocaleString("en-BD", { minimumFractionDigits: 2 })}
           </span>

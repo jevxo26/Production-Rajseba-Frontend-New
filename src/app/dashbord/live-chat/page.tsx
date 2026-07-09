@@ -16,6 +16,7 @@ import { useChatMessages } from "./hooks/useChatMessages";
 function LiveChatContent() {
   const user = useAppSelector((state) => state.auth.user);
   const rawRole = useAppSelector((state) => state.auth.role);
+  const lang = useAppSelector((state) => state.lang.value);
   const role = typeof rawRole === "string" ? rawRole.toLowerCase().replace(/\s+/g, "") : "";
   const isAdmin = role === "superadmin" || role === "admin";
   const isAgent = role === "agent";
@@ -103,6 +104,7 @@ function LiveChatContent() {
         filteredInbox={filteredInbox}
         activeChatUser={activeChatUser}
         setActiveChatUser={setActiveChatUser}
+        lang={lang}
       />
 
       {/* Main Chat Area Window */}
@@ -128,9 +130,10 @@ function LiveChatContent() {
             handleSendMessage={handleSendMessageSubmit}
             setImageFile={setImageFile}
             setImagePreview={setImagePreview}
+            lang={lang}
           />
         ) : (
-          <EmptyChatState />
+          <EmptyChatState lang={lang} />
         )}
       </div>
     </div>
@@ -138,8 +141,9 @@ function LiveChatContent() {
 }
 
 export default function LiveChatPage() {
+  const lang = useAppSelector((state) => state.lang.value);
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-500 font-bold animate-pulse">Loading chat...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-500 font-bold animate-pulse">{lang === "bn" ? "চ্যাট লোড হচ্ছে..." : "Loading chat..."}</div>}>
       <LiveChatContent />
     </Suspense>
   );

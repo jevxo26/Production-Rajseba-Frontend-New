@@ -8,15 +8,16 @@ interface SettingsSidebarProps {
   activeTab: string;
   handleTabClick: (tabId: string) => void;
   router: AppRouterInstance;
+  lang?: string;
 }
 
-export default function SettingsSidebar({ activeTab, handleTabClick, router }: SettingsSidebarProps) {
+export default function SettingsSidebar({ activeTab, handleTabClick, router, lang = "bn" }: SettingsSidebarProps) {
   const tabs = [
-    { id: "personal", label: "Personal Info", icon: User },
-    { id: "security", label: "Login & Security", icon: Shield },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "linked", label: "Linked Accounts", icon: LinkIcon },
-    { id: "payment", label: "Payment Methods", icon: CreditCard },
+    { id: "personal", label: lang === "bn" ? "ব্যক্তিগত তথ্য" : "Personal Info", icon: User },
+    { id: "security", label: lang === "bn" ? "লগইন ও নিরাপত্তা" : "Login & Security", icon: Shield },
+    { id: "notifications", label: lang === "bn" ? "নোটিফিকেশনসমূহ" : "Notifications", icon: Bell },
+    { id: "linked", label: lang === "bn" ? "সংযুক্ত অ্যাকাউন্টসমূহ" : "Linked Accounts", icon: LinkIcon },
+    { id: "payment", label: lang === "bn" ? "পেমেন্ট পদ্ধতি" : "Payment Methods", icon: CreditCard },
   ];
 
   return (
@@ -55,7 +56,7 @@ export default function SettingsSidebar({ activeTab, handleTabClick, router }: S
           className="w-full flex items-center gap-3 px-5 py-3 rounded-2xl text-left text-slate-500 hover:bg-[#FFF8F4] hover:text-[#E0530A] transition-all font-semibold"
         >
           <LogOut size={18} />
-          <span className="text-sm">Logout</span>
+          <span className="text-sm">{lang === "bn" ? "লগআউট" : "Logout"}</span>
         </button>
       </div>
     </div>

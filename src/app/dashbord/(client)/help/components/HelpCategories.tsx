@@ -2,39 +2,60 @@
 
 import React from "react";
 import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
 import { Calendar, CreditCard, User, Shield } from "lucide-react";
 
-export const categories = [
-  {
-    title: "Booking & Scheduling",
-    icon: Calendar,
-    desc: "Learn how to book a service, reschedule an appointment, or handle cancellations.",
-    links: ["How do I change my booking time?", "Can I book multiple services?"],
-  },
-  {
-    title: "Payments & Refund",
-    icon: CreditCard,
-    desc: "Understand pricing, payment methods, and our guaranteed refund policy.",
-    links: ["When will I get my refund?", "Which payment methods are accepted?"],
-  },
-  {
-    title: "Account & Privacy",
-    icon: User,
-    desc: "Manage your profile, data preferences, and security settings easily.",
-    links: ["Changing your account email", "How we protect your data"],
-  },
-  {
-    title: "Safety & Trust",
-    icon: Shield,
-    desc: "Our commitment to professional vetting and on-site service safety.",
-    links: ["Verified service provider badge", "Report a safety concern"],
-  },
-];
-
 export default function HelpCategories() {
+  const lang = useAppSelector((state) => state.lang.value);
+
+  const categories = [
+    {
+      title: lang === "bn" ? "বুকিং ও সময়সূচী" : "Booking & Scheduling",
+      icon: Calendar,
+      desc: lang === "bn"
+        ? "কীভাবে সার্ভিস বুক করবেন, সময় পরিবর্তন করবেন বা বাতিল করবেন তা জানুন।"
+        : "Learn how to book a service, reschedule an appointment, or handle cancellations.",
+      links: lang === "bn"
+        ? ["আমি কীভাবে আমার বুকিংয়ের সময় পরিবর্তন করব?", "আমি কি একাধিক সার্ভিস বুক করতে পারি?"]
+        : ["How do I change my booking time?", "Can I book multiple services?"],
+    },
+    {
+      title: lang === "bn" ? "পেমেন্ট ও রিফান্ড" : "Payments & Refund",
+      icon: CreditCard,
+      desc: lang === "bn"
+        ? "মূল্য নির্ধারণ, পেমেন্ট পদ্ধতি এবং আমাদের গ্যারান্টিযুক্ত রিফান্ড পলিসি বুঝুন।"
+        : "Understand pricing, payment methods, and our guaranteed refund policy.",
+      links: lang === "bn"
+        ? ["আমি কখন আমার রিফান্ড পাব?", "কোন কোন পেমেন্ট পদ্ধতি গ্রহণ করা হয়?"]
+        : ["When will I get my refund?", "Which payment methods are accepted?"],
+    },
+    {
+      title: lang === "bn" ? "অ্যাকাউন্ট ও গোপনীয়তা" : "Account & Privacy",
+      icon: User,
+      desc: lang === "bn"
+        ? "আপনার প্রোফাইল, ডেটা পছন্দ এবং নিরাপত্তা সেটিংস সহজেই পরিচালনা করুন।"
+        : "Manage your profile, data preferences, and security settings easily.",
+      links: lang === "bn"
+        ? ["আপনার অ্যাকাউন্ট ইমেইল পরিবর্তন করা", "আমরা কীভাবে আপনার ডেটা সুরক্ষিত রাখি"]
+        : ["Changing your account email", "How we protect your data"],
+    },
+    {
+      title: lang === "bn" ? "নিরাপত্তা ও বিশ্বাস" : "Safety & Trust",
+      icon: Shield,
+      desc: lang === "bn"
+        ? "পেশাদার যাচাইকরণ এবং অন-সাইট সার্ভিস সুরক্ষার প্রতি আমাদের প্রতিশ্রুতি।"
+        : "Our commitment to professional vetting and on-site service safety.",
+      links: lang === "bn"
+        ? ["যাচাইকৃত সার্ভিস প্রোভাইডার ব্যাজ", "নিরাপত্তা উদ্বেগ রিপোর্ট করুন"]
+        : ["Verified service provider badge", "Report a safety concern"],
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-slate-900 tracking-tight">Explore Categories</h2>
+      <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+        {lang === "bn" ? "ক্যাটাগরি এক্সপ্লোর করুন" : "Explore Categories"}
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {categories.map((cat, idx) => {
           const Icon = cat.icon;

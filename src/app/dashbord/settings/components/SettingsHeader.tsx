@@ -5,9 +5,10 @@ import { Pencil } from "lucide-react";
 
 interface SettingsHeaderProps {
   email: string;
+  lang?: string;
 }
 
-export default function SettingsHeader({ email }: SettingsHeaderProps) {
+export default function SettingsHeader({ email, lang = "bn" }: SettingsHeaderProps) {
   return (
     <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
       <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
@@ -27,13 +28,13 @@ export default function SettingsHeader({ email }: SettingsHeaderProps) {
           <h2 className="text-2xl font-black text-slate-900 leading-tight">Zayed Mansoor</h2>
           <p className="text-sm text-slate-400 mt-0.5 font-semibold">{email}</p>
           <span className="inline-flex items-center gap-1 bg-[#FFF8F4] text-[#FF6014] text-xs font-bold px-3 py-1 rounded-full mt-2 border border-[#FFF0EB]">
-            ★ Premium Member
+            {lang === "bn" ? "★ প্রিমিয়াম মেম্বার" : "★ Premium Member"}
           </span>
         </div>
       </div>
 
       <button className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-6 py-2.5 rounded-full text-xs shadow-md shadow-[#FF6014]/10 transition-all active:scale-[0.98]">
-        View Public Profile
+        {lang === "bn" ? "পাবলিক প্রোফাইল দেখুন" : "View Public Profile"}
       </button>
     </div>
   );

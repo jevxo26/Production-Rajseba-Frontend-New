@@ -3,7 +3,11 @@
 import React from "react";
 import { MessageSquare, Sparkles } from "lucide-react";
 
-export default function EmptyChatState() {
+interface EmptyChatStateProps {
+  lang?: string;
+}
+
+export default function EmptyChatState({ lang = "bn" }: EmptyChatStateProps) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-6 bg-slate-50/20 relative">
       <div className="absolute inset-0 bg-gradient-to-br from-[#FFF8F4]/20 via-transparent to-transparent pointer-events-none" />
@@ -14,9 +18,13 @@ export default function EmptyChatState() {
         </div>
       </div>
       <div className="text-center space-y-2 max-w-sm">
-        <p className="text-sm font-black text-slate-800 uppercase tracking-widest">লাইভ চ্যাট রুম</p>
+        <p className="text-sm font-black text-slate-800 uppercase tracking-widest">
+          {lang === "bn" ? "লাইভ চ্যাট রুম" : "Live Chat Room"}
+        </p>
         <p className="text-xs text-slate-400 font-semibold leading-relaxed">
-          রিয়েল-টাইমে মেসেজ করার জন্য কথোপকথনের তালিকা থেকে একজন গ্রাহক বা পার্টনার নির্বাচন করুন।
+          {lang === "bn"
+            ? "রিয়েল-টাইমে মেসেজ করার জন্য কথোপকথনের তালিকা থেকে একজন গ্রাহক বা পার্টনার নির্বাচন করুন।"
+            : "Select a customer or partner from the conversation list to message in real-time."}
         </p>
       </div>
     </div>

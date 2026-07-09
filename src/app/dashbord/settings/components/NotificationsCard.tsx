@@ -11,6 +11,7 @@ interface NotificationsCardProps {
   promotions: boolean;
   onPromotionsChange: () => void;
   Switch: React.ComponentType<{ checked: boolean; onChange: () => void }>;
+  lang?: string;
 }
 
 export default function NotificationsCard({
@@ -21,10 +22,13 @@ export default function NotificationsCard({
   promotions,
   onPromotionsChange,
   Switch,
+  lang = "bn",
 }: NotificationsCardProps) {
   return (
     <div id="notifications" className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 scroll-mt-6">
-      <h3 className="text-lg font-bold text-slate-900">Notifications</h3>
+      <h3 className="text-lg font-bold text-slate-900">
+        {lang === "bn" ? "নোটিফিকেশনসমূহ" : "Notifications"}
+      </h3>
 
       <div className="space-y-4">
         {/* Email Notifications Row */}
@@ -34,8 +38,14 @@ export default function NotificationsCard({
               <Mail size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-800">Email Notifications</h4>
-              <p className="text-xs text-slate-400 mt-1 font-semibold">Updates about your bookings and account.</p>
+              <h4 className="text-sm font-bold text-slate-800">
+                {lang === "bn" ? "ইমেইল নোটিফিকেশন" : "Email Notifications"}
+              </h4>
+              <p className="text-xs text-slate-400 mt-1 font-semibold">
+                {lang === "bn"
+                  ? "আপনার বুকিং এবং অ্যাকাউন্ট সম্পর্কে সর্বশেষ আপডেট।"
+                  : "Updates about your bookings and account."}
+              </p>
             </div>
           </div>
           <Switch checked={emailNotif} onChange={onEmailNotifChange} />
@@ -48,8 +58,14 @@ export default function NotificationsCard({
               <MessageSquare size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-800">SMS Alerts</h4>
-              <p className="text-xs text-slate-400 mt-1 font-semibold">Urgent updates and service confirmations.</p>
+              <h4 className="text-sm font-bold text-slate-800">
+                {lang === "bn" ? "এসএমএস অ্যালার্ট" : "SMS Alerts"}
+              </h4>
+              <p className="text-xs text-slate-400 mt-1 font-semibold">
+                {lang === "bn"
+                  ? "জরুরী আপডেট এবং সার্ভিস নিশ্চিতকরণ।"
+                  : "Urgent updates and service confirmations."}
+              </p>
             </div>
           </div>
           <Switch checked={smsAlert} onChange={onSmsAlertChange} />
@@ -62,8 +78,14 @@ export default function NotificationsCard({
               <Megaphone size={18} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-slate-800">Promotions</h4>
-              <p className="text-xs text-slate-400 mt-1 font-semibold">News, offers, and seasonal discounts.</p>
+              <h4 className="text-sm font-bold text-slate-800">
+                {lang === "bn" ? "প্রচারণা ও অফার" : "Promotions"}
+              </h4>
+              <p className="text-xs text-slate-400 mt-1 font-semibold">
+                {lang === "bn"
+                  ? "সংবাদ, অফার এবং মৌসুমী ডিসকাউন্ট।"
+                  : "News, offers, and seasonal discounts."}
+              </p>
             </div>
           </div>
           <Switch checked={promotions} onChange={onPromotionsChange} />

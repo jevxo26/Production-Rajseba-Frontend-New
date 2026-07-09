@@ -9,6 +9,7 @@ import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
 
 export default function CustomerOverview() {
   const authUser = useAppSelector((state) => state.auth.user);
+  const lang = useAppSelector((state) => state.lang.value);
   const { data: bookingsRes, isLoading: loadingBookings } = useGetAllBookingsQuery();
 
   const allBookings = bookingsRes?.data || [];
@@ -17,40 +18,59 @@ export default function CustomerOverview() {
   const activeBookings = myBookings.filter((b: any) => ["assigned", "on_the_way"].includes(b.status));
   const completedBookings = myBookings.filter((b: any) => b.status === "completed");
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "pending":
+        return lang === "bn" ? "পেন্ডিং" : "Pending";
+      case "assigned":
+        return lang === "bn" ? "নিযুক্ত" : "Assigned";
+      case "on_the_way":
+        return lang === "bn" ? "চলমান" : "On The Way";
+      case "completed":
+        return lang === "bn" ? "সম্পন্ন" : "Completed";
+      case "cancelled":
+        return lang === "bn" ? "বাতিল" : "Cancelled";
+      default:
+        return status;
+    }
+  };
+
   const customerColumns = [
     {
       key: "id",
-      header: "Booking ID",
+      header: lang === "bn" ? "বুকিং আইডি" : "Booking ID",
       render: (b: any) => <span className="font-bold text-brand-primary">#{b.id}</span>,
     },
     {
       key: "service",
-      header: "Service",
+      header: lang === "bn" ? "সার্ভিস" : "Service",
       render: (b: any) => (
-        <span className="font-semibold text-slate-900">{b.nestedService?.name || b.pkg?.name || "Service"}</span>
+        <span className="font-semibold text-slate-900">
+          {b.nestedService?.name || b.pkg?.name || (lang === "bn" ? "সার্ভিস" : "Service")}
+        </span>
       ),
     },
     {
       key: "vendor",
-      header: "Expert Provider",
+      header: lang === "bn" ? "অভিজ্ঞ সেবাদাতা" : "Expert Provider",
       render: (b: any) => <span>{b.vendor?.name || "—"}</span>,
     },
     {
       key: "status",
-      header: "Status",
+      header: lang === "bn" ? "অবস্থা" : "Status",
       render: (b: any) => (
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
             b.status === "completed" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
           }`}
         >
-          {b.status}
+          {getStatusText(b.status)}
         </span>
       ),
     },
     {
       key: "createdAt",
-      header: "Date",
+      header: lang === "bn" ? "তারিখ" : "Date",
       render: (b: any) => <span>{new Date(b.createdAt).toLocaleDateString("en-BD")}</span>,
     },
   ];
@@ -69,14 +89,16 @@ export default function CustomerOverview() {
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-xs font-bold text-[#FFF0EB]">
                 <Sparkles className="w-3.5 h-3.5 text-[#FF6014] animate-pulse" />
-                <span>Client Dashboard</span>
+                <span>{lang === "bn" ? "গ্রাহক ড্যাশবোর্ড" : "Client Dashboard"}</span>
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
-                  Hello, {authUser?.name || "Client"}
+                  {lang === "bn" ? `হ্যালো, ${authUser?.name || "গ্রাহক"}` : `Hello, {authUser?.name || "Client"}`}
                 </h1>
                 <p className="text-xs md:text-sm text-slate-300 mt-1 font-medium">
-                  It's a great day to refresh your home with Rajseba.
+                  {lang === "bn"
+                    ? "রাজসেবার সাথে আপনার ঘর সাজানোর আজ এক চমৎকার দিন।"
+                    : "It's a great day to refresh your home with Rajseba."}
                 </p>
               </div>
             </div>
@@ -91,7 +113,9 @@ export default function CustomerOverview() {
                     {activeBookings.length.toString().padStart(2, "0")}
                   </span>
                 )}
-                <span className="text-[9px] font-bold text-slate-300 tracking-wider uppercase mt-1 block">Active</span>
+                <span className="text-[9px] font-bold text-slate-300 tracking-wider uppercase mt-1 block">
+                  {lang === "bn" ? "সক্রিয়" : "Active"}
+                </span>
               </div>
 
               <div className="flex-1 md:flex-none bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3 md:p-4 min-w-[105px] text-center hover:bg-white/15 transition-all">
@@ -102,7 +126,9 @@ export default function CustomerOverview() {
                     {completedBookings.length.toString().padStart(2, "0")}
                   </span>
                 )}
-                <span className="text-[9px] font-bold text-slate-300 tracking-wider uppercase mt-1 block">Completed</span>
+                <span className="text-[9px] font-bold text-slate-300 tracking-wider uppercase mt-1 block">
+                  {lang === "bn" ? "সম্পন্ন" : "Completed"}
+                </span>
               </div>
             </div>
           </div>
@@ -120,9 +146,12 @@ export default function CustomerOverview() {
               </div>
               <div>
                 <h3 className="text-xl font-black tracking-tight flex items-center gap-1">
-                  Book a New Service <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  {lang === "bn" ? "নতুন সার্ভিস বুক করুন" : "Book a New Service"}{" "}
+                  <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </h3>
-                <p className="text-xs text-rose-100 mt-0.5 font-medium">Get professional help today</p>
+                <p className="text-xs text-rose-100 mt-0.5 font-medium">
+                  {lang === "bn" ? "আজই পেশাদার সেবা নিন" : "Get professional help today"}
+                </p>
               </div>
             </div>
           </Link>
@@ -133,11 +162,15 @@ export default function CustomerOverview() {
                 <Share2 size={22} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-800 tracking-tight">Refer a Friend</h3>
-                <p className="text-xs text-slate-400 mt-0.5 font-semibold">Earn credits for sharing</p>
+                <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                  {lang === "bn" ? "বন্ধুকে রেফার করুন" : "Refer a Friend"}
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5 font-semibold">
+                  {lang === "bn" ? "শেয়ার করে ক্রেডিট জিতুন" : "Earn credits for sharing"}
+                </p>
               </div>
             </div>
-            <button className="p-2.5 bg-[#FF6014] text-white rounded-full hover:bg-[#E0530A] transition-colors shadow-sm focus:outline-none">
+            <button className="p-2.5 bg-[#FF6014] text-white rounded-full hover:bg-[#E0530A] transition-colors shadow-sm focus:outline-none cursor-pointer">
               <ChevronRight size={16} />
             </button>
           </div>
@@ -147,9 +180,11 @@ export default function CustomerOverview() {
         {activeBookings.length > 0 && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">Active Bookings</h2>
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {lang === "bn" ? "সক্রিয় বুকিংস" : "Active Bookings"}
+              </h2>
               <Link href="/dashbord/bookings" className="text-xs font-bold text-[#FF6014] hover:underline">
-                View All &rarr;
+                {lang === "bn" ? "সব দেখুন" : "View All"} &rarr;
               </Link>
             </div>
 
@@ -162,7 +197,7 @@ export default function CustomerOverview() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-extrabold text-[#FF6014] text-base">
-                        {booking.nestedService?.name || booking.pkg?.name || "Service Booking"}
+                        {booking.nestedService?.name || booking.pkg?.name || (lang === "bn" ? "সার্ভিস বুকিং" : "Service Booking")}
                       </h3>
                       <span className="text-[10px] font-bold text-slate-400 block mt-0.5">ID: #{booking.id}</span>
                     </div>
@@ -171,7 +206,7 @@ export default function CustomerOverview() {
                         booking.status === "on_the_way" ? "text-[#E0530A] bg-[#FFF8F4]" : "text-amber-600 bg-amber-50"
                       }`}
                     >
-                      {booking.status === "on_the_way" ? "On the Way" : booking.status}
+                      {getStatusText(booking.status)}
                     </span>
                   </div>
 
@@ -181,20 +216,24 @@ export default function CustomerOverview() {
                         {booking.vendor?.name?.[0] || "V"}
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-800">{booking.vendor?.name || "Assigned Vendor"}</h4>
-                        <p className="text-[10px] font-semibold text-slate-400">Verified Specialist</p>
+                        <h4 className="text-xs font-bold text-slate-800">
+                          {booking.vendor?.name || (lang === "bn" ? "নিযুক্ত ভেন্ডর" : "Assigned Vendor")}
+                        </h4>
+                        <p className="text-[10px] font-semibold text-slate-400">
+                          {lang === "bn" ? "যাচাইকৃত স্পেশালিস্ট" : "Verified Specialist"}
+                        </p>
                       </div>
                     </div>
-                    <button className="p-2 bg-white text-[#FF6014] rounded-xl hover:bg-[#FFF8F4] border border-slate-100 shadow-sm transition-colors">
+                    <button className="p-2 bg-white text-[#FF6014] rounded-xl hover:bg-[#FFF8F4] border border-slate-100 shadow-sm transition-colors cursor-pointer">
                       <MessageCircle size={16} />
                     </button>
                   </div>
 
                   <div className="flex items-center gap-2 text-xs text-slate-400">
                     <Calendar size={13} />
-                    <span>{booking.date ? new Date(booking.date).toLocaleDateString("en-BD") : "Date TBD"}</span>
+                    <span>{booking.date ? new Date(booking.date).toLocaleDateString("en-BD") : (lang === "bn" ? "তারিখ নির্ধারিত হবে" : "Date TBD")}</span>
                     <span className="mx-1">•</span>
-                    <span className="truncate max-w-[140px]">{booking.location || "Location not set"}</span>
+                    <span className="truncate max-w-[140px]">{booking.location || (lang === "bn" ? "অবস্থান নির্ধারণ করা হয়নি" : "Location not set")}</span>
                   </div>
                 </div>
               ))}
@@ -206,12 +245,14 @@ export default function CustomerOverview() {
         {myBookings.length > 0 && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">Booking History</h2>
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {lang === "bn" ? "বुकিংয়ের ইতিহাস" : "Booking History"}
+              </h2>
               <div className="flex items-center gap-2">
-                <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors">
+                <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors cursor-pointer">
                   <SlidersHorizontal size={14} />
                 </button>
-                <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors">
+                <button className="p-2 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-100 shadow-sm transition-colors cursor-pointer">
                   <Download size={14} />
                 </button>
               </div>
@@ -221,7 +262,7 @@ export default function CustomerOverview() {
               columns={customerColumns}
               data={myBookings}
               searchKey="id"
-              searchPlaceholder="Search bookings..."
+              searchPlaceholder={lang === "bn" ? "বুকিং খুঁজুন..." : "Search bookings..."}
               pageSize={5}
             />
           </div>

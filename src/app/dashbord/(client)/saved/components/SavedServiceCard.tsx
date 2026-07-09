@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
+import { useAppSelector } from "@/redux/hooks";
 
 interface SavedServiceCardProps {
   service: any;
@@ -10,6 +11,8 @@ interface SavedServiceCardProps {
 }
 
 export default function SavedServiceCard({ service, handleUnsave }: SavedServiceCardProps) {
+  const lang = useAppSelector((state) => state.lang.value);
+
   return (
     <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group relative">
       {/* Image */}
@@ -53,7 +56,7 @@ export default function SavedServiceCard({ service, handleUnsave }: SavedService
             )}
           </div>
           <p className="text-xs text-slate-400 font-semibold line-clamp-2">
-            {service.subtitle || (service.description ? service.description.replace(/<[^>]*>/g, "") : "Top-rated service.")}
+            {service.subtitle || (service.description ? service.description.replace(/<[^>]*>/g, "") : (lang === "bn" ? "শীর্ষ রেটেড সার্ভিস।" : "Top-rated service."))}
           </p>
         </div>
 
@@ -62,13 +65,13 @@ export default function SavedServiceCard({ service, handleUnsave }: SavedService
             href={`/services/${service.id}`}
             className="flex-1 text-center bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl transition-all"
           >
-            Details
+            {lang === "bn" ? "বিস্তারিত" : "Details"}
           </Link>
           <Link
             href={`/categories/service/${service.slug || service.id}`}
             className="flex-1 text-center bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-bold px-3 py-2 rounded-xl transition-all shadow-sm"
           >
-            Book Now
+            {lang === "bn" ? "বুক করুন" : "Book Now"}
           </Link>
         </div>
       </div>

@@ -4,7 +4,7 @@ import React from "react";
 import { Briefcase, Calendar, MapPin, MessageCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { STATUS_TEXT } from "../hooks/useClientBookingsState";
+import { useAppSelector } from "@/redux/hooks";
 
 interface BookingItemProps {
   booking: any;
@@ -12,6 +12,24 @@ interface BookingItemProps {
 
 export default function BookingItem({ booking }: BookingItemProps) {
   const router = useRouter();
+  const lang = useAppSelector((state) => state.lang.value);
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "pending":
+        return lang === "bn" ? "পেন্ডিং" : "Pending";
+      case "assigned":
+        return lang === "bn" ? "নিযুক্ত" : "Assigned";
+      case "on_the_way":
+        return lang === "bn" ? "চলমান" : "On The Way";
+      case "completed":
+        return lang === "bn" ? "সম্পন্ন" : "Completed";
+      case "cancelled":
+        return lang === "bn" ? "বাতিল" : "Cancelled";
+      default:
+        return status;
+    }
+  };
 
   return (
     <div className="bg-white rounded-[28px] border border-slate-100 p-6 shadow-sm space-y-6 flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -23,14 +41,16 @@ export default function BookingItem({ booking }: BookingItemProps) {
           </div>
           <div>
             <h3 className="text-xl font-bold text-slate-800 tracking-tight">
-              {booking.nestedService?.name || booking.pkg?.name || "Service Booking"}
+              {booking.nestedService?.name || booking.pkg?.name || (lang === "bn" ? "সার্ভিস বুকিং" : "Service Booking")}
             </h3>
             <div className="flex items-center gap-2 mt-1.5">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF8F4] text-[#E0530A]">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E0530A] animate-pulse" />
-                {STATUS_TEXT[booking.status] || booking.status}
+                {getStatusText(booking.status)}
               </span>
-              <span className="text-[10px] font-bold text-slate-400">Order #{booking.id}</span>
+              <span className="text-[10px] font-bold text-slate-400">
+                {lang === "bn" ? `অর্ডার #${booking.id}` : `Order #${booking.id}`}
+              </span>
             </div>
           </div>
         </div>
@@ -47,7 +67,7 @@ export default function BookingItem({ booking }: BookingItemProps) {
         {/* Column 1: Assigned Personnel */}
         <div>
           <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">
-            Assigned To
+            {lang === "bn" ? "নিযুক্ত কর্মী/ভেন্ডর" : "Assigned To"}
           </span>
           <div className="flex flex-col gap-2">
             {booking.vendor && (
@@ -57,9 +77,11 @@ export default function BookingItem({ booking }: BookingItemProps) {
                 </div>
                 <div>
                   <span className="text-xs font-bold text-slate-800 block">
-                    {booking.vendor?.name || "Assigned Vendor"}
+                    {booking.vendor?.name || (lang === "bn" ? "নিযুক্ত ভেন্ডর" : "Assigned Vendor")}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-semibold">Service Provider</span>
+                  <span className="text-[10px] text-slate-500 font-semibold">
+                    {lang === "bn" ? "সার্ভিস প্রোভাইডার" : "Service Provider"}
+                  </span>
                 </div>
               </div>
             )}
@@ -73,7 +95,9 @@ export default function BookingItem({ booking }: BookingItemProps) {
                   </div>
                   <div>
                     <span className="text-xs font-bold text-slate-800 block">{emp.name}</span>
-                    <span className="text-[10px] text-slate-500 font-semibold">Technician</span>
+                    <span className="text-[10px] text-slate-500 font-semibold">
+                      {lang === "bn" ? "টেকনিশিয়ান" : "Technician"}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -83,7 +107,9 @@ export default function BookingItem({ booking }: BookingItemProps) {
                 <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs border border-slate-200">
                   ?
                 </div>
-                <span className="text-xs font-bold text-slate-400">Not assigned yet</span>
+                <span className="text-xs font-bold text-slate-400">
+                  {lang === "bn" ? "এখনো নিযুক্ত করা হয়নি" : "Not assigned yet"}
+                </span>
               </div>
             )}
           </div>
@@ -91,7 +117,9 @@ export default function BookingItem({ booking }: BookingItemProps) {
 
         {/* Column 2: Date & Time */}
         <div>
-          <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">Date</span>
+          <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">
+            {lang === "bn" ? "তারিখ" : "Date"}
+          </span>
           <div className="flex items-start gap-2.5">
             <Calendar size={16} className="text-slate-400 mt-0.5" />
             <div>
@@ -112,12 +140,12 @@ export default function BookingItem({ booking }: BookingItemProps) {
         {/* Column 3: Service Location */}
         <div>
           <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest block mb-2">
-            Service Location
+            {lang === "bn" ? "সার্ভিসের স্থান" : "Service Location"}
           </span>
           <div className="flex items-start gap-2.5">
             <MapPin size={16} className="text-slate-400 mt-0.5" />
             <span className="text-xs font-bold text-slate-800 leading-relaxed max-w-[200px]">
-              {booking.location || "Location not provided"}
+              {booking.location || (lang === "bn" ? "অবস্থান দেওয়া হয়নি" : "Location not provided")}
             </span>
           </div>
         </div>
@@ -135,10 +163,10 @@ export default function BookingItem({ booking }: BookingItemProps) {
                   )}`
                 )
               }
-              className="flex items-center gap-1.5 text-[#FF6014] bg-[#FFF8F4] hover:bg-[#FFF0EB] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"
+              className="flex items-center gap-1.5 text-[#FF6014] bg-[#FFF8F4] hover:bg-[#FFF0EB] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none cursor-pointer"
             >
               <MessageCircle size={14} />
-              <span>Chat Vendor</span>
+              <span>{lang === "bn" ? "ভেন্ডরের সাথে চ্যাট" : "Chat Vendor"}</span>
             </button>
           )}
           {booking.employees?.map((emp: any) => (
@@ -149,15 +177,20 @@ export default function BookingItem({ booking }: BookingItemProps) {
                   `/dashbord/live-chat?receiverId=${emp.id}&receiverName=${encodeURIComponent(emp.name)}`
                 )
               }
-              className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none"
+              className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors focus:outline-none cursor-pointer"
             >
               <MessageCircle size={14} />
-              <span>Chat {emp.name?.split(" ")[0]}</span>
+              <span>
+                {lang === "bn"
+                  ? `${emp.name?.split(" ")[0]} এর সাথে চ্যাট`
+                  : `Chat ${emp.name?.split(" ")[0]}`}
+              </span>
             </button>
           ))}
           {!booking.vendor && (!booking.employees || booking.employees.length === 0) && (
             <span className="text-xs text-slate-400 font-bold flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Waiting for provider
+              <Loader2 size={14} className="animate-spin" />{" "}
+              {lang === "bn" ? "সেবাদাতার জন্য অপেক্ষা করা হচ্ছে" : "Waiting for provider"}
             </span>
           )}
         </div>
@@ -165,15 +198,15 @@ export default function BookingItem({ booking }: BookingItemProps) {
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={() => router.push(`/dashbord/bookings/${booking.id}`)}
-            className="flex-1 sm:flex-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-4 sm:px-6 rounded-2xl transition-colors active:scale-[0.98]"
+            className="flex-1 sm:flex-none bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold py-2.5 px-4 sm:px-6 rounded-2xl transition-colors active:scale-[0.98] cursor-pointer"
           >
-            View Details
+            {lang === "bn" ? "বিস্তারিত দেখুন" : "View Details"}
           </button>
           <Link
             href={`/dashbord/bookings/track/${booking.id}`}
             className="flex-1 sm:flex-none bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-bold py-2.5 px-4 sm:px-6 rounded-2xl transition-all shadow-sm shadow-[#FF6014]/10 active:scale-[0.98] inline-block text-center"
           >
-            Track Order
+            {lang === "bn" ? "অর্ডার ট্র্যাক করুন" : "Track Order"}
           </Link>
         </div>
       </div>
