@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ArrowRight, ShieldCheck, Loader2, Sparkles, CheckCircle2, Award, Clock, ChevronRight, ChevronLeft } from "lucide-react"
+import { ArrowRight, ShieldCheck, Loader2, Sparkles, CheckCircle2, Award, Clock, ChevronRight, ChevronLeft, LogIn } from "lucide-react"
 import { useLoginState } from "@/app/login/hooks/useLoginState"
 import LoginLeftPanel from "@/app/login/components/LoginLeftPanel"
 
@@ -22,11 +22,9 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col relative overflow-y-auto">
         {/* Same bg-icons pattern used across all pages */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.06]"
+          className="absolute inset-0 pointer-events-none opacity-10"
           style={{ backgroundImage: "url('/bg-icons-design.png')", backgroundRepeat: "repeat" }}
         />
-        {/* Warm gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#FFF8F4]/90 via-white/80 to-orange-50/60 pointer-events-none" />
 
         <div className="relative z-10 px-6 sm:px-10 pt-6">
           <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-400 hover:text-[#FF6014] transition-colors group">
@@ -45,7 +43,7 @@ export default function LoginPage() {
           </div>
 
           {!isOtpSent ? (
-          <div className="w-full max-w-[440px] bg-transparent px-6 py-8 sm:px-2 sm:py-0">
+          <div className="w-full max-w-[440px] bg-transparent border border-slate-200/80 sm:border-0 rounded-3xl shadow-lg sm:shadow-none px-6 py-8 sm:px-2 sm:py-0">
               <div className="flex flex-col items-center text-center mb-8">
                 <Link href="/" className="flex flex-col items-center gap-2.5 group mb-5 lg:flex hidden">
                   <div className="w-14 h-14 bg-gradient-to-br from-[#FF6014] to-[#FF8142] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-[#FF6014]/25 group-hover:scale-105 transition-transform">
@@ -56,7 +54,10 @@ export default function LoginPage() {
                 <div className="inline-flex items-center gap-2 bg-[#FFF4EE] text-[#FF6014] px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider mb-4 border border-[#FF6014]/20">
                   <ShieldCheck size={13} className="stroke-[2.5]" />Secure OTP Login
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">Welcome back 👋</h2>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight flex items-center gap-2.5">
+                  <LogIn size={28} className="text-[#FF6014]" />
+                  Welcome back
+                </h2>
                 <p className="text-slate-400 text-xs font-semibold mt-2 leading-relaxed max-w-xs">Enter your phone number and we'll send you a login code instantly.</p>
               </div>
 
