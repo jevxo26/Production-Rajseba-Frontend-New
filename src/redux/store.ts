@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { baseApi } from './api/baseApi';
 import authReducer from './features/auth/authSlice';
 import wishlistReducer from './features/wishlist/wishlistSlice';
-import ticketReducer from './features/admin/ticketSlice';
+
 import searchLogReducer from './features/admin/searchLogSlice';
 import langReducer from './features/shared/langSlice';
 
@@ -11,7 +11,7 @@ export const store = configureStore({
     [baseApi.reducerPath]: baseApi.reducer,
     auth: authReducer,
     wishlist: wishlistReducer,
-    tickets: ticketReducer,
+
     searchLogs: searchLogReducer,
     lang: langReducer,
   },
