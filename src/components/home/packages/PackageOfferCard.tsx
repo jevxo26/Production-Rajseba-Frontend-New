@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, CheckCircle } from "lucide-react";
 import { DisplayPackage } from "./packageOfferUtils";
 
 const itemVariants = {
@@ -105,6 +105,12 @@ export function PackageOfferCard({
             </div>
           ) : (
             <div className="text-2xl font-bold text-slate-400">Get Quote</div>
+          )}
+          {(pkg.bookingsCount !== undefined && pkg.bookingsCount !== null) && (
+            <p className="text-[10px] text-slate-500 font-semibold pt-1.5 flex items-center gap-1">
+              <CheckCircle size={11} className="text-emerald-500 flex-shrink-0" />
+              <span><span className="text-emerald-600 font-bold">{pkg.bookingsCount}</span> bookings completed</span>
+            </p>
           )}
         </div>
 

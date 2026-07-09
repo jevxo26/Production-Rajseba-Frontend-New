@@ -115,7 +115,7 @@ export default function CategoryDetailClientPage({ slug }: { slug: string }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFFDFD] via-slate-50/70 to-[#FFF8F4] relative pb-16">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFDFD] via-slate-50/70 to-[#FFF8F4] relative pb-16 overflow-x-hidden">
       <div className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0" style={{ backgroundSize: "auto" }} />
       <div className="relative z-10">
         <CategorizedHero id={service.id} name={service.name} description={service.description} image={service.image} rating={rating} bookingsCount={bookingsCount} reviewsCount={reviewsCount} categoryName={service.category?.name} />

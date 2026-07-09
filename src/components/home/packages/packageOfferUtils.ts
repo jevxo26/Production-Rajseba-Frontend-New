@@ -11,6 +11,7 @@ export interface DisplayPackage {
   serviceId?: number;
   serviceName?: string;
   vendorId?: number;
+  bookingsCount?: number;
 }
 
 function normalizePackageFeatures(pkg: any): string[] {
@@ -69,6 +70,7 @@ export function mapPackagesToDisplay(
       serviceId: options?.serviceId ?? pkg.service?.id,
       serviceName: options?.serviceName ?? pkg.service?.name ?? "",
       vendorId: options?.vendorId ?? pkg.service?.vendor?.id,
+      bookingsCount: Array.isArray(pkg.bookings) ? pkg.bookings.length : (typeof pkg.bookings_count === "number" ? pkg.bookings_count : undefined),
     };
   });
 }
