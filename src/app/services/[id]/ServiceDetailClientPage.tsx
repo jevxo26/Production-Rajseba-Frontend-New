@@ -290,6 +290,10 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
                 </div>
               )}
 
+              <div id="vendor">
+                <VendorProfile vendor={service.vendor} serviceRating={rating} />
+              </div>
+
               <div id="reviews">
                 <ServiceReviews reviews={reviews} />
               </div>

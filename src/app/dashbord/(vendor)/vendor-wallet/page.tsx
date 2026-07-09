@@ -18,8 +18,8 @@ export default function VendorWalletPage() {
         <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4">
           <ShieldAlert size={48} />
         </div>
-        <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
-        <p className="text-sm text-slate-500 mt-2 max-w-sm">This panel is restricted to Vendors only.</p>
+        <h3 className="text-xl font-bold text-slate-800">প্রবেশাধিকার নেই</h3>
+        <p className="text-sm text-slate-500 mt-2 max-w-sm">এই প্যানেলটি শুধুমাত্র ভেন্ডরদের জন্য।</p>
       </div>
     );
   }
@@ -36,10 +36,11 @@ export default function VendorWalletPage() {
       rejected: <XCircle size={11} />,
     };
     const cls = map[status] || "bg-slate-100 text-slate-600 border-slate-200";
+    const translatedStatus: Record<string, string> = { pending: "অপেক্ষমান", approved: "অনুমোদিত", rejected: "বাতিল" };
     return (
       <span className={`inline-flex items-center gap-1.5 font-bold text-xs px-2.5 py-1 rounded-xl border ${cls}`}>
         {icons[status]}
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {translatedStatus[status] || status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
@@ -47,19 +48,19 @@ export default function VendorWalletPage() {
   const columns = [
     {
       key: "id",
-      header: "Request ID",
+      header: "রিকোয়েস্ট আইডি",
       render: (item: Withdraw) => <span className="text-slate-600 font-medium">#{item.id}</span>,
     },
     {
       key: "booking",
-      header: "Booking ID",
+      header: "বুকিং আইডি",
       render: (item: Withdraw) => (
         <span className="text-slate-800 font-bold">{item.booking?.id ? `#${item.booking.id}` : "—"}</span>
       ),
     },
     {
       key: "service",
-      header: "Service & Client",
+      header: "সার্ভিস এবং ক্লায়েন্ট",
       render: (item: Withdraw) => (
         <div className="flex flex-col">
           <span className="text-slate-800 font-bold text-sm">
@@ -71,7 +72,7 @@ export default function VendorWalletPage() {
     },
     {
       key: "amount",
-      header: "Amount",
+      header: "অ্যামাউন্ট",
       render: (item: Withdraw) => (
         <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-emerald-100/50">
           ৳{(item.amount || 0).toLocaleString()}
@@ -80,12 +81,12 @@ export default function VendorWalletPage() {
     },
     {
       key: "status",
-      header: "Status",
+      header: "স্ট্যাটাস",
       render: (item: Withdraw) => statusBadge(item.status),
     },
     {
       key: "admin_note",
-      header: "Admin Note",
+      header: "অ্যাডমিন নোট",
       render: (item: Withdraw) => (
         <span className="text-slate-500 text-xs truncate max-w-[150px] inline-block" title={item.admin_note}>
           {item.admin_note || "—"}
@@ -94,7 +95,7 @@ export default function VendorWalletPage() {
     },
     {
       key: "createdAt",
-      header: "Date",
+      header: "তারিখ",
       render: (item: Withdraw) => (
         <span className="text-slate-400 text-xs font-medium">
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "—"}
@@ -106,27 +107,27 @@ export default function VendorWalletPage() {
   const withdrawableColumns = [
     {
       key: "id",
-      header: "Booking ID",
+      header: "বুকিং আইডি",
       render: (item: any) => <span className="text-slate-600 font-bold">#{item.id}</span>,
     },
     {
       key: "service",
-      header: "Service & Client",
+      header: "সার্ভিস এবং ক্লায়েন্ট",
       render: (item: any) => (
         <div className="flex flex-col">
-          <span className="text-slate-800 font-bold text-sm">{item.service?.name || item.pkg?.name || "Service"}</span>
-          <span className="text-xs text-slate-500">{item.user?.name || "Client"}</span>
+          <span className="text-slate-800 font-bold text-sm">{item.service?.name || item.pkg?.name || "সার্ভিস"}</span>
+          <span className="text-xs text-slate-500">{item.user?.name || "ক্লায়েন্ট"}</span>
         </div>
       ),
     },
     {
       key: "total_price",
-      header: "Total Price",
+      header: "মোট মূল্য",
       render: (item: any) => <span className="text-slate-600">৳{Number(item.total_price || 0).toLocaleString()}</span>,
     },
     {
       key: "earnings",
-      header: "Your Earnings",
+      header: "আপনার উপার্জন",
       render: (item: any) => {
         let amount = 0;
         if (state.normalizedRole === "agent") {
@@ -142,14 +143,14 @@ export default function VendorWalletPage() {
     },
     {
       key: "actions",
-      header: "Actions",
+      header: "অ্যাকশন",
       render: (item: any) => (
         <button
           onClick={() => state.handleRequestWithdrawClick(item.id)}
           disabled={state.isRequesting}
           className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-all shadow-sm shadow-[#FF6014]/20 disabled:opacity-50"
         >
-          {state.isRequesting ? "Wait..." : "Request Commission"}
+          {state.isRequesting ? "অপেক্ষা করুন..." : "কমিশন রিকোয়েস্ট করুন"}
         </button>
       ),
     },
@@ -164,8 +165,8 @@ export default function VendorWalletPage() {
             <Wallet className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Wallet & Earnings</h1>
-            <p className="text-xs text-slate-400 mt-0.5">Manage your commissions and withdrawal requests.</p>
+            <h1 className="text-xl font-extrabold text-slate-900">ওয়ালেট এবং উপার্জন</h1>
+            <p className="text-xs text-slate-400 mt-0.5">আপনার কমিশন এবং উইথড্র রিকোয়েস্ট পরিচালনা করুন।</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -185,21 +186,21 @@ export default function VendorWalletPage() {
             <Wallet size={80} />
           </div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider relative z-10">
-            Current Wallet Balance
+            বর্তমান ওয়ালেট ব্যালেন্স
           </p>
           <p className="text-4xl font-black mt-2 relative z-10">৳{state.walletBalance.toLocaleString()}</p>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Commission Rate</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">কমিশন রেট</p>
           <p className="text-3xl font-bold text-[#FF6014] mt-1">{state.commissionPct}%</p>
-          <p className="text-xs text-slate-400 mt-1">Per completed booking</p>
+          <p className="text-xs text-slate-400 mt-1">প্রতি কমপ্লিট হওয়া বুকিংয়ে</p>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Withdrawals</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">অপেক্ষমান উইথড্র</p>
           <p className="text-3xl font-bold text-amber-600 mt-1">৳{state.totalPending.toLocaleString()}</p>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Approved (Lifetime)</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">মোট অনুমোদিত (লাইফটাইম)</p>
           <p className="text-3xl font-bold text-emerald-600 mt-1">৳{state.totalWithdrawn.toLocaleString()}</p>
         </div>
       </div>
@@ -214,15 +215,15 @@ export default function VendorWalletPage() {
 
       {/* Withdrawable Bookings Table */}
       <div className="pt-4">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Earnings Ready to Withdraw</h2>
+        <h2 className="text-lg font-bold text-slate-900 mb-4">উইথড্র করার জন্য প্রস্তুত উপার্জন</h2>
         {state.isBookingsLoading ? (
           <div className="flex items-center justify-center py-10 bg-white border border-slate-100 rounded-3xl shadow-sm">
             <div className="w-8 h-8 border-4 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : state.withdrawableBookings.length === 0 ? (
           <div className="bg-white border border-slate-100 rounded-3xl p-10 text-center shadow-sm">
-            <h3 className="text-base font-bold text-slate-800">No Earnings Available</h3>
-            <p className="text-sm text-slate-400 mt-1">Complete more bookings to earn commissions.</p>
+            <h3 className="text-base font-bold text-slate-800">কোনো উপার্জন নেই</h3>
+            <p className="text-sm text-slate-400 mt-1">কমিশন পেতে আরও বুকিং সম্পূর্ণ করুন।</p>
           </div>
         ) : (
           <CustomTable
@@ -238,7 +239,7 @@ export default function VendorWalletPage() {
 
       {/* Withdrawal Requests Table */}
       <div className="pt-4 border-t border-slate-100">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">Withdrawal History</h2>
+        <h2 className="text-lg font-bold text-slate-900 mb-4">উইথড্র হিস্ট্রি</h2>
         {state.isWithdrawsLoading ? (
           <div className="flex items-center justify-center py-20 bg-white border border-slate-100 rounded-3xl shadow-sm">
             <div className="w-8 h-8 border-4 border-[#FF6014] border-t-transparent rounded-full animate-spin" />
@@ -248,8 +249,8 @@ export default function VendorWalletPage() {
             <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
               <Wallet size={28} />
             </div>
-            <h3 className="text-base font-bold text-slate-800">No Withdraw Requests</h3>
-            <p className="text-sm text-slate-400 mt-1">You haven't requested any commissions yet.</p>
+            <h3 className="text-base font-bold text-slate-800">কোনো উইথড্র রিকোয়েস্ট নেই</h3>
+            <p className="text-sm text-slate-400 mt-1">আপনি এখনও কোনো কমিশন রিকোয়েস্ট করেননি।</p>
           </div>
         ) : (
           <CustomTable
@@ -257,11 +258,11 @@ export default function VendorWalletPage() {
             data={state.withdraws}
             searchKey="status"
             filterKey="status"
-            filterPlaceholder="All Statuses"
+            filterPlaceholder="সব স্ট্যাটাস"
             filterOptions={[
-              { label: "Pending", value: "pending" },
-              { label: "Approved", value: "approved" },
-              { label: "Rejected", value: "rejected" },
+              { label: "অপেক্ষমান", value: "pending" },
+              { label: "অনুমোদিত", value: "approved" },
+              { label: "বাতিল", value: "rejected" },
             ]}
             pageSize={10}
           />

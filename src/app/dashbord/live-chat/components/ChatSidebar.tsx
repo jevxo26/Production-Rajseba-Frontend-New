@@ -29,10 +29,10 @@ export default function ChatSidebar({
         <div className="flex items-center justify-between">
           <h2 className="text-base font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
             <MessageSquare className="w-4 h-4 text-[#FF6014]" />
-            Inbox Chats
+            ইনবক্স চ্যাট
           </h2>
           <span className="text-[10px] font-extrabold text-[#FF6014] bg-[#FFF8F4] border border-[#FF6014]/20 px-2 py-0.5 rounded-full">
-            {filteredInbox.length} Total
+            মোট {filteredInbox.length}
           </span>
         </div>
 
@@ -43,7 +43,7 @@ export default function ChatSidebar({
             type="text"
             value={inboxSearch}
             onChange={(e) => setInboxSearch(e.target.value)}
-            placeholder="Search chat users..."
+            placeholder="ইউজার খুঁজুন..."
             className="flex-1 bg-transparent text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none"
           />
         </div>
@@ -52,7 +52,7 @@ export default function ChatSidebar({
       <div className="flex-1 overflow-y-auto divide-y divide-slate-100/50 p-2 space-y-1">
         {filteredInbox.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs font-semibold">
-            {inboxSearch ? "No matching chat users" : "No recent conversations"}
+            {inboxSearch ? "কোনো ইউজার পাওয়া যায়নি" : "কোনো সাম্প্রতিক কথোপকথন নেই"}
           </div>
         ) : (
           <AnimatePresence>

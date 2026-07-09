@@ -30,7 +30,8 @@ import {
   Search,
   X,
   ChevronDown,
-  Bot
+  Bot,
+  Languages
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -64,9 +65,11 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
     setMounted(true);
   }, []);
 
+  const [lang, setLang] = useState<"bn" | "en">("bn");
+
   // Dynamic grouped menu items based on role (Accordion Tree structure)
   const getSidebarGroups = (userRole: UserRole): SidebarGroup[] => {
-    const homeItem = { label: "Home Page", icon: Home, href: "/" };
+    const homeItem = { label: lang === "bn" ? "হোম পেজ" : "Home Page", icon: Home, href: "/" };
 
     switch (userRole) {
       case "superadmin":
@@ -101,7 +104,6 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               { label: "Locations", href: "/dashbord/locations", icon: MapPin },
               { label: "Services", href: "/dashbord/services", icon: Wrench },
               { label: "Nested Services", href: "/dashbord/nested-services", icon: Layers },
-              { label: "Sub Services", href: "/dashbord/sub-services", icon: Layers },
               { label: "Packages", href: "/dashbord/packages", icon: Package },
               { label: "Hero Management", href: "/dashbord/hero", icon: LayoutGrid }
             ]
@@ -141,7 +143,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             children: [
               { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
               { label: "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
-              { label: "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
+              { label: lang === "bn" ? "ওয়ালেট এবং উপার্জন" : "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
             ]
           },
           {
@@ -164,39 +166,38 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       case "vendor":
         return [
           homeItem,
-          { label: "Overview", icon: LayoutGrid, href: "/dashbord" },
+          { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord" },
           {
-            label: "Bookings",
+            label: lang === "bn" ? "বুকিংস" : "Bookings",
             icon: Calendar,
             children: [
-              { label: "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
-              { label: "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
+              { label: lang === "bn" ? "বুকিং ম্যানেজ করুন" : "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
+              { label: lang === "bn" ? "ওয়ালেট এবং উপার্জন" : "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
             ]
           },
           {
-            label: "Services",
+            label: lang === "bn" ? "সার্ভিসেস" : "Services",
             icon: Wrench,
             children: [
-              { label: "My Services", href: "/dashbord/vendor-services", icon: Wrench },
-              { label: "Nested Services", href: "/dashbord/nested-services", icon: Layers },
-              { label: "Sub-Services", href: "/dashbord/sub-services", icon: Layers },
-              { label: "Packages", href: "/dashbord/vendor-packages", icon: Package }
+              { label: lang === "bn" ? "আমার সার্ভিসেস" : "My Services", href: "/dashbord/vendor-services", icon: Wrench },
+              { label: lang === "bn" ? "নেস্টেড সার্ভিসেস" : "Nested Services", href: "/dashbord/nested-services", icon: Layers },
+              { label: lang === "bn" ? "প্যাকেজসমূহ" : "Packages", href: "/dashbord/vendor-packages", icon: Package }
             ]
           },
           {
-            label: "Team & Clients",
+            label: lang === "bn" ? "টিম এবং ক্লাইন্টস" : "Team & Clients",
             icon: Users,
             children: [
-              { label: "My Employees", href: "/dashbord/employees", icon: UserPlus },
-              { label: "My Clients", href: "/dashbord/users", icon: Users }
+              { label: lang === "bn" ? "আমার কর্মচারীবৃন্দ" : "My Employees", href: "/dashbord/employees", icon: UserPlus },
+              { label: lang === "bn" ? "আমার ক্লাইন্টস" : "My Clients", href: "/dashbord/users", icon: Users }
             ]
           },
           {
-            label: "Support & Profile",
+            label: lang === "bn" ? "সাপোর্ট এবং প্রোফাইল" : "Support & Profile",
             icon: MessageSquare,
             children: [
-              { label: "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
-              { label: "My Profile", href: "/dashbord/profile", icon: User }
+              { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
+              { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
             ]
           }
         ];
@@ -472,7 +473,15 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         )}
 
         {/* Bottom Profile/Logout */}
-        <div className="p-4 border-t border-slate-100 relative z-10">
+        <div className="p-4 border-t border-slate-100 relative z-10 flex flex-col gap-2">
+          <button
+            onClick={() => setLang(lang === "bn" ? "en" : "bn")}
+            className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-[#FF6014] w-full rounded-xl hover:bg-[#FFF8F4]/30 transition-all duration-200"
+          >
+            <Languages size={20} />
+            {!collapsed && <span className="text-sm font-semibold">{lang === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}</span>}
+          </button>
+          
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-[#E0530A] w-full rounded-xl hover:bg-[#FFF8F4]/30 transition-all duration-200"

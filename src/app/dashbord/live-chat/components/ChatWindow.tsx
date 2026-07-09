@@ -68,7 +68,7 @@ export default function ChatWindow({
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-              {activeChatUser.role?.name || "User"} • Online
+              {activeChatUser.role?.name || "User"} • অনলাইন
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function ChatWindow({
               <MessageSquare size={36} className="text-[#FF6014]/25" />
             </div>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              No messages yet. Start the conversation!
+              কোনো মেসেজ নেই। কথোপকথন শুরু করুন!
             </p>
           </div>
         ) : (
@@ -107,7 +107,7 @@ export default function ChatWindow({
                   }`}
                 >
                   <div className={`flex items-baseline gap-2 mb-1 ${isMe ? "justify-end text-white/90" : "justify-start text-slate-550"}`}>
-                    <span className="font-extrabold text-[10px]">{isMe ? "You" : msg.sender?.name}</span>
+                    <span className="font-extrabold text-[10px]">{isMe ? "আপনি" : msg.sender?.name}</span>
                     {senderRoleName && (
                       <span className="text-[9px] opacity-75 font-bold capitalize">({senderRoleName})</span>
                     )}
@@ -176,7 +176,7 @@ export default function ChatWindow({
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
-            placeholder={isUploading ? "Uploading image..." : "Type your message..."}
+            placeholder={isUploading ? "ছবি আপলোড হচ্ছে..." : "আপনার মেসেজ লিখুন..."}
             className="flex-1 bg-slate-550/5 border border-slate-200/80 rounded-full px-4 py-2.5 text-xs font-semibold text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FF6014]/5 transition-all"
             disabled={isUploading}
           />

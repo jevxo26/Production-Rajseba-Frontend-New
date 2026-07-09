@@ -24,8 +24,8 @@ export default function AdminPackagesManagementPage() {
     setDescription,
     price,
     setPrice,
-    featuresStr,
-    setFeaturesStr,
+    featuresList,
+    setFeaturesList,
     serviceId,
     setServiceId,
     selectedNestedIds,
@@ -39,6 +39,12 @@ export default function AdminPackagesManagementPage() {
     handleDelete,
     isCreating,
     isUpdating,
+    agentCommission,
+    setAgentCommission,
+    vendorCommission,
+    setVendorCommission,
+    packageType,
+    setPackageType,
   } = usePackageState();
 
   if (role !== "superadmin") {
@@ -116,13 +122,19 @@ export default function AdminPackagesManagementPage() {
           setPrice={setPrice}
           description={description}
           setDescription={setDescription}
-          featuresStr={featuresStr}
-          setFeaturesStr={setFeaturesStr}
+          featuresList={featuresList}
+          setFeaturesList={setFeaturesList}
           selectedNestedIds={selectedNestedIds}
           toggleNestedService={toggleNestedService}
           availableNestedServices={availableNestedServices}
           isCreating={isCreating}
           isUpdating={isUpdating}
+          agentCommission={agentCommission}
+          setAgentCommission={setAgentCommission}
+          vendorCommission={vendorCommission}
+          setVendorCommission={setVendorCommission}
+          packageType={packageType}
+          setPackageType={setPackageType}
         />
       )}
 

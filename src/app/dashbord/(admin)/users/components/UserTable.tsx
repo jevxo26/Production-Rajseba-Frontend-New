@@ -40,7 +40,7 @@ export default function UserTable({
   const columns = [
     {
       key: "name",
-      header: "User Details",
+      header: "ইউজারের বিবরণ",
       render: (user: UserItem) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-center">
@@ -61,12 +61,12 @@ export default function UserTable({
     },
     {
       key: "id",
-      header: "ID",
+      header: "আইডি",
       render: (user: UserItem) => <span className="font-mono text-slate-500 font-bold text-xs">{user.id}</span>,
     },
     {
       key: "role",
-      header: "Role",
+      header: "রোল",
       render: (user: UserItem) => (
         <span
           className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
@@ -79,11 +79,11 @@ export default function UserTable({
     },
     {
       key: "joined",
-      header: "Joined Date",
+      header: "যোগদানের তারিখ",
     },
     {
       key: "status",
-      header: "Status",
+      header: "স্ট্যাটাস",
       render: (user: UserItem) => (
         <span
           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
@@ -100,82 +100,55 @@ export default function UserTable({
     },
     {
       key: "actions",
-      header: "Actions",
+      header: "অ্যাকশন",
       render: (user: UserItem) => (
-        <div className="relative flex justify-end">
-          <button
-            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+        <div className="flex justify-end gap-1">
+          <Link
+            href={`/dashbord/users/${user.id}`}
+            title="বিবরণ দেখুন"
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
           >
-            <MoreVertical size={16} />
-          </button>
+            <Eye size={16} />
+          </Link>
 
-          {openDropdownId === user.id && (
-            <>
-              {/* Click outside overlay */}
-              <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
+          {user.status !== "active" && (
+            <button
+              onClick={() => handleActivate(user.id)}
+              title="সক্রিয় করুন"
+              className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+            >
+              <ShieldCheck size={16} />
+            </button>
+          )}
 
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                <Link
-                  href={`/dashbord/users/${user.id}`}
-                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
-                >
-                  <Eye size={14} className="text-slate-400" /> View Details
-                </Link>
+          {user.status !== "inactive" && (
+            <button
+              onClick={() => handleDeactivate(user.id)}
+              title="নিষ্ক্রিয় করুন"
+              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+            >
+              <XCircle size={16} />
+            </button>
+          )}
 
-                {user.status !== "active" && (
-                  <button
-                    onClick={() => {
-                      handleActivate(user.id);
-                      setOpenDropdownId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
-                  >
-                    <ShieldCheck size={14} /> Activate User
-                  </button>
-                )}
+          {user.status !== "blocked" && (
+            <button
+              onClick={() => handleBlock(user.id)}
+              title="ব্লক করুন"
+              className="p-1.5 text-slate-400 hover:text-[#E0530A] hover:bg-[#FFF8F4] rounded-lg transition-colors"
+            >
+              <XCircle size={16} />
+            </button>
+          )}
 
-                {user.status !== "inactive" && (
-                  <button
-                    onClick={() => {
-                      handleDeactivate(user.id);
-                      setOpenDropdownId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
-                  >
-                    <XCircle size={14} /> Deactivate User
-                  </button>
-                )}
-
-                {user.status !== "blocked" && (
-                  <button
-                    onClick={() => {
-                      handleBlock(user.id);
-                      setOpenDropdownId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
-                  >
-                    <XCircle size={14} /> Block User
-                  </button>
-                )}
-
-                {role !== "agent" && (
-                  <>
-                    <div className="h-px bg-slate-100 my-1 mx-2" />
-                    <button
-                      onClick={() => {
-                        handleDelete(user.id);
-                        setOpenDropdownId(null);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
-                    >
-                      <Trash2 size={14} /> Delete User
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
+          {role !== "agent" && (
+            <button
+              onClick={() => handleDelete(user.id)}
+              title="ডিলিট করুন"
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <Trash2 size={16} />
+            </button>
           )}
         </div>
       ),
@@ -187,13 +160,13 @@ export default function UserTable({
       columns={columns}
       data={users}
       searchKey="name"
-      searchPlaceholder="Search users by name..."
+      searchPlaceholder="নাম দিয়ে ইউজার খুঁজুন..."
       filterKey="status"
-      filterPlaceholder="All Statuses"
+      filterPlaceholder="সকল স্ট্যাটাস"
       filterOptions={[
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Blocked", value: "blocked" },
+        { label: "সক্রিয়", value: "active" },
+        { label: "নিষ্ক্রিয়", value: "inactive" },
+        { label: "ব্লকড", value: "blocked" },
       ]}
       pageSize={5}
     />

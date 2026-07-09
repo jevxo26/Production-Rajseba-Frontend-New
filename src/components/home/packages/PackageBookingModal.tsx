@@ -48,6 +48,7 @@ export function PackageBookingModal({
     notes: "",
   });
   const [packageQuantity, setPackageQuantity] = useState(1);
+  const [packageDuration, setPackageDuration] = useState(1);
   const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResult | null>(
     null
   );
@@ -69,7 +70,7 @@ export function PackageBookingModal({
   const packageUnitPrice = selectedPackage.price
     ? Number(String(selectedPackage.price).replace(/,/g, ""))
     : 0;
-  const packageSubtotal = packageUnitPrice * packageQuantity;
+  const packageSubtotal = packageUnitPrice * packageQuantity * packageDuration;
   const packagePayableTotal = appliedCoupon
     ? appliedCoupon.final_price
     : packageSubtotal;
@@ -88,6 +89,7 @@ export function PackageBookingModal({
       service_id: Number(selectedPackage.serviceId),
       vendor_id: Number(selectedPackage.vendorId || 1),
       quantity: packageQuantity,
+      duration_months: packageDuration,
       coupon_code: appliedCoupon?.coupon.code,
       date: bookingDetails.date,
       time: bookingDetails.time || undefined,
@@ -198,6 +200,24 @@ export function PackageBookingModal({
                   <Plus size={14} strokeWidth={2.5} />
                 </button>
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                Duration
+              </label>
+              <CustomSelect
+                options={[
+                  { value: "1", label: "1 Month" },
+                  { value: "3", label: "3 Months" },
+                  { value: "6", label: "6 Months" },
+                  { value: "12", label: "1 Year" },
+                ]}
+                value={String(packageDuration)}
+                onChange={(val) => setPackageDuration(Number(val))}
+                placeholder="Select Duration"
+                className="w-full"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3 items-end">

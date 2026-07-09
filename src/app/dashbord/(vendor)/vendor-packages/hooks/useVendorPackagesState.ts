@@ -49,9 +49,10 @@ export function useVendorPackagesState() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [featuresStr, setFeaturesStr] = useState("");
+  const [featuresList, setFeaturesList] = useState<string[]>([]);
   const [serviceId, setServiceId] = useState("NONE");
   const [selectedNestedIds, setSelectedNestedIds] = useState<number[]>([]);
+  const [packageType, setPackageType] = useState<"one_time" | "weekly" | "monthly">("one_time");
 
   // All services for the dropdown
   const allServices: Service[] =
@@ -111,9 +112,10 @@ export function useVendorPackagesState() {
     setName("");
     setDescription("");
     setPrice("");
-    setFeaturesStr("");
+    setFeaturesList([]);
     setServiceId("NONE");
     setSelectedNestedIds([]);
+    setPackageType("one_time");
   };
 
   const openCreateModal = () => {
@@ -127,11 +129,12 @@ export function useVendorPackagesState() {
     setName(item.name);
     setDescription(item.description || "");
     setPrice(item.price != null ? String(item.price) : "");
-    setFeaturesStr(item.features ? item.features.join(", ") : "");
+    setFeaturesList(item.features ? [...item.features] : []);
     setServiceId(item.service ? String(item.service.id) : "NONE");
     setSelectedNestedIds(
       item.items?.map((i) => i.nestedService?.id).filter(Boolean) as number[] || []
     );
+    setPackageType(item.package_type || "one_time");
     setIsModalOpen(true);
   };
 
@@ -161,9 +164,10 @@ export function useVendorPackagesState() {
             name: name.trim(),
             description: description.trim() || undefined,
             price: price !== "" ? Number(price) : undefined,
-            features: featuresStr.split(',').map(f => f.trim()).filter(Boolean),
+            features: featuresList,
             nested_service_ids:
               selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
+            package_type: packageType,
           },
         }).unwrap();
         toast.success("Package updated successfully!");
@@ -173,9 +177,10 @@ export function useVendorPackagesState() {
           name: name.trim(),
           description: description.trim() || undefined,
           price: price !== "" ? Number(price) : undefined,
-          features: featuresStr.split(',').map(f => f.trim()).filter(Boolean),
+          features: featuresList,
           nested_service_ids:
             selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
+          package_type: packageType,
         }).unwrap();
         toast.success("Package created successfully!");
       }
@@ -225,8 +230,8 @@ export function useVendorPackagesState() {
     setDescription,
     price,
     setPrice,
-    featuresStr,
-    setFeaturesStr,
+    featuresList,
+    setFeaturesList,
     serviceId,
     setServiceId,
     selectedNestedIds,
@@ -240,5 +245,7 @@ export function useVendorPackagesState() {
     handleSubmit,
     openDeleteModal,
     handleDelete,
+    packageType,
+    setPackageType,
   };
 }

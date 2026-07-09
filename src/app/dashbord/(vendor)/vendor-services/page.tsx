@@ -14,7 +14,6 @@ import { CustomTable } from "@/components/ui/table";
 import type { TableAction } from "@/components/ui/table";
 import { Service } from "@/redux/features/admin/service";
 import { useVendorServicesState } from "./hooks/useVendorServicesState";
-import ServiceFormModal from "./components/ServiceFormModal";
 import DeleteServiceModal from "./components/DeleteServiceModal";
 
 export default function VendorServicesPage() {
@@ -26,8 +25,8 @@ export default function VendorServicesPage() {
         <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4">
           <ShieldAlert size={48} />
         </div>
-        <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
-        <p className="text-sm text-slate-500 mt-2 max-w-sm">This panel is restricted to Vendors only.</p>
+        <h3 className="text-xl font-bold text-slate-800">প্রবেশাধিকার নেই</h3>
+        <p className="text-sm text-slate-500 mt-2 max-w-sm">এই প্যানেলটি শুধুমাত্র ভেন্ডরদের জন্য।</p>
       </div>
     );
   }
@@ -35,7 +34,7 @@ export default function VendorServicesPage() {
   const columns = [
     {
       key: "name",
-      header: "Service Details",
+      header: "সার্ভিস বিস্তারিত",
       render: (item: Service) => (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-[#FFF8F4] text-[#FF6014] rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-[#FFF0EB]/40">
@@ -54,7 +53,7 @@ export default function VendorServicesPage() {
     },
     {
       key: "slug",
-      header: "Slug",
+      header: "স্লাগ",
       render: (item: Service) => (
         <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 font-mono font-bold text-xs px-2.5 py-1 rounded-xl">
           <Globe size={11} />
@@ -64,7 +63,7 @@ export default function VendorServicesPage() {
     },
     {
       key: "createdAt",
-      header: "Created",
+      header: "তারিখ",
       render: (item: Service) => (
         <span className="text-slate-400 text-xs font-medium">
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "—"}
@@ -75,13 +74,13 @@ export default function VendorServicesPage() {
 
   const tableActions: TableAction<Service>[] = [
     {
-      label: "View",
+      label: "দেখুন",
       icon: Eye,
       onClick: (item) => state.router.push(`/dashbord/vendor-services/${item.id}`),
       variant: "default",
     },
-    { label: "Edit", icon: Edit2, onClick: state.openEditModal, variant: "secondary" },
-    { label: "Delete", icon: Trash2, onClick: state.openDeleteModal, variant: "destructive" },
+    { label: "এডিট", icon: Edit2, onClick: (item) => state.router.push(`/dashbord/vendor-services/edit/${item.id}`), variant: "secondary" },
+    { label: "ডিলিট", icon: Trash2, onClick: state.openDeleteModal, variant: "destructive" },
   ];
 
   return (
@@ -93,15 +92,15 @@ export default function VendorServicesPage() {
             <Wrench className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">My Services</h1>
-            <p className="text-xs text-slate-400 mt-0.5">Manage your service offerings on the platform.</p>
+            <h1 className="text-xl font-extrabold text-slate-900">আমার সার্ভিসেস</h1>
+            <p className="text-xs text-slate-400 mt-0.5">প্ল্যাটফর্মে আপনার সার্ভিস অফারগুলো ম্যানেজ করুন।</p>
           </div>
         </div>
         <button
-          onClick={state.openCreateModal}
+          onClick={() => state.router.push("/dashbord/vendor-services/create")}
           className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-[#FF6014]/10"
         >
-          <PlusCircle size={18} /> Add Service
+          <PlusCircle size={18} /> সার্ভিস যোগ করুন
         </button>
       </div>
 
@@ -114,15 +113,15 @@ export default function VendorServicesPage() {
           <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
             <Wrench size={28} />
           </div>
-          <h3 className="text-base font-bold text-slate-800">No Services Found</h3>
+          <h3 className="text-base font-bold text-slate-800">কোনো সার্ভিস পাওয়া যায়নি</h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-            Create your first service to start offering it to clients.
+            ক্লায়েন্টদের অফার করতে আপনার প্রথম সার্ভিস তৈরি করুন।
           </p>
           <button
-            onClick={state.openCreateModal}
+            onClick={() => state.router.push("/dashbord/vendor-services/create")}
             className="mt-4 bg-[#FFF8F4] hover:bg-[#FFF0EB] text-[#FF6014] font-bold px-4 py-2 rounded-xl text-xs transition-all"
           >
-            Add New Service
+            নতুন সার্ভিস যোগ করুন
           </button>
         </div>
       ) : (
@@ -131,44 +130,10 @@ export default function VendorServicesPage() {
           data={state.services}
           actions={tableActions}
           searchKey="name"
-          searchPlaceholder="Search services..."
+          searchPlaceholder="সার্ভিস খুঁজুন..."
           pageSize={10}
         />
       )}
-
-      {/* Create/Edit Modal */}
-      <ServiceFormModal
-        isModalOpen={state.isModalOpen}
-        setIsModalOpen={state.setIsModalOpen}
-        editingItem={state.editingItem}
-        name={state.name}
-        setName={state.setName}
-        slug={state.slug}
-        setSlug={state.setSlug}
-        subtitle={state.subtitle}
-        setSubtitle={state.setSubtitle}
-        categoryId={state.categoryId}
-        setCategoryId={state.setCategoryId}
-        categoryOptions={state.categoryOptions}
-        employeeIds={state.employeeIds}
-        setEmployeeIds={state.setEmployeeIds}
-        employeeOptions={state.employeeOptions}
-        description={state.description}
-        setDescription={state.setDescription}
-        overview={state.overview}
-        setOverview={state.setOverview}
-        details={state.details}
-        setDetails={state.setDetails}
-        faq={state.faq}
-        setFaq={state.setFaq}
-        image={state.image}
-        setImage={state.setImage}
-        isUploadingImage={state.isUploadingImage}
-        handleImageUpload={state.handleImageUpload}
-        handleSubmit={state.handleSubmit}
-        isCreating={state.isCreating}
-        isUpdating={state.isUpdating}
-      />
 
       {/* Delete Modal */}
       <DeleteServiceModal

@@ -39,7 +39,7 @@ export default function ProfileCard({
         {/* Camera Overlay button */}
         <label className="absolute inset-0 bg-black/45 flex flex-col items-center justify-center text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer z-10">
           <Camera size={20} className="mb-0.5" />
-          <span className="text-[9px] font-bold tracking-wider uppercase">Upload</span>
+          <span className="text-[9px] font-bold tracking-wider uppercase">আপলোড</span>
           <input
             type="file"
             accept="image/*"

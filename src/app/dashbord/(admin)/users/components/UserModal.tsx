@@ -52,7 +52,7 @@ export default function UserModal({
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-slate-800">
-            {step === 1 ? "Step 1: User Account" : "Step 2: User Profile"}
+            {step === 1 ? "ধাপ ১: ইউজার অ্যাকাউন্ট" : "ধাপ ২: ইউজার প্রোফাইল"}
           </h2>
           <button
             onClick={closeModal}
@@ -65,27 +65,27 @@ export default function UserModal({
         {step === 1 ? (
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">পুরো নাম</label>
               <input
                 name="name"
                 type="text"
                 required
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
-                placeholder="John Doe"
+                placeholder="যেমন: রহিম মিয়া"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ইমেইল এড্রেস</label>
               <input
                 name="email"
                 type="email"
                 required
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
-                placeholder="john@example.com"
+                placeholder="যেমন: email@example.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ফোন নম্বর</label>
               <input
                 name="phone"
                 type="tel"
@@ -95,7 +95,7 @@ export default function UserModal({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Role</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">রোল</label>
               <select
                 name="role"
                 required
@@ -103,11 +103,11 @@ export default function UserModal({
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
               >
                 <option value="" disabled>
-                  Select a role
+                  একটি রোল নির্বাচন করুন
                 </option>
                 {isRolesLoading ? (
                   <option value="" disabled>
-                    Loading roles...
+                    রোল লোড হচ্ছে...
                   </option>
                 ) : (
                   (rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []))
@@ -126,33 +126,33 @@ export default function UserModal({
                 onClick={closeModal}
                 className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
               >
-                Cancel
+                বাতিল
               </button>
               <button
                 type="submit"
                 disabled={isCreatingUser}
                 className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50"
               >
-                {isCreatingUser ? "Saving..." : "Next Step"}
+                {isCreatingUser ? "সেভ হচ্ছে..." : "পরবর্তী ধাপ"}
               </button>
             </div>
           </form>
         ) : (
           <form onSubmit={handleCreateProfile} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile Type</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">প্রোফাইলের ধরন</label>
               <select
                 name="type"
                 required
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
               >
-                <option value="personal">Personal / Freelancer</option>
-                <option value="company">Company / Agency</option>
+                <option value="personal">ব্যক্তিগত / ফ্রিল্যান্সার</option>
+                <option value="company">কোম্পানি / এজেন্সি</option>
               </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                Categories (Hold Ctrl/Cmd to select multiple)
+                ক্যাটাগরি (একাধিক নির্বাচনের জন্য Ctrl/Cmd চেপে ধরুন)
               </label>
               <select
                 multiple
@@ -162,7 +162,7 @@ export default function UserModal({
               >
                 {isCategoriesLoading ? (
                   <option value="" disabled>
-                    Loading categories...
+                    ক্যাটাগরি লোড হচ্ছে...
                   </option>
                 ) : (
                   allCategories.map((c: any) => (
@@ -175,7 +175,7 @@ export default function UserModal({
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                Company / Business Name (Optional)
+                কোম্পানি / ব্যবসার নাম (ঐচ্ছিক)
               </label>
               <input
                 name="company_name"
@@ -196,27 +196,27 @@ export default function UserModal({
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                Specific Location (Optional)
+                নির্দিষ্ট অবস্থান (ঐচ্ছিক)
               </label>
               <input
                 name="location"
                 type="text"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all"
-                placeholder="House 12, Road 4"
+                placeholder="যেমন: ঢাকা"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">বিবরণ</label>
               <textarea
                 name="description"
                 rows={3}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all resize-none"
-                placeholder="Briefly describe the user's services..."
+                placeholder="ইউজারের সার্ভিস সম্পর্কে সংক্ষেপে লিখুন..."
               ></textarea>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">শুরুর সর্বনিম্ন মূল্য</label>
                 <input
                   name="min_starting_price"
                   type="number"
@@ -226,7 +226,7 @@ export default function UserModal({
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">গুগল ম্যাপ লিংক</label>
                 <input
                   name="google_map_link"
                   type="url"
@@ -241,7 +241,7 @@ export default function UserModal({
                 disabled={isCreatingProfile}
                 className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50"
               >
-                {isCreatingProfile ? "Saving..." : "Complete Profile"}
+                {isCreatingProfile ? "সেভ হচ্ছে..." : "প্রোফাইল সম্পন্ন করুন"}
               </button>
             </div>
           </form>

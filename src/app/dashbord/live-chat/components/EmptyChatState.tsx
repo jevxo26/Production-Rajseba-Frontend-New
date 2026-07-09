@@ -14,9 +14,9 @@ export default function EmptyChatState() {
         </div>
       </div>
       <div className="text-center space-y-2 max-w-sm">
-        <p className="text-sm font-black text-slate-800 uppercase tracking-widest">Live Chat Room</p>
+        <p className="text-sm font-black text-slate-800 uppercase tracking-widest">লাইভ চ্যাট রুম</p>
         <p className="text-xs text-slate-400 font-semibold leading-relaxed">
-          Select a customer or partner from the conversation list to start messaging in real-time.
+          রিয়েল-টাইমে মেসেজ করার জন্য কথোপকথনের তালিকা থেকে একজন গ্রাহক বা পার্টনার নির্বাচন করুন।
         </p>
       </div>
     </div>

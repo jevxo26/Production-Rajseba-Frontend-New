@@ -1,45 +1,24 @@
 "use client";
 
 import { ShieldAlert, PlusCircle, Layers } from "lucide-react";
-import NestedServiceModal from "./components/NestedServiceModal";
 import DeleteNestedServiceModal from "./components/DeleteNestedServiceModal";
 import NestedServiceTable from "./components/NestedServiceTable";
 import { useNestedServiceState } from "./hooks/useNestedServiceState";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function NestedServicesManagementPage() {
+  const router = useRouter();
   const {
     role,
     isNestedLoading,
     nestedServices,
-    isModalOpen,
-    setIsModalOpen,
-    editingItem,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     itemToDelete,
     setItemToDelete,
-    name,
-    setName,
-    description,
-    setDescription,
-    image,
-    setImage,
-    price,
-    setPrice,
-    subServices,
-    setSubServices,
-    serviceId,
-    setServiceId,
-    isUploadingImage,
-    serviceOptions,
-    handleImageUpload,
-    openCreateModal,
-    openEditModal,
-    handleSubmit,
     openDeleteModal,
     handleDelete,
-    isCreating,
-    isUpdating,
   } = useNestedServiceState();
 
   if (role !== "superadmin" && role !== "vendor") {
@@ -48,9 +27,9 @@ export default function NestedServicesManagementPage() {
         <div className="p-4 bg-[#FFF8F4] rounded-2xl text-[#FF6014] mb-4">
           <ShieldAlert size={48} />
         </div>
-        <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
+        <h3 className="text-xl font-bold text-slate-800">প্রবেশাধিকার নেই</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm">
-          This panel is restricted to Administrators and Registered Vendors.
+          এই প্যানেলটি শুধুমাত্র অ্যাডমিনিস্ট্রেটর এবং নিবন্ধিত ভেন্ডরদের জন্য সংরক্ষিত।
         </p>
       </div>
     );
@@ -66,22 +45,22 @@ export default function NestedServicesManagementPage() {
           </div>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900 font-display">
-              {role === "vendor" ? "My Sub-Services" : "Nested Service Directory"}
+              {role === "vendor" ? "আমার সাব-সার্ভিসেস" : "নেস্টেড সার্ভিস ডিরেক্টরি"}
             </h1>
             <p className="text-xs text-slate-400 mt-0.5">
               {role === "vendor"
-                ? "Add and manage sub-services under your main service offerings."
-                : "Manage sub-services linked to parent services across all vendors."}
+                ? "আপনার মূল সার্ভিসের অধীনে সাব-সার্ভিসগুলো যোগ করুন এবং পরিচালনা করুন।"
+                : "সমস্ত ভেন্ডরদের মূল সার্ভিসের সাথে লিঙ্ক করা সাব-সার্ভিস পরিচালনা করুন।"}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={openCreateModal}
-            className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-brand-primary/10"
+          <Link
+            href="/dashbord/nested-services/create"
+            className="bg-[#FF6014] hover:bg-[#E0530A] text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-[#FF6014]/10"
           >
-            <PlusCircle size={18} /> Add Sub-Service
-          </button>
+            <PlusCircle size={18} /> সাব-সার্ভিস যোগ করুন
+          </Link>
         </div>
       </div>
 
@@ -95,48 +74,22 @@ export default function NestedServicesManagementPage() {
           <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100/50">
             <Layers size={28} />
           </div>
-          <h3 className="text-base font-bold text-slate-800">No Sub-Services Found</h3>
+          <h3 className="text-base font-bold text-slate-800">কোনো সাব-সার্ভিস পাওয়া যায়নি</h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
-            Start by adding a sub-service under one of your existing services.
+            আপনার একটি বিদ্যমান সার্ভিসের অধীনে একটি সাব-সার্ভিস যোগ করে শুরু করুন।
           </p>
-          <button
-            onClick={openCreateModal}
-            className="mt-4 bg-[#FFF8F4] hover:bg-[#FFF0EB] text-[#FF6014] font-bold px-4 py-2 rounded-xl text-xs transition-all"
+          <Link
+            href="/dashbord/nested-services/create"
+            className="mt-4 bg-[#FFF8F4] hover:bg-[#FFF0EB] text-[#FF6014] font-bold px-4 py-2 rounded-xl text-xs transition-all inline-block"
           >
-            Add New Sub-Service
-          </button>
+            নতুন সাব-সার্ভিস যোগ করুন
+          </Link>
         </div>
       ) : (
         <NestedServiceTable
           nestedServices={nestedServices}
-          openEditModal={openEditModal}
+          openEditModal={(item: any) => router.push(`/dashbord/nested-services/edit/${item.id}`)}
           openDeleteModal={openDeleteModal}
-        />
-      )}
-
-      {/* Create / Edit Modal */}
-      {isModalOpen && (
-        <NestedServiceModal
-          editingItem={editingItem}
-          setIsModalOpen={setIsModalOpen}
-          handleSubmit={handleSubmit}
-          serviceOptions={serviceOptions}
-          serviceId={serviceId}
-          setServiceId={setServiceId}
-          name={name}
-          setName={setName}
-          price={price}
-          setPrice={setPrice}
-          subServices={subServices}
-          setSubServices={setSubServices}
-          description={description}
-          setDescription={setDescription}
-          image={image}
-          setImage={setImage}
-          isUploadingImage={isUploadingImage}
-          handleImageUpload={handleImageUpload}
-          isCreating={isCreating}
-          isUpdating={isUpdating}
         />
       )}
 

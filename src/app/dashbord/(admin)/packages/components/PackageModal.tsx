@@ -21,13 +21,19 @@ interface PackageModalProps {
   setPrice: (val: string) => void;
   description: string;
   setDescription: (val: string) => void;
-  featuresStr: string;
-  setFeaturesStr: (val: string) => void;
+  featuresList: string[];
+  setFeaturesList: (val: string[]) => void;
   selectedNestedIds: number[];
   toggleNestedService: (id: number) => void;
   availableNestedServices: NestedService[];
   isCreating: boolean;
   isUpdating: boolean;
+  agentCommission?: string;
+  setAgentCommission?: (val: string) => void;
+  vendorCommission?: string;
+  setVendorCommission?: (val: string) => void;
+  packageType: string;
+  setPackageType: (val: "one_time" | "weekly" | "monthly") => void;
 }
 
 export default function PackageModal({
@@ -43,14 +49,33 @@ export default function PackageModal({
   setPrice,
   description,
   setDescription,
-  featuresStr,
-  setFeaturesStr,
+  featuresList,
+  setFeaturesList,
   selectedNestedIds,
   toggleNestedService,
   availableNestedServices,
   isCreating,
   isUpdating,
+  agentCommission,
+  setAgentCommission,
+  vendorCommission,
+  setVendorCommission,
+  packageType,
+  setPackageType,
 }: PackageModalProps) {
+  const [featureInput, setFeatureInput] = React.useState("");
+
+  const handleAddFeature = () => {
+    if (featureInput.trim()) {
+      setFeaturesList([...featuresList, featureInput.trim()]);
+      setFeatureInput("");
+    }
+  };
+
+  const handleRemoveFeature = (index: number) => {
+    setFeaturesList(featuresList.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
@@ -58,7 +83,7 @@ export default function PackageModal({
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-900 font-display flex items-center gap-2">
             <Sparkles className="text-violet-500" size={20} />
-            {editingItem ? "Edit Package" : "Create New Package"}
+            {editingItem ? "প্যাকেজ এডিট করুন" : "নতুন প্যাকেজ তৈরি করুন"}
           </h2>
           <button
             onClick={() => setIsModalOpen(false)}
@@ -74,7 +99,7 @@ export default function PackageModal({
           {!editingItem && (
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Parent Service *
+                প্যারেন্ট সার্ভিস *
               </label>
               <CustomSelect
                 options={serviceOptions}
@@ -86,13 +111,29 @@ export default function PackageModal({
             </div>
           )}
 
+          {/* Package Type */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              প্যাকেজের ধরন *
+            </label>
+            <CustomSelect
+              options={[
+                { value: "one_time", label: "এককালীন (One Time)" },
+                { value: "weekly", label: "সাপ্তাহিক (Weekly)" },
+                { value: "monthly", label: "মাসিক (Monthly)" },
+              ]}
+              value={packageType}
+              onChange={(val) => setPackageType(val as any)}
+            />
+          </div>
+
           {/* Name */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              Package Name *
+              প্যাকেজের নাম *
             </label>
             <Input
-              placeholder="e.g. Standard AC Servicing Package"
+              placeholder="যেমন: স্ট্যান্ডার্ড এসি সার্ভিসিং প্যাকেজ"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -102,11 +143,11 @@ export default function PackageModal({
           {/* Price */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              Price (৳)
+              মূল্য (৳)
             </label>
             <Input
               type="number"
-              placeholder="e.g. 800"
+              placeholder="যেমন: ৮০০"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               min={0}
@@ -116,10 +157,10 @@ export default function PackageModal({
           {/* Description */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              Description
+              বিবরণ
             </label>
             <Textarea
-              placeholder="Describe what this package includes..."
+              placeholder="এই প্যাকেজে কী কী অন্তর্ভুক্ত আছে তার বিবরণ দিন..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -130,27 +171,90 @@ export default function PackageModal({
           {/* Features */}
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-              Features (Comma Separated)
+              বৈশিষ্ট্যসমূহ
             </label>
-            <Textarea
-              placeholder="e.g. Free Checkup, 24/7 Support, Premium Parts"
-              value={featuresStr}
-              onChange={(e) => setFeaturesStr(e.target.value)}
-              rows={2}
-              className="rounded-2xl border border-slate-200/80 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/10 focus-visible:border-violet-400/80 disabled:cursor-not-allowed disabled:opacity-50 transition-all w-full"
-            />
+            <div className="flex gap-2 mb-3">
+              <Input
+                placeholder="যেমন: ফ্রি চেকআপ, ২৪/৭ সাপোর্ট"
+                value={featureInput}
+                onChange={(e) => setFeatureInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddFeature();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleAddFeature}
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold transition-all shrink-0"
+              >
+                + যোগ করুন
+              </button>
+            </div>
+            {featuresList.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {featuresList.map((f, i) => (
+                  <div key={i} className="flex items-center gap-1.5 bg-violet-50 text-violet-700 px-3 py-1.5 rounded-lg text-sm border border-violet-100">
+                    <span>{f}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFeature(i)}
+                      className="text-violet-400 hover:text-violet-700 hover:bg-violet-200 p-0.5 rounded-md transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Commissions */}
+          <div className="grid grid-cols-2 gap-4">
+            {setAgentCommission && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                  এজেন্ট কমিশন (%)
+                </label>
+                <Input
+                  type="number"
+                  placeholder="যেমন: ১০"
+                  value={agentCommission || ""}
+                  onChange={(e) => setAgentCommission(e.target.value)}
+                  min={0}
+                  max={100}
+                />
+              </div>
+            )}
+            {setVendorCommission && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                  ভেন্ডর কমিশন (%)
+                </label>
+                <Input
+                  type="number"
+                  placeholder="যেমন: ৮০"
+                  value={vendorCommission || ""}
+                  onChange={(e) => setVendorCommission(e.target.value)}
+                  min={0}
+                  max={100}
+                />
+              </div>
+            )}
           </div>
 
           {/* Nested Service Multi-Select */}
           {(serviceId !== "NONE" || editingItem) && (
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                Include Nested Services ({selectedNestedIds.length} selected)
+                নেস্টেড সার্ভিসসমূহ অন্তর্ভুক্ত করুন ({selectedNestedIds.length}টি নির্বাচিত)
               </label>
               {availableNestedServices.length === 0 && !editingItem ? (
                 <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4 text-center">
                   <Layers className="text-slate-300 mx-auto mb-1" size={24} />
-                  <p className="text-xs text-slate-400 font-medium">No nested services found for this service.</p>
+                  <p className="text-xs text-slate-400 font-medium">এই সার্ভিসের জন্য কোনো নেস্টেড সার্ভিস পাওয়া যায়নি।</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-1.5 max-h-48 overflow-y-auto rounded-2xl border border-slate-100 bg-slate-50/50 p-2">
@@ -199,14 +303,14 @@ export default function PackageModal({
               onClick={() => setIsModalOpen(false)}
               className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-xl transition-all"
             >
-              Cancel
+              বাতিল
             </button>
             <button
               type="submit"
               disabled={isCreating || isUpdating}
               className="bg-brand-primary hover:bg-brand-dark disabled:opacity-50 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all active:scale-[0.98] shadow-md shadow-brand-primary/10"
             >
-              {editingItem ? "Update Package" : "Create Package"}
+              {editingItem ? "প্যাকেজ আপডেট করুন" : "প্যাকেজ তৈরি করুন"}
             </button>
           </div>
         </form>

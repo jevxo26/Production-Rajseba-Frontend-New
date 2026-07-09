@@ -40,6 +40,7 @@ export function useBookingState() {
     selection_type: "nested", // 'nested' or 'package'
     sub_service_ids: [] as string[],
     package_id: "",
+    duration_months: 1,
     quantity: 1,
     date: "",
     time: "",
@@ -79,7 +80,7 @@ export function useBookingState() {
       ? selectedService.packages || []
       : selectedVendorServices.flatMap((s: any) => s.packages || []);
     const match = allPackages.find((p: any) => p.id?.toString() === newBooking.package_id);
-    estimatedTotalPrice = match ? Number(match.price || 0) * Number(newBooking.quantity || 1) : 0;
+    estimatedTotalPrice = match ? Number(match.price || 0) * Number(newBooking.quantity || 1) * Number(newBooking.duration_months || 1) : 0;
   }
 
   const handleStatusChange = async (id: number, status: string) => {
@@ -127,6 +128,7 @@ export function useBookingState() {
     if (newBooking.selection_type === "package" && newBooking.package_id) {
       payload.package_id = Number(newBooking.package_id);
       payload.quantity = Number(newBooking.quantity || 1);
+      payload.duration_months = Number(newBooking.duration_months || 1);
     }
 
     try {
@@ -141,6 +143,7 @@ export function useBookingState() {
         selection_type: "nested",
         sub_service_ids: [],
         package_id: "",
+        duration_months: 1,
         quantity: 1,
         date: "",
         time: "",

@@ -44,9 +44,12 @@ export function usePackageState() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [featuresStr, setFeaturesStr] = useState("");
+  const [featuresList, setFeaturesList] = useState<string[]>([]);
   const [serviceId, setServiceId] = useState("NONE");
   const [selectedNestedIds, setSelectedNestedIds] = useState<number[]>([]);
+  const [agentCommission, setAgentCommission] = useState("");
+  const [vendorCommission, setVendorCommission] = useState("");
+  const [packageType, setPackageType] = useState<"one_time" | "weekly" | "monthly">("one_time");
 
   // All services
   const allServices: Service[] = apiServicesRes?.data || (Array.isArray(apiServicesRes) ? apiServicesRes : []);
@@ -78,9 +81,12 @@ export function usePackageState() {
     setName("");
     setDescription("");
     setPrice("");
-    setFeaturesStr("");
+    setFeaturesList([]);
     setServiceId("NONE");
     setSelectedNestedIds([]);
+    setAgentCommission("");
+    setVendorCommission("");
+    setPackageType("one_time");
   };
 
   const openCreateModal = () => {
@@ -94,9 +100,12 @@ export function usePackageState() {
     setName(item.name);
     setDescription(item.description || "");
     setPrice(item.price != null ? String(item.price) : "");
-    setFeaturesStr(item.features ? item.features.join(", ") : "");
+    setFeaturesList(item.features ? [...item.features] : []);
     setServiceId(item.service ? String(item.service.id) : "NONE");
     setSelectedNestedIds((item.items?.map((i) => i.nestedService?.id).filter(Boolean) as number[]) || []);
+    setAgentCommission(item.agent_commission_percentage != null ? String(item.agent_commission_percentage) : "");
+    setVendorCommission(item.vendor_commission_percentage != null ? String(item.vendor_commission_percentage) : "");
+    setPackageType(item.package_type || "one_time");
     setIsModalOpen(true);
   };
 
@@ -124,11 +133,11 @@ export function usePackageState() {
             name: name.trim(),
             description: description.trim() || undefined,
             price: price !== "" ? Number(price) : undefined,
-            features: featuresStr
-              .split(",")
-              .map((f) => f.trim())
-              .filter(Boolean),
+            features: featuresList,
             nested_service_ids: selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
+            agent_commission_percentage: agentCommission !== "" ? Number(agentCommission) : undefined,
+            vendor_commission_percentage: vendorCommission !== "" ? Number(vendorCommission) : undefined,
+            package_type: packageType,
           },
         }).unwrap();
         toast.success("Package updated successfully!");
@@ -138,11 +147,11 @@ export function usePackageState() {
           name: name.trim(),
           description: description.trim() || undefined,
           price: price !== "" ? Number(price) : undefined,
-          features: featuresStr
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean),
+          features: featuresList,
           nested_service_ids: selectedNestedIds.length > 0 ? selectedNestedIds : undefined,
+          agent_commission_percentage: agentCommission !== "" ? Number(agentCommission) : undefined,
+          vendor_commission_percentage: vendorCommission !== "" ? Number(vendorCommission) : undefined,
+          package_type: packageType,
         }).unwrap();
         toast.success("Package created successfully!");
       }
@@ -188,8 +197,8 @@ export function usePackageState() {
     setDescription,
     price,
     setPrice,
-    featuresStr,
-    setFeaturesStr,
+    featuresList,
+    setFeaturesList,
     serviceId,
     setServiceId,
     selectedNestedIds,
@@ -203,5 +212,11 @@ export function usePackageState() {
     handleDelete,
     isCreating,
     isUpdating,
+    agentCommission,
+    setAgentCommission,
+    vendorCommission,
+    setVendorCommission,
+    packageType,
+    setPackageType,
   };
 }

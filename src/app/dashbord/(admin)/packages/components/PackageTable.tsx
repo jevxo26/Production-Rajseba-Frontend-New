@@ -20,7 +20,7 @@ export default function PackageTable({
   const columns = [
     {
       key: "name",
-      header: "Package Details",
+      header: "প্যাকেজের বিবরণ",
       render: (item: Package) => (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-violet-50 text-violet-500 font-bold rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-violet-100/40">
@@ -39,7 +39,7 @@ export default function PackageTable({
     },
     {
       key: "service",
-      header: "Parent Service",
+      header: "প্যারেন্ট সার্ভিস",
       render: (item: Package) => (
         <span className="inline-flex items-center gap-1.5 bg-[#FFF8F4]/70 text-[#E0530A] font-bold text-xs px-2.5 py-1 rounded-xl border border-[#FFF0EB]/50">
           <Wrench size={12} />
@@ -49,30 +49,47 @@ export default function PackageTable({
     },
     {
       key: "items",
-      header: "Included Items",
+      header: "অন্তর্ভুক্ত আইটেমসমূহ",
       render: (item: Package) => {
         const count = item.items?.length || 0;
         return (
           <span className="inline-flex items-center gap-1.5 bg-indigo-50/70 text-indigo-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-indigo-100/50">
             <Layers size={12} />
-            {count} nested service{count !== 1 ? "s" : ""}
+            {count}টি সাব-সার্ভিস
           </span>
         );
       },
     },
     {
       key: "price",
-      header: "Price",
+      header: "মূল্য",
       render: (item: Package) => (
         <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-emerald-100/50">
           <DollarSign size={12} />
-          {item.price != null ? `৳${item.price.toLocaleString()}` : "Free"}
+          {item.price != null ? `৳${item.price.toLocaleString()}` : "ফ্রি"}
         </span>
       ),
     },
     {
+      key: "packageType",
+      header: "ধরন",
+      render: (item: Package) => {
+        const typeLabels: Record<string, string> = {
+          one_time: "এককালীন",
+          weekly: "সাপ্তাহিক",
+          monthly: "মাসিক",
+        };
+        const type = item.package_type || "one_time";
+        return (
+          <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-700 font-bold text-xs px-2.5 py-1 rounded-xl border border-sky-100/50">
+            {typeLabels[type]}
+          </span>
+        );
+      },
+    },
+    {
       key: "createdAt",
-      header: "Created",
+      header: "তৈরির তারিখ",
       render: (item: Package) => (
         <span className="text-slate-400 text-xs font-medium">
           {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "—"}
@@ -83,13 +100,13 @@ export default function PackageTable({
 
   const tableActions: TableAction<Package>[] = [
     {
-      label: "Edit",
+      label: "এডিট",
       icon: Edit2,
       onClick: openEditModal,
       variant: "secondary",
     },
     {
-      label: "Delete",
+      label: "ডিলিট",
       icon: Trash2,
       onClick: openDeleteModal,
       variant: "destructive",
@@ -102,7 +119,7 @@ export default function PackageTable({
       data={packages}
       actions={tableActions}
       searchKey="name"
-      searchPlaceholder="Search packages by name..."
+      searchPlaceholder="নাম দিয়ে প্যাকেজ খুঁজুন..."
       pageSize={10}
     />
   );

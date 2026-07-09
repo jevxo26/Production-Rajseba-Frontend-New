@@ -29,10 +29,37 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const notificationDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: notifications = [], refetch } = useGetNotificationsQuery(undefined, { skip: !mounted });
+  const [prevUnreadCount, setPrevUnreadCount] = useState(0);
+  const { data: notifications = [], refetch } = useGetNotificationsQuery(undefined, { 
+    skip: !mounted,
+    pollingInterval: 30000 
+  });
   const [markAsRead] = useMarkNotificationAsReadMutation();
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+
+  useEffect(() => {
+    if (unreadCount > prevUnreadCount) {
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+        oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {
+        console.log("Audio not supported");
+      }
+    }
+    setPrevUnreadCount(unreadCount);
+  }, [unreadCount, prevUnreadCount]);
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -93,9 +120,11 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
             onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
             className="p-2.5 hover:bg-slate-50 rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm"
           >
-            <Bell size={18} />
+            <Bell size={18} className={unreadCount > 0 ? "animate-bounce text-[#FF6014]" : ""} />
             {unreadCount > 0 && (
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-[#FF6014] rounded-full ring-2 ring-white"></span>
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
             )}
           </button>
           

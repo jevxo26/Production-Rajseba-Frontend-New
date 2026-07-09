@@ -18,7 +18,7 @@ export default function ServiceDetailsPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center">
         <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-sm text-slate-400 font-medium">Loading service details...</p>
+        <p className="text-sm text-slate-400 font-medium">সার্ভিসের বিস্তারিত লোড হচ্ছে...</p>
       </div>
     );
   }
@@ -28,15 +28,15 @@ export default function ServiceDetailsPage() {
   if (error || !service) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 bg-white border border-slate-100 rounded-3xl shadow-sm text-center">
-        <h3 className="text-xl font-bold text-slate-800">Service Not Found</h3>
+        <h3 className="text-xl font-bold text-slate-800">সার্ভিস পাওয়া যায়নি</h3>
         <p className="text-sm text-slate-500 mt-2 max-w-sm mb-6">
-          The service you are looking for does not exist or has been deleted.
+          আপনি যে সার্ভিসটি খুঁজছেন তা নেই বা মুছে ফেলা হয়েছে।
         </p>
         <button
           onClick={() => router.push("/dashbord/vendor-services")}
           className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md flex items-center gap-2"
         >
-          <ArrowLeft size={16} /> Go Back
+          <ArrowLeft size={16} /> ফিরে যান
         </button>
       </div>
     );
@@ -53,8 +53,8 @@ export default function ServiceDetailsPage() {
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Service Details</h1>
-          <p className="text-sm text-slate-500">Overview of {service.name}</p>
+          <h1 className="text-2xl font-bold text-slate-900">সার্ভিস বিস্তারিত</h1>
+          <p className="text-sm text-slate-500">{service.name} এর ওভারভিউ</p>
         </div>
       </div>
 
@@ -83,15 +83,15 @@ export default function ServiceDetailsPage() {
 
           {/* Quick Stats / Relations */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
-            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-2">Properties</h3>
+            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-2">বৈশিষ্ট্যসমূহ</h3>
             
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0">
                 <Tag size={18} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Category</p>
-                <p className="font-semibold text-slate-700 text-sm">{service.category?.name || "Unassigned"}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ক্যাটাগরি</p>
+                <p className="font-semibold text-slate-700 text-sm">{service.category?.name || "অনির্ধারিত"}</p>
               </div>
             </div>
 
@@ -100,8 +100,8 @@ export default function ServiceDetailsPage() {
                 <User size={18} />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vendor</p>
-                <p className="font-semibold text-slate-700 text-sm">{service.vendor?.name || "No Vendor"}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ভেন্ডর</p>
+                <p className="font-semibold text-slate-700 text-sm">{service.vendor?.name || "কোনো ভেন্ডর নেই"}</p>
               </div>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function ServiceDetailsPage() {
           {/* Description */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
             <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <Wrench size={18} className="text-brand-primary" /> Service Description
+              <Wrench size={18} className="text-brand-primary" /> সার্ভিসের বিবরণ
             </h3>
             {service.description ? (
               /<[a-z]/.test(service.description) ? (
@@ -124,14 +124,14 @@ export default function ServiceDetailsPage() {
                 <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{service.description}</p>
               )
             ) : (
-              <p className="text-slate-400 text-sm italic">No description provided.</p>
+              <p className="text-slate-400 text-sm italic">কোনো বিবরণ দেওয়া হয়নি।</p>
             )}
           </div>
 
           {/* Assigned Employees */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Users size={18} className="text-brand-primary" /> Assigned Employees
+              <Users size={18} className="text-brand-primary" /> নির্ধারিত কর্মচারীবৃন্দ
             </h3>
             {service.employees && service.employees.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -149,7 +149,7 @@ export default function ServiceDetailsPage() {
               </div>
             ) : (
               <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-2xl border-dashed">
-                <p className="text-sm text-slate-400 font-medium">No employees assigned to this service yet.</p>
+                <p className="text-sm text-slate-400 font-medium">এখনো এই সার্ভিসে কোনো কর্মচারী নির্ধারণ করা হয়নি।</p>
               </div>
             )}
           </div>
@@ -157,7 +157,7 @@ export default function ServiceDetailsPage() {
           {/* Packages Grid */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Package size={18} className="text-brand-primary" /> Available Packages
+              <Package size={18} className="text-brand-primary" /> উপলব্ধ প্যাকেজসমূহ
             </h3>
             {service.packages && service.packages.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -180,7 +180,7 @@ export default function ServiceDetailsPage() {
                       </ul>
                     )}
                     <div className="mt-auto pt-4 border-t border-slate-200/60">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1">Price</span>
+                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide block mb-1">মূল্য</span>
                       <span className="text-lg font-black text-brand-primary">৳{pkg.price}</span>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export default function ServiceDetailsPage() {
               </div>
             ) : (
               <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-2xl border-dashed">
-                <p className="text-sm text-slate-400 font-medium italic">No packages available.</p>
+                <p className="text-sm text-slate-400 font-medium italic">কোনো প্যাকেজ উপলব্ধ নেই।</p>
               </div>
             )}
           </div>
@@ -196,7 +196,7 @@ export default function ServiceDetailsPage() {
           {/* Nested Services Grid */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <Briefcase size={18} className="text-brand-primary" /> Included Services
+              <Briefcase size={18} className="text-brand-primary" /> অন্তর্ভুক্ত সার্ভিসেস
             </h3>
             {service.nestedServices && service.nestedServices.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -215,14 +215,14 @@ export default function ServiceDetailsPage() {
                       <h4 className="text-sm font-bold text-slate-800 leading-tight mb-1">{ns.name}</h4>
                       {ns.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2 mb-3">{ns.description}</p>}
                       <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">Starting Price</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">শুরুর মূল্য</span>
                         <span className="text-sm font-black text-brand-primary">
-                          {ns.starting_price ? `৳${ns.starting_price}` : "Variable"}
+                          {ns.starting_price ? `৳${ns.starting_price}` : "পরিবর্তনশীল"}
                         </span>
                       </div>
                       {ns.subServices && ns.subServices.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-slate-100 border-dashed">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Options</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">অপশনসমূহ</p>
                           <ul className="space-y-1.5">
                             {ns.subServices.map((sub: any) => (
                               <li key={sub.id} className="flex justify-between items-center text-xs">
@@ -239,7 +239,7 @@ export default function ServiceDetailsPage() {
               </div>
             ) : (
               <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-2xl border-dashed">
-                <p className="text-sm text-slate-400 font-medium italic">No nested services included.</p>
+                <p className="text-sm text-slate-400 font-medium italic">কোনো নেস্টেড সার্ভিস অন্তর্ভুক্ত নেই।</p>
               </div>
             )}
           </div>

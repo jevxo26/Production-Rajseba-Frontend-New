@@ -21,6 +21,9 @@ export interface Package {
   deletedAt?: string | null;
   service?: Service;
   items?: PackageItem[];
+  agent_commission_percentage?: number;
+  vendor_commission_percentage?: number;
+  package_type?: 'one_time' | 'weekly' | 'monthly';
 }
 
 export interface CreatePackageRequest {
@@ -30,6 +33,9 @@ export interface CreatePackageRequest {
   price?: number;
   features?: string[];
   nested_service_ids?: number[];
+  agent_commission_percentage?: number;
+  vendor_commission_percentage?: number;
+  package_type?: 'one_time' | 'weekly' | 'monthly';
 }
 
 export interface UpdatePackageRequest {
@@ -38,6 +44,9 @@ export interface UpdatePackageRequest {
   price?: number;
   features?: string[];
   nested_service_ids?: number[];
+  agent_commission_percentage?: number;
+  vendor_commission_percentage?: number;
+  package_type?: 'one_time' | 'weekly' | 'monthly';
 }
 
 /* ==========================================================================

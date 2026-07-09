@@ -63,7 +63,7 @@ export default function EmployeeModal({
         <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-slate-800">
-              {step === 1 ? "Step 1: Employee Account" : "Step 2: Employee Profile"}
+              {step === 1 ? "ধাপ ১: এমপ্লয়ি অ্যাকাউন্ট" : "ধাপ ২: এমপ্লয়ি প্রোফাইল"}
             </h2>
             <button
               onClick={closeCreateModal}
@@ -76,27 +76,27 @@ export default function EmployeeModal({
           {step === 1 ? (
             <form onSubmit={handleCreateUser} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">পুরো নাম</label>
                 <input
                   name="name"
                   type="text"
                   required
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
-                  placeholder="Jane Doe"
+                  placeholder="যেমন: রহিম মিয়া"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ইমেইল এড্রেস</label>
                 <input
                   name="email"
                   type="email"
                   required
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
-                  placeholder="jane@example.com"
+                  placeholder="যেমন: email@example.com"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ফোন নম্বর</label>
                 <input
                   name="phone"
                   type="tel"
@@ -107,15 +107,15 @@ export default function EmployeeModal({
               </div>
               {role !== "vendor" && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Vendor</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ভেন্ডর</label>
                   <select
                     name="vendor_id"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
                   >
-                    <option value="">No Vendor (Optional)</option>
+                    <option value="">কোনো ভেন্ডর নেই (ঐচ্ছিক)</option>
                     {isUsersLoading ? (
                       <option value="" disabled>
-                        Loading vendors...
+                        ভেন্ডর লোড হচ্ছে...
                       </option>
                     ) : (
                       vendorOptions.map((v: any) => (
@@ -133,14 +133,14 @@ export default function EmployeeModal({
                   onClick={closeCreateModal}
                   className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
                 >
-                  Cancel
+                  বাতিল
                 </button>
                 <button
                   type="submit"
                   disabled={isCreating}
                   className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50"
                 >
-                  {isCreating ? "Saving..." : "Next Step"}
+                  {isCreating ? "সেভ হচ্ছে..." : "পরবর্তী ধাপ"}
                 </button>
               </div>
             </form>
@@ -148,7 +148,7 @@ export default function EmployeeModal({
             <form onSubmit={handleCreateProfile} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  Categories (Hold Ctrl/Cmd to select multiple)
+                  ক্যাটাগরি (একাধিক নির্বাচনের জন্য Ctrl/Cmd চেপে ধরুন)
                 </label>
                 <select
                   multiple
@@ -158,7 +158,7 @@ export default function EmployeeModal({
                 >
                   {isCategoriesLoading ? (
                     <option value="" disabled>
-                      Loading categories...
+                      ক্যাটাগরি লোড হচ্ছে...
                     </option>
                   ) : (
                     allCategories.map((c: any) => (
@@ -181,27 +181,27 @@ export default function EmployeeModal({
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                  Specific Location (Optional)
+                  নির্দিষ্ট অবস্থান (ঐচ্ছিক)
                 </label>
                 <input
                   name="location"
                   type="text"
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all"
-                  placeholder="City, Region"
+                  placeholder="যেমন: ঢাকা"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">বিবরণ</label>
                 <textarea
                   name="description"
                   rows={3}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all resize-none"
-                  placeholder="Briefly describe the employee's skills..."
+                  placeholder="এমপ্লয়ির দক্ষতা সম্পর্কে সংক্ষেপে লিখুন..."
                 ></textarea>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">শুরুর সর্বনিম্ন মূল্য</label>
                   <input
                     name="min_starting_price"
                     type="number"
@@ -211,7 +211,7 @@ export default function EmployeeModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">গুগল ম্যাপ লিংক</label>
                   <input
                     name="google_map_link"
                     type="url"
@@ -226,7 +226,7 @@ export default function EmployeeModal({
                   disabled={isCreatingProfile}
                   className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50"
                 >
-                  {isCreatingProfile ? "Saving..." : "Complete Profile"}
+                  {isCreatingProfile ? "সেভ হচ্ছে..." : "প্রোফাইল সম্পন্ন করুন"}
                 </button>
               </div>
             </form>
@@ -240,7 +240,7 @@ export default function EmployeeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg p-6 my-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-slate-800">Edit Employee</h2>
+          <h2 className="text-xl font-bold text-slate-800">এমপ্লয়ি এডিট করুন</h2>
           <button
             onClick={() => {
               if (setIsEditModalOpen) setIsEditModalOpen(false);
@@ -253,9 +253,9 @@ export default function EmployeeModal({
         </div>
 
         <form onSubmit={handleEditEmployee} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-          <h3 className="font-bold text-slate-700 border-b pb-2 mb-2">Account Details</h3>
+          <h3 className="font-bold text-slate-700 border-b pb-2 mb-2">অ্যাকাউন্টের বিবরণ</h3>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Full Name</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">পুরো নাম</label>
             <input
               name="name"
               type="text"
@@ -265,7 +265,7 @@ export default function EmployeeModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ইমেইল এড্রেস</label>
             <input
               name="email"
               type="email"
@@ -275,7 +275,7 @@ export default function EmployeeModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Phone Number</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">ফোন নম্বর</label>
             <input
               name="phone"
               type="tel"
@@ -285,10 +285,10 @@ export default function EmployeeModal({
             />
           </div>
 
-          <h3 className="font-bold text-slate-700 border-b pb-2 mb-2 mt-4">Profile Details</h3>
+          <h3 className="font-bold text-slate-700 border-b pb-2 mb-2 mt-4">প্রোফাইলের বিবরণ</h3>
           <div>
             <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-              Categories (Hold Ctrl/Cmd to select multiple)
+              ক্যাটাগরি (একাধিক নির্বাচনের জন্য Ctrl/Cmd চেপে ধরুন)
             </label>
             <select
               multiple
@@ -298,7 +298,7 @@ export default function EmployeeModal({
             >
               {isCategoriesLoading ? (
                 <option value="" disabled>
-                  Loading categories...
+                  ক্যাটাগরি লোড হচ্ছে...
                 </option>
               ) : (
                 allCategories.map((c: any) => (
@@ -310,7 +310,7 @@ export default function EmployeeModal({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Location</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">অবস্থান</label>
             <input
               name="location"
               type="text"
@@ -320,7 +320,7 @@ export default function EmployeeModal({
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
+            <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">বিবরণ</label>
             <textarea
               name="description"
               rows={3}
@@ -330,7 +330,7 @@ export default function EmployeeModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Min Starting Price</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">শুরুর সর্বনিম্ন মূল্য</label>
               <input
                 name="min_starting_price"
                 type="number"
@@ -340,7 +340,7 @@ export default function EmployeeModal({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Google Map Link</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">গুগল ম্যাপ লিংক</label>
               <input
                 name="google_map_link"
                 type="url"
@@ -358,14 +358,14 @@ export default function EmployeeModal({
               }}
               className="px-5 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
             >
-              Cancel
+              বাতিল
             </button>
             <button
               type="submit"
               disabled={isUpdatingProfile}
               className="px-5 py-2.5 text-sm font-bold text-white bg-brand-primary hover:bg-brand-dark rounded-xl transition-all disabled:opacity-50"
             >
-              {isUpdatingProfile ? "Saving..." : "Update Employee"}
+              {isUpdatingProfile ? "সেভ হচ্ছে..." : "এমপ্লয়ি আপডেট করুন"}
             </button>
           </div>
         </form>

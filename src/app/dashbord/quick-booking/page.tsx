@@ -35,7 +35,7 @@ export default function AgentQuickBookingPage() {
         <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm space-y-6">
           <h3 className="text-base font-bold text-slate-800 border-b border-slate-50 pb-2">1. Select Service</h3>
 
-          {(state.role === "admin" || state.role === "superadmin") && (
+          {(state.role === "agent" || state.role === "admin" || state.role === "superadmin") && state.clientOptions.length > 0 && (
             <div className="mb-4">
               <CustomSelect
                 label="Select Client (Optional)"

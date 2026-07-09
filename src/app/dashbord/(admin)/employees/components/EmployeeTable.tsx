@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { MoreVertical } from "lucide-react";
+import { Eye, Edit2, ShieldCheck, XCircle, Trash2 } from "lucide-react";
 import { CustomTable } from "@/components/ui/table";
-import EmployeeActionMenu from "./EmployeeActionMenu";
 
 interface EmployeeItem {
   id: string;
@@ -51,7 +50,7 @@ export default function EmployeeTable({
   const columns = [
     {
       key: "name",
-      header: "Employee Details",
+      header: "এমপ্লয়ি বিবরণ",
       render: (user: EmployeeItem) => (
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-center">
@@ -69,13 +68,13 @@ export default function EmployeeTable({
     },
     {
       key: "categoryName",
-      header: "Category",
+      header: "ক্যাটাগরি",
       render: (user: EmployeeItem) => <span className="font-bold text-slate-600 text-xs">{user.categoryName}</span>,
     },
-    { key: "joined", header: "Joined Date" },
+    { key: "joined", header: "যোগদানের তারিখ" },
     {
       key: "status",
-      header: "Status",
+      header: "স্ট্যাটাস",
       render: (user: EmployeeItem) => (
         <span
           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
@@ -92,27 +91,65 @@ export default function EmployeeTable({
     },
     {
       key: "actions",
-      header: "Actions",
+      header: "অ্যাকশন",
       render: (user: EmployeeItem) => (
-        <div className="relative flex justify-end">
+        <div className="flex justify-end gap-1">
           <button
-            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            onClick={() => setSelectedUser(user)}
+            title="বিবরণ দেখুন"
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
           >
-            <MoreVertical size={16} />
+            <Eye size={16} />
           </button>
-          <EmployeeActionMenu
-            user={user}
-            openDropdownId={openDropdownId}
-            setOpenDropdownId={setOpenDropdownId}
-            setSelectedUser={setSelectedUser}
-            setEditingEmployee={setEditingEmployee}
-            setIsEditModalOpen={setIsEditModalOpen}
-            handleActivate={handleActivate}
-            handleDeactivate={handleDeactivate}
-            handleBlock={handleBlock}
-            handleDelete={handleDelete}
-          />
+
+          <button
+            onClick={() => {
+              setEditingEmployee(user);
+              setIsEditModalOpen(true);
+            }}
+            title="এডিট করুন"
+            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+          >
+            <Edit2 size={16} />
+          </button>
+
+          {user.status !== "active" && (
+            <button
+              onClick={() => handleActivate(user.id)}
+              title="সক্রিয় করুন"
+              className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+            >
+              <ShieldCheck size={16} />
+            </button>
+          )}
+
+          {user.status !== "inactive" && (
+            <button
+              onClick={() => handleDeactivate(user.id)}
+              title="নিষ্ক্রিয় করুন"
+              className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
+            >
+              <XCircle size={16} />
+            </button>
+          )}
+
+          {user.status !== "blocked" && (
+            <button
+              onClick={() => handleBlock(user.id)}
+              title="ব্লক করুন"
+              className="p-1.5 text-slate-400 hover:text-[#E0530A] hover:bg-[#FFF8F4] rounded-lg transition-colors cursor-pointer"
+            >
+              <XCircle size={16} />
+            </button>
+          )}
+
+          <button
+            onClick={() => handleDelete(user.id)}
+            title="ডিলিট করুন"
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+          >
+            <Trash2 size={16} />
+          </button>
         </div>
       ),
     },
@@ -123,13 +160,13 @@ export default function EmployeeTable({
       columns={columns}
       data={employees}
       searchKey="name"
-      searchPlaceholder="Search employees by name..."
+      searchPlaceholder="নাম দিয়ে এমপ্লয়ি খুঁজুন..."
       filterKey="status"
-      filterPlaceholder="All Statuses"
+      filterPlaceholder="সকল স্ট্যাটাস"
       filterOptions={[
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-        { label: "Blocked", value: "blocked" },
+        { label: "সক্রিয়", value: "active" },
+        { label: "নিষ্ক্রিয়", value: "inactive" },
+        { label: "ব্লকড", value: "blocked" },
       ]}
       pageSize={10}
     />

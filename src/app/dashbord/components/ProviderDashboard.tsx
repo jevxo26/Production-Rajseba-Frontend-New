@@ -11,7 +11,10 @@ import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import {
   useGetAllBookingsQuery,
   useUpdateBookingStatusMutation,
+  useAssignEmployeeToBookingMutation,
 } from "@/redux/features/admin/booking";
+import { useGetEmployeesByVendorQuery } from "@/redux/features/admin/user";
+import { useGetNotificationsQuery, useMarkNotificationAsReadMutation } from "@/redux/features/notification/notificationApi";
 import { toast } from "sonner";
 import {
   DollarSign,
@@ -25,18 +28,132 @@ import {
   Briefcase,
   FileText,
   Globe,
+  Languages,
+  Users,
+  X,
+  Bell
 } from "lucide-react";
+
+// Basic translations for the dashboard
+const dashboardTranslations = {
+  bn: {
+    providerMode: "প্রোভাইডার মোড",
+    dashboardTitle: "প্রোভাইডার ড্যাশবোর্ড",
+    hello: "হ্যালো,",
+    subtitle: "আপনার অ্যাক্টিভ শিডিউল এবং উপার্জন ম্যানেজ করুন।",
+    online: "অনলাইন এবং অ্যাভেইলেবল",
+    toggleOffline: "অফলাইন করুন",
+    todaysEarnings: "আজকের আয়",
+    fromCompleted: "কমপ্লিট বুকিং থেকে",
+    projectsCompleted: "প্রজেক্ট সম্পন্ন হয়েছে",
+    totalProjects: "মোট প্রজেক্ট সম্পন্ন",
+    startingPrice: "শুরুর মূল্য",
+    minPrice: "সর্বনিম্ন শুরুর মূল্য",
+    myRating: "আমার রেটিং",
+    professionalProfile: "প্রফেশনাল প্রোফাইল",
+    myJobSchedule: "আমার জব শিডিউল",
+    jobConsole: "জব কনসোল",
+    updateStatusOf: "বর্তমান স্ট্যাটাস আপডেট করুন: বুকিং",
+    clientContact: "ক্লাইন্ট কন্টাক্ট",
+    updateStatus: "স্ট্যাটাস আপডেট",
+    onTheWay: "অন দ্য ওয়ে",
+    markCompleted: "কমপ্লিট মার্ক করুন",
+    cancelBooking: "বুকিং বাতিল করুন",
+    jobCompletedSuccess: "জব সফলভাবে সম্পন্ন হয়েছে!",
+    businessProfile: "বিজনেস প্রোফাইল",
+    manageBusinessProfile: "আপনার কমার্শিয়াল প্রোফাইল ডিটেইলস ম্যানেজ করুন",
+    edit: "এডিট",
+    saveDetails: "সেভ করুন",
+    cancel: "বাতিল",
+    setupProfileNow: "প্রোফাইল সেটআপ করুন",
+    setupProfilePrompt: "আপনি এখনও আপনার বিজনেস প্রোফাইল সেটআপ করেননি। বুকিং পেতে প্রোফাইল সেটআপ সম্পূর্ণ করুন!",
+    profileType: "প্রোফাইলের ধরন",
+    companyName: "কোম্পানি/বিজনেস নাম",
+    businessCategory: "বিজনেস ক্যাটাগরি",
+    serviceLocation: "সার্ভিস লোকেশন",
+    businessDescription: "বিজনেস ডেসক্রিপশন",
+    googleMapsLink: "গুগল ম্যাপস লিংক",
+    personal: "পার্সোনাল",
+    company: "কোম্পানি",
+    selectCategory: "ক্যাটাগরি নির্বাচন করুন",
+    assignEmployee: "এমপ্লয়ি অ্যাসাইন করুন",
+    selectEmployee: "এমপ্লয়ি নির্বাচন করুন",
+    assign: "অ্যাসাইন করুন",
+    noEmployeesFound: "কোনো এমপ্লয়ি পাওয়া যায়নি",
+    assignedEmployee: "অ্যাসাইনকৃত এমপ্লয়ি",
+    totalRevenue: "মোট আয়",
+  },
+  en: {
+    providerMode: "Provider Mode",
+    dashboardTitle: "Provider Dashboard",
+    hello: "Hello,",
+    subtitle: "Manage your active schedules and monitor earnings.",
+    online: "Online & Available",
+    toggleOffline: "Toggle Offline",
+    todaysEarnings: "Today's Earnings",
+    fromCompleted: "From completed bookings",
+    projectsCompleted: "Projects completed",
+    totalProjects: "Total projects completed",
+    startingPrice: "Starting Price",
+    minPrice: "Minimum starting price",
+    myRating: "My Rating",
+    professionalProfile: "Professional Profile",
+    myJobSchedule: "My Job Schedule",
+    jobConsole: "Job Console",
+    updateStatusOf: "Update current status of Booking",
+    clientContact: "Client Contact",
+    updateStatus: "Update Status",
+    onTheWay: "On The Way",
+    markCompleted: "Mark as Completed",
+    cancelBooking: "Cancel Booking",
+    jobCompletedSuccess: "Job Completed successfully!",
+    businessProfile: "Business Profile",
+    manageBusinessProfile: "Manage your commercial profile details",
+    edit: "Edit",
+    saveDetails: "Save Details",
+    cancel: "Cancel",
+    setupProfileNow: "Set Up Profile Now",
+    setupProfilePrompt: "You haven't set up your business profile yet. Complete your profile setup to receive bookings!",
+    profileType: "Profile Type",
+    companyName: "Company/Business Name",
+    businessCategory: "Business Category",
+    serviceLocation: "Service Location",
+    businessDescription: "Business Description",
+    googleMapsLink: "Google Maps Link",
+    personal: "Personal",
+    company: "Company",
+    selectCategory: "Select a Category",
+    assignEmployee: "Assign Employee",
+    selectEmployee: "Select Employee",
+    assign: "Assign",
+    noEmployeesFound: "No employees found",
+    assignedEmployee: "Assigned Employee",
+    totalRevenue: "Total Revenue",
+  }
+};
 
 export default function ProviderDashboard() {
   const authUser = useAppSelector((state) => state.auth.user);
   const { data: profilesRes } = useGetAllProfilesQuery();
   const { data: categoriesRes } = useGetAllCategoriesQuery();
+  const { data: employeesRes } = useGetEmployeesByVendorQuery(authUser?.id as any, { skip: !authUser?.id });
+  const { data: notificationsRes } = useGetNotificationsQuery(undefined, {
+    pollingInterval: 30000, // Poll every 30s
+  });
+  const [markNotificationAsRead] = useMarkNotificationAsReadMutation();
 
   const [createProfileMut, { isLoading: isCreating }] = useCreateProfileMutation();
   const [updateProfileMut, { isLoading: isUpdating }] = useUpdateProfileMutation();
+  const [assignEmployeeMut, { isLoading: isAssigning }] = useAssignEmployeeToBookingMutation();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState(false);
+  const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [prevUnreadCount, setPrevUnreadCount] = useState(0);
+  const [lang, setLang] = useState<"bn" | "en">("bn");
+  const t = dashboardTranslations[lang];
 
   const myProfile = profilesRes?.data?.find(
     (p: any) =>
@@ -50,10 +167,10 @@ export default function ProviderDashboard() {
   const { data: bookingsRes } = useGetAllBookingsQuery(undefined);
   const myBookings =
     bookingsRes?.data?.filter(
-      (b: any) => b.vendor?.id === authUser?.id || b.vendor?._id === authUser?.id
+      (b: any) =>
+        b.vendor?.id === authUser?.id || b.vendor?.id === Number(authUser?.id)
     ) || [];
-
-  const completedBookings = myBookings.filter((b) => b.status === "completed");
+  const completedBookings = myBookings.filter((b: any) => b.status === "completed");
   const todayEarnings = completedBookings.reduce((sum, b) => {
     const completedDate = new Date(b.updatedAt).toDateString();
     const today = new Date().toDateString();
@@ -62,39 +179,41 @@ export default function ProviderDashboard() {
     }
     return sum;
   }, 0);
+  
+  const totalRevenue = completedBookings.reduce((sum, b) => sum + Number(b.total_price || 0), 0);
 
   const stats = [
     {
-      label: "Today's Earnings",
+      label: t.todaysEarnings,
       value: `৳${todayEarnings.toLocaleString()}`,
-      desc: "From completed bookings",
+      desc: t.fromCompleted,
       icon: DollarSign,
       color: "text-emerald-600 bg-emerald-50",
     },
     {
-      label: "Projects completed",
+      label: t.totalRevenue,
+      value: `৳${totalRevenue.toLocaleString()}`,
+      desc: t.fromCompleted,
+      icon: DollarSign,
+      color: "text-blue-600 bg-blue-50",
+    },
+    {
+      label: t.projectsCompleted,
       value: completedBookings.length.toString(),
-      desc: "Total projects completed",
+      desc: t.totalProjects,
       icon: CheckCircle2,
       color: "text-teal-600 bg-teal-50",
     },
     {
-      label: "Starting Price",
-      value: myProfile?.min_starting_price !== undefined ? `৳${myProfile.min_starting_price}` : "N/A",
-      desc: "Minimum starting price",
-      icon: Calendar,
-      color: "text-indigo-600 bg-indigo-50",
-    },
-    {
-      label: "My Rating",
+      label: t.myRating,
       value: myProfile?.rating !== undefined ? `${myProfile.rating} / 5` : "New",
-      desc: myProfile?.company_name || "Professional Profile",
+      desc: myProfile?.company_name || t.professionalProfile,
       icon: Star,
       color: "text-amber-600 bg-amber-50",
     },
   ];
 
-  const providerJobs = myBookings.map((b) => ({
+  const providerJobs = myBookings.map((b: any) => ({
     id: String(b.id),
     customer: b.user?.name || "Unknown Customer",
     phone: b.user?.phone || "N/A",
@@ -103,9 +222,45 @@ export default function ProviderDashboard() {
     time: `${b.date || ""} ${b.time || ""}`,
     amount: `৳${Number(b.total_price || 0).toLocaleString()}`,
     status: b.status,
+    employees: b.employees || [],
   }));
 
   const [activeJob, setActiveJob] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const jobsPerPage = 5;
+
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = providerJobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(providerJobs.length / jobsPerPage);
+
+  const notifications = notificationsRes || [];
+  const unreadNotifications = notifications.filter((n: any) => !n.isRead && n.userId === authUser?.id);
+  const unreadCount = unreadNotifications.length;
+
+  // Play sound when new notification arrives
+  useEffect(() => {
+    if (unreadCount > prevUnreadCount) {
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+        oscillator.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1); // A6
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {
+        console.log("Audio not supported");
+      }
+    }
+    setPrevUnreadCount(unreadCount);
+  }, [unreadCount, prevUnreadCount]);
 
   useEffect(() => {
     if (!activeJob && providerJobs.length > 0) {
@@ -123,6 +278,21 @@ export default function ProviderDashboard() {
   };
 
   const activeJobDetails = providerJobs.find((j) => j.id === activeJob);
+
+  const handleAssignEmployee = async () => {
+    if (!activeJob || selectedEmployeeIds.length === 0) {
+      toast.error(lang === "bn" ? "দয়া করে এমপ্লয়ি নির্বাচন করুন" : "Please select an employee");
+      return;
+    }
+    try {
+      await assignEmployeeMut({ id: activeJob, employee_ids: selectedEmployeeIds }).unwrap();
+      toast.success(lang === "bn" ? "এমপ্লয়ি সফলভাবে অ্যাসাইন করা হয়েছে" : "Employees assigned successfully");
+      setIsEmployeeModalOpen(false);
+      setSelectedEmployeeIds([]);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to assign employees");
+    }
+  };
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -160,27 +330,39 @@ export default function ProviderDashboard() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
       {/* Header */}
       <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm px-7 py-6">
+        {/* Language Toggle */}
+        <div className="absolute top-6 right-7 z-20 flex items-center gap-3">
+          <button
+            onClick={() => setLang(lang === "bn" ? "en" : "bn")}
+            className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 transition-colors"
+          >
+            <Languages className="w-3.5 h-3.5" />
+            {lang === "bn" ? "English" : "বাংলা"}
+          </button>
+        </div>
+
         <div className="absolute -top-10 -right-10 w-48 h-48 bg-gradient-to-br from-teal-100/40 to-transparent rounded-full blur-3xl pointer-events-none" />
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+          <div className="max-w-[70%]">
             <div className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-100 text-teal-600 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse inline-block" />
-              Provider Mode
+              {t.providerMode}
             </div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Provider Dashboard</h1>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t.dashboardTitle}</h1>
             <p className="text-slate-400 mt-1.5 text-sm font-medium">
-              Hello,{" "}
+              {t.hello}{" "}
               <span className="text-slate-600 font-semibold text-wrap">
                 {authUser?.name || myProfile?.company_name || "Provider"}
               </span>
-              ! Manage your active schedules and monitor earnings.
+              ! {t.subtitle}
             </p>
           </div>
-          <div className="flex items-center gap-3 bg-white border border-slate-100 p-3 rounded-2xl shadow-sm shrink-0">
+          {/* Status info moved below language toggle space or responsive */}
+          <div className="flex items-center gap-3 bg-white border border-slate-100 p-3 rounded-2xl shadow-sm shrink-0 md:mt-10 lg:mt-0 lg:mr-28">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-sm font-semibold text-slate-700">Online &amp; Available</span>
+            <span className="text-sm font-semibold text-slate-700">{t.online}</span>
             <button className="text-xs font-semibold text-[#FF6014] bg-[#FFF8F4] hover:bg-[#FFF0EB]/50 px-3 py-1.5 rounded-xl transition-all">
-              Toggle Offline
+              {t.toggleOffline}
             </button>
           </div>
         </div>
@@ -218,10 +400,10 @@ export default function ProviderDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Jobs List */}
         <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2 space-y-6">
-          <h3 className="text-lg font-bold text-slate-900">My Job Schedule</h3>
+          <h3 className="text-lg font-bold text-slate-900">{t.myJobSchedule}</h3>
 
           <div className="space-y-4">
-            {providerJobs.map((job) => {
+            {currentJobs.map((job: any) => {
               const currentStatus = job.status;
               return (
                 <div
@@ -266,6 +448,29 @@ export default function ProviderDashboard() {
               );
             })}
           </div>
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-xs font-bold text-slate-500">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 disabled:opacity-50 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Column */}
@@ -273,23 +478,50 @@ export default function ProviderDashboard() {
           {activeJobDetails && (
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
               <div>
-                <h3 className="text-lg font-bold text-slate-950">Job Console</h3>
+                <h3 className="text-lg font-bold text-slate-950">{t.jobConsole}</h3>
                 <p className="text-xs text-slate-400 mt-1 font-medium">
-                  Update current status of Booking {activeJobDetails.id}
+                  {t.updateStatusOf} {activeJobDetails.id}
                 </p>
               </div>
 
               <div className="space-y-4 pt-2">
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2">
-                  <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Client Contact</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">{t.clientContact}</p>
                   <h5 className="text-sm font-bold text-slate-850">{activeJobDetails.customer}</h5>
                   <p className="text-xs font-semibold text-[#FF6014] flex items-center gap-1">
                     <Phone size={12} /> {activeJobDetails.phone}
                   </p>
                 </div>
 
+                {/* Assign Employee Section */}
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+                  <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">{t.assignedEmployee}</p>
+                  
+                  {activeJobDetails.employees && activeJobDetails.employees.length > 0 ? (
+                    <div className="space-y-2">
+                      {activeJobDetails.employees.map((emp: any) => (
+                        <div key={emp.id} className="flex items-center gap-2">
+                          <Users size={14} className="text-slate-400" />
+                          <span className="text-sm font-semibold text-slate-700">{emp.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500 font-medium">{t.noEmployeesFound}</p>
+                  )}
+
+                  {activeJobDetails.status !== "completed" && activeJobDetails.status !== "cancelled" && (
+                    <button
+                      onClick={() => setIsEmployeeModalOpen(true)}
+                      className="w-full py-2 bg-white border border-slate-200 hover:border-[#FF6014]/50 rounded-lg text-xs font-semibold text-slate-700 hover:text-[#FF6014] transition-all flex justify-center items-center gap-1.5"
+                    >
+                      <Users size={14} /> {t.assignEmployee}
+                    </button>
+                  )}
+                </div>
+
                 <div className="space-y-2 pt-2">
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Update Status</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t.updateStatus}</p>
                   {activeJobDetails.status !== "completed" && activeJobDetails.status !== "cancelled" ? (
                     <div className="flex flex-col gap-2">
                       <button
@@ -300,24 +532,24 @@ export default function ProviderDashboard() {
                             : "border-slate-200 hover:bg-slate-50 text-slate-700"
                         }`}
                       >
-                        On The Way
+                        {t.onTheWay}
                       </button>
                       <button
                         onClick={() => updateJobStatus(activeJobDetails.id, "Completed")}
                         className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all border-slate-200 hover:bg-emerald-50 hover:text-emerald-600 text-slate-700"
                       >
-                        Mark as Completed
+                        {t.markCompleted}
                       </button>
                       <button
                         onClick={() => updateJobStatus(activeJobDetails.id, "Cancelled")}
                         className="w-full py-2.5 rounded-xl text-xs font-semibold border transition-all border-slate-200 hover:bg-red-50 hover:text-red-600 text-red-505 text-red-600"
                       >
-                        Cancel Booking
+                        {t.cancelBooking}
                       </button>
                     </div>
                   ) : (
                     <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-center text-xs font-semibold flex items-center justify-center gap-1.5">
-                      <CheckCircle2 size={16} /> Job Completed successfully!
+                      <CheckCircle2 size={16} /> {t.jobCompletedSuccess}
                     </div>
                   )}
                 </div>
@@ -329,15 +561,15 @@ export default function ProviderDashboard() {
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Business Profile</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Manage your commercial profile details</p>
+                <h3 className="text-lg font-bold text-slate-900">{t.businessProfile}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{t.manageBusinessProfile}</p>
               </div>
               {!isEditingProfile && !isCreatingProfile && myProfile && (
                 <button
                   onClick={() => setIsEditingProfile(true)}
                   className="text-xs font-semibold text-[#FF6014] hover:text-[#E0530A] px-3 py-1.5 rounded-lg border border-slate-100 bg-slate-50/50 hover:bg-slate-100/50 transition-colors"
                 >
-                  Edit
+                  {t.edit}
                 </button>
               )}
             </div>
@@ -347,15 +579,14 @@ export default function ProviderDashboard() {
                 {!myProfile && !isCreatingProfile && (
                   <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2">
                     <p className="text-xs text-amber-800 font-semibold leading-relaxed">
-                      You haven't set up your business profile yet. Complete your profile setup to receive bookings
-                      and show up in searches!
+                      {t.setupProfilePrompt}
                     </p>
                     <button
                       type="button"
                       onClick={() => setIsCreatingProfile(true)}
                       className="text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg transition-all"
                     >
-                      Set Up Profile Now
+                      {t.setupProfileNow}
                     </button>
                   </div>
                 )}
@@ -365,7 +596,7 @@ export default function ProviderDashboard() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                          Profile Type
+                          {t.profileType}
                         </label>
                         <select
                           name="type"
@@ -373,13 +604,13 @@ export default function ProviderDashboard() {
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none focus:border-[#FF6014]/40"
                           required
                         >
-                          <option value="personal">Personal</option>
-                          <option value="company">Company</option>
+                          <option value="personal">{t.personal}</option>
+                          <option value="company">{t.company}</option>
                         </select>
                       </div>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                          Starting Price (৳)
+                          {t.startingPrice} (৳)
                         </label>
                         <input
                           name="min_starting_price"
@@ -394,7 +625,7 @@ export default function ProviderDashboard() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                        Company/Business Name
+                        {t.companyName}
                       </label>
                       <input
                         name="company_name"
@@ -408,14 +639,14 @@ export default function ProviderDashboard() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                        Business Category
+                        {t.businessCategory}
                       </label>
                       <select
                         name="category_id"
                         defaultValue={myProfile?.category?.id || ""}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-850 focus:outline-none focus:border-[#FF6014]/40"
                       >
-                        <option value="">Select a Category</option>
+                        <option value="">{t.selectCategory}</option>
                         {categoriesRes?.data?.map((cat: any) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.name}
@@ -426,7 +657,7 @@ export default function ProviderDashboard() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                        Service Location
+                        {t.serviceLocation}
                       </label>
                       <input
                         name="location"
@@ -440,7 +671,7 @@ export default function ProviderDashboard() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                        Business Description
+                        {t.businessDescription}
                       </label>
                       <textarea
                         name="description"
@@ -454,7 +685,7 @@ export default function ProviderDashboard() {
 
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                        Google Maps Link
+                        {t.googleMapsLink}
                       </label>
                       <input
                         name="google_map_link"
@@ -471,7 +702,7 @@ export default function ProviderDashboard() {
                         disabled={isCreating || isUpdating}
                         className="flex-1 py-2 bg-[#FF6014] hover:bg-[#E0530A] text-white rounded-xl text-xs font-semibold shadow-sm transition-all"
                       >
-                        {isCreating || isUpdating ? "Saving..." : "Save Details"}
+                        {isCreating || isUpdating ? "Saving..." : t.saveDetails}
                       </button>
                       <button
                         type="button"
@@ -481,7 +712,7 @@ export default function ProviderDashboard() {
                         }}
                         className="px-4 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 transition-all"
                       >
-                        Cancel
+                        {t.cancel}
                       </button>
                     </div>
                   </>
@@ -505,7 +736,7 @@ export default function ProviderDashboard() {
                   <div className="flex items-start gap-2.5">
                     <MapPin size={14} className="text-slate-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-slate-750">Location</p>
+                      <p className="font-bold text-slate-750">{t.serviceLocation}</p>
                       <p className="text-slate-500">{myProfile.location || "Not provided"}</p>
                     </div>
                   </div>
@@ -514,7 +745,7 @@ export default function ProviderDashboard() {
                     <div className="flex items-start gap-2.5">
                       <Briefcase size={14} className="text-slate-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-bold text-slate-750">Category</p>
+                        <p className="font-bold text-slate-750">{t.businessCategory}</p>
                         <p className="text-slate-500">{myProfile.category.name}</p>
                       </div>
                     </div>
@@ -523,7 +754,7 @@ export default function ProviderDashboard() {
                   <div className="flex items-start gap-2.5">
                     <FileText size={14} className="text-slate-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-slate-750">Description</p>
+                      <p className="font-bold text-slate-750">{t.businessDescription}</p>
                       <p className="text-slate-500 leading-relaxed">{myProfile.description || "Not provided"}</p>
                     </div>
                   </div>
@@ -531,7 +762,7 @@ export default function ProviderDashboard() {
                   <div className="flex items-start gap-2.5">
                     <DollarSign size={14} className="text-slate-400 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-slate-750">Min Starting Price</p>
+                      <p className="font-bold text-slate-750">{t.minPrice}</p>
                       <p className="text-slate-500">৳{myProfile.min_starting_price || "Not set"}</p>
                     </div>
                   </div>
@@ -540,7 +771,7 @@ export default function ProviderDashboard() {
                     <div className="flex items-start gap-2.5">
                       <Globe size={14} className="text-slate-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-bold text-slate-750">Location Link</p>
+                        <p className="font-bold text-slate-750">{t.googleMapsLink}</p>
                         <a
                           href={myProfile.google_map_link}
                           target="_blank"
@@ -558,6 +789,98 @@ export default function ProviderDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Employee Assignment Modal */}
+      {isEmployeeModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <Users size={18} className="text-[#FF6014]" />
+                {t.assignEmployee}
+              </h3>
+              <button 
+                onClick={() => {
+                  setIsEmployeeModalOpen(false);
+                  setSelectedEmployeeIds([]);
+                }}
+                className="text-slate-400 hover:text-red-500 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+              {employeesRes?.data && employeesRes.data.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                    {t.selectEmployee}
+                  </p>
+                  {employeesRes.data.map((emp: any) => {
+                    const isSelected = selectedEmployeeIds.includes(emp.id);
+                    return (
+                      <div 
+                        key={emp.id}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedEmployeeIds(prev => prev.filter(id => id !== emp.id));
+                          } else {
+                            setSelectedEmployeeIds(prev => [...prev, emp.id]);
+                          }
+                        }}
+                        className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-3 ${
+                          isSelected 
+                            ? "border-[#FF6014] bg-[#FFF8F4] shadow-sm" 
+                            : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 shrink-0">
+                          <Users size={16} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-800 text-sm">{emp.name}</p>
+                          <p className="text-xs text-slate-500">{emp.email || "No email"}</p>
+                        </div>
+                        {isSelected && (
+                          <div className="ml-auto text-[#FF6014]">
+                            <CheckCircle2 size={18} />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mx-auto mb-3">
+                    <Users size={24} />
+                  </div>
+                  <p className="text-slate-500 font-medium">{t.noEmployeesFound}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setIsEmployeeModalOpen(false);
+                  setSelectedEmployeeIds([]);
+                }}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 bg-slate-100 rounded-xl transition-colors"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={handleAssignEmployee}
+                disabled={selectedEmployeeIds.length === 0 || isAssigning}
+                className="px-6 py-2 text-sm font-bold text-white bg-[#FF6014] hover:bg-[#E0530A] rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isAssigning ? "..." : t.assign}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

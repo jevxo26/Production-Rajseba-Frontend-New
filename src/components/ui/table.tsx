@@ -143,6 +143,7 @@ export interface CustomTableProps<T> {
   pageSize?: number;
   className?: string;
   rowClassName?: (row: T) => string;
+  expandableContent?: (row: T) => React.ReactNode;
 }
 
 export function CustomTable<T extends { id?: string | number;[key: string]: any }>({
@@ -157,24 +158,14 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
   pageSize = 5,
   className,
   rowClassName,
+  expandableContent,
 }: CustomTableProps<T>) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [activeFilter, setActiveFilter] = React.useState("ALL")
   const [currentPage, setCurrentPage] = React.useState(1)
-  const [openDropdownId, setOpenDropdownId] = React.useState<string | number | null>(null)
+  const [expandedRowId, setExpandedRowId] = React.useState<string | number | null>(null)
 
-  const dropdownRef = React.useRef<HTMLDivElement>(null)
 
-  // Close dropdown on click outside
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdownId(null)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
 
   // Filter & Search Logic
   const filteredData = React.useMemo(() => {
@@ -266,77 +257,69 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
             {paginatedData.length > 0 ? (
               paginatedData.map((row, idx) => {
                 const uniqueRowId = row.id ?? idx
+                const isExpanded = expandedRowId === uniqueRowId
                 return (
-                  <TableRow key={uniqueRowId} className={rowClassName ? rowClassName(row) : undefined}>
-                    {columns.map((col) => (
-                      <TableCell key={col.key}>
-                        {col.render ? col.render(row) : row[col.key]}
-                      </TableCell>
-                    ))}
+                  <React.Fragment key={uniqueRowId}>
+                    <TableRow 
+                      className={cn(
+                        rowClassName ? rowClassName(row) : undefined, 
+                        expandableContent && "cursor-pointer",
+                        isExpanded && "bg-premium-light/50"
+                      )}
+                      onClick={() => {
+                        if (expandableContent) {
+                          setExpandedRowId(isExpanded ? null : uniqueRowId)
+                        }
+                      }}
+                    >
+                      {columns.map((col) => (
+                        <TableCell key={col.key}>
+                          {col.render ? col.render(row) : row[col.key]}
+                        </TableCell>
+                      ))}
 
-                    {/* Action dropdown or buttons */}
-                    {actions.length > 0 && (
-                      <TableCell className="text-right relative">
-                        <div className="inline-flex items-center justify-end gap-1">
+                      {/* Action dropdown or buttons */}
+                      {actions.length > 0 && (
+                        <TableCell className="text-right relative" onClick={(e) => e.stopPropagation()}>
+                          <div className="inline-flex items-center justify-end gap-2">
 
-                          {/* Standard primary button if single action, otherwise show dropdown */}
-                          {actions.length === 1 ? (
-                            <button
-                              onClick={() => actions[0].onClick(row)}
-                              className={cn(
-                                "text-xs font-bold px-3 py-1.5 rounded-lg transition-all active:scale-[0.98]",
-                                actions[0].variant === "destructive"
-                                  ? "bg-rose-50 text-brand-primary hover:bg-rose-100"
-                                  : actions[0].variant === "secondary"
-                                    ? "bg-premium-light text-premium-gray hover:bg-slate-100"
-                                    : "bg-brand-bg text-brand-primary hover:bg-brand-hover"
-                              )}
-                            >
-                              {actions[0].label}
-                            </button>
-                          ) : (
-                            <div className="relative">
-                              <button
-                                onClick={() => setOpenDropdownId(openDropdownId === uniqueRowId ? null : uniqueRowId)}
-                                className="p-2 hover:bg-premium-light rounded-lg text-premium-gray hover:text-premium-slate transition-colors"
-                              >
-                                <MoreHorizontal size={18} />
-                              </button>
-
-                              {/* Custom Dropdown Dialog overlay list */}
-                              {openDropdownId === uniqueRowId && (
-                                <div
-                                  ref={dropdownRef}
-                                  className="absolute right-0 mt-1.5 w-44 bg-white border border-slate-100 rounded-xl shadow-premium-lg z-50 p-1.5 space-y-0.5 animate-in fade-in duration-100 slide-in-from-top-1 text-left"
+                            {actions.map((act, actIdx) => {
+                              const ActIcon = act.icon
+                              return (
+                                <button
+                                  key={actIdx}
+                                  title={act.label}
+                                  onClick={() => act.onClick(row)}
+                                  className={cn(
+                                    "p-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center shadow-sm",
+                                    act.variant === "destructive"
+                                      ? "bg-rose-50 text-brand-primary hover:bg-rose-100 border border-rose-100"
+                                      : act.variant === "secondary"
+                                        ? "bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200"
+                                        : "bg-[#FFF8F4] text-[#FF6014] hover:bg-[#FFF0EB] border border-[#FFF0EB]"
+                                  )}
                                 >
-                                  {actions.map((act, actIdx) => {
-                                    const ActIcon = act.icon
-                                    return (
-                                      <button
-                                        key={actIdx}
-                                        onClick={() => {
-                                          act.onClick(row)
-                                          setOpenDropdownId(null)
-                                        }}
-                                        className={cn(
-                                          "w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg hover:bg-premium-light transition-colors",
-                                          act.variant === "destructive" ? "text-brand-primary hover:bg-rose-50" : "text-premium-slate"
-                                        )}
-                                      >
-                                        {ActIcon && <ActIcon size={14} className="opacity-70" />}
-                                        {act.label}
-                                      </button>
-                                    )
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                  {ActIcon ? <ActIcon size={16} /> : <span className="text-[10px] font-bold px-1">{act.label}</span>}
+                                </button>
+                              )
+                            })}
 
-                        </div>
-                      </TableCell>
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                    
+                    {/* Expandable Content Row */}
+                    {expandableContent && isExpanded && (
+                      <TableRow className="bg-slate-50/50 hover:bg-slate-50/50 border-b border-slate-100/60">
+                        <TableCell colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="p-0">
+                          <div className="animate-in slide-in-from-top-2 fade-in duration-200">
+                            {expandableContent(row)}
+                          </div>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </TableRow>
+                  </React.Fragment>
                 )
               })
             ) : (

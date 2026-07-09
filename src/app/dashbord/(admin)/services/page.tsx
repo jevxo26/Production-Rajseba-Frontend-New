@@ -1,59 +1,24 @@
 "use client";
 
 import { ShieldAlert, PlusCircle, Wrench } from "lucide-react";
-import ServiceModal from "./components/ServiceModal";
 import DeleteServiceModal from "./components/DeleteServiceModal";
 import ServiceTable from "./components/ServiceTable";
 import { useServiceState } from "./hooks/useServiceState";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AdminServicesManagementPage() {
+  const router = useRouter();
   const {
     role,
     isServicesLoading,
     services,
-    isModalOpen,
-    setIsModalOpen,
-    editingItem,
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     itemToDelete,
     setItemToDelete,
-    isUploadingImage,
-    name,
-    setName,
-    slug,
-    setSlug,
-    subtitle,
-    setSubtitle,
-    categoryId,
-    setCategoryId,
-    agentCommissionPercentage,
-    setAgentCommissionPercentage,
-    vendorId,
-    setVendorId,
-    employeeIds,
-    setEmployeeIds,
-    description,
-    setDescription,
-    overview,
-    setOverview,
-    details,
-    setDetails,
-    faq,
-    setFaq,
-    image,
-    setImage,
-    categoryOptions,
-    vendorOptions,
-    employeeOptions,
-    handleImageUpload,
-    openCreateModal,
-    openEditModal,
     openDeleteModal,
-    handleSubmit,
     handleDelete,
-    isCreating,
-    isUpdating,
   } = useServiceState();
 
   if (role !== "superadmin" && role !== "agent") {
@@ -82,12 +47,12 @@ export default function AdminServicesManagementPage() {
           </div>
         </div>
         {role === "superadmin" && (
-          <button
-            onClick={openCreateModal}
+          <Link
+            href="/dashbord/services/create"
             className="bg-brand-primary hover:bg-brand-dark text-white font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-all active:scale-[0.98] shadow-md shadow-brand-primary/10"
           >
             <PlusCircle size={18} /> Add Service
-          </button>
+          </Link>
         )}
       </div>
 
@@ -103,59 +68,19 @@ export default function AdminServicesManagementPage() {
           </div>
           <h3 className="text-base font-bold text-slate-800">No Services Found</h3>
           <p className="text-sm text-slate-400 mt-1 max-w-sm mx-auto">Start by creating your first service.</p>
-          <button
-            onClick={openCreateModal}
-            className="mt-4 bg-rose-50 hover:bg-rose-100 text-rose-500 font-bold px-4 py-2 rounded-xl text-xs transition-all"
+          <Link
+            href="/dashbord/services/create"
+            className="mt-4 inline-block bg-rose-50 hover:bg-rose-100 text-rose-500 font-bold px-4 py-2 rounded-xl text-xs transition-all"
           >
             Add New Service
-          </button>
+          </Link>
         </div>
       ) : (
         <ServiceTable
           services={services}
           role={role}
-          openEditModal={openEditModal}
+          openEditModal={(item) => router.push(`/dashbord/services/edit/${item.id}`)}
           openDeleteModal={openDeleteModal}
-        />
-      )}
-
-      {/* Create / Edit Modal */}
-      {isModalOpen && (
-        <ServiceModal
-          editingItem={editingItem}
-          setIsModalOpen={setIsModalOpen}
-          handleSubmit={handleSubmit}
-          name={name}
-          setName={setName}
-          slug={slug}
-          setSlug={setSlug}
-          subtitle={subtitle}
-          setSubtitle={setSubtitle}
-          categoryOptions={categoryOptions}
-          categoryId={categoryId}
-          setCategoryId={setCategoryId}
-          agentCommissionPercentage={agentCommissionPercentage}
-          setAgentCommissionPercentage={setAgentCommissionPercentage}
-          vendorOptions={vendorOptions}
-          vendorId={vendorId}
-          setVendorId={setVendorId}
-          employeeOptions={employeeOptions}
-          employeeIds={employeeIds}
-          setEmployeeIds={setEmployeeIds}
-          description={description}
-          setDescription={setDescription}
-          overview={overview}
-          setOverview={setOverview}
-          details={details}
-          setDetails={setDetails}
-          faq={faq}
-          setFaq={setFaq}
-          image={image}
-          setImage={setImage}
-          isUploadingImage={isUploadingImage}
-          handleImageUpload={handleImageUpload}
-          isCreating={isCreating}
-          isUpdating={isUpdating}
         />
       )}
 
