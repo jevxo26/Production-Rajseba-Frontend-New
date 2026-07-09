@@ -26,6 +26,7 @@ import {
   PhoneCall,
   MapPin,
   TrendingUp,
+  Truck,
 } from "lucide-react";
 import { TbAirConditioning, TbTruck } from "react-icons/tb";
 import {
@@ -84,6 +85,7 @@ const LEFT_NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/", icon: HomeIcon },
   { label: "Menu", href: "#menu", icon: LayoutGrid, hasDropdown: true },
   { label: "Services", href: "/services", icon: Briefcase },
+  { label: "Home Shifting", href: "/home-shifting", icon: Truck },
   { label: "Booking", href: "/bookings", icon: Calendar },
 ];
 
@@ -98,7 +100,7 @@ const ALL_NAV_LINKS: NavLink[] = [...LEFT_NAV_LINKS, ...RIGHT_NAV_LINKS];
 const MOBILE_BOTTOM_LINKS: NavLink[] = [
   { label: "Home", href: "/", icon: HomeIcon },
   { label: "Services", href: "/services", icon: Briefcase },
-  { label: "Opportunity", href: "/opportunity", icon: TrendingUp },
+  { label: "Shifting", href: "/home-shifting", icon: Truck },
   { label: "Booking", href: "/bookings", icon: Calendar },
   { label: "Contact", href: "/contact", icon: PhoneCall },
   { label: "Login", href: "/login", icon: User },
@@ -682,7 +684,7 @@ export function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       <Icon className="w-5 h-5 text-slate-500" />
-                      <span>{link.label}</span>
+                      <span>{link.label === "Home Shifting" ? "Shifting" : link.label}</span>
                     </Link>
                   );
                 })}
@@ -809,6 +811,7 @@ export function Navbar() {
             const isProfileLink = link.label === "Login" || link.isDashboard;
             const showAvatar = isProfileLink && mounted && isAuthenticated && profile;
 
+
             return (
               <Link
                 key={i}
@@ -816,13 +819,7 @@ export function Navbar() {
                 onClick={handleClick}
                 className="relative flex flex-col items-center justify-center py-1 group"
               >
-                {active && (
-                  <motion.div
-                    layoutId="bottomNavPill"
-                    className="absolute inset-x-1.5 inset-y-0.5 bg-[#FF6014]/10 rounded-2xl border border-[#FF6014]/20"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
+
 
                 <motion.div
                   className="relative z-10"

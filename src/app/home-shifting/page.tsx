@@ -8,7 +8,6 @@ import {
   X, CheckCircle, ArrowRight, Truck, Package, Shield,
   Star, Clock, Users, ChevronRight,
 } from "lucide-react";
-import { Navbar } from "@/components/home/Navbar";
 import { useAppSelector } from "@/redux/hooks";
 import { useCreateCustomShiftingMutation } from "@/redux/features/admin/customShiftingApi";
 
@@ -137,35 +136,18 @@ export default function HomeShiftingPage() {
     try {
       const urls = files.length
         ? (await Promise.allSettled(files.map(uploadToImgBB)))
-            .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
-            .map((r) => r.value)
+          .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled")
+          .map((r) => r.value)
         : [];
       await create({ ...form, images: urls, userId: isAuth && user ? Number((user as any).id) : undefined }).unwrap();
       setDone(true);
     } catch { setErr("Something went wrong. Please try again."); }
   };
 
-  if (done) return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-[#FFF8F4] flex items-center justify-center px-4 relative">
-        <div className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-[0.07] pointer-events-none" style={{ backgroundSize: "auto" }} />
-        <div className="relative z-10 max-w-sm w-full text-center space-y-5 bg-white/80 backdrop-blur-xl rounded-3xl border border-[#FF6014]/10 p-8 shadow-xl">
-          <div className="w-16 h-16 bg-green-50 border-2 border-green-200 rounded-full flex items-center justify-center mx-auto">
-            <CheckCircle size={32} className="text-green-500" />
-          </div>
-          <h2 className="text-xl font-black text-slate-800">Booking Submitted! 🎉</h2>
-          <p className="text-sm text-slate-500 leading-relaxed">Your request is received. Our team will contact you shortly to assign a verified vendor.</p>
-          <Link href="/" className="block bg-[#FF6014] text-white font-bold py-3 rounded-2xl text-sm shadow-lg hover:bg-[#E0530A] transition-all">Back to Home</Link>
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-[#FFF8F4] relative">
+      <div className="min-h-screen ">
         <div className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-[0.07] pointer-events-none z-0" style={{ backgroundSize: "auto" }} />
         <div className="absolute inset-0 bg-gradient-to-br from-[#FFF8F4]/80 via-white/40 to-orange-50/60 pointer-events-none z-0" />
 

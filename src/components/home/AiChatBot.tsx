@@ -190,18 +190,18 @@ export function AiChatBot() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 15 }}
-            whileHover={{ 
-              scale: 1.1, 
+            whileHover={{
+              scale: 1.1,
               rotate: 8,
               boxShadow: "0 10px 25px rgba(15, 23, 42, 0.35)"
             }}
             whileTap={{ scale: 0.9 }}
             href="tel:+8801613410880"
-            className="group relative w-14 h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-black transition-all duration-300"
+            className="group relative w-9 h-9 md:w-14 md:h-14 bg-slate-900 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-black transition-all duration-300"
             aria-label="Call Support"
           >
-            <Phone size={22} className="transition-transform duration-300" />
-            
+            <Phone className="w-[18px] h-[18px] md:w-[22px] md:h-[22px] transition-transform duration-300" />
+
             {/* Tooltip */}
             <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-[11px] font-bold px-3 py-1.5 rounded-xl opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg border border-slate-800/50 translate-x-2 group-hover:translate-x-0">
               Call Hotline
@@ -214,26 +214,26 @@ export function AiChatBot() {
           {/* Breathing aura glow */}
           <motion.span
             animate={{
-              scale: [1, 1.35, 1],
-              opacity: [0.4, 0, 0.4],
+              scale: [1, 1.4, 1],
+              opacity: [0.6, 0.1, 0.6],
             }}
             transition={{
               duration: 2.2,
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-[#FF6014] to-[#FF7C71] blur-md pointer-events-none z-[-1]"
+            className="absolute w-9 h-9 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-[#FF6014] to-[#FF7C71] blur-md pointer-events-none z-[-1]"
           />
 
           <motion.button
-            whileHover={{ 
+            whileHover={{
               scale: 1.1,
               rotate: -8,
               boxShadow: "0 14px 32px rgba(255, 96, 20, 0.45)"
             }}
             whileTap={{ scale: 0.92 }}
             onClick={() => setIsOpen(!isOpen)}
-            className="w-14 h-14 bg-gradient-to-r from-[#FF6014] to-[#FF7C71] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#FF6014]/25 cursor-pointer relative overflow-hidden transition-all duration-300"
+            className="w-9 h-9 md:w-14 md:h-14 bg-gradient-to-r from-[#FF6014] to-[#FF7C71] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#FF6014]/25 cursor-pointer relative overflow-hidden transition-all duration-300"
             aria-label="AI Assistant"
           >
             {/* Shimmer sweep effect */}
@@ -242,20 +242,25 @@ export function AiChatBot() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={isOpen ? "open" : "closed"}
+                className="flex items-center justify-center"
                 initial={{ rotate: -90, scale: 0.8, opacity: 0 }}
                 animate={{ rotate: 0, scale: 1, opacity: 1 }}
                 exit={{ rotate: 90, scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.22 }}
               >
-                {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+                {isOpen ? (
+                  <X className="w-5 h-5 md:w-6 md:h-6" />
+                ) : (
+                  <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
+                )}
               </motion.div>
             </AnimatePresence>
-
-            {!isOpen && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
-            )}
           </motion.button>
-          
+
+          {!isOpen && (
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 md:w-4 md:h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse z-10 pointer-events-none" />
+          )}
+
           {/* Tooltip */}
           {!isOpen && (
             <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-[11px] font-bold px-3 py-1.5 rounded-xl opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg border border-slate-800/50 translate-x-2 group-hover:translate-x-0">
@@ -311,8 +316,8 @@ export function AiChatBot() {
                 >
                   <div
                     className={`max-w-[80%] rounded-[20px] p-3.5 text-xs font-semibold leading-relaxed shadow-2xs whitespace-pre-wrap ${msg.role === "user"
-                        ? "bg-[#FF6014] text-white rounded-tr-none"
-                        : "bg-white text-slate-700 border border-slate-100/50 rounded-tl-none"
+                      ? "bg-[#FF6014] text-white rounded-tr-none"
+                      : "bg-white text-slate-700 border border-slate-100/50 rounded-tl-none"
                       }`}
                   >
                     {parseMessageText(msg.text)}
