@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Truck,
   Search,
@@ -18,6 +20,7 @@ import {
   Image as ImageIcon,
   RefreshCw,
   Users,
+  Eye,
 } from "lucide-react";
 import {
   useGetAllCustomShiftingsQuery,
@@ -27,6 +30,7 @@ import {
 } from "@/redux/features/admin/customShiftingApi";
 import { useGetAllUsersQuery } from "@/redux/features/admin/user";
 import { useAppSelector } from "@/redux/hooks";
+import { CustomSelect } from "@/components/ui/select";
 
 /* ── Status helpers ─────────────────────────────────────────────────── */
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -102,8 +106,8 @@ function DeleteModal({ id, onConfirm, onClose, isDeleting }: { id: number; onCon
 
 /* ── Main Page ───────────────────────────────────────────────────────── */
 export default function CustomShiftingDashboard() {
+  const router = useRouter();
   const role = useAppSelector((state) => state.auth.role) || "";
-  const authUser = useAppSelector((state) => state.auth.user);
   const isSuperAdmin = role === "superadmin";
   const isVendor = role === "vendor";
 
@@ -134,6 +138,12 @@ export default function CustomShiftingDashboard() {
     : Array.isArray(vendorsData)
     ? vendorsData
     : [];
+
+  const vendorsOptions = vendors.map((v) => ({
+    value: String(v.id),
+    label: v.profile?.businessName || v.name || `Vendor #${v.id}`,
+    desc: v.phone || undefined,
+  }));
 
   const filtered = shiftings.filter((s) => {
     const matchesSearch =
@@ -227,17 +237,30 @@ export default function CustomShiftingDashboard() {
       {isSuperAdmin && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
-            { label: "Total", value: stats.total, color: "text-slate-700", bg: "bg-slate-50 border-slate-200" },
-            { label: "Pending", value: stats.pending, color: "text-amber-600", bg: "bg-amber-50 border-amber-200" },
-            { label: "Assigned", value: stats.assigned, color: "text-blue-600", bg: "bg-blue-50 border-blue-200" },
-            { label: "Completed", value: stats.completed, color: "text-green-600", bg: "bg-green-50 border-green-200" },
-            { label: "Vendors Active", value: stats.vendorsAssigned, color: "text-[#FF6014]", bg: "bg-[#FFF8F4] border-orange-200" },
-          ].map((s) => (
-            <div key={s.label} className={`border rounded-2xl p-4 ${s.bg}`}>
-              <p className="text-xs font-semibold text-slate-500 mb-1">{s.label}</p>
-              <p className={`text-2xl font-extrabold ${s.color}`}>{s.value}</p>
-            </div>
-          ))}
+            { label: "Total", value: stats.total, color: "text-slate-700", bg: "bg-slate-50 border-slate-200/60", icon: Truck, iconColor: "text-slate-600 bg-slate-100" },
+            { label: "Pending", value: stats.pending, color: "text-amber-700", bg: "bg-amber-50/60 border-amber-200/50", icon: Clock, iconColor: "text-amber-600 bg-amber-100/80" },
+            { label: "Assigned", value: stats.assigned, color: "text-blue-700", bg: "bg-blue-50/60 border-blue-200/50", icon: UserCheck, iconColor: "text-blue-600 bg-blue-100/80" },
+            { label: "Completed", value: stats.completed, color: "text-green-700", bg: "bg-green-50/60 border-green-200/50", icon: CheckCircle, iconColor: "text-green-600 bg-green-100/80" },
+            { label: "Vendors Active", value: stats.vendorsAssigned, color: "text-[#FF6014]", bg: "bg-[#FFF8F4]/80 border-orange-200/50", icon: Users, iconColor: "text-[#FF6014] bg-orange-100/80" },
+          ].map((s, index) => {
+            const IconComponent = s.icon;
+            return (
+              <div
+                key={s.label}
+                className={`border rounded-3xl p-5 flex items-center justify-between shadow-sm transition-all hover:shadow-md ${s.bg} ${
+                  index === 4 ? "max-sm:col-span-2" : ""
+                }`}
+              >
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{s.label}</p>
+                  <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                </div>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.iconColor}`}>
+                  <IconComponent size={20} />
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -305,7 +328,11 @@ export default function CustomShiftingDashboard() {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filtered.map((shifting) => (
-                  <tr key={shifting.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr
+                    key={shifting.id}
+                    onClick={() => router.push(`/dashbord/custom-shifting/${shifting.id}`)}
+                    className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
+                  >
                     {/* Client */}
                     <td className="px-5 py-4">
                       <div className="font-bold text-sm text-slate-800">{shifting.name}</div>
@@ -315,14 +342,22 @@ export default function CustomShiftingDashboard() {
 
                     {/* Type */}
                     <td className="px-5 py-4">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                        {shifting.shiftingType === "office" ? (
-                          <Building2 size={11} className="text-blue-500" />
-                        ) : (
-                          <Home size={11} className="text-[#FF6014]" />
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+                          {shifting.shiftingType === "office" ? (
+                            <Building2 size={11} className="text-blue-500" />
+                          ) : (
+                            <Home size={11} className="text-[#FF6014]" />
+                          )}
+                          {shifting.shiftingType === "office" ? "Office" : "Home"}
+                        </span>
+                        {shifting.price && (
+                          <div className="text-xs font-black text-slate-800 flex items-center gap-0.5 mt-1">
+                            <span className="text-[#FF6014] font-extrabold">৳</span>
+                            {Number(shifting.price).toLocaleString()}
+                          </div>
                         )}
-                        {shifting.shiftingType === "office" ? "Office" : "Home"}
-                      </span>
+                      </div>
                     </td>
 
                     {/* Route */}
@@ -339,7 +374,10 @@ export default function CustomShiftingDashboard() {
                     <td className="px-5 py-4">
                       {shifting.images && shifting.images.length > 0 ? (
                         <button
-                          onClick={() => setImageModalData(shifting.images)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setImageModalData(shifting.images);
+                          }}
                           className="flex items-center gap-1.5 text-xs font-bold text-[#FF6014] hover:underline"
                         >
                           <ImageIcon size={13} />
@@ -352,17 +390,18 @@ export default function CustomShiftingDashboard() {
                     </td>
 
                     {/* Status */}
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                       {isVendor ? (
-                        <select
+                        <CustomSelect
+                          options={[
+                            { value: "assigned", label: "Assigned" },
+                            { value: "completed", label: "Completed" },
+                          ]}
                           value={shifting.status}
-                          onChange={(e) => handleStatusUpdate(shifting.id, e.target.value)}
+                          onChange={(val) => handleStatusUpdate(shifting.id, val)}
                           disabled={isUpdatingStatus}
-                          className="text-xs font-bold border border-slate-200 rounded-xl px-2.5 py-1.5 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 disabled:opacity-60"
-                        >
-                          <option value="assigned">Assigned</option>
-                          <option value="completed">Completed</option>
-                        </select>
+                          className="min-w-[120px] text-xs font-bold"
+                        />
                       ) : (
                         <StatusBadge status={shifting.status} />
                       )}
@@ -370,7 +409,7 @@ export default function CustomShiftingDashboard() {
 
                     {/* Vendor (Super Admin only) */}
                     {isSuperAdmin && (
-                      <td className="px-5 py-4">
+                      <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         {shifting.vendor ? (
                           <div className="space-y-1.5">
                             <div className="flex items-center gap-1.5 flex-wrap">
@@ -406,27 +445,29 @@ export default function CustomShiftingDashboard() {
                         )}
                         {assigningId === shifting.id && (
                           <div className="mt-2">
-                            <select
-                              defaultValue=""
-                              onChange={(e) => handleAssign(shifting.id, e.target.value)}
+                            <CustomSelect
+                              options={vendorsOptions}
+                              value=""
+                              onChange={(val) => handleAssign(shifting.id, val)}
                               disabled={isAssigning}
-                              className="text-xs border border-slate-200 rounded-xl px-2.5 py-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 w-full disabled:opacity-60"
-                            >
-                              <option value="" disabled>Select vendor...</option>
-                              {vendors.map((v) => (
-                                <option key={v.id} value={v.id}>
-                                  {v.profile?.businessName || v.name || `Vendor #${v.id}`}
-                                </option>
-                              ))}
-                            </select>
+                              placeholder="Select vendor..."
+                              className="w-full text-xs"
+                            />
                           </div>
                         )}
                       </td>
                     )}
 
                     {/* Actions */}
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => router.push(`/dashbord/custom-shifting/${shifting.id}`)}
+                          title="View Details"
+                          className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                        >
+                          <Eye size={14} />
+                        </button>
                         {isSuperAdmin && (
                           <>
                             {shifting.status !== "completed" && (

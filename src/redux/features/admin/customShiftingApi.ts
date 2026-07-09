@@ -14,6 +14,10 @@ export const customShiftingApi = baseApi.injectEndpoints({
       query: () => '/custom-shifting',
       providesTags: ['Admin'],
     }),
+    getCustomShiftingById: builder.query<any, string | number>({
+      query: (id) => `/custom-shifting/${id}`,
+      providesTags: ['Admin'],
+    }),
     getCustomShiftingByVendor: builder.query<any, string | number>({
       query: (vendorId) => `/custom-shifting/vendor/${vendorId}`,
       providesTags: ['Vendor'],
@@ -38,6 +42,14 @@ export const customShiftingApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['Admin', 'Vendor'],
     }),
+    updateShiftingPrice: builder.mutation<any, { id: number; price: number }>({
+      query: ({ id, price }) => ({
+        url: `/custom-shifting/${id}/price`,
+        method: 'PATCH',
+        body: { price },
+      }),
+      invalidatesTags: ['Admin', 'Vendor'],
+    }),
     deleteCustomShifting: builder.mutation<any, number>({
       query: (id) => ({
         url: `/custom-shifting/${id}`,
@@ -52,9 +64,11 @@ export const customShiftingApi = baseApi.injectEndpoints({
 export const {
   useCreateCustomShiftingMutation,
   useGetAllCustomShiftingsQuery,
+  useGetCustomShiftingByIdQuery,
   useGetCustomShiftingByVendorQuery,
   useGetCustomShiftingByUserQuery,
   useAssignVendorToShiftingMutation,
   useUpdateShiftingStatusMutation,
+  useUpdateShiftingPriceMutation,
   useDeleteCustomShiftingMutation,
 } = customShiftingApi;

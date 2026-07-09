@@ -71,7 +71,7 @@ const Hero = () => {
 
   const searchResults = searchRes?.data || [];
 
-  const { data: apiHeroesRes } = useGetAllHeroesQuery();
+  const { data: apiHeroesRes, isLoading } = useGetAllHeroesQuery();
   const heroes = apiHeroesRes?.data || (Array.isArray(apiHeroesRes) ? apiHeroesRes : []);
 
   const slides = heroes.length > 0
@@ -190,6 +190,14 @@ const Hero = () => {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full aspect-[16/9.5] md:aspect-auto md:min-h-[45vh] lg:min-h-[50vh] mt-0 md:mt-2 flex items-center max-w-7xl mx-auto pt-0 md:pt-6 rounded-none md:rounded-[26px] overflow-hidden justify-center py-0 md:py-0">
+        <Loader2 className="w-8 h-8 animate-spin text-[#FF6014]" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full aspect-[16/9.5] md:aspect-auto md:min-h-[45vh] lg:min-h-[50vh] mt-0 md:mt-2 flex items-center max-w-7xl mx-auto pt-0 md:pt-6 rounded-none md:rounded-[26px] overflow-hidden justify-center py-0 md:py-0">
