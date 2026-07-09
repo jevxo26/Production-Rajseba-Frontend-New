@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, ArrowRight, CheckCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
 import { useAppSelector } from "@/redux/hooks";
@@ -73,16 +73,14 @@ export default function TopServices() {
     return (
       <section className="py-5 md:py-8 lg:py-10 bg-transparent">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center gap-4 mb-16">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 animate-pulse" />
-            <div className="space-y-2">
-              <div className="w-48 h-6 bg-slate-100 rounded-md animate-pulse" />
-              <div className="w-32 h-4 bg-slate-50 rounded-md animate-pulse" />
-            </div>
+          <div className="flex flex-col items-center justify-center gap-3 mb-8 md:mb-14">
+            <div className="w-24 h-6 rounded-full bg-slate-100 animate-pulse" />
+            <div className="w-64 md:w-80 h-8 bg-slate-100 rounded-xl animate-pulse" />
+            <div className="w-72 md:w-96 h-4 bg-slate-50 rounded-lg animate-pulse" />
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="h-80 bg-slate-50 rounded-3xl animate-pulse" />
+              <div key={n} className="h-80 bg-slate-50 rounded-3xl animate-pulse border border-slate-100/50" />
             ))}
           </div>
         </div>
@@ -135,10 +133,10 @@ export default function TopServices() {
   };
 
   return (
-    <section className="py-5 md:py-8 lg:py-10  relative overflow-hidden">
+    <section className="py-5 md:py-8 lg:py-10 relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute top-0 right-0 w-1/3 h-[500px]  rounded-bl-full pointer-events-none" />
-      <div className="absolute -left-32 bottom-0 w-96 h-96 bg-blue-50/50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/3 h-[500px] rounded-bl-full pointer-events-none" />
+      <div className="absolute -left-32 bottom-0 w-96 h-96 bg-[#FF6014]/5 rounded-full mix-blend-multiply filter blur-3xl opacity-70 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
 
@@ -193,7 +191,7 @@ export default function TopServices() {
               <motion.div
                 key={service.id}
                 variants={cardVariants}
-                className="bg-white rounded-3xl overflow-hidden border border-blue-200 group flex flex-col h-full hover-card-premium transition-all duration-300 hover:border-blue-500 hover:shadow-blue-100 hover:shadow-lg"
+                className="bg-white rounded-3xl overflow-hidden border border-[#FF6014]/10 group flex flex-col h-full hover-card-premium transition-all duration-300 hover:border-[#FF6014]/30 hover:shadow-[#FF6014]/10 hover:shadow-xl"
               >
                 {/* ── Illustration or image ── */}
                 <div className="relative">
@@ -212,9 +210,7 @@ export default function TopServices() {
 
                   {/* Verified badge */}
                   <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[9px] font-black tracking-wider flex items-center gap-1 shadow-sm text-slate-700 uppercase">
-                    <svg className="w-3 h-3 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l5-5z" clipRule="evenodd" />
-                    </svg>
+                    <ShieldCheck size={12} className="text-[#FF6014]" />
                     Verified
                   </div>
 
@@ -261,8 +257,9 @@ export default function TopServices() {
                         {service.description.replace(/<[^>]*>/g, "")}
                       </p>
                     )}
-                    <p className="text-[10px] text-slate-500 font-semibold pt-1">
-                      <span className="text-emerald-500 font-bold">{totalBookings}</span> bookings completed
+                    <p className="text-[10px] text-slate-500 font-semibold pt-1.5 flex items-center gap-1">
+                      <CheckCircle size={12} className="text-emerald-500" />
+                      <span><span className="text-emerald-600 font-bold">{totalBookings}</span> bookings completed</span>
                     </p>
                   </div>
 
@@ -285,8 +282,8 @@ export default function TopServices() {
                       )}
                     </div>
                     <Link href={`/services/${service.id}`}>
-                      <Button className="bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg">
-                        Details
+                      <Button className="bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-extrabold px-4 py-2 h-auto rounded-xl transition-all cursor-pointer hover:scale-105 border-none shadow-md hover:shadow-lg flex items-center gap-1.5">
+                        Details <ArrowRight size={13} strokeWidth={3} />
                       </Button>
                     </Link>
                   </div>
@@ -299,10 +296,10 @@ export default function TopServices() {
         {/* View All Button */}
         {!isLoading && !isError && displayServices.length > 0 && (
           <div className="flex justify-center mt-10 md:mt-12">
-            <Button variant="outline" className="rounded-xl font-bold h-12 px-6 border-slate-200 hover:border-[#FF6014] hover:text-[#FF6014] hover:bg-rose-50/50 group" asChild>
+            <Button variant="outline" className="rounded-xl font-bold h-12 px-3 border-slate-200 hover:border-[#FF6014] hover:text-[#FF6014] hover:bg-rose-50/50 group" asChild>
               <Link href="/services">
                 View All Services
-                <svg className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-2 h-2 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
