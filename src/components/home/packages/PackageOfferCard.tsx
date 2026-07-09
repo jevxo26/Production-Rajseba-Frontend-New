@@ -26,10 +26,10 @@ export function PackageOfferCard({
     <motion.div
       variants={itemVariants}
       className={`rounded-3xl relative flex flex-col h-full transition-all hover:-translate-y-1 overflow-hidden ${pkg.variant === "popular"
-          ? "border-2 border-[#FF6014] bg-rose-50/50 shadow-xl"
+          ? "border-2 border-blue-500 bg-blue-50/50 shadow-blue-500/20 shadow-xl"
           : pkg.variant === "dark"
-            ? "bg-[#261817] text-white border border-blue-200 hover:border-blue-500"
-            : "bg-white border border-blue-200 shadow-sm hover:border-blue-500 hover:shadow-blue-100 hover:shadow-lg"
+            ? "bg-[#261817] text-white border border-blue-200 hover:border-blue-500 hover:shadow-blue-500/20"
+            : "bg-white border border-blue-200 shadow-sm hover:border-blue-500 hover:shadow-blue-500/20 hover:shadow-xl"
         }`}
     >
       {/* Badge */}

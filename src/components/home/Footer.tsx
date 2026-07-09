@@ -269,7 +269,7 @@ export default function Footer() {
             <span>
               Developed by{" "}
               <Link
-                href="https://jevxo-core-ecosystem.vercel.app/"
+                href="https://www.jevxo.com"
                 target="_blank"
                 className="text-[#FF6014] font-semibold hover:underline"
               >

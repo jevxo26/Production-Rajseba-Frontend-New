@@ -85,7 +85,7 @@ const LEFT_NAV_LINKS: NavLink[] = [
   { label: "Home", href: "/", icon: HomeIcon },
   { label: "Menu", href: "#menu", icon: LayoutGrid, hasDropdown: true },
   { label: "Services", href: "/services", icon: Briefcase },
-  { label: "Home Shifting", href: "/home-shifting", icon: Truck },
+  { label: "Shifting", href: "/home-shifting", icon: Truck },
   { label: "Booking", href: "/bookings", icon: Calendar },
 ];
 
@@ -684,7 +684,7 @@ export function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       <Icon className="w-5 h-5 text-slate-500" />
-                      <span>{link.label === "Home Shifting" ? "Shifting" : link.label}</span>
+                      <span>{link.label === "Shifting" ? "Shifting" : link.label}</span>
                     </Link>
                   );
                 })}

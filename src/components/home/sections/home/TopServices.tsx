@@ -191,7 +191,7 @@ export default function TopServices() {
               <motion.div
                 key={service.id}
                 variants={cardVariants}
-                className="bg-white rounded-3xl overflow-hidden border border-[#FF6014]/10 group flex flex-col h-full hover-card-premium transition-all duration-300 hover:border-[#FF6014]/30 hover:shadow-[#FF6014]/10 hover:shadow-xl"
+                className="bg-white rounded-3xl overflow-hidden border border-blue-200 group flex flex-col h-full hover-card-premium transition-all duration-300 hover:border-blue-500 hover:shadow-blue-500/20 hover:shadow-xl"
               >
                 {/* ── Illustration or image ── */}
                 <div className="relative">
@@ -293,19 +293,7 @@ export default function TopServices() {
           })}
         </motion.div >
 
-        {/* View All Button */}
-        {!isLoading && !isError && displayServices.length > 0 && (
-          <div className="flex justify-center mt-10 md:mt-12">
-            <Button variant="outline" className="rounded-xl font-bold h-12 px-3 border-slate-200 hover:border-[#FF6014] hover:text-[#FF6014] hover:bg-rose-50/50 group" asChild>
-              <Link href="/services">
-                View All Services
-                <svg className="w-2 h-2 ml-2 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </Button>
-          </div>
-        )}
+
 
         {/* Empty state */}
         {
@@ -316,5 +304,5 @@ export default function TopServices() {
 
       </div>
     </section>
-  );
+  )
 }
