@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { CustomTable } from "@/components/ui/table";
-import { Calendar, User, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText } from "lucide-react";
-import InvoiceModal from "./InvoiceModal";
+import { Calendar, User, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText, Download } from "lucide-react";
 import AssignEmployeeModal from "./AssignEmployeeModal";
 import { printBookingInvoice } from "@/utils/invoicePrint";
 
@@ -69,7 +68,6 @@ import { useGetAllNestedServicesQuery } from '@/redux/features/admin/service';
 
 export default function BookingTable({ filteredBookings, setDeleteModalBookingId, lang, handleStatusChange, roleName }: BookingTableProps) {
   const t = translations[lang];
-  const [invoiceBooking, setInvoiceBooking] = useState<any>(null);
   const [assignBooking, setAssignBooking] = useState<any>(null);
 
   // Fetch all nested services to map sub-services accurately
@@ -197,7 +195,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
             className="p-2 rounded-xl border border-[#FF6014]/20 hover:border-[#FF6014] hover:text-white hover:bg-[#FF6014] text-[#FF6014] bg-[#FFF8F4] transition-all shadow-sm cursor-pointer"
             title="Download Invoice"
           >
-            <FileText size={16} />
+            <Download size={16} />
           </button>
           <button
             onClick={() => setDeleteModalBookingId(item.id)}
@@ -245,10 +243,10 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
               </div>
               <div className="md:col-span-2 pt-1">
                 <button 
-                  onClick={() => setInvoiceBooking(row)}
-                  className="w-full flex justify-center items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                  onClick={() => printBookingInvoice(row)}
+                  className="w-full flex justify-center items-center gap-2 bg-[#FF6014] hover:bg-[#E0530A] text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer"
                 >
-                  <FileText size={16} /> Create Invoice
+                  <Download size={16} /> Download PDF
                 </button>
               </div>
             </div>
@@ -474,12 +472,6 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
         data={filteredBookings}
         rowClassName={getRowClassName}
         expandableContent={renderExpandedContent}
-      />
-
-      <InvoiceModal 
-        isOpen={!!invoiceBooking} 
-        onClose={() => setInvoiceBooking(null)} 
-        booking={invoiceBooking} 
       />
 
       <AssignEmployeeModal

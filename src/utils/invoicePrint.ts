@@ -106,8 +106,29 @@ export const printHTML = async (htmlContent: string, filename: string = 'invoice
       jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
     };
 
-    // Generate PDF and trigger download
-    await html2pdf().set(opt).from(element).save();
+    // If the browser extension is active, send the dataurl directly to the extension for silent direct download
+    if ((window as any).__rajseba_extension_active) {
+      const pdfWorker = html2pdf().set(opt).from(element).toPdf();
+      const dataUrl = await pdfWorker.output('dataurlstring');
+      window.dispatchEvent(new CustomEvent('rajseba-direct-download', { 
+        detail: { dataUrl, filename } 
+      }));
+      document.body.removeChild(element);
+      return;
+    }
+
+    // Generate PDF and handle download/preview
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      const pdfWorker = html2pdf().set(opt).from(element).toPdf();
+      const blobUrl = await pdfWorker.output('bloburl');
+      const newWindow = window.open(blobUrl, '_blank');
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        window.location.href = blobUrl;
+      }
+    } else {
+      await html2pdf().set(opt).from(element).save();
+    }
 
     // Clean up
     document.body.removeChild(element);
@@ -188,7 +209,7 @@ export const printBookingInvoice = (booking: any) => {
           body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 40px;
+            padding: 0;
             color: #334155;
             background-color: #ffffff;
             -webkit-print-color-adjust: exact;
@@ -198,7 +219,9 @@ export const printBookingInvoice = (booking: any) => {
             max-width: 800px;
             margin: 0 auto;
             position: relative;
-            min-height: 1000px;
+            min-height: 1120px;
+            padding: 40px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -435,10 +458,11 @@ export const printBookingInvoice = (booking: any) => {
           }
           @media print {
             body {
-              padding: 20px;
+              padding: 0;
             }
             .container {
-              min-height: 90vh;
+              padding: 20px;
+              min-height: 95vh;
             }
           }
         </style>
@@ -601,7 +625,7 @@ export const printWithdrawInvoice = (withdraw: any) => {
           body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 40px;
+            padding: 0;
             color: #334155;
             background-color: #ffffff;
             -webkit-print-color-adjust: exact;
@@ -611,7 +635,9 @@ export const printWithdrawInvoice = (withdraw: any) => {
             max-width: 800px;
             margin: 0 auto;
             position: relative;
-            min-height: 1000px;
+            min-height: 1120px;
+            padding: 40px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1005,7 +1031,7 @@ export const printAllWithdrawsInvoice = (withdraws: any[], totalAmount: number) 
           body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 40px;
+            padding: 0;
             color: #334155;
             background-color: #ffffff;
             -webkit-print-color-adjust: exact;
@@ -1015,7 +1041,9 @@ export const printAllWithdrawsInvoice = (withdraws: any[], totalAmount: number) 
             max-width: 800px;
             margin: 0 auto;
             position: relative;
-            min-height: 1000px;
+            min-height: 1120px;
+            padding: 40px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1392,7 +1420,7 @@ export const printClientStatement = (bookings: any[], totalAmount: number) => {
           body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 40px;
+            padding: 0;
             color: #334155;
             background-color: #ffffff;
             -webkit-print-color-adjust: exact;
@@ -1402,7 +1430,9 @@ export const printClientStatement = (bookings: any[], totalAmount: number) => {
             max-width: 800px;
             margin: 0 auto;
             position: relative;
-            min-height: 1000px;
+            min-height: 1120px;
+            padding: 40px;
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;

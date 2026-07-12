@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Printer } from 'lucide-react';
+import { X, Download } from 'lucide-react';
 import dayjs from 'dayjs';
 import { printBookingInvoice } from '@/utils/invoicePrint';
 
@@ -48,7 +48,7 @@ export default function InvoiceModal({ isOpen, onClose, booking }: InvoiceModalP
               onClick={handlePrint}
               className="flex items-center gap-2 bg-[#FF6014] hover:bg-[#E0530A] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm shadow-[#FF6014]/20 cursor-pointer active:scale-95"
             >
-              <Printer size={16} /> Print / Save PDF
+              <Download size={16} /> Download PDF
             </button>
             <button onClick={onClose} className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all cursor-pointer">
               <X size={20} />
