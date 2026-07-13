@@ -151,7 +151,7 @@ export default function Footer() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
-        className="w-full max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6 pt-6 pb-8 md:pt-12 md:pb-16 relative z-10"
+        className="w-full md:max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6 pt-6 pb-8 md:pt-12 md:pb-16 relative z-10"
       >
         <div className="grid grid-cols-2 md:grid-cols-12 gap-x-6 gap-y-10 md:gap-x-8 lg:gap-x-10">
           {/* ── Brand (4/12 columns on desktop, full width on mobile) ── */}
@@ -267,7 +267,7 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div className="border-t border-slate-200/50 bg-slate-50/40 backdrop-blur-md relative z-10">
-        <div className="w-full max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="w-full md:max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1.5 text-[12px] text-slate-500 font-medium">
             <span>
               © {new Date().getFullYear()} Rajseba. All rights reserved.

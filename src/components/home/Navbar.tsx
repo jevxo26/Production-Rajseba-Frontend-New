@@ -126,6 +126,42 @@ const MOBILE_BOTTOM_LINKS: NavLink[] = [
   { label: "Login", href: "/login", icon: User },
 ];
 
+const mobileDrawerVariants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: {
+    opacity: 1,
+    height: "auto",
+    transition: {
+      height: { duration: 0.28, ease: "easeOut" },
+      staggerChildren: 0.04,
+      delayChildren: 0.02,
+    } as any,
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+    transition: {
+      height: { duration: 0.2, ease: "easeIn" },
+      staggerChildren: 0.02,
+      staggerDirection: -1,
+    } as any,
+  },
+};
+
+const mobileItemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: "easeOut" } as any,
+  },
+  exit: {
+    opacity: 0,
+    y: 8,
+    transition: { duration: 0.15 } as any,
+  },
+};
+
 export function Navbar() {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, role, isLoading: authLoading } = useAppSelector((state) => state.auth);
@@ -267,7 +303,7 @@ export function Navbar() {
         style={{ boxShadow: headerShadow, borderBottomColor: borderColor }}
         className="bg-white/80 md:bg-white/70 backdrop-blur-md border-b sticky top-0 z-50 transition-all duration-300"
       >
-        <div className="w-full max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6">
+        <div className="w-full md:max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6">
           {/* ─── TOP BAR ─── */}
           <div className="relative flex items-center justify-between h-16 sm:h-[68px] gap-3">
             {/* Left Section: Brand Logo + Desktop Navigation Links */}
@@ -442,10 +478,10 @@ export function Navbar() {
               </nav>
             </div>
 
-            {/* Desktop & Laptop Search Bar - Flex auto-fill */}
+            {/* Desktop & Laptop Search Bar - Aligned to the right next to profile */}
             <div
               ref={desktopSearchContainerRef}
-              className="hidden md:block flex-1 min-w-0 mx-4 lg:mx-6 relative z-20"
+              className="hidden md:block w-full max-w-[240px] lg:max-w-[280px] xl:max-w-[320px] ml-auto mr-4 lg:mr-6 relative z-20"
             >
               <div className="w-full flex items-center bg-slate-50/60 hover:bg-slate-50/80 border border-slate-200/80 focus-within:bg-white focus-within:border-[#FF6014]/50 rounded-full pl-4 pr-3 h-10.5 gap-2.5 shadow-sm hover:shadow transition-all duration-200 focus-within:shadow-[0_4px_20px_-2px_rgba(255,96,20,0.12)]">
                 <Search className="w-4 h-4 text-slate-400 group-focus-within:text-[#FF6014] transition-colors flex-shrink-0" aria-hidden="true" />
@@ -776,13 +812,13 @@ export function Navbar() {
               id="mobile-menu"
               role="navigation"
               aria-label="Mobile navigation"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.22, ease: "easeInOut" }}
-              className="md:hidden max-h-[calc(100vh-70px)] overflow-y-auto border-t border-slate-200/30 bg-[#FFFDFB]/85 backdrop-blur-xl shadow-inner pb-8 scrollbar-thin"
+              variants={mobileDrawerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="md:hidden absolute top-full left-0 right-0 z-[99] max-h-[calc(100vh-80px)] overflow-y-auto border-t border-slate-100 bg-white/95 backdrop-blur-xl shadow-[0_12px_30px_rgba(0,0,0,0.08)] pb-8 scrollbar-none"
             >
-              <div className="px-4 py-4 space-y-1">
+              <div className="px-4.5 py-4 space-y-2">
                 {ALL_NAV_LINKS.map((link, i) => {
                   const active = link.hasDropdown
                     ? pathname.startsWith("/categories") || pathname.startsWith("/services")
@@ -791,19 +827,20 @@ export function Navbar() {
 
                   if (link.hasDropdown) {
                     return (
-                      <div key={i} className="space-y-1">
+                      <motion.div key={i} variants={mobileItemVariants} className="space-y-1">
                         <div
-                          className={`w-full flex items-center justify-between px-3 py-3 font-semibold text-[15px] rounded-xl transition-all ${active
-                            ? "text-[#FF6014] bg-[#FF6014]/8 border border-[#FF6014]/15"
-                            : "text-slate-700 hover:bg-orange-50/50 hover:text-[#FF6014] border border-transparent"
-                            }`}
+                          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all ${
+                            active
+                              ? "text-[#FF6014] bg-[#FFF4EE] font-bold border-l-2 border-[#FF6014]"
+                              : "text-slate-700 hover:bg-slate-50 border-l-2 border-transparent"
+                          }`}
                         >
                           <Link
                             href={link.href}
-                            className="flex items-center gap-2.5 flex-1"
+                            className="flex items-center gap-2 flex-grow text-sm font-semibold"
                             onClick={() => setIsOpen(false)}
                           >
-                            <Icon className="w-5 h-5 text-slate-500" />
+                            <Icon className={`w-[18px] h-[18px] ${active ? "text-[#FF6014]" : "text-slate-400"}`} />
                             <span>{link.label}</span>
                           </Link>
                           <button
@@ -811,7 +848,7 @@ export function Navbar() {
                             onClick={() => setShowMobileAccordion(!showMobileAccordion)}
                             aria-label={showMobileAccordion ? "Collapse categories" : "Expand categories"}
                             aria-expanded={showMobileAccordion}
-                            className="p-1.5 -m-1.5 cursor-pointer"
+                            className="p-1 text-slate-400 hover:text-[#FF6014] transition-colors cursor-pointer"
                           >
                             <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showMobileAccordion ? "rotate-180" : ""}`} />
                           </button>
@@ -823,76 +860,84 @@ export function Navbar() {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="overflow-hidden pl-2 pr-2 py-1"
+                              transition={{ duration: 0.22, ease: "easeOut" }}
+                              className="overflow-hidden pl-2 pr-1 py-1"
                             >
                               <div className="grid grid-cols-2 gap-2">
                                 {apiCategories.length === 0 ? (
                                   [1, 2, 3, 4].map((n) => (
-                                    <div key={n} className="h-20 bg-slate-50 rounded-xl animate-pulse" />
+                                    <div key={n} className="h-16 bg-slate-50/70 rounded-xl animate-pulse" />
                                   ))
-                                ) : apiCategories.map((cat: any) => {
-                                  const isCategoryActive = pathname === `/categories/${cat.id}`;
-                                  const CatIcon = getCategoryIcon(cat.name);
-                                  return (
-                                    <Link
-                                      key={cat.id}
-                                      href={`/categories/${cat.id}`}
-                                      className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all text-sm font-medium ${isCategoryActive
-                                        ? "bg-orange-50/80 text-[#FF6014] font-semibold border border-orange-100/60"
-                                        : "text-slate-600 hover:bg-orange-50/30 hover:text-[#FF6014] border border-transparent hover:border-slate-100"
+                                ) : (
+                                  apiCategories.map((cat: any) => {
+                                    const isCategoryActive = pathname === `/categories/${cat.id}`;
+                                    const CatIcon = getCategoryIcon(cat.name);
+                                    return (
+                                      <Link
+                                        key={cat.id}
+                                        href={`/categories/${cat.id}`}
+                                        className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all ${
+                                          isCategoryActive
+                                            ? "bg-[#FFF4EE] border-[#FF6014]/20 text-[#FF6014] font-bold"
+                                            : "bg-slate-50/50 border-slate-100 text-slate-600 hover:bg-slate-50 hover:text-[#FF6014]"
                                         }`}
-                                      onClick={() => { setIsOpen(false); setShowMobileAccordion(false); }}
-                                    >
-                                      <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
-                                        <CatIcon className={`w-5 h-5 ${isCategoryActive ? "text-[#FF6014]" : "text-slate-400"}`} />
-                                      </div>
-                                      <span className="line-clamp-2 text-center text-xs leading-snug">{cat.name}</span>
-                                      {isCategoryActive && (
-                                        <div className="w-1.5 h-1.5 bg-[#FF6014] rounded-full" />
-                                      )}
-                                    </Link>
-                                  );
-                                })}
+                                        onClick={() => {
+                                          setIsOpen(false);
+                                          setShowMobileAccordion(false);
+                                        }}
+                                      >
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                          isCategoryActive ? "bg-[#FF6014] text-white" : "bg-white border border-slate-200/60 text-slate-400"
+                                        }`}>
+                                          <CatIcon className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-[10px] leading-tight text-center font-medium line-clamp-1">{cat.name}</span>
+                                      </Link>
+                                    );
+                                  })
+                                )}
                               </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
-                      </div>
+                      </motion.div>
                     );
                   }
 
                   return (
-                    <Link
-                      key={i}
-                      href={link.href}
-                      className={`flex items-center gap-2.5 px-3 py-3 font-semibold text-[15px] rounded-xl transition-all ${active
-                        ? "text-[#FF6014] bg-[#FF6014]/8 border border-[#FF6014]/15"
-                        : "text-slate-700 hover:bg-orange-50/50 hover:text-[#FF6014] border border-transparent"
+                    <motion.div key={i} variants={mobileItemVariants}>
+                      <Link
+                        href={link.href}
+                        className={`flex items-center gap-2 px-3 py-2.5 text-sm font-semibold rounded-xl transition-all ${
+                          active
+                            ? "text-[#FF6014] bg-[#FFF4EE] font-bold border-l-2 border-[#FF6014]"
+                            : "text-slate-700 hover:bg-slate-50 border-l-2 border-transparent"
                         }`}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Icon className="w-5 h-5 text-slate-500" />
-                      <span>{link.label}</span>
-                    </Link>
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Icon className={`w-[18px] h-[18px] ${active ? "text-[#FF6014]" : "text-slate-400"}`} />
+                        <span>{link.label}</span>
+                      </Link>
+                    </motion.div>
                   );
                 })}
 
                 {/* Auth Section */}
                 {!mounted || authLoading ? (
-                  <div className="pt-4 border-t border-slate-100 mt-1">
-                    <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-slate-50">
-                      <div className="w-12 h-12 bg-slate-200 rounded-full animate-pulse" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 bg-slate-200 rounded animate-pulse w-3/4" />
-                        <div className="h-2.5 bg-slate-200 rounded animate-pulse w-1/2" />
+                  <motion.div variants={mobileItemVariants} className="pt-3 border-t border-slate-100 mt-2">
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/60">
+                      <div className="w-10 h-10 bg-slate-200 rounded-full animate-pulse shrink-0" />
+                      <div className="flex-grow space-y-1.5">
+                        <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
+                        <div className="h-2 bg-slate-200 rounded animate-pulse w-1/2" />
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ) : isAuthenticated && profile ? (
-                  <div className="pt-4 border-t border-slate-200/30 mt-1 space-y-4">
-                    <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white/50 border border-slate-200/40 backdrop-blur-md">
-                      <div className="w-12 h-12 bg-orange-100 text-[#FF6014] font-bold rounded-full flex items-center justify-center overflow-hidden border border-orange-200 shadow-inner select-none shrink-0">
+                  <motion.div variants={mobileItemVariants} className="pt-3 border-t border-slate-100 mt-2 space-y-3">
+                    {/* User profile card */}
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/40 border border-slate-100">
+                      <div className="w-10 h-10 bg-orange-50 text-[#FF6014] font-bold rounded-full flex items-center justify-center overflow-hidden border border-orange-100 shadow-inner shrink-0 select-none">
                         {profile.avatarUrl ? (
                           <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" />
                         ) : (
@@ -900,66 +945,73 @@ export function Navbar() {
                         )}
                       </div>
                       <div className="min-w-0 flex-grow">
-                        <p className="text-sm font-bold text-slate-800 truncate leading-none">{profile.name}</p>
-                        <p className="text-xs text-slate-400 mt-1 truncate font-medium leading-none">{profile.email}</p>
-                        <span className="inline-block px-2 py-0.5 text-[9px] font-bold text-[#FF6014] bg-orange-50 border border-orange-100/50 rounded-full mt-1.5">
+                        <p className="text-xs font-bold text-slate-800 truncate">{profile.name}</p>
+                        <p className="text-[10px] text-slate-400 truncate mt-0.5 font-medium">{profile.email}</p>
+                        <span className="inline-block px-1.5 py-0.5 text-[8px] font-bold text-[#FF6014] bg-[#FFF4EE] border border-[#FF6014]/15 rounded-full mt-1.5 leading-none">
                           {profile.roleName}
                         </span>
                       </div>
                     </div>
+
+                    {/* Quick action grid */}
                     <div className="grid grid-cols-3 gap-2">
                       <Link
                         href={role === "client" ? "/dashbord/overview" : "/dashbord"}
-                        className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/40 border border-slate-200/30 text-slate-700 hover:bg-orange-50/60 hover:text-[#FF6014] transition-all gap-1.5"
+                        className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white border border-slate-200/50 text-slate-700 hover:bg-[#FFF4EE] hover:text-[#FF6014] hover:border-[#FF6014]/20 transition-all gap-1 cursor-pointer"
                         onClick={() => setIsOpen(false)}
                       >
-                        <LayoutGrid size={18} className="text-slate-400" />
-                        <span className="text-[11px] font-bold">Dashboard</span>
+                        <LayoutGrid size={15} className="text-slate-400 group-hover:text-[#FF6014]" />
+                        <span className="text-[10px] font-bold">Dashboard</span>
                       </Link>
                       <Link
                         href="/dashbord/profile"
-                        className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/40 border border-slate-200/30 text-slate-700 hover:bg-orange-50/60 hover:text-[#FF6014] transition-all gap-1.5"
+                        className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white border border-slate-200/50 text-slate-700 hover:bg-[#FFF4EE] hover:text-[#FF6014] hover:border-[#FF6014]/20 transition-all gap-1 cursor-pointer"
                         onClick={() => setIsOpen(false)}
                       >
-                        <User size={18} className="text-slate-400" />
-                        <span className="text-[11px] font-bold">Profile</span>
+                        <User size={15} className="text-slate-400 group-hover:text-[#FF6014]" />
+                        <span className="text-[10px] font-bold">Profile</span>
                       </Link>
                       <Link
                         href="/dashbord/settings"
-                        className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/40 border border-slate-200/30 text-slate-700 hover:bg-orange-50/60 hover:text-[#FF6014] transition-all gap-1.5"
+                        className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white border border-slate-200/50 text-slate-700 hover:bg-[#FFF4EE] hover:text-[#FF6014] hover:border-[#FF6014]/20 transition-all gap-1 cursor-pointer"
                         onClick={() => setIsOpen(false)}
                       >
-                        <Settings size={18} className="text-slate-400" />
-                        <span className="text-[11px] font-bold">Settings</span>
+                        <Settings size={15} className="text-slate-400 group-hover:text-[#FF6014]" />
+                        <span className="text-[10px] font-bold">Settings</span>
                       </Link>
                     </div>
+
+                    {/* Sign out */}
                     <button
-                      onClick={() => { setIsOpen(false); dispatch(authLogout()); }}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-rose-500/10 text-rose-600 hover:bg-rose-500/15 border border-rose-200/20 font-bold text-[15px] transition-all active:scale-[0.98]"
+                      onClick={() => {
+                        setIsOpen(false);
+                        dispatch(authLogout());
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-rose-50 border border-rose-100 hover:bg-rose-100/65 text-rose-600 font-bold text-xs transition-all active:scale-[0.98] cursor-pointer"
                     >
-                      <LogOut size={16} />
+                      <LogOut size={14} />
                       <span>Sign Out</span>
                     </button>
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200/30 mt-1">
+                  <motion.div variants={mobileItemVariants} className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 mt-2">
                     <Link
                       href="/login"
-                      className="flex items-center justify-center gap-2 py-3 text-slate-700 font-semibold text-[15px] border border-slate-200/60 bg-white/40 rounded-xl hover:border-[#FF6014] hover:text-[#FF6014] hover:bg-[#FF6014]/5 transition-all"
+                      className="flex items-center justify-center gap-1.5 py-2.5 text-slate-700 font-bold text-xs border border-slate-200 bg-white rounded-xl hover:border-[#FF6014] hover:text-[#FF6014] transition-all cursor-pointer"
                       onClick={() => setIsOpen(false)}
                     >
-                      <LogIn className="w-4 h-4" />
+                      <LogIn className="w-3.5 h-3.5" />
                       Login
                     </Link>
                     <Link
                       href="/register"
-                      className="flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#FF6014] to-[#FF7A37] text-white font-semibold text-[15px] rounded-xl shadow-sm hover:shadow-lg hover:shadow-orange-500/15 transition-all active:scale-[0.98]"
+                      className="flex items-center justify-center gap-1.5 py-2.5 bg-gradient-to-r from-[#FF6014] to-[#FF7A37] text-white font-bold text-xs rounded-xl shadow-sm hover:shadow hover:shadow-orange-500/10 transition-all active:scale-[0.98] cursor-pointer"
                       onClick={() => setIsOpen(false)}
                     >
-                      <UserPlus className="w-4 h-4" />
+                      <UserPlus className="w-3.5 h-3.5" />
                       Signup
                     </Link>
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
