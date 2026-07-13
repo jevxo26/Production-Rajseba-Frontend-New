@@ -301,7 +301,11 @@ export function Navbar() {
     <>
       <motion.nav
         style={{ boxShadow: headerShadow, borderBottomColor: borderColor }}
-        className="bg-white/80 md:bg-white/70 backdrop-blur-md border-b sticky top-0 z-50 transition-all duration-300"
+        className={`backdrop-blur-md border-b sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/95 border-slate-200"
+            : "bg-white/80 md:bg-white/70 border-slate-100/80"
+        }`}
       >
         <div className="w-full md:max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6">
           {/* ─── TOP BAR ─── */}

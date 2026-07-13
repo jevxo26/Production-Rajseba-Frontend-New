@@ -558,8 +558,8 @@ export default function ServiceListing({
                       key={page}
                       onClick={() => setFilters({ currentPage: page })}
                       className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition-all shadow-sm cursor-pointer ${currentPage === page
-                          ? "bg-[#FF6014] text-white border-[#FF6014]"
-                          : "border border-slate-100 bg-white text-slate-600 hover:border-[#FF6014] hover:text-[#FF6014]"
+                        ? "bg-[#FF6014] text-white border-[#FF6014]"
+                        : "border border-slate-100 bg-white text-slate-600 hover:border-[#FF6014] hover:text-[#FF6014]"
                         }`}
                     >
                       {page}

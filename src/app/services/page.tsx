@@ -28,7 +28,7 @@ const Services = () => {
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
-      <div className="relative space-y-16 md:space-y-24 lg:space-y-32">
+      <div className="relative space-y-4 md:space-y-6 lg:space-y-8">
         <TrendingServices />
         <Suspense fallback={
           <div className="flex justify-center items-center py-20">

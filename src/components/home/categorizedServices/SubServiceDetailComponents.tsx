@@ -91,9 +91,16 @@ export function SubServiceDetailCard({
         {subService.description && (
           <div className="space-y-2">
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Service Inclusions</h4>
-            <p className="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
-              {subService.description}
-            </p>
+            {/<[a-z]/.test(subService.description) ? (
+              <div
+                className="text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 rich-content"
+                dangerouslySetInnerHTML={{ __html: subService.description }}
+              />
+            ) : (
+              <p className="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                {subService.description}
+              </p>
+            )}
           </div>
         )}
 
@@ -156,7 +163,8 @@ export function SubServiceDetailDrawer({
   onUpdateQuantity,
 }: SubServiceDetailProps & { isOpen: boolean }) {
   useEffect(() => {
-    if (isOpen) {
+    const isMobile = window.matchMedia("(max-width: 1023px)").matches;
+    if (isOpen && isMobile) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -258,9 +266,16 @@ export function SubServiceDetailDrawer({
               {subService.description && (
                 <div className="space-y-2">
                   <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Service Inclusions</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
-                    {subService.description}
-                  </p>
+                  {/<[a-z]/.test(subService.description) ? (
+                    <div
+                      className="text-sm text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50 rich-content"
+                      dangerouslySetInnerHTML={{ __html: subService.description }}
+                    />
+                  ) : (
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium whitespace-pre-line bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">
+                      {subService.description}
+                    </p>
+                  )}
                 </div>
               )}
 

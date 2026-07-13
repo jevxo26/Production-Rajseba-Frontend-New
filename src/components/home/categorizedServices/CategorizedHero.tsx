@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Zap,
   ShieldCheck,
@@ -94,6 +95,42 @@ export function CategorizedHero({
     }
   };
 
+  const renderHighlightedTitle = (title: string) => {
+    const words = title.split(" ");
+    if (words.length <= 1) return title;
+
+    const stopWords = ["and", "or", "in", "for", "with", "of", "to", "a", "the", "at", "by", "from", "on", "service", "services"];
+
+    // Find the best word to highlight:
+    const middleIndex = Math.floor(words.length / 2);
+    let highlightIndex = middleIndex;
+
+    // Check if middle word is a stop word, if so, look around
+    if (stopWords.includes(words[middleIndex].toLowerCase())) {
+      if (middleIndex - 1 >= 0 && !stopWords.includes(words[middleIndex - 1].toLowerCase())) {
+        highlightIndex = middleIndex - 1;
+      } else if (middleIndex + 1 < words.length && !stopWords.includes(words[middleIndex + 1].toLowerCase())) {
+        highlightIndex = middleIndex + 1;
+      }
+    }
+
+    return (
+      <>
+        {words.map((word, idx) => {
+          const isHighlighted = idx === highlightIndex;
+          return (
+            <React.Fragment key={idx}>
+              <span className={isHighlighted ? "text-[#FF6014]" : ""}>
+                {word}
+              </span>
+              {idx < words.length - 1 ? " " : ""}
+            </React.Fragment>
+          );
+        })}
+      </>
+    );
+  };
+
   return (
     <div className="py-10 md:py-14 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -118,7 +155,7 @@ export function CategorizedHero({
             {/* Title + Wishlist */}
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-slate-900 max-w-xl">
-                {displayName}
+                {renderHighlightedTitle(displayName)}
               </h1>
               <motion.button
                 whileHover={{ scale: 1.1 }}

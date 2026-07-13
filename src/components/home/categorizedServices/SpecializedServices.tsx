@@ -231,9 +231,16 @@ export function SpecializedServices({
                     <h3 className="text-lg md:text-xl font-black text-slate-800 group-hover:text-[#FF6014] transition-colors leading-snug">
                       {service.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold max-w-xl">
-                      {service.description}
-                    </p>
+                    {/<[a-z]/.test(service.description) ? (
+                      <div
+                        className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold max-w-xl rich-content"
+                        dangerouslySetInnerHTML={{ __html: service.description }}
+                      />
+                    ) : (
+                      <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-semibold max-w-xl">
+                        {service.description}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -290,8 +297,8 @@ export function SpecializedServices({
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="bg-[#FFF8F4]/30 border border-slate-100 p-5 rounded-[28px] shadow-xs mt-3">
-                      <div className="flex flex-col gap-3">
+                    <div className="bg-[#FFF8F4]/30 border border-slate-100 p-3 sm:p-5 rounded-[24px] sm:rounded-[28px] shadow-xs mt-3">
+                      <div className="flex flex-col gap-2.5">
                         {service.subServices?.map((sub) => {
                           const isAdded = isInCart(sub.id);
                           const quantity = getQuantity(sub.id);
@@ -300,7 +307,7 @@ export function SpecializedServices({
                             <div
                               key={sub.id}
                               onClick={() => onSubServiceClick?.({ ...sub, parentTitle: service.title, parentService: service })}
-                              className={`flex items-center justify-between p-4 rounded-2xl border bg-white transition-all gap-4 cursor-pointer group
+                              className={`flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl border bg-white transition-all gap-3 sm:gap-4 cursor-pointer group
                                 ${isSelected
                                   ? "border-[#FF6014]/50 shadow-md ring-2 ring-[#FF6014]/10 bg-gradient-to-br from-white to-[#FFF8F4]/50"
                                   : isAdded
@@ -309,31 +316,31 @@ export function SpecializedServices({
                                 }`}
                             >
                               <div className="min-w-0 flex-1">
-                                <h4 className={`text-sm font-bold leading-snug transition-colors ${isSelected ? "text-[#FF6014]" : "text-slate-800 group-hover:text-[#FF6014]"}`}>
+                                <h4 className={`text-xs sm:text-sm font-bold leading-snug transition-colors ${isSelected ? "text-[#FF6014]" : "text-slate-800 group-hover:text-[#FF6014]"}`}>
                                   {sub.name}
                                 </h4>
-                                <div className="text-[#FF6014] text-sm font-black mt-0.5">
+                                <div className="text-[#FF6014] text-xs sm:text-sm font-black mt-0.5">
                                   ৳{Number(sub.price).toLocaleString()}
                                 </div>
                               </div>
 
-                              <div className="shrink-0 w-28" onClick={(e) => e.stopPropagation()}>
+                              <div className="shrink-0 w-[96px] sm:w-28" onClick={(e) => e.stopPropagation()}>
                                 {isAdded ? (
-                                  <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#FF6014]/20 rounded-xl p-0.5 w-full justify-between">
+                                  <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#FF6014]/20 rounded-lg sm:rounded-xl p-0.5 w-full justify-between">
                                     <button
                                       type="button"
                                       onClick={() => onUpdateQuantity(sub.id, -1)}
-                                      className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
+                                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
                                     >
-                                      <Minus size={11} strokeWidth={3} />
+                                      <Minus size={10} strokeWidth={3} />
                                     </button>
                                     <span className="text-xs font-black text-slate-800">{quantity}</span>
                                     <button
                                       type="button"
                                       onClick={() => onUpdateQuantity(sub.id, 1)}
-                                      className="w-7 h-7 rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
+                                      className="w-6 h-6 sm:w-7 sm:h-7 rounded-md sm:rounded-lg bg-white text-[#FF6014] flex items-center justify-center hover:bg-rose-50 transition shadow-xs cursor-pointer"
                                     >
-                                      <Plus size={11} strokeWidth={3} />
+                                      <Plus size={10} strokeWidth={3} />
                                     </button>
                                   </div>
                                 ) : (
@@ -342,7 +349,7 @@ export function SpecializedServices({
                                       onAddToCart(service, sub.id);
                                       onSubServiceClick?.({ ...sub, parentTitle: service.title, parentService: service });
                                     }}
-                                    className="w-full py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 bg-[#FF6014] text-white hover:bg-[#E0530A] shadow-xs"
+                                    className="w-full py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 bg-[#FF6014] text-white hover:bg-[#E0530A] shadow-xs"
                                   >
                                     <Plus size={12} strokeWidth={3} />
                                     Add

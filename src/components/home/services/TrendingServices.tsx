@@ -182,7 +182,7 @@ export default function TrendingServices() {
   const secondary = trendingListings[1];
 
   return (
-    <section className="pt-4 pb-4 md:py-14 relative overflow-hidden">
+    <section className="pt-4 pb-0 md:pt-10 md:pb-2 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center md:items-start md:text-left mb-8">
           <div>

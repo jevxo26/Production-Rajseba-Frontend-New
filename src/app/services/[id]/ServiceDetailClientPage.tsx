@@ -88,7 +88,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBookingCartState } from "@/components/home/booking/hooks/useBookingCartState";
-import { DesktopBookingSidebar } from "@/components/home/booking/DesktopBookingSidebar";
+import { ServiceDeliveryDetails } from "@/components/home/categorizedServices/ServiceDeliveryDetails";
 import { MobileBookingDrawer } from "@/components/home/booking/MobileBookingDrawer";
 
 export default function ServiceDetailClientPage({ id }: { id: string }) {
@@ -247,10 +247,19 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
       <div className="relative z-10">
         <CategorizedHero id={service.id} name={service.name} description={service.description} image={service.image} rating={rating} bookingsCount={bookingsCount} reviewsCount={reviewsCount} categoryName={service.category?.name} />
 
-        <div className="sticky top-[72px] z-30 max-w-7xl mx-auto bg-[#FFF8F4]/50 backdrop-blur-lg border-b border-slate-100 shadow-[0_4px_24px_-6px_rgba(0,0,0,0.02)] hidden md:block">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 flex gap-2">
+        <div className="sticky top-[64px]  md:top-[69px] lg:top-[72px] z-30 max-w-7xl mx-auto bg-white/95 rounded-xl backdrop-blur-md border-b border-slate-100 shadow-[0_4px_24px_-6px_rgba(0,0,0,0.02)] transition-all duration-300 w-full">
+          <div className="px-4 md:px-6 py-2 flex gap-2 overflow-x-auto scrollbar-none">
             {tabs.map((tab) => (
-              <button key={tab.id} onClick={() => state.scrollToSection(tab.id)} className={`text-xs font-bold px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer ${state.activeTab === tab.id ? "text-white bg-[#FF6014] shadow-md shadow-rose-100" : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"}`}>{tab.label}</button>
+              <button
+                key={tab.id}
+                onClick={() => state.scrollToSection(tab.id)}
+                className={`text-xs font-bold px-4 py-2.5 rounded-full transition-all duration-300 shrink-0 cursor-pointer ${state.activeTab === tab.id
+                  ? "text-white bg-[#FF6014] shadow-md shadow-rose-100"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                  }`}
+              >
+                {tab.label}
+              </button>
             ))}
           </div>
         </div>
@@ -274,7 +283,7 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
                   selectedSubServiceId={selectedSubService?.id ?? null}
                 />
               </div>
-              
+
               {service.packages && service.packages.length > 0 && (
                 <div id="packages">
                   <Packages packages={service.packages} serviceId={service.id} vendorId={service.vendor?.id} serviceName={service.name} serviceImage={service.image} />
@@ -317,9 +326,9 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
             </div>
 
             {/* Sidebar Column */}
-            <div className="space-y-6 md:space-y-8 sticky top-[136px] z-20">
+            <div className="space-y-6 md:space-y-8 lg:sticky lg:top-[136px] lg:z-20">
 
-              {/* Sub-service Detail Panel — desktop only, replaces commitments when active */}
+              {/* Sub-service Detail Panel & Service Delivery details info card */}
               {selectedSubService ? (
                 <>
                   {/* Desktop detail card */}
@@ -333,10 +342,8 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
                       onUpdateQuantity={handleUpdateQuantity}
                     />
                   </div>
-                  {/* Always show Commitments below the detail card */}
-                  <div className="hidden lg:block">
-                    <Commitments />
-                  </div>
+                  {/* Service delivery procedures, hours & hotline */}
+                  <ServiceDeliveryDetails />
                 </>
               ) : (
                 <>
@@ -358,7 +365,7 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
                     </div>
                   )}
 
-                  <Commitments />
+                  <ServiceDeliveryDetails />
                 </>
               )}
             </div>

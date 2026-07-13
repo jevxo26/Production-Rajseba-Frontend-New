@@ -238,11 +238,11 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
   useEffect(() => {
     const sections = ["specialized-services", "packages", "overview", "details", "experts", "vendor", "faq", "reviews"];
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 200;
+      const scrollPos = window.scrollY + 160; // Offset of 160px accommodates header/tabs
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
-          const top = el.offsetTop;
+          const top = el.getBoundingClientRect().top + window.scrollY;
           const height = el.offsetHeight;
           if (scrollPos >= top && scrollPos < top + height) {
             setActiveTab(section);
@@ -251,7 +251,7 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
         }
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
