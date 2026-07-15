@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { toast } from "sonner";
 import { uploadImage } from "@/lib/upload";
@@ -14,14 +14,17 @@ import { CustomSelect } from "@/components/ui/select";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import Link from "next/link";
 
-export default function EditServicePage({ params }: { params: { id: string } }) {
+export default function EditServicePage() {
   const router = useRouter();
-  const id = params.id;
+  const params = useParams();
+  const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
   
   const rawRole = useAppSelector((state) => state.auth.role) || "superadmin";
   const role = typeof rawRole === "string" ? rawRole.toLowerCase().replace(/\s+/g, "") : "client";
 
-  const { data: serviceRes, isLoading: isServiceLoading } = useGetServiceByIdQuery(id);
+  const { data: serviceRes, isLoading: isServiceLoading } = useGetServiceByIdQuery(id, {
+    skip: !id,
+  });
   const service = serviceRes?.data;
 
   const { data: apiCategoriesRes } = useGetAllCategoriesQuery();

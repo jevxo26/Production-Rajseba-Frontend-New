@@ -67,7 +67,7 @@ export default function BlogTable({ blogs, openEditModal, openDeleteModal }: Blo
       header: "Overview",
       render: (blog: Blog) => (
         <p className="text-slate-500 text-xs font-semibold max-w-[200px] leading-relaxed break-words line-clamp-2">
-          {blog.overview || "—"}
+          {blog.overview ? blog.overview.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() : "—"}
         </p>
       ),
     },
@@ -76,7 +76,7 @@ export default function BlogTable({ blogs, openEditModal, openDeleteModal }: Blo
       header: "Content Body",
       render: (blog: Blog) => (
         <p className="text-slate-400 text-xs font-medium max-w-[280px] leading-relaxed break-words line-clamp-2">
-          {blog.description || "—"}
+          {blog.description ? blog.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() : "—"}
         </p>
       ),
     },

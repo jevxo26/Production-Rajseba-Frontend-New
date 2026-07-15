@@ -30,7 +30,7 @@ export default function PackageTable({
             <p className="font-bold text-slate-900 leading-none">{item.name}</p>
             {item.description && (
               <p className="text-xs text-slate-400 font-medium mt-1 max-w-[200px] truncate">
-                {item.description}
+                {item.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim()}
               </p>
             )}
           </div>

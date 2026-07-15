@@ -459,7 +459,7 @@ export default function CreateInvoicePage() {
                   <tr className="bg-slate-50/75 border-b border-slate-100 text-slate-450 font-extrabold uppercase tracking-wider text-[10px]">
                     <th className="px-4 py-3 w-10">#</th>
                     <th className="px-4 py-3 min-w-[240px]">Description</th>
-                    <th className="px-4 py-3 w-20">Qty</th>
+                    <th className="px-4 py-3 w-28">Qty</th>
                     <th className="px-4 py-3 w-28">Rate (BDT)</th>
                     <th className="px-4 py-3 w-32">Amount (BDT)</th>
                     <th className="px-4 py-3 w-10"></th>
@@ -493,7 +493,7 @@ export default function CreateInvoicePage() {
                       </td>
                       <td className="px-4 py-4">
                         <input
-                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
+                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
                           type="number"
                           min="1"
                           value={item.qty}
@@ -502,7 +502,7 @@ export default function CreateInvoicePage() {
                       </td>
                       <td className="px-4 py-4">
                         <input
-                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
+                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
                           type="number"
                           min="0"
                           value={item.rate}
