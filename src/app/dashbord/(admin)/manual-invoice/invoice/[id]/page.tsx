@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, DollarSign, Download, Printer, Check, AlertTriangle, FileText } from "lucide-react";
+import { toast } from "sonner";
 import InvoiceTemplate1 from "@/components/manual-invoice/InvoiceTemplate1";
 import InvoiceTemplate2 from "@/components/manual-invoice/InvoiceTemplate2";
 
@@ -70,21 +71,58 @@ export default function InvoiceViewPage() {
 
   const handleDownloadPDF = async () => {
     try {
-      const html2pdf = (await import("html2pdf.js")).default;
+      const html2pdfModule = await import("html2pdf.js");
+      let html2pdf = html2pdfModule.default || html2pdfModule;
+      if (html2pdf && (html2pdf as any).default) {
+        html2pdf = (html2pdf as any).default;
+      }
+
+      if (typeof html2pdf !== "function") {
+        throw new Error("html2pdf is not a function");
+      }
+
       const element = document.getElementById("invoice-print-area");
       if (!element) return;
+
+      // Extract HTML and convert relative image paths to absolute ones with a cache-buster
+      const origin = window.location.origin;
+      const processedHtml = element.innerHTML.replace(/src="\/([^"]+)"/g, `src="${origin}/$1?v=${Date.now()}"`);
+
+      // Create a temporary off-screen container for rendering
+      const tempContainer = document.createElement("div");
+      tempContainer.innerHTML = processedHtml;
+      tempContainer.style.position = "absolute";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.top = "-9999px";
+      tempContainer.style.width = "800px";
+      tempContainer.style.background = "#ffffff";
+      document.body.appendChild(tempContainer);
+
+      // Wait a moment for images to load
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const options = {
         margin: 0,
         filename: `Invoice-${invoice.invoiceNumber}.pdf`,
         image: { type: "jpeg" as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          allowTaint: false,
+          letterRendering: true,
+          logging: false
+        },
         jsPDF: { unit: "mm" as const, format: "a4", orientation: "portrait" as const },
       };
-      html2pdf().set(options).from(element).save();
-    } catch {
-      alert("html2pdf not installed. Run: npm install html2pdf.js");
+
+      await html2pdf().set(options).from(tempContainer).save();
+      document.body.removeChild(tempContainer);
+    } catch (err: any) {
+      console.error("PDF Download error:", err);
+      toast.error(err.message || "Failed to download PDF");
     }
   };
+
 
   if (loading) {
     return (

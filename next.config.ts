@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import path from "path";
+
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -43,6 +45,18 @@ const nextConfig: NextConfig = {
         hostname: "*.amazonaws.com",
       },
     ],
+  },
+  turbopack: {
+    resolveAlias: {
+      html2canvas: "./src/utils/html2canvas-wrapper.js",
+    },
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      html2canvas: path.resolve("./src/utils/html2canvas-wrapper.js"),
+    };
+    return config;
   },
 };
 // iuSDHfuygwef uy2y8fg2

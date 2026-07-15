@@ -56,7 +56,8 @@ export default function CreateInvoicePage() {
   const [svcSuggestions, setSvcSuggestions] = useState<ServiceItem[][]>([[]]);
   const [showSvcDrop, setShowSvcDrop] = useState<boolean[]>([false]);
 
-  // Submit state
+  // Loading & Submit state
+  const [initialLoading, setInitialLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -72,6 +73,7 @@ export default function CreateInvoicePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setInitialLoading(true);
         const [cr, sr, rr] = await Promise.all([
           fetch(`${API}/users`, { headers: authHeader() }),
           fetch(`${API}/api/manual-services`, { headers: authHeader() }),
@@ -87,7 +89,9 @@ export default function CreateInvoicePage() {
         if (clientRole) {
           setClientRoleId(clientRole.id);
         }
-      } catch { /* non-blocking */ }
+      } catch { /* non-blocking */ } finally {
+        setInitialLoading(false);
+      }
     };
     fetchData();
     // Auto-generate invoice number
@@ -256,6 +260,36 @@ export default function CreateInvoicePage() {
       setSubmitting(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div className="w-full space-y-8 animate-in fade-in duration-300 pb-16">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 bg-[#FFF8F4] text-[#FF6014] rounded-2xl border border-[#FF6014]/15 shadow-xs">
+              <FilePlus2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Create New Invoice</h1>
+              <p className="text-xs text-slate-400 font-semibold mt-1">Generate a manual billing invoice for offline customers.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold px-4 py-2.5 rounded-xl text-sm transition-all shadow-xs cursor-pointer active:scale-[0.98]"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft size={16} /> Back
+          </button>
+        </div>
+
+        <div className="min-h-[40vh] flex flex-col items-center justify-center text-center">
+          <div className="w-8 h-8 border-4 border-[#FF6014] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-400 font-semibold animate-pulse">Loading Invoice Configuration...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300 pb-16">
@@ -561,10 +595,17 @@ export default function CreateInvoicePage() {
           </button>
           <button
             type="submit"
-            className="flex items-center gap-1.5 bg-[#FF6014] hover:bg-[#e0530a] text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm shadow-orange-500/10 cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 bg-[#FF6014] hover:bg-[#e0530a] text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all shadow-sm shadow-orange-500/10 cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={submitting}
           >
-            {submitting ? "Creating..." : <><Check size={16} /> Create Invoice</>}
+            {submitting ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
+                Creating...
+              </>
+            ) : (
+              <><Check size={16} /> Create Invoice</>
+            )}
           </button>
         </div>
       </form>
