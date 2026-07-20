@@ -144,6 +144,7 @@ export interface CustomTableProps<T> {
   className?: string;
   rowClassName?: (row: T) => string;
   expandableContent?: (row: T) => React.ReactNode;
+  onRowClick?: (row: T) => void;
 }
 
 export function CustomTable<T extends { id?: string | number;[key: string]: any }>({
@@ -159,6 +160,7 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
   className,
   rowClassName,
   expandableContent,
+  onRowClick,
 }: CustomTableProps<T>) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [activeFilter, setActiveFilter] = React.useState("ALL")
@@ -263,11 +265,13 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
                     <TableRow 
                       className={cn(
                         rowClassName ? rowClassName(row) : undefined, 
-                        expandableContent && "cursor-pointer",
+                        (expandableContent || onRowClick) && "cursor-pointer",
                         isExpanded && "bg-premium-light/50"
                       )}
                       onClick={() => {
-                        if (expandableContent) {
+                        if (onRowClick) {
+                          onRowClick(row)
+                        } else if (expandableContent) {
                           setExpandedRowId(isExpanded ? null : uniqueRowId)
                         }
                       }}

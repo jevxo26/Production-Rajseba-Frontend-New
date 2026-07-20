@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
-import { Calendar, User, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText, Download } from "lucide-react";
+import { Calendar, User, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText, Download, Eye } from "lucide-react";
 import AssignEmployeeModal from "./AssignEmployeeModal";
 import { printBookingInvoice } from "@/utils/invoicePrint";
 
@@ -68,6 +69,7 @@ import { useGetAllNestedServicesQuery } from '@/redux/features/admin/service';
 
 export default function BookingTable({ filteredBookings, setDeleteModalBookingId, lang, handleStatusChange, roleName }: BookingTableProps) {
   const t = translations[lang];
+  const router = useRouter();
   const [assignBooking, setAssignBooking] = useState<any>(null);
 
   // Fetch all nested services to map sub-services accurately
@@ -190,6 +192,16 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
           <button
             onClick={(e) => {
               e.stopPropagation();
+              router.push(`/dashbord/manage-bookings/${item.id}`);
+            }}
+            className="p-2 rounded-xl border border-blue-250/20 hover:border-blue-500 hover:text-white hover:bg-blue-500 text-blue-500 bg-blue-50/5 transition-all shadow-sm cursor-pointer"
+            title={t.viewDetails}
+          >
+            <Eye size={16} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               printBookingInvoice(item);
             }}
             className="p-2 rounded-xl border border-[#FF6014]/20 hover:border-[#FF6014] hover:text-white hover:bg-[#FF6014] text-[#FF6014] bg-[#FF6014]/5 transition-all shadow-sm cursor-pointer"
@@ -198,8 +210,11 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
             <Download size={16} />
           </button>
           <button
-            onClick={() => setDeleteModalBookingId(item.id)}
-            className="p-2 rounded-xl border border-rose-200 hover:border-rose-500 hover:text-white hover:bg-rose-500 text-rose-500 bg-rose-50 transition-all shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteModalBookingId(item.id);
+            }}
+            className="p-2 rounded-xl border border-rose-200 hover:border-rose-500 hover:text-white hover:bg-rose-500 text-rose-500 bg-rose-50 transition-all shadow-sm cursor-pointer"
             title="Delete Booking"
           >
             <Trash2 size={16} />
@@ -463,7 +478,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
         columns={columns}
         data={filteredBookings}
         rowClassName={getRowClassName}
-        expandableContent={renderExpandedContent}
+        onRowClick={(row) => router.push(`/dashbord/manage-bookings/${row.id}`)}
       />
 
       <AssignEmployeeModal
