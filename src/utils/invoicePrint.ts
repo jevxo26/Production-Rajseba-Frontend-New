@@ -128,28 +128,30 @@ export const printHTML = async (htmlContent: string, filename: string = 'invoice
       jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
     };
 
-    // If the browser extension is active, send the dataurl directly to the extension for silent direct download
-    if ((window as any).__rajseba_extension_active) {
-      const pdfWorker = html2pdf().set(opt).from(element).toPdf();
-      const dataUrl = await pdfWorker.output('dataurlstring');
-      window.dispatchEvent(new CustomEvent('rajseba-direct-download', { 
-        detail: { dataUrl, filename } 
-      }));
-      document.body.removeChild(element);
-      return;
-    }
-
     // Generate PDF and handle download/preview
+    const pdfWorker = html2pdf().set(opt).from(element);
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
     if (isMobile) {
-      const pdfWorker = html2pdf().set(opt).from(element).toPdf();
       const blobUrl = await pdfWorker.output('bloburl');
       const newWindow = window.open(blobUrl, '_blank');
       if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
         window.location.href = blobUrl;
       }
     } else {
-      await html2pdf().set(opt).from(element).save();
+      // Create blob manually and force download to ensure it works 100% on all desktop browsers
+      const blob = await pdfWorker.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}.pdf`;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     }
 
     // Clean up

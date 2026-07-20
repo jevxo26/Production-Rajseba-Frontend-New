@@ -25,7 +25,7 @@ export default function ServiceTable({
   const columns = [
     {
       key: "name",
-      header: "Service Details",
+      header: "Service Name",
       render: (item: Service) => (
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-rose-100/40">
@@ -37,7 +37,6 @@ export default function ServiceTable({
           </div>
           <div>
             <p className="font-bold text-slate-900 leading-none">{item.name}</p>
-            {item.subtitle && <p className="text-xs text-slate-400 mt-1">{item.subtitle}</p>}
           </div>
         </div>
       ),

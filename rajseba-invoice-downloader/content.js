@@ -29,8 +29,8 @@ document.addEventListener('click', async (event) => {
     const isInvoiceBtn = 
       (target.tagName === 'A' || target.tagName === 'BUTTON') && 
       (
-        target.innerText?.toLowerCase().includes('download pdf') || 
-        target.innerText?.toLowerCase().includes('download invoice') ||
+        target.textContent?.toLowerCase().includes('download pdf') || 
+        target.textContent?.toLowerCase().includes('download invoice') ||
         target.title?.toLowerCase().includes('download invoice') ||
         target.getAttribute('aria-label')?.toLowerCase().includes('download invoice')
       );
@@ -91,7 +91,7 @@ function getFilenameFromElement(element) {
   }
   
   // Try extracting from title or text
-  const text = element.innerText || element.title || '';
+  const text = element.textContent || element.title || '';
   const match = text.match(/(INV-RS-\d+-\d+|TXN-RS-\d+-\d+|STMT-[A-Z]+-\d+-\d+)/i);
   if (match) {
     return match[0];
@@ -100,7 +100,7 @@ function getFilenameFromElement(element) {
   // Try extracting from booking/invoice table row text
   const row = element.closest('tr');
   if (row) {
-    const rowText = row.innerText || '';
+    const rowText = row.textContent || '';
     const rowMatch = rowText.match(/(INV-RS-\d+-\d+|TXN-RS-\d+-\d+|STMT-[A-Z]+-\d+-\d+)/i);
     if (rowMatch) {
       return rowMatch[0];
