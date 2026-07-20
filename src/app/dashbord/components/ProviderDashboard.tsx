@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import {
   useGetAllProfilesQuery,
@@ -327,71 +328,84 @@ export default function ProviderDashboard() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-200">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm px-7 py-6">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-7"
+    >
+      {/* ── Light Primary Glassmorphism Header ── */}
+      <motion.div
+        whileHover={{ y: -2 }}
+        className="relative overflow-hidden bg-white/90 backdrop-blur-xl rounded-3xl border border-orange-100/90 shadow-sm px-7 py-6.5 group hover:shadow-xl hover:shadow-[#FF6014]/5 transition-all duration-300"
+      >
         {/* Language Toggle */}
         <div className="absolute top-6 right-7 z-20 flex items-center gap-3">
           <button
             onClick={() => setLang(lang === "bn" ? "en" : "bn")}
-            className="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 transition-colors"
+            className="flex items-center gap-1.5 bg-orange-50/80 hover:bg-orange-100/80 text-[#FF6014] px-3.5 py-1.5 rounded-full text-xs font-black border border-orange-200/60 shadow-2xs transition-colors cursor-pointer"
           >
-            <Languages className="w-3.5 h-3.5" />
+            <Languages className="w-3.5 h-3.5 text-[#FF6014]" />
             {lang === "bn" ? "English" : "বাংলা"}
           </button>
         </div>
 
-        <div className="absolute -top-10 -right-10 w-48 h-48 bg-gradient-to-br from-teal-100/40 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="max-w-[70%]">
-            <div className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-100 text-teal-600 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse inline-block" />
+        <div className="absolute -top-10 -right-10 w-52 h-52 bg-gradient-to-br from-[#FF6014]/15 to-[#FFB3AD]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+        <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-gradient-to-tr from-amber-100/40 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="max-w-[70%] space-y-2">
+            <div className="inline-flex items-center gap-1.5 bg-orange-50/90 border border-orange-200/60 text-[#FF6014] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FF6014] animate-ping inline-block" />
               {t.providerMode}
             </div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{t.dashboardTitle}</h1>
-            <p className="text-slate-400 mt-1.5 text-sm font-medium">
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t.dashboardTitle}</h1>
+            <p className="text-slate-500 text-sm font-semibold flex items-center gap-1.5">
+              <Briefcase size={14} className="text-[#FF6014]" />
               {t.hello}{" "}
-              <span className="text-slate-600 font-semibold text-wrap">
+              <span className="text-slate-900 font-extrabold text-wrap">
                 {authUser?.name || myProfile?.company_name || "Provider"}
               </span>
               ! {t.subtitle}
             </p>
           </div>
-          {/* Status info moved below language toggle space or responsive */}
-          <div className="flex items-center gap-3 bg-white border border-slate-100 p-3 rounded-2xl shadow-sm shrink-0 md:mt-10 lg:mt-0 lg:mr-28">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-sm font-semibold text-slate-700">{t.online}</span>
-            <button className="text-xs font-semibold text-[#FF6014] bg-[#FFF8F4] hover:bg-[#FFF0EB]/50 px-3 py-1.5 rounded-xl transition-all">
+
+          {/* Status info toggle */}
+          <div className="flex items-center gap-3 bg-white/90 backdrop-blur-md border border-slate-100 p-3 rounded-2xl shadow-2xs shrink-0 md:mt-10 lg:mt-0 lg:mr-28">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs font-black text-slate-800">{t.online}</span>
+            <button className="text-xs font-extrabold text-[#FF6014] bg-[#FFF8F4] hover:bg-[#FFF0EB] px-3 py-1.5 rounded-xl border border-orange-100 transition-all cursor-pointer">
               {t.toggleOffline}
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      {/* ── Stats Cards Grid ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <div
+            <motion.div
               key={i}
-              className="group bg-white p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3 sm:gap-4 hover:shadow-lg hover:shadow-slate-100/80 hover:-translate-y-0.5 transition-all duration-200 cursor-default"
+              whileHover={{ y: -3, scale: 1.015 }}
+              className="group bg-white/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-slate-100/90 shadow-sm flex items-start gap-3 sm:gap-4 hover:shadow-xl hover:shadow-[#FF6014]/5 hover:border-[#FF6014]/20 transition-all duration-300 cursor-pointer"
             >
               <div
-                className={`p-2.5 sm:p-3 rounded-xl ${stat.color} group-hover:scale-110 transition-transform duration-200 shrink-0`}
+                className={`p-2.5 sm:p-3 rounded-xl border ${stat.color} group-hover:scale-110 transition-transform duration-200 shrink-0`}
               >
                 <Icon size={20} className="sm:w-6 sm:h-6" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-slate-400 font-semibold truncate">{stat.label}</p>
-                <h4 className="text-lg sm:text-2xl font-extrabold text-slate-900 mt-0.5 leading-tight tracking-tight">
+                <p className="text-xs text-slate-400 font-extrabold uppercase tracking-wider truncate">{stat.label}</p>
+                <h4 className="text-lg sm:text-2xl font-black text-slate-900 mt-0.5 leading-tight tracking-tight">
                   {stat.value}
                 </h4>
-                <span className="text-[10px] sm:text-xs text-slate-400 mt-1 block font-medium leading-tight">
+                <span className="text-[10px] sm:text-xs text-slate-400 mt-1 block font-extrabold leading-tight">
                   {stat.desc}
                 </span>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -881,6 +895,6 @@ export default function ProviderDashboard() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
