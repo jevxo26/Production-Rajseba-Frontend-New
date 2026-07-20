@@ -41,124 +41,52 @@ export function numberToWords(num: number): string {
   return words.trim();
 }
 
-// Trigger print or auto-download PDF using html2pdf.js
 export const printHTML = async (htmlContent: string, filename: string = 'invoice') => {
   if (typeof window === 'undefined') return;
 
-  const runPrintFallback = () => {
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      // On mobile, native printing the iframe often prints the parent page instead.
-      // We open it in a new window/tab to show a clean HTML version of the invoice.
-      const newWindow = window.open();
-      if (newWindow) {
-        newWindow.document.write(htmlContent);
-        newWindow.document.close();
-      } else {
-        window.location.href = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
-      }
-      return;
-    }
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow?.document || iframe.contentDocument;
-    if (doc) {
-      doc.write(htmlContent);
-      doc.close();
-
-      setTimeout(() => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-        }, 1000);
-      }, 500);
-    }
-  };
-
-  try {
-    // Resolve relative image URLs to absolute ones so html2canvas can fetch them properly
-    const origin = window.location.origin;
-    const processedHtml = htmlContent.replace(/src="\/([^"]+)"/g, `src="${origin}/$1"`);
-
-    // Dynamically import html2pdf.js to avoid SSR/compilation errors
-    // @ts-ignore
-    const html2pdfModule = await import('html2pdf.js');
-    let html2pdf = html2pdfModule.default || html2pdfModule;
-    if (html2pdf && (html2pdf as any).default) {
-      html2pdf = (html2pdf as any).default;
-    }
-
-    if (typeof html2pdf !== 'function') {
-      throw new Error('html2pdf is not a function');
-    }
-
-    // Create a temporary container offscreen to render the content with correct dimensions
-    const element = document.createElement('div');
-    element.innerHTML = processedHtml;
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
-    element.style.top = '-9999px';
-    element.style.width = '800px'; // Align with the container width
-    element.style.background = '#ffffff';
-    document.body.appendChild(element);
-
-    // Wait a brief moment for images to load inside the element
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const opt = {
-      margin:       0,
-      filename:     `${filename}.pdf`,
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { 
-        scale: 2, 
-        useCORS: true, 
-        allowTaint: false,
-        letterRendering: true,
-        logging: false
-      },
-      jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
-    };
-
-    // Generate PDF and handle download/preview
-    const pdfWorker = html2pdf().set(opt).from(element);
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      const blobUrl = await pdfWorker.output('bloburl');
-      const newWindow = window.open(blobUrl, '_blank');
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        window.location.href = blobUrl;
-      }
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    // On mobile, native printing the iframe often prints the parent page instead.
+    // We open it in a new window/tab to show a clean HTML version of the invoice.
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.document.write(htmlContent);
+      newWindow.document.close();
     } else {
-      // Create blob manually and force download to ensure it works 100% on all desktop browsers
-      const blob = await pdfWorker.output('blob');
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${filename}.pdf`;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
+      window.location.href = `data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`;
     }
+    return;
+  }
 
-    // Clean up
-    document.body.removeChild(element);
-  } catch (error) {
-    console.error('Failed to auto-download PDF, falling back to print window:', error);
-    runPrintFallback();
+  // Use native browser print/save-as-pdf engine for desktop
+  // This is 100x faster than html2pdf, creates text-searchable PDFs, and prevents browser freezing
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document || iframe.contentDocument;
+  if (doc) {
+    // Inject a script to set the document title to the filename, so "Save as PDF" uses the correct default filename
+    const processedHtml = htmlContent.replace(
+      '<head>',
+      `<head><title>${filename}</title>`
+    );
+    
+    doc.write(processedHtml);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    }, 500);
   }
 };
 
