@@ -26,6 +26,7 @@ export function useClientBookingsState() {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
   const authUser = useAppSelector((state) => state.auth.user);
   const [filter, setFilter] = useState<BookingStatus>("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: bookingsRes, isLoading } = useGetAllBookingsQuery();
 
@@ -36,16 +37,26 @@ export function useClientBookingsState() {
   });
 
   const filteredBookings = myBookings.filter((b: any) => {
-    if (filter === "All") return true;
-    const mappedStatus = STATUS_MAP[b.status] || "Pending";
-    return mappedStatus === filter;
+    const matchesFilter = filter === "All" || (STATUS_MAP[b.status] || "Pending") === filter;
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return matchesFilter;
+
+    const serviceName = (b.nestedService?.name || b.pkg?.name || "").toLowerCase();
+    const vendorName = (b.vendor?.name || "").toLowerCase();
+    const bookingId = (b.id || "").toString().toLowerCase();
+
+    const matchesSearch = serviceName.includes(q) || vendorName.includes(q) || bookingId.includes(q);
+    return matchesFilter && matchesSearch;
   });
 
   return {
     role,
     filter,
     setFilter,
+    searchQuery,
+    setSearchQuery,
     isLoading,
+    myBookings,
     filteredBookings,
   };
 }
