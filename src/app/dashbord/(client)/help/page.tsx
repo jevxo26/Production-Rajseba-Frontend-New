@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { useAppSelector } from "@/redux/hooks";
 import {
   HelpCircle,
@@ -121,57 +122,65 @@ export default function HelpCenterPage() {
   };
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-200">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="w-full space-y-7"
+    >
       
-      {/* Premium Gradient Hero Banner */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-8 sm:p-10 shadow-xl border border-slate-800/80">
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#FF6014]/10 rounded-full blur-3xl" />
-        <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl" />
+      {/* ── Premium Light Glassmorphic Care Hub Banner ── */}
+      <motion.div
+        whileHover={{ y: -2 }}
+        className="relative overflow-hidden rounded-[32px] bg-white/90 backdrop-blur-xl border border-orange-100/90 p-8 sm:p-10 shadow-sm group hover:shadow-xl hover:shadow-[#FF6014]/5 transition-all duration-300"
+      >
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-gradient-to-br from-[#FF6014]/15 to-[#FFB3AD]/10 rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+        <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-amber-100/40 rounded-full blur-2xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black tracking-widest text-[#FF6014] uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-50/90 border border-orange-200/60 rounded-full text-[10px] font-black tracking-widest text-[#FF6014] uppercase shadow-2xs">
               <Sparkles className="w-3.5 h-3.5 text-[#FF6014] animate-pulse" />
               {lang === "bn" ? "রাজসেবা কাস্টমার সাপোর্ট" : "Rajseba Care Hub"}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">
               {lang === "bn" ? "আমরা কীভাবে সাহায্য করতে পারি?" : "How can we help you today?"}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-350 font-medium max-w-lg">
+            <p className="text-xs sm:text-sm text-slate-500 font-semibold max-w-lg leading-relaxed">
               {lang === "bn"
                 ? "আপনার বুকিং, রিফান্ড বা অ্যাকাউন্ট সম্পর্কিত যেকোনো জিজ্ঞাসার তাৎক্ষণিক সমাধান ও সহায়তা এখানে পাবেন।"
                 : "Get real-time answers to your scheduling questions, manage refund processes, or chat directly with our helpdesk specialists."}
             </p>
           </div>
 
-          {/* Quick tab switcher with premium pill look */}
-          <div className="flex bg-white/5 border border-white/10 p-1.5 rounded-2xl self-start md:self-auto backdrop-blur-md">
+          {/* Quick tab switcher with light glass pill look */}
+          <div className="flex bg-orange-50/80 border border-orange-200/60 p-1.5 rounded-2xl self-start md:self-auto backdrop-blur-md shadow-2xs">
             <button
               onClick={() => {
                 setActiveTab("faqs");
                 setSelectedTicketId(null);
               }}
-              className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${
+              className={`px-4.5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === "faqs"
-                  ? "bg-white text-slate-950 shadow-md scale-[1.02]"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-gradient-to-r from-[#FF6014] to-[#E0530A] text-white shadow-md shadow-[#FF6014]/20 scale-[1.02]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
               }`}
             >
               {lang === "bn" ? "নির্দেশিকা ও FAQ" : "FAQ & Guides"}
             </button>
             <button
               onClick={() => setActiveTab("tickets")}
-              className={`px-4 py-2.5 text-xs font-black rounded-xl transition-all duration-300 ${
+              className={`px-4.5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 cursor-pointer ${
                 activeTab === "tickets"
-                  ? "bg-white text-slate-950 shadow-md scale-[1.02]"
-                  : "text-slate-300 hover:text-white"
+                  ? "bg-gradient-to-r from-[#FF6014] to-[#E0530A] text-white shadow-md shadow-[#FF6014]/20 scale-[1.02]"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
               }`}
             >
               {lang === "bn" ? "সাপোর্ট টিকিট" : "Support Tickets"}
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {activeTab === "faqs" ? (
         <div className="space-y-8 animate-in fade-in duration-300">
@@ -646,6 +655,6 @@ export default function HelpCenterPage() {
         </div>
       )}
 
-    </div>
+    </motion.div>
   );
 }

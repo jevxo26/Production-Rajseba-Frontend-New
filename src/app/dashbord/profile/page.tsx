@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { User as UserIcon, Save } from "lucide-react";
+import { motion } from "framer-motion";
+import { User as UserIcon, Save, Sparkles, ShieldCheck } from "lucide-react";
 import { LocationCascader } from "@/components/ui/LocationCascader";
 import { CustomSelect } from "@/components/ui/select";
 import { useProfileState } from "./hooks/useProfileState";
@@ -21,30 +22,39 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6 md:space-y-8 pb-12 sm:pb-16 animate-in fade-in duration-200 relative">
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+      className="space-y-6 md:space-y-8 pb-12 sm:pb-16 relative"
+    >
       <div
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
-      {/* Premium Profile Page Header */}
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-6 md:p-8 text-white shadow-xl shadow-slate-950/15">
-        {/* Decorative Glow Circles */}
-        <div className="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-[#FF6014]/25 blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+      
+      {/* ── Premium Light Glassmorphic Header ── */}
+      <motion.div
+        whileHover={{ y: -2 }}
+        className="relative overflow-hidden rounded-[32px] bg-white/90 backdrop-blur-xl border border-orange-100/90 p-6 md:p-8 shadow-sm group hover:shadow-xl hover:shadow-[#FF6014]/5 transition-all duration-300"
+      >
+        <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-gradient-to-br from-[#FF6014]/15 to-[#FFB3AD]/10 blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+        <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-orange-100/40 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-white/10 backdrop-blur-md text-[#FF6014] rounded-2xl border border-white/10">
+            <div className="p-3 bg-orange-50 border border-orange-200/60 text-[#FF6014] rounded-2xl shadow-2xs">
               <UserIcon className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#FF6014] tracking-widest uppercase bg-[#FF6014]/10 px-2.5 py-1 rounded-md border border-[#FF6014]/20">
-                {lang === "bn" ? "ইউজার প্রোফাইল" : "User Profile"}
-              </span>
-              <h1 className="text-xl md:text-2xl font-black tracking-tight text-white mt-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50/90 border border-orange-200/60 text-[10px] font-black text-[#FF6014] uppercase tracking-widest shadow-2xs mb-1.5">
+                <ShieldCheck size={11} className="text-[#FF6014]" />
+                <span>{lang === "bn" ? "ইউজার প্রোফাইল" : "User Profile"}</span>
+              </div>
+              <h1 className="text-xl md:text-2xl font-black tracking-tight text-slate-900">
                 {lang === "bn" ? "আমার প্রোফাইল" : "My Profile"}
               </h1>
-              <p className="text-xs text-slate-300 mt-1">
+              <p className="text-xs text-slate-500 mt-1 font-semibold">
                 {lang === "bn"
                   ? "ব্যক্তিগত কন্টাক্ট কার্ড, ঠিকানা এবং অ্যাকাউন্টের বিবরণ পরিচালনা করুন।"
                   : "Manage personal contact card, address, and account details."}
@@ -52,7 +62,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column: Premium ID Card */}
@@ -274,6 +284,6 @@ export default function ProfilePage() {
           </form>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
