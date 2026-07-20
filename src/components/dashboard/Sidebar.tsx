@@ -508,21 +508,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
           })}
         </nav>
 
-        {/* Refer & Earn Promo Card (For client role in expanded state) */}
-        {role === "client" && !collapsed && (
-          <div className="bg-slate-50/80 backdrop-blur-md border border-slate-200/50 p-4 rounded-3xl shadow-sm mb-4 mx-4 relative z-10">
-            <div className="w-9 h-9 bg-white border border-slate-200/60 rounded-full flex items-center justify-center text-[#FF6014] mx-auto">
-              <Gift size={16} />
-            </div>
-            <h4 className="text-xs font-bold text-slate-800 text-center mt-2">Refer & Earn</h4>
-            <p className="text-[10px] text-slate-400 text-center mt-1 max-w-[170px] mx-auto leading-relaxed">
-              Invite friends and get 500 BDT off your next service.
-            </p>
-            <button className="mt-3 bg-[#FF6014] hover:opacity-95 text-white font-extrabold text-[10px] py-2 px-4 rounded-xl w-full text-center shadow-md shadow-[#FF6014]/10 active:scale-[0.98] transition-all">
-              Invite Now
-            </button>
-          </div>
-        )}
+
 
         {/* Bottom Profile/Logout */}
         <div className="p-4 border-t border-slate-100 relative z-10 flex flex-col gap-2">
