@@ -90,7 +90,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         return [
           homeItem,
           { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord" },
-          { label: lang === "bn" ? "সেলস অ্যাসিস্ট্যান্ট" : "Sales Assistant", icon: Sparkles, href: "/dashbord/analytics" },
+          { label: lang === "bn" ? "এআই অ্যাডভাইজর" : "AI Advisor", icon: Bot, href: "/dashbord/analytics" },
           {
             label: lang === "bn" ? "অপারেশনস" : "Operations",
             icon: Calendar,
