@@ -106,8 +106,8 @@ export default function InvoiceTemplate1({ invoice }: InvoiceTemplateProps) {
             <div
               style={{
                 position: "absolute",
-                top: "-15px",
-                right: "-15px",
+                top: "10px",
+                right: "10px",
                 backgroundColor: "#ffffff",
                 color: badgeColor,
                 border: `3px solid ${badgeColor}`,
