@@ -201,12 +201,12 @@ export default function CustomerOverview() {
           </div>
 
           {/* Right side: Modern Light Glass Counters */}
-          <div className="flex items-center gap-3 sm:gap-4 self-stretch lg:self-auto overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0 flex-wrap sm:flex-nowrap">
             {/* Active Bookings Counter */}
             <Link href="/dashbord/bookings">
               <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer"
+                whileHover={{ y: -3 }}
+                className="bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer"
               >
                 {loadingBookings ? (
                   <Loader2 size={18} className="animate-spin text-[#FF6014] mx-auto" />
@@ -225,8 +225,8 @@ export default function CustomerOverview() {
             {/* Completed Services Counter */}
             <Link href="/dashbord/bookings">
               <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer"
+                whileHover={{ y: -3 }}
+                className="bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer"
               >
                 {loadingBookings ? (
                   <Loader2 size={18} className="animate-spin text-emerald-500 mx-auto" />
@@ -245,8 +245,8 @@ export default function CustomerOverview() {
             {/* Saved Wishlist Counter */}
             <Link href="/dashbord/saved">
               <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-rose-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-rose-300/40 hover:shadow-md transition-all cursor-pointer"
+                whileHover={{ y: -3 }}
+                className="bg-white/90 backdrop-blur-md border border-rose-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-rose-300/40 hover:shadow-md transition-all cursor-pointer"
               >
                 <span className="text-2xl md:text-3xl font-black text-rose-500 block leading-tight">
                   {savedServices.length.toString().padStart(2, "0")}
