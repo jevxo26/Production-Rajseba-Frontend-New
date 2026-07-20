@@ -126,13 +126,12 @@ export default function CustomerOverview() {
       header: lang === "bn" ? "অবস্থা" : "Status",
       render: (b: any) => (
         <span
-          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold ${
-            b.status === "completed"
+          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold ${b.status === "completed"
               ? "bg-emerald-50 text-emerald-700 border border-emerald-200/60"
               : b.status === "on_the_way"
-              ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60"
-              : "bg-amber-50 text-amber-700 border border-amber-200/60"
-          }`}
+                ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60"
+                : "bg-amber-50 text-amber-700 border border-amber-200/60"
+            }`}
         >
           <CheckCircle2 size={11} />
           {getStatusText(b.status)}
@@ -383,9 +382,8 @@ export default function CustomerOverview() {
                     <span className="text-[10px] font-extrabold text-slate-400 block mt-0.5">Booking ID: #{booking.id}</span>
                   </div>
                   <span
-                    className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 ${
-                      booking.status === "on_the_way" ? "text-[#E0530A] bg-[#FFF8F4] border border-orange-200/60" : "text-amber-700 bg-amber-50 border border-amber-200/60"
-                    }`}
+                    className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 ${booking.status === "on_the_way" ? "text-[#E0530A] bg-[#FFF8F4] border border-orange-200/60" : "text-amber-700 bg-amber-50 border border-amber-200/60"
+                      }`}
                   >
                     <CheckCircle2 size={10} />
                     {getStatusText(booking.status)}
