@@ -98,16 +98,24 @@ export function useCategoryState() {
           return;
         }
 
-        await updateCategoryMut({
+        const res = await updateCategoryMut({
           id: editingCategory.id,
           data: {
             ...payload,
             parentId: parentId === "NONE" ? null : Number(parentId),
           },
         }).unwrap();
+        if (res?.data) {
+          setCategories((prev) =>
+            prev.map((cat) => (cat.id === editingCategory.id ? res.data : cat))
+          );
+        }
         toast.success("Category updated successfully!");
       } else {
-        await createCategoryMut(payload).unwrap();
+        const res = await createCategoryMut(payload).unwrap();
+        if (res?.data) {
+          setCategories((prev) => [...prev, res.data]);
+        }
         toast.success("Category created successfully!");
       }
       setIsModalOpen(false);
@@ -126,6 +134,9 @@ export function useCategoryState() {
     if (!categoryToDelete) return;
     try {
       await deleteCategoryMut(categoryToDelete.id).unwrap();
+      setCategories((prev) =>
+        prev.filter((cat) => cat.id !== categoryToDelete.id)
+      );
       toast.success("Category deleted successfully!");
       setIsDeleteModalOpen(false);
       setCategoryToDelete(null);

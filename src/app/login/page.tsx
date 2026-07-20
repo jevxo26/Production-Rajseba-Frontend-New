@@ -154,7 +154,7 @@ export default function LoginPage() {
             <Link href="/privacy" className="ml-3 text-slate-400 hover:text-[#FF6014] transition-colors">Privacy</Link>
             <Link href="/terms" className="ml-3 text-slate-400 hover:text-[#FF6014] transition-colors">Terms</Link>
           </div>
-          <div>Developed by <a href="https://aftabfarhan.tech" target="_blank" rel="noopener noreferrer" className="text-[#FF6014] hover:underline font-semibold">Aftab Farhan Arko</a></div>
+          <div>Developed by <a href="https://jevxo.com" target="_blank" rel="noopener noreferrer" className="text-[#FF6014] hover:underline font-semibold">Jevxo</a></div>
         </div>
       </div>
     </div>

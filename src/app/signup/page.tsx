@@ -178,7 +178,7 @@ export default function RegisterPage() {
 
         <div className="text-center py-5 text-[11px] text-slate-400 font-medium relative z-10 border-t border-slate-100 mx-6 space-y-1">
           <div>© {new Date().getFullYear()} Rajseba Services Ltd. · All rights reserved. <Link href="/privacy" className="ml-3 text-slate-400 hover:text-[#FF6014] transition-colors">Privacy</Link><Link href="/terms" className="ml-3 text-slate-400 hover:text-[#FF6014] transition-colors">Terms</Link></div>
-          <div>Developed by <a href="https://aftabfarhan.tech" target="_blank" rel="noopener noreferrer" className="text-[#FF6014] hover:underline font-semibold">Aftab Farhan Arko</a></div>
+          <div>Developed by <a href="https://jevxo.com" target="_blank" rel="noopener noreferrer" className="text-[#FF6014] hover:underline font-semibold">Jevxo</a></div>
         </div>
       </div>
     </div>
