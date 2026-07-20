@@ -24,6 +24,24 @@ import {
   Timer,
   ArrowUpRight,
   Flame,
+  Star,
+  Mail,
+  Layers,
+  PieChart,
+  Globe,
+  Target,
+  ShieldCheck,
+  BadgeCheck,
+  Calendar,
+  User,
+  Wallet,
+  Tag,
+  FolderTree,
+  Cpu,
+  Bot,
+  Percent,
+  Compass,
+  Hash,
 } from "lucide-react";
 import {
   useGetAnalyticsStatsQuery,
@@ -704,7 +722,8 @@ export default function AnalyticsPage() {
                 {lang === "bn" ? "সেরা ভেন্ডর তালিকা (Top 5)" : "Top Vendors Leaderboard"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs flex items-center gap-1">
+              <BadgeCheck size={13} className="text-[#FF6014]" />
               Verified Partners
             </span>
           </div>
@@ -734,17 +753,32 @@ export default function AnalyticsPage() {
                     #{idx + 1}
                   </span>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors">{vendor.name}</h4>
-                    <p className="text-[11px] text-slate-400 font-medium">{vendor.email}</p>
+                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors flex items-center gap-1.5">
+                      <User size={12} className="text-[#FF6014]" />
+                      {vendor.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                      <Mail size={10} className="text-slate-400" />
+                      {vendor.email}
+                    </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-black text-[#FF6014]">
+                  <span className="text-xs font-black text-[#FF6014] flex items-center justify-end gap-0.5">
+                    <Wallet size={12} className="text-[#FF6014]" />
                     ৳{vendor.totalEarned ? vendor.totalEarned.toLocaleString() : "45,000"}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-semibold block">
-                    {vendor.completedJobs} {lang === "bn" ? "টি কাজ" : "Jobs"} • ★ {vendor.rating || 4.9}
+                  <span className="text-[10px] text-slate-400 font-semibold block flex items-center justify-end gap-1.5 mt-0.5">
+                    <span className="flex items-center gap-0.5">
+                      <Briefcase size={10} className="text-slate-400" />
+                      {vendor.completedJobs} {lang === "bn" ? "টি কাজ" : "Jobs"}
+                    </span>
+                    •
+                    <span className="flex items-center gap-0.5 text-amber-500 font-bold">
+                      <Star size={10} className="fill-amber-400 text-amber-400" />
+                      {vendor.rating || 4.9}
+                    </span>
                   </span>
                 </div>
               </motion.div>
@@ -766,7 +800,8 @@ export default function AnalyticsPage() {
                 {lang === "bn" ? "সেরা এজেন্ট তালিকা (Top 5)" : "Top Agents Leaderboard"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs flex items-center gap-1">
+              <Award size={13} className="text-[#FF6014]" />
               Field Officers
             </span>
           </div>
@@ -796,16 +831,24 @@ export default function AnalyticsPage() {
                     #{idx + 1}
                   </span>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors">{agent.name}</h4>
-                    <p className="text-[11px] text-slate-400 font-medium">{agent.email}</p>
+                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors flex items-center gap-1.5">
+                      <User size={12} className="text-[#FF6014]" />
+                      {agent.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                      <Mail size={10} className="text-slate-400" />
+                      {agent.email}
+                    </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-black text-[#FF6014]">
+                  <span className="text-xs font-black text-[#FF6014] flex items-center justify-end gap-1">
+                    <ShoppingBag size={12} className="text-[#FF6014]" />
                     {agent.bookingsCount} {lang === "bn" ? "বুকিং" : "Bookings"}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-semibold block">
+                  <span className="text-[10px] text-slate-400 font-semibold block flex items-center justify-end gap-1 mt-0.5">
+                    <Wallet size={10} className="text-slate-400" />
                     Commission: ৳{(agent.commissions || 12000).toLocaleString()}
                   </span>
                 </div>
@@ -831,7 +874,8 @@ export default function AnalyticsPage() {
                 {lang === "bn" ? "সেরা আয়ের সার্ভিস গিগ (Top 5)" : "Top 5 Revenue Generating Services"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs flex items-center gap-1">
+              <Flame size={13} className="text-[#FF6014]" />
               Highest Demand
             </span>
           </div>
@@ -851,18 +895,24 @@ export default function AnalyticsPage() {
                     #{idx + 1}
                   </div>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-800 line-clamp-1">{svc.name}</h4>
-                    <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
+                    <h4 className="text-xs font-extrabold text-slate-800 line-clamp-1 flex items-center gap-1.5">
+                      <Layers size={12} className="text-[#FF6014]" />
+                      {svc.name}
+                    </h4>
+                    <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-0.5">
+                      <Tag size={10} className="text-slate-400" />
                       {svc.categoryName}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-black text-slate-900">
+                  <span className="text-xs font-black text-slate-900 flex items-center justify-end gap-0.5">
+                    <Wallet size={12} className="text-slate-700" />
                     ৳{svc.totalRevenue ? svc.totalRevenue.toLocaleString() : "50,000"}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-semibold block">
+                  <span className="text-[10px] text-slate-400 font-semibold block flex items-center justify-end gap-1 mt-0.5">
+                    <ShoppingBag size={10} className="text-slate-400" />
                     {svc.bookingsCount} {lang === "bn" ? "টি বুকিং" : "Bookings"}
                   </span>
                 </div>
@@ -903,9 +953,12 @@ export default function AnalyticsPage() {
               >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold text-slate-800">{b.customerName}</span>
+                    <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1">
+                      <User size={12} className="text-[#FF6014]" />
+                      {b.customerName}
+                    </span>
                     <span
-                      className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${
+                      className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase flex items-center gap-1 ${
                         b.status === "COMPLETED"
                           ? "bg-emerald-50 text-emerald-600 border border-emerald-200/50"
                           : b.status === "ASSIGNED"
@@ -913,17 +966,23 @@ export default function AnalyticsPage() {
                           : "bg-amber-50 text-amber-600 border border-amber-200/50"
                       }`}
                     >
+                      <CheckCircle2 size={10} />
                       {b.status}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 font-medium line-clamp-1">{b.serviceTitle}</p>
+                  <p className="text-[11px] text-slate-500 font-medium line-clamp-1 flex items-center gap-1">
+                    <Layers size={10} className="text-slate-400" />
+                    {b.serviceTitle}
+                  </p>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <span className="text-xs font-black text-[#FF6014]">
+                  <span className="text-xs font-black text-[#FF6014] flex items-center justify-end gap-0.5">
+                    <Wallet size={12} className="text-[#FF6014]" />
                     ৳{Number(b.totalPrice || 0).toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-medium block">
+                  <span className="text-[10px] text-slate-400 font-medium block flex items-center justify-end gap-1 mt-0.5">
+                    <Calendar size={10} className="text-slate-400" />
                     {new Date(b.createdAt || Date.now()).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -943,25 +1002,41 @@ export default function AnalyticsPage() {
           whileHover={{ y: -2 }}
           className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6"
         >
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900">
-              {lang === "bn" ? "সার্ভিস ক্যাটাগরি শেয়ার" : "Service Category Share"}
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              {lang === "bn"
-                ? "বুকিং পরিমাণ অনুযায়ী ক্যাটাগরি শেয়ার"
-                : "Percentage of bookings by service categories"}
-            </p>
+          <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl shadow-xs">
+                <PieChart size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  {lang === "bn" ? "সার্ভিস ক্যাটাগরি শেয়ার" : "Service Category Share"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                  {lang === "bn"
+                    ? "বুকিং পরিমাণ অনুযায়ী ক্যাটাগরি শেয়ার"
+                    : "Percentage of bookings by service categories"}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4">
             {categoryBreakdown.map((cat: any, i: number) => (
               <motion.div key={i} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-semibold text-slate-700">
-                  <span className="text-slate-800 font-bold">{cat.name}</span>
-                  <div className="flex gap-2">
-                    <span className="text-slate-400">{cat.count}</span>
-                    <span className="text-[#FF6014] font-bold">{cat.percentage}%</span>
+                  <span className="text-slate-800 font-bold flex items-center gap-1.5">
+                    <FolderTree size={13} className="text-[#FF6014]" />
+                    {cat.name}
+                  </span>
+                  <div className="flex gap-2.5 items-center">
+                    <span className="text-slate-400 flex items-center gap-1 text-[11px]">
+                      <Hash size={10} className="text-slate-400" />
+                      {cat.count}
+                    </span>
+                    <span className="text-[#FF6014] font-black flex items-center gap-0.5">
+                      <Percent size={11} className="text-[#FF6014]" />
+                      {cat.percentage}%
+                    </span>
                   </div>
                 </div>
                 <div className="h-3 w-full bg-orange-50/70 border border-orange-100 rounded-full overflow-hidden p-0.5">
@@ -982,15 +1057,22 @@ export default function AnalyticsPage() {
           whileHover={{ y: -2 }}
           className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6"
         >
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900">
-              {lang === "bn" ? "আঞ্চলিক কভারেজ ও চাহিদা" : "Regional Coverage & Demand"}
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              {lang === "bn"
-                ? "ঢাকা মেট্রোপলিটন এলাকার চাহিদা বিশ্লেষণ"
-                : "Regional distribution across active service hubs"}
-            </p>
+          <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl shadow-xs">
+                <Globe size={18} />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">
+                  {lang === "bn" ? "আঞ্চলিক কভারেজ ও চাহিদা" : "Regional Coverage & Demand"}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                  {lang === "bn"
+                    ? "ঢাকা মেট্রোপলিটন এলাকার চাহিদা বিশ্লেষণ"
+                    : "Regional distribution across active service hubs"}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -1009,16 +1091,24 @@ export default function AnalyticsPage() {
                       <MapPin size={18} />
                     </div>
                     <div>
-                      <h5 className="text-xs font-extrabold text-slate-800">{region.name}</h5>
-                      <span className="text-[11px] text-slate-400 font-medium">
+                      <h5 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                        <Compass size={12} className="text-[#FF6014]" />
+                        {region.name}
+                      </h5>
+                      <span className="text-[11px] text-slate-400 font-medium flex items-center gap-1 mt-0.5">
+                        <Target size={10} className="text-slate-400" />
                         {region.count} completed
                       </span>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-xs font-black text-slate-900">{region.percentage}%</span>
-                    <span className="text-[10px] font-bold text-emerald-600 block">
+                    <span className="text-xs font-black text-slate-900 flex items-center justify-end gap-0.5">
+                      <Percent size={11} className="text-slate-700" />
+                      {region.percentage}%
+                    </span>
+                    <span className="text-[10px] font-bold text-emerald-600 block flex items-center justify-end gap-0.5 mt-0.5">
+                      <TrendingUp size={10} className="text-emerald-500" />
                       {region.trend || "+8%"} growth
                     </span>
                   </div>
