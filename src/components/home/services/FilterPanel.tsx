@@ -1,5 +1,5 @@
-"use client"
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowDownNarrowWide,
@@ -123,6 +123,8 @@ export default function FilterPanel({
   categories,
   isLoadingCategories = false,
 }: FilterPanelProps) {
+  const router = useRouter();
+
   const {
     activeCategory,
     selectedRating,
@@ -130,6 +132,15 @@ export default function FilterPanel({
     priceMax,
     selectedAvailability,
   } = filters;
+
+  const handleSelectCategory = (cat: any, isActive: boolean) => {
+    const name = (cat.name || cat.label || "").toLowerCase();
+    const slug = (cat.slug || name.replace(/\s+/g, "-") || String(cat.id)).toLowerCase();
+    setFilters({
+      activeCategory: isActive ? "all" : slug,
+      currentPage: 1,
+    });
+  };
 
   const fillPct = ((priceMax - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
 
@@ -232,12 +243,7 @@ export default function FilterPanel({
                           whileTap={{ scale: 0.985 }}
                           key={cat.id}
                           type="button"
-                          onClick={() =>
-                            setFilters({
-                              activeCategory: isActive ? "all" : slug,
-                              currentPage: 1,
-                            })
-                          }
+                          onClick={() => handleSelectCategory(cat, isActive)}
                           className={`flex items-center gap-2.5 px-3.5 py-3 rounded-xl border text-xs font-bold transition-all duration-200 text-left cursor-pointer ${
                             isActive
                               ? "border-[#FF6014] bg-[#FFF8F4] text-[#FF6014] shadow-[0_4px_12px_rgba(255,90,95,0.08)]"
@@ -445,6 +451,17 @@ export function FilterPanelDesktop({
   categories,
   isLoadingCategories = false,
 }: Omit<FilterPanelProps, "isOpen" | "onClose">) {
+  const router = useRouter();
+
+  const handleSelectCategory = (cat: any, isActive: boolean) => {
+    const name = (cat.name || cat.label || "").toLowerCase();
+    const slug = (cat.slug || name.replace(/\s+/g, "-") || String(cat.id)).toLowerCase();
+    setFilters({
+      activeCategory: isActive ? "all" : slug,
+      currentPage: 1,
+    });
+  };
+
   const {
     activeCategory,
     selectedRating,
@@ -500,12 +517,7 @@ export function FilterPanelDesktop({
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() =>
-                    setFilters({
-                      activeCategory: isActive ? "all" : slug,
-                      currentPage: 1,
-                    })
-                  }
+                  onClick={() => handleSelectCategory(cat, isActive)}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold transition-all duration-200 text-left cursor-pointer truncate ${
                     isActive
                       ? "border-[#FF6014] bg-[#FFF8F4] text-[#FF6014]"

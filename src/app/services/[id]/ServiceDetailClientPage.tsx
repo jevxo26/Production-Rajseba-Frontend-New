@@ -90,6 +90,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBookingCartState } from "@/components/home/booking/hooks/useBookingCartState";
 import { ServiceDeliveryDetails } from "@/components/home/categorizedServices/ServiceDeliveryDetails";
 import { MobileBookingDrawer } from "@/components/home/booking/MobileBookingDrawer";
+import CustomServiceBanner from "@/components/home/CustomServiceBanner";
 
 export default function ServiceDetailClientPage({ id }: { id: string }) {
   const router = useRouter();
@@ -319,6 +320,8 @@ export default function ServiceDetailClientPage({ id }: { id: string }) {
               <div id="vendor">
                 <VendorProfile vendor={service.vendor} serviceRating={rating} />
               </div>
+
+              <CustomServiceBanner categoryName={service.category?.name || service.name} />
 
               <div id="reviews">
                 <ServiceReviews reviews={reviews} />

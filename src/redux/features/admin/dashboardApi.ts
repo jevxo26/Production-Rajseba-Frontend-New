@@ -15,6 +15,7 @@ export const dashboardApi = baseApi.injectEndpoints({
       providesTags: ["Admin"],
     }),
   }),
+  overrideExisting: true,
 });
 
 export const { 

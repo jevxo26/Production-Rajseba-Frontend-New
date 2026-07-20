@@ -38,7 +38,13 @@ import {
   Shield,
   FileText,
   Receipt,
-  Globe
+  PlusCircle,
+  Trash2,
+  Globe,
+  Sparkles,
+  BookOpen,
+  UserCheck,
+  ShoppingBag
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -90,8 +96,15 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             children: [
               { label: lang === "bn" ? "বুকিং ম্যানেজ করুন" : "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
               { label: lang === "bn" ? "কুইক বুকিং" : "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
-              { label: lang === "bn" ? "কাস্টম শিফটিং" : "Custom Shifting", href: "/dashbord/custom-shifting", icon: Truck },
               { label: lang === "bn" ? "উত্তোলনের অনুরোধসমূহ" : "Withdraw Requests", href: "/dashbord/withdraw", icon: Wallet }
+            ]
+          },
+          {
+            label: lang === "bn" ? "কাস্টম রিকোয়েস্ট" : "Custom Requests",
+            icon: FileText,
+            children: [
+              { label: lang === "bn" ? "সার্ভিসেস রিকোয়েস্ট" : "Service Requests", href: "/dashbord/custom-requests", icon: Wrench },
+              { label: lang === "bn" ? "হোম শিফটিং" : "Home Shifting", href: "/dashbord/custom-shifting", icon: Truck }
             ]
           },
           {
@@ -121,8 +134,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             label: lang === "bn" ? "ল্যান্ডিং পেজ" : "Landing Page",
             icon: Globe,
             children: [
-              { label: lang === "bn" ? "হিরো ম্যানেজমেন্ট" : "Hero Management", href: "/dashbord/hero", icon: LayoutGrid },
-              { label: lang === "bn" ? "ব্লগ ম্যানেজমেন্ট" : "Blog Management", href: "/dashbord/blogs", icon: FileText }
+              { label: lang === "bn" ? "হিরো ম্যানেজমেন্ট" : "Hero Management", href: "/dashbord/hero", icon: Sparkles },
+              { label: lang === "bn" ? "ব্লগ ম্যানেজমেন্ট" : "Blog Management", href: "/dashbord/blogs", icon: BookOpen }
             ]
           },
           {
@@ -137,11 +150,11 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             label: lang === "bn" ? "ম্যানুয়াল ইনভয়েস" : "Manual Invoice",
             icon: Receipt,
             children: [
-              { label: lang === "bn" ? "ড্যাশবোর্ড" : "Dashboard", href: "/dashbord/manual-invoice", icon: FileText },
-              { label: lang === "bn" ? "নতুন ইনভয়েস" : "Create Invoice", href: "/dashbord/manual-invoice/create", icon: FileText },
+              { label: lang === "bn" ? "ড্যাশবোর্ড" : "Dashboard", href: "/dashbord/manual-invoice", icon: LayoutGrid },
+              { label: lang === "bn" ? "নতুন ইনভয়েস" : "Create Invoice", href: "/dashbord/manual-invoice/create", icon: PlusCircle },
               { label: lang === "bn" ? "ক্লায়েন্ট ডিরেক্টরি" : "Client Directory", href: "/dashbord/manual-invoice/customers", icon: Users },
               { label: lang === "bn" ? "সার্ভিস ক্যাটালগ" : "Service Catalog", href: "/dashbord/manual-invoice/services", icon: Wrench },
-              { label: lang === "bn" ? "ট্র্যাশ বিন" : "Trash Bin", href: "/dashbord/manual-invoice/trash", icon: Ticket }
+              { label: lang === "bn" ? "ট্র্যাশ বিন" : "Trash Bin", href: "/dashbord/manual-invoice/trash", icon: Trash2 }
             ]
           },
           {
@@ -173,7 +186,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               { label: lang === "bn" ? "বুকিং ম্যানেজ করুন" : "Manage Bookings", href: "/dashbord/manage-bookings", icon: ClipboardList },
               { label: lang === "bn" ? "কুইক বুকিং" : "Quick Booking", href: "/dashbord/quick-booking", icon: Zap },
               { label: lang === "bn" ? "কমিশনসমূহ" : "Commissions", href: "/dashbord/commissions", icon: Coins },
-              { label: lang === "bn" ? "অর্ডারসমূহ" : "Orders", href: "/dashbord/orders", icon: ClipboardList },
+              { label: lang === "bn" ? "অর্ডারসমূহ" : "Orders", href: "/dashbord/orders", icon: ShoppingBag },
               { label: lang === "bn" ? "ওয়ালেট এবং উপার্জন" : "Wallet & Earnings", href: "/dashbord/vendor-wallet", icon: Wallet }
             ]
           },
@@ -181,28 +194,28 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             label: lang === "bn" ? "ডিরেক্টরি" : "Directories",
             icon: Users,
             children: [
-              { label: lang === "bn" ? "ক্লায়েন্ট ম্যানেজ করুন" : "Manage Clients", href: "/dashbord/users", icon: Users },
+              { label: lang === "bn" ? "ক্লায়েন্ট ম্যানেজ করুন" : "Manage Clients", href: "/dashbord/users", icon: UserCheck },
               { label: lang === "bn" ? "সার্ভিসেস" : "Services", href: "/dashbord/services", icon: Wrench }
-            ]
-          },
-          {
-            label: lang === "bn" ? "সাপোর্ট এবং প্রোফাইল" : "Support & Profile",
-            icon: MessageSquare,
-            children: [
-              { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
-              { label: lang === "bn" ? "সাপোর্ট ডেস্ক" : "Support Desk", href: "/dashbord/support", icon: HelpCircle },
-              { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
             ]
           },
           {
             label: lang === "bn" ? "ম্যানুয়াল ইনভয়েস" : "Manual Invoice",
             icon: Receipt,
             children: [
-              { label: lang === "bn" ? "ড্যাশবোর্ড" : "Invoice Dashboard", href: "/dashbord/manual-invoice", icon: FileText },
-              { label: lang === "bn" ? "নতুন ইনভয়েস" : "Create Invoice", href: "/dashbord/manual-invoice/create", icon: FileText },
+              { label: lang === "bn" ? "ড্যাশবোর্ড" : "Invoice Dashboard", href: "/dashbord/manual-invoice", icon: LayoutGrid },
+              { label: lang === "bn" ? "নতুন ইনভয়েস" : "Create Invoice", href: "/dashbord/manual-invoice/create", icon: PlusCircle },
               { label: lang === "bn" ? "ক্লায়েন্ট ডিরেক্টরি" : "Client Directory", href: "/dashbord/manual-invoice/customers", icon: Users },
               { label: lang === "bn" ? "সার্ভিস ক্যাটালগ" : "Service Catalog", href: "/dashbord/manual-invoice/services", icon: Wrench },
-              { label: lang === "bn" ? "ট্র্যাশ বিন" : "Trash Bin", href: "/dashbord/manual-invoice/trash", icon: Ticket }
+              { label: lang === "bn" ? "ট্র্যাশ বিন" : "Trash Bin", href: "/dashbord/manual-invoice/trash", icon: Trash2 }
+            ]
+          },
+          {
+            label: lang === "bn" ? "সাপোর্ট এবং প্রোফাইল" : "Support & Profile",
+            icon: HelpCircle,
+            children: [
+              { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
+              { label: lang === "bn" ? "সাপোর্ট ডেস্ক" : "Support Desk", href: "/dashbord/support", icon: HelpCircle },
+              { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
             ]
           }
         ];
@@ -223,7 +236,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             label: lang === "bn" ? "সার্ভিসেস" : "Services",
             icon: Wrench,
             children: [
-              { label: lang === "bn" ? "আমার সার্ভিসেস" : "My Services", href: "/dashbord/vendor-services", icon: Wrench },
+              { label: lang === "bn" ? "আমার সার্ভিসেস" : "My Services", href: "/dashbord/vendor-services", icon: Briefcase },
               { label: lang === "bn" ? "নেস্টেড সার্ভিসেস" : "Nested Services", href: "/dashbord/nested-services", icon: Layers },
               { label: lang === "bn" ? "প্যাকেজসমূহ" : "Packages", href: "/dashbord/vendor-packages", icon: Package }
             ]
@@ -233,12 +246,12 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             icon: Users,
             children: [
               { label: lang === "bn" ? "আমার কর্মচারীবৃন্দ" : "My Employees", href: "/dashbord/employees", icon: UserPlus },
-              { label: lang === "bn" ? "আমার ক্লাইন্টস" : "My Clients", href: "/dashbord/users", icon: Users }
+              { label: lang === "bn" ? "আমার ক্লাইন্টস" : "My Clients", href: "/dashbord/users", icon: UserCheck }
             ]
           },
           {
             label: lang === "bn" ? "সাপোর্ট এবং প্রোফাইল" : "Support & Profile",
-            icon: MessageSquare,
+            icon: HelpCircle,
             children: [
               { label: lang === "bn" ? "লাইভ চ্যাট" : "Live Chat", href: "/dashbord/live-chat", icon: MessageSquare },
               { label: lang === "bn" ? "আমার প্রোফাইল" : "My Profile", href: "/dashbord/profile", icon: User }
@@ -464,25 +477,25 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                               key={cIdx}
                               href={child.href}
                               onClick={onClose}
-                              className={`flex items-center gap-2.5 pl-9 pr-3 py-2.5 rounded-xl text-[13px] font-bold transition-all relative group border ${isChildActive
+                              className={`flex items-center gap-2.5 pl-9 pr-3 py-2 rounded-xl text-[13px] font-bold transition-all relative group border ${isChildActive
                                 ? "bg-gradient-to-r from-[#FF6014] to-[#FF7C71] text-white shadow-md shadow-[#FF6014]/15 border-transparent scale-[1.01]"
                                 : "border-transparent text-slate-500 hover:bg-[#FF6014]/5 hover:text-[#FF6014] hover:translate-x-1.5"
                                 }`}
                             >
                               {/* Branch hook curve SVG-style path connector */}
-                              <div className="absolute left-[27px] top-0 w-3.5 h-[22px] border-l-[1.5px] border-b-[1.5px] border-[#FF6014]/30 rounded-bl-lg pointer-events-none" />
+                              <div className="absolute left-[27px] top-0 w-3.5 h-[20px] border-l-[1.5px] border-b-[1.5px] border-[#FF6014]/30 rounded-bl-lg pointer-events-none" />
 
                               {isChildActive && (
-                                <div className="absolute left-[25px] top-[14px] w-1.5 h-1.5 bg-[#FF7C71] rounded-full ring-2 ring-white z-10" />
+                                <div className="absolute left-[25px] top-[12px] w-1.5 h-1.5 bg-[#FF7C71] rounded-full ring-2 ring-white z-10" />
                               )}
 
                               {child.icon && (
                                 <child.icon
                                   size={14}
-                                  className={isChildActive ? "text-white" : "text-slate-400 group-hover:text-slate-500 transition-colors"}
+                                  className={isChildActive ? "text-white shrink-0" : "text-slate-400 group-hover:text-slate-600 transition-colors shrink-0"}
                                 />
                               )}
-                              <span>{child.label}</span>
+                              <span className="truncate">{child.label}</span>
                             </Link>
                           );
                         })}

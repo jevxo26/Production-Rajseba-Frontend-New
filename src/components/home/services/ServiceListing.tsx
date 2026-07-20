@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import FilterPanel, { FilterPanelDesktop } from "./FilterPanel";
 import ServiceCard from "./ServiceCard";
+import CustomServiceBanner from "../CustomServiceBanner";
 import { CustomSelect } from "@/components/ui/select";
 import {
   useGetPublicCategoriesQuery,
@@ -100,7 +101,7 @@ const getHash = (str: string) => {
   return Math.abs(hash);
 };
 
-const ServiceCardSkeleton = () => (
+const ListingCardSkeleton = () => (
   <div className="bg-white border border-[#e5e7eb] rounded-2xl overflow-hidden shadow-sm flex flex-col animate-pulse">
     <div className="h-48 bg-slate-200 relative" />
     <div className="p-4 flex flex-col flex-1 space-y-3">
@@ -386,7 +387,7 @@ export default function ServiceListing({
   ];
 
   return (
-    <section className="py-6 bg-slate-50/30">
+    <section className="py-6 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
 
         {/* Results count heading — shown only when a category name is provided (e.g. from category page) */}
@@ -521,7 +522,7 @@ export default function ServiceListing({
             >
               {isServicesLoadingCombined ? (
                 Array.from({ length: 6 }).map((_, idx) => (
-                  <ServiceCardSkeleton key={idx} />
+                  <ListingCardSkeleton key={idx} />
                 ))
               ) : (
                 pagedItems.map((service) => (
@@ -595,6 +596,9 @@ export default function ServiceListing({
                 </button>
               </div>
             )}
+
+            {/* Custom Service Booking Request Banner */}
+            <CustomServiceBanner categoryName={categoryName} className="mt-8" />
           </div>
 
         </div>

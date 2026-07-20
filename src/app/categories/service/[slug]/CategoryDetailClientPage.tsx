@@ -52,6 +52,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBookingCartState } from "@/components/home/booking/hooks/useBookingCartState";
 import { DesktopBookingSidebar } from "@/components/home/booking/DesktopBookingSidebar";
 import { MobileBookingDrawer } from "@/components/home/booking/MobileBookingDrawer";
+import CustomServiceBanner from "@/components/home/CustomServiceBanner";
 
 export default function CategoryDetailClientPage({ slug }: { slug: string }) {
   const router = useRouter();
@@ -164,6 +165,8 @@ export default function CategoryDetailClientPage({ slug }: { slug: string }) {
                   <Experts employees={service.employees} />
                 </div>
               )}
+
+              <CustomServiceBanner categoryName={service.category?.name || service.name} />
 
               <div id="reviews">
                 <ServiceReviews reviews={reviews} />

@@ -28,16 +28,6 @@ export default function CategoryServicesPage({ categoryId }: { categoryId: strin
   );
   const category = categoryRes?.data || categoryRes;
 
-  useEffect(() => {
-    if (category) {
-      const name = category.name?.toLowerCase() || "";
-      const slug = category.slug?.toLowerCase() || "";
-      if (name.includes("shifting") || slug.includes("shifting")) {
-        router.replace("/home-shifting");
-      }
-    }
-  }, [category, router]);
-
   const [filters, setFiltersState] = useState<FilterState>({
     activeCategory: categoryId,
     searchQuery: searchParams.get("q") || "",
@@ -74,10 +64,10 @@ export default function CategoryServicesPage({ categoryId }: { categoryId: strin
   }, [categoryId]);
 
   return (
-    <div className="min-h-screen bg-[#FFF8F4] relative">
-      {/* Subtle background pattern */}
+    <div className="min-h-screen bg-transparent relative">
+      {/* Background pattern image */}
       <div
-        className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"
+        className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-15 pointer-events-none z-0"
         style={{ backgroundSize: "auto" }}
       />
 
