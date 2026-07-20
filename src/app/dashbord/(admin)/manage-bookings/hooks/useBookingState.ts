@@ -132,6 +132,7 @@ export function useBookingState() {
     }
 
     try {
+      console.log("Submitting Admin Booking Payload:", payload);
       await createBooking(payload).unwrap();
       toast.success("Booking created successfully!");
       setIsAddModalOpen(false);
@@ -151,7 +152,9 @@ export function useBookingState() {
         notes: "",
       });
     } catch (error: any) {
-      toast.error(error.data?.message || "Failed to create booking");
+      console.error("Admin booking creation error details:", error);
+      const errorMsg = error?.data?.message || error?.message || JSON.stringify(error) || "Unknown error";
+      toast.error(`Failed to create booking: ${errorMsg}`);
     }
   };
 

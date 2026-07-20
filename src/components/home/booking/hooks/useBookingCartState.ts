@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import { useCreateBookingMutation } from "@/redux/features/admin/booking";
 import { ValidateCouponResult } from "@/redux/features/admin/coupon";
+import { useGetPublicProfilesQuery } from "@/redux/features/landing/landingApi";
+import { getFallbackVendorId } from "@/utils/vendorResolution";
 import { toast } from "sonner";
 
 const fallbackServices = [
@@ -45,6 +47,7 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
   const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResult | null>(null);
   const [activeTab, setActiveTab] = useState("specialized-services");
   const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
+  const { data: profilesRes } = useGetPublicProfilesQuery();
   const hasAutoBooked = useRef(false);
   // Guard: prevent saving an empty cart to localStorage before we've loaded the persisted one
   const hasLoadedFromStorage = useRef(false);
@@ -175,17 +178,23 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!authUser) {
+      toast.error("Please login to place a booking.");
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
     if (!bookingDetails.date || !bookingDetails.location) {
       toast.error("Booking Date and Service Location are required!");
       return;
     }
     const subServiceItems = cartItems.map((item: any) => ({
-      sub_service_id: item.id,
-      quantity: item.quantity,
+      sub_service_id: Number(item.id),
+      quantity: Number(item.quantity),
     }));
     const payload = {
       user_id: Number(authUser?.id),
-      vendor_id: Number(service?.vendor?.id || 1),
+      vendor_id: Number(service?.vendor?.id || service?.vendor_id || getFallbackVendorId(profilesRes)),
       service_id: Number(service?.id),
       date: bookingDetails.date,
       time: bookingDetails.time || undefined,
@@ -194,6 +203,9 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
       sub_service_items: subServiceItems,
       coupon_code: appliedCoupon?.coupon.code,
     };
+
+    console.log("Submitting Booking Payload:", payload);
+
     try {
       await createBooking(payload).unwrap();
       toast.success(
@@ -217,7 +229,9 @@ export function useBookingCartState({ service, isLoading, nestedServices }: UseB
         window.localStorage.removeItem(`rajseba_cart_${service.id}`);
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to place booking. Please try again.");
+      console.error("Booking submission error details:", err);
+      const errorMsg = err?.data?.message || err?.message || JSON.stringify(err) || "Unknown error";
+      toast.error(`Failed to place booking: ${errorMsg}`);
     }
   };
 

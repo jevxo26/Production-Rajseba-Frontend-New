@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Calendar, Loader2, X, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
 import { useCreateBookingMutation } from "@/redux/features/admin/booking";
 import { ValidateCouponResult } from "@/redux/features/admin/coupon";
+import { useGetPublicProfilesQuery } from "@/redux/features/landing/landingApi";
+import { getFallbackVendorId } from "@/utils/vendorResolution";
 import { CouponApply } from "@/components/home/booking/CouponApply";
 import { DisplayPackage } from "./packageOfferUtils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,7 +42,9 @@ export function PackageBookingModal({
   onClose: () => void;
   onSuccess?: () => void;
 }) {
+  const router = useRouter();
   const [createBooking, { isLoading: isBooking }] = useCreateBookingMutation();
+  const { data: profilesRes } = useGetPublicProfilesQuery();
   const authUser = useAppSelector((state) => state.auth.user);
   const [bookingDetails, setBookingDetails] = useState({
     date: "",
@@ -78,6 +83,13 @@ export function PackageBookingModal({
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!authUser) {
+      toast.error("Please login to place a booking.");
+      const currentPath = window.location.pathname + window.location.search;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
     if (!bookingDetails.date || !bookingDetails.location) {
       toast.error("Booking Date and Service Location are required!");
       return;
@@ -87,7 +99,7 @@ export function PackageBookingModal({
       user_id: Number(authUser?.id),
       package_id: Number(selectedPackage.id),
       service_id: Number(selectedPackage.serviceId),
-      vendor_id: Number(selectedPackage.vendorId || 1),
+      vendor_id: Number(selectedPackage.vendorId || getFallbackVendorId(profilesRes)),
       quantity: packageQuantity,
       duration_months: packageDuration,
       coupon_code: appliedCoupon?.coupon.code,
@@ -97,13 +109,17 @@ export function PackageBookingModal({
       notes: bookingDetails.notes || undefined,
     };
 
+    console.log("Submitting Package Booking Payload:", payload);
+
     try {
       await createBooking(payload).unwrap();
       toast.success("Your package booking has been placed successfully!");
       onClose();
       onSuccess?.();
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to place booking. Please try again.");
+      console.error("Package booking submission error details:", err);
+      const errorMsg = err?.data?.message || err?.message || JSON.stringify(err) || "Unknown error";
+      toast.error(`Failed to place booking: ${errorMsg}`);
     }
   };
 

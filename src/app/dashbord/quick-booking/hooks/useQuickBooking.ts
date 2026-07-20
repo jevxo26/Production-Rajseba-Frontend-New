@@ -8,6 +8,8 @@ import { useGetAllServicesQuery } from "@/redux/features/admin/service";
 import { useGetAllUsersQuery } from "@/redux/features/admin/user";
 import { useCreateBookingMutation } from "@/redux/features/admin/booking";
 import { ValidateCouponResult } from "@/redux/features/admin/coupon";
+import { useGetPublicProfilesQuery } from "@/redux/features/landing/landingApi";
+import { getFallbackVendorId } from "@/utils/vendorResolution";
 
 export function useQuickBooking() {
   const role = useAppSelector((state) => state.auth.role) || "superadmin";
@@ -31,6 +33,7 @@ export function useQuickBooking() {
   const { data: categoriesRes, isLoading: loadingCategories } = useGetAllCategoriesQuery();
   const { data: servicesRes, isLoading: loadingServices } = useGetAllServicesQuery();
   const { data: usersRes } = useGetAllUsersQuery();
+  const { data: profilesRes } = useGetPublicProfilesQuery();
   const [createBooking, { isLoading: submitting }] = useCreateBookingMutation();
 
   const categories = (categoriesRes?.data || []) as any[];
@@ -126,8 +129,8 @@ export function useQuickBooking() {
     }
 
     const subServiceItems = cartItems.map((item: any) => ({
-      sub_service_id: item.id,
-      quantity: item.quantity,
+      sub_service_id: Number(item.id),
+      quantity: Number(item.quantity),
     }));
 
     try {
@@ -137,11 +140,13 @@ export function useQuickBooking() {
         date: bookingDetails.date,
         time: bookingDetails.time || undefined,
         user_id: Number(selectedClientId || authUser?.id), // Admin can select client, otherwise defaults to agent
-        vendor_id: Number(currentService?.vendor?.id || currentService?.vendor_id || 1),
+        vendor_id: Number(currentService?.vendor?.id || currentService?.vendor_id || getFallbackVendorId(profilesRes)),
         service_id: Number(selectedServiceId),
         sub_service_items: subServiceItems,
         coupon_code: appliedCoupon?.coupon?.code,
       };
+
+      console.log("Submitting Quick Booking Payload:", payload);
 
       await createBooking(payload).unwrap();
       toast.success("Booking placed successfully!");
@@ -154,7 +159,9 @@ export function useQuickBooking() {
       setAppliedCoupon(null);
       setBookingDetails({ date: "", time: "", location: "", notes: "" });
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to place booking. Please try again.");
+      console.error("Quick booking submission error details:", err);
+      const errorMsg = err?.data?.message || err?.message || JSON.stringify(err) || "Unknown error";
+      toast.error(`Failed to place booking: ${errorMsg}`);
     }
   };
 

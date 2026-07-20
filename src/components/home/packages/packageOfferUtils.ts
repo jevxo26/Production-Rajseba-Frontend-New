@@ -79,7 +79,7 @@ export function mapPackagesToDisplay(
       description: pkg.description?.trim() || undefined,
       serviceId: options?.serviceId ?? pkg.service?.id,
       serviceName: options?.serviceName ?? pkg.service?.name ?? "",
-      vendorId: options?.vendorId ?? pkg.service?.vendor?.id,
+      vendorId: options?.vendorId ?? pkg.vendor_id ?? pkg.service?.vendor?.id ?? pkg.service?.vendor_id,
       bookingsCount,
     };
   });
