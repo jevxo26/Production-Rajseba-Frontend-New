@@ -167,7 +167,7 @@ export default function HeroModal({
               </label>
             </div>
             
-            <p className="text-[10px] text-slate-400">Upload one or more images. Click on an image to remove it.</p>
+            <p className="text-[10px] text-slate-400">Recommended: 1920x800 px (Max File Size: 6MB). Click on an image to remove it.</p>
           </div>
 
           {/* Modal Footer */}

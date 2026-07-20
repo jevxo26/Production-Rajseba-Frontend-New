@@ -182,7 +182,7 @@ export default function SubServiceModal({
                     className="hidden"
                   />
                 </label>
-                <p className="text-[9px] text-slate-400">Square size recommended.</p>
+                <p className="text-[9px] text-slate-400">Square size recommended (Max 6MB).</p>
               </div>
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function SubServiceModal({
                     className="hidden"
                   />
                 </label>
-                <p className="text-[9px] text-slate-400">Square size recommended.</p>
+                <p className="text-[9px] text-slate-400">Square size recommended (Max 6MB).</p>
               </div>
             </div>
           </div>

@@ -35,12 +35,7 @@ export function useVendorState() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
-  const [selectedDevision, setSelectedDevision] = useState<string>("");
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedArea, setSelectedArea] = useState<string>("");
-
   const [profileType, setProfileType] = useState<string>("personal");
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingVendor, setEditingVendor] = useState<VendorItem | null>(null);
@@ -122,17 +117,10 @@ export function useVendorState() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const categoryIds = selectedCategoryIds;
 
     const profileData = {
       user_id: createdUserId,
-      category_ids: categoryIds.length > 0 ? categoryIds : undefined,
       type: profileType,
-      location: formData.get("location")?.toString() || "",
-      devision_id: selectedDevision ? Number(selectedDevision) : undefined,
-      district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
-      area_id: selectedArea && !isNaN(Number(selectedArea)) ? Number(selectedArea) : undefined,
-      area_name: selectedArea && isNaN(Number(selectedArea)) ? selectedArea : undefined,
       description: formData.get("description")?.toString() || "",
       company_name: formData.get("company_name")?.toString() || "",
       min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
@@ -154,11 +142,7 @@ export function useVendorState() {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
-    setSelectedDevision("");
-    setSelectedDistrict("");
-    setSelectedArea("");
     setProfileType("personal");
-    setSelectedCategoryIds([]);
   };
 
   const handleEditVendor = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -241,18 +225,8 @@ export function useVendorState() {
     setOpenDropdownId,
     step,
     isUsersLoading,
-    isCategoriesLoading,
-    allCategories,
-    selectedDevision,
-    setSelectedDevision,
-    selectedDistrict,
-    setSelectedDistrict,
-    selectedArea,
-    setSelectedArea,
     profileType,
     setProfileType,
-    selectedCategoryIds,
-    setSelectedCategoryIds,
     isEditModalOpen,
     setIsEditModalOpen,
     editingVendor,

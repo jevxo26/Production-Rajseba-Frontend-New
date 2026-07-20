@@ -149,7 +149,7 @@ export default function BlogModal({
                         {lang === "bn" ? "ক্লিক করে ছবি আপলোড করুন" : "Click to upload an image"}
                       </span>
                       <span className="text-[10px] font-bold text-slate-400 block mt-0.5">
-                        PNG, JPG, JPEG up to 5MB
+                        {lang === "bn" ? "PNG, JPG, JPEG সর্বোচ্চ ৬ এমবি" : "PNG, JPG, JPEG up to 6MB"}
                       </span>
                     </div>
                   </div>

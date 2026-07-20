@@ -367,16 +367,19 @@ export default function EditServicePage() {
                   <ImageIcon className="text-slate-400" size={24} />
                 )}
               </div>
-              <label className="cursor-pointer bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 transition-all active:scale-[0.98]">
-                {isUploadingImage ? "Uploading..." : "Browse Photo"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  disabled={isUploadingImage}
-                  className="hidden"
-                />
-              </label>
+              <div className="flex flex-col gap-1">
+                <label className="cursor-pointer bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold px-4 py-2.5 rounded-lg inline-flex items-center gap-2 transition-all active:scale-[0.98]">
+                  {isUploadingImage ? "Uploading..." : "Browse Photo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUploadingImage}
+                    className="hidden"
+                  />
+                </label>
+                <p className="text-[10px] text-slate-400 mt-1">PNG, JPG or WebP (Max 6MB)</p>
+              </div>
             </div>
           </div>
 

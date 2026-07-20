@@ -281,7 +281,7 @@ export default function CreateNestedServicePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2 border border-dashed border-slate-300 rounded-xl p-4 relative group">
                         <label className="text-xs font-semibold text-slate-500 uppercase flex items-center gap-2">
-                           <ImageIcon size={14} /> ছবি ১
+                           <ImageIcon size={14} /> ছবি ১ <span className="text-[9px] text-slate-400 font-normal">(সর্বোচ্চ ৬ এমবি)</span>
                         </label>
                         <Input
                           type="file"
@@ -301,7 +301,7 @@ export default function CreateNestedServicePage() {
                       </div>
                       <div className="space-y-2 border border-dashed border-slate-300 rounded-xl p-4 relative group">
                         <label className="text-xs font-semibold text-slate-500 uppercase flex items-center gap-2">
-                           <ImageIcon size={14} /> ছবি ২
+                           <ImageIcon size={14} /> ছবি ২ <span className="text-[9px] text-slate-400 font-normal">(সর্বোচ্চ ৬ এমবি)</span>
                         </label>
                         <Input
                           type="file"
@@ -420,7 +420,7 @@ export default function CreateNestedServicePage() {
                     className="hidden"
                   />
                 </label>
-                <p className="text-[10px] text-slate-400">স্কোয়ার (Square) সাইজের ছবি ব্যবহার করার পরামর্শ দেওয়া হচ্ছে।</p>
+                <p className="text-[10px] text-slate-400">স্কোয়ার (Square) সাইজের ছবি ব্যবহার করার পরামর্শ দেওয়া হচ্ছে (সর্বোচ্চ ৬ এমবি)।</p>
               </div>
             </div>
           </div>

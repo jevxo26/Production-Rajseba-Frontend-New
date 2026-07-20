@@ -22,18 +22,8 @@ export default function VendorsManagementPage() {
     setOpenDropdownId,
     step,
     isUsersLoading,
-    isCategoriesLoading,
-    allCategories,
-    selectedDevision,
-    setSelectedDevision,
-    selectedDistrict,
-    setSelectedDistrict,
-    selectedArea,
-    setSelectedArea,
     profileType,
     setProfileType,
-    selectedCategoryIds,
-    setSelectedCategoryIds,
     isEditModalOpen,
     setIsEditModalOpen,
     editingVendor,
@@ -123,16 +113,6 @@ export default function VendorsManagementPage() {
         isCreatingProfile={isCreatingProfile}
         profileType={profileType}
         setProfileType={setProfileType}
-        allCategories={allCategories}
-        isCategoriesLoading={isCategoriesLoading}
-        selectedCategoryIds={selectedCategoryIds}
-        setSelectedCategoryIds={setSelectedCategoryIds}
-        selectedDevision={selectedDevision}
-        setSelectedDevision={setSelectedDevision}
-        selectedDistrict={selectedDistrict}
-        setSelectedDistrict={setSelectedDistrict}
-        selectedArea={selectedArea}
-        setSelectedArea={setSelectedArea}
       />
 
       {/* View Details Modal */}

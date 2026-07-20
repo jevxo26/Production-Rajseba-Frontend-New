@@ -43,16 +43,11 @@ export function useAgentState() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
 
-  const [selectedDevision, setSelectedDevision] = useState<string>("");
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedArea, setSelectedArea] = useState<string>("");
-
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const [shopImage1File, setShopImage1File] = useState<File | null>(null);
   const [shopImage2File, setShopImage2File] = useState<File | null>(null);
   const [nidFrontFile, setNidFrontFile] = useState<File | null>(null);
   const [nidBackFile, setNidBackFile] = useState<File | null>(null);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
 
   const { data: apiUsersRes, isLoading: isUsersLoading, refetch } = useGetAllUsersQuery();
   const { data: rolesRes } = useGetAllRolesQuery();
@@ -136,7 +131,6 @@ export function useAgentState() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const categoryIds = selectedCategoryIds.length > 0 ? selectedCategoryIds : formData.getAll("category_ids").map((id) => Number(id));
 
     if (!pictureFile) {
       toast.error("Please upload a Profile / Logo picture.");
@@ -168,21 +162,13 @@ export function useAgentState() {
         user_id: createdUserId,
         company_name: formData.get("company_name")?.toString() || "",
         nid_number: formData.get("nid_number")?.toString() || "",
-        category_ids: categoryIds.length > 0 ? categoryIds : undefined,
         type: "personal",
         picture: pictureUrl,
         nid_front: nidFrontUrl,
         nid_back: nidBackUrl,
         shop_image1: shopImageUrl1,
         shop_image2: shopImageUrl2,
-        location: formData.get("location")?.toString() || "",
-        devision_id: selectedDevision ? Number(selectedDevision) : undefined,
-        district_id: selectedDistrict ? Number(selectedDistrict) : undefined,
-        area_id: selectedArea && !isNaN(Number(selectedArea)) ? Number(selectedArea) : undefined,
-        area_name: selectedArea && isNaN(Number(selectedArea)) ? selectedArea : undefined,
         description: formData.get("description")?.toString() || "",
-        min_starting_price: formData.get("min_starting_price") ? Number(formData.get("min_starting_price")) : 0,
-        google_map_link: formData.get("google_map_link")?.toString() || "",
       };
 
       await createProfileMut(profileData).unwrap();
@@ -200,9 +186,6 @@ export function useAgentState() {
     setIsAddModalOpen(false);
     setStep(1);
     setCreatedUserId(null);
-    setSelectedDevision("");
-    setSelectedDistrict("");
-    setSelectedArea("");
     setPictureFile(null);
     setShopImage1File(null);
     setShopImage2File(null);
@@ -267,16 +250,6 @@ export function useAgentState() {
     setOpenDropdownId,
     step,
     isUsersLoading,
-    isCategoriesLoading,
-    allCategories,
-    selectedDevision,
-    setSelectedDevision,
-    selectedDistrict,
-    setSelectedDistrict,
-    selectedArea,
-    setSelectedArea,
-    selectedCategoryIds,
-    setSelectedCategoryIds,
     pictureFile,
     setPictureFile,
     shopImage1File,

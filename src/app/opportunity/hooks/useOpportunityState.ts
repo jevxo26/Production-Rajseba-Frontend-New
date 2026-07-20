@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { useCreateProfileMutation } from "@/redux/features/admin/profile";
-import { useGetPublicRolesQuery, useGetPublicCategoriesQuery } from "@/redux/features/landing/landingApi";
+import { useGetPublicRolesQuery } from "@/redux/features/landing/landingApi";
 import { uploadImage } from "@/lib/upload";
 import { CheckCircle2, MapPin } from "lucide-react";
 
@@ -27,7 +27,7 @@ export function useOpportunityState() {
   const [step, setStep] = useState<1 | 2>(1);
   const [createdUserId, setCreatedUserId] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedCategoryIds] = useState<number[]>([]);
   const [pictureFile, setPictureFile] = useState<File | null>(null);
   const [shopImage1File, setShopImage1File] = useState<File | null>(null);
   const [shopImage2File, setShopImage2File] = useState<File | null>(null);
@@ -37,15 +37,13 @@ export function useOpportunityState() {
   const [register, { isLoading: isRegistering }] = useRegisterMutation();
   const [createProfile, { isLoading: isCreatingProfile }] = useCreateProfileMutation();
   const { data: rolesRes } = useGetPublicRolesQuery();
-  const { data: categoriesRes } = useGetPublicCategoriesQuery();
 
   const roles = rolesRes?.data || (Array.isArray(rolesRes) ? rolesRes : []);
-  const categories = categoriesRes?.data || (Array.isArray(categoriesRes) ? categoriesRes : []);
 
   const [formData, setFormData] = useState({
-    name: "", phone: "", email: "", company_name: "", location: "",
+    name: "", phone: "", email: "", company_name: "",
     description: "", min_starting_price: "", google_map_link: "",
-    devision_id: "", district_id: "", area_id: "", nid_number: "",
+    nid_number: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -96,15 +94,6 @@ export function useOpportunityState() {
   const handleProfileSubmit = async (e: React.FormEvent, selectedRole: string | null) => {
     e.preventDefault();
     if (!createdUserId) return;
-    if (!formData.devision_id || !formData.district_id || !formData.area_id) {
-      toast.error("Please complete the location details (Division, District, Area)."); return;
-    }
-    
-    // Conditionally validate categories
-    if (selectedRole === "Vendor" && selectedCategoryIds.length === 0) {
-      toast.error("Please select at least one category."); return;
-    }
-    
     if (!pictureFile) {
       toast.error("Please upload a picture."); return;
     }
@@ -154,15 +143,10 @@ export function useOpportunityState() {
         user_id: createdUserId, type: "business",
         company_name: formData.company_name,
         category_ids: selectedRole === "Agent" ? [] : selectedCategoryIds,
-        location: formData.location, description: formData.description,
+        description: formData.description,
         picture: pictureUrl,
         min_starting_price: selectedRole === "Agent" ? 0 : (Number(formData.min_starting_price) || 0),
         google_map_link: selectedRole === "Agent" ? "" : formData.google_map_link,
-        devision_id: Number(formData.devision_id),
-        district_id: Number(formData.district_id),
-        area_id: formData.area_id && !isNaN(Number(formData.area_id)) ? Number(formData.area_id) : undefined,
-        area_name: formData.area_id && isNaN(Number(formData.area_id)) ? formData.area_id : undefined,
-        
         shop_image1: shopImageUrl1 || undefined,
         shop_image2: shopImageUrl2 || undefined,
         nid_number: selectedRole === "Agent" ? formData.nid_number : undefined,
@@ -182,14 +166,13 @@ export function useOpportunityState() {
 
   return {
     step, formData, setFormData, handleChange,
-    selectedCategoryIds, setSelectedCategoryIds,
     pictureFile, setPictureFile,
     shopImage1File, setShopImage1File,
     shopImage2File, setShopImage2File,
     nidFrontFile, setNidFrontFile,
     nidBackFile, setNidBackFile,
     isRegistering, isCreatingProfile, isUploading,
-    categories, handleSelectRole, handleBack,
+    handleSelectRole, handleBack,
     handleRegister, handleProfileSubmit,
   };
 }

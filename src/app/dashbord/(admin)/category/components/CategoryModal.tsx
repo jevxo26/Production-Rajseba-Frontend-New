@@ -155,7 +155,7 @@ export default function CategoryModal({
                     </button>
                   )}
                 </div>
-                <p className="text-[10px] text-slate-400">Supports JPG, PNG, GIF. Max file size 5MB.</p>
+                <p className="text-[10px] text-slate-400">Supports JPG, PNG, GIF. Max file size 6MB.</p>
               </div>
             </div>
           </div>

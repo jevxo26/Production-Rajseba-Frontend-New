@@ -170,6 +170,7 @@ export default function ChatWindow({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
+            title={lang === "bn" ? "ছবি আপলোড করুন (সর্বোচ্চ ৬ এমবি)" : "Upload Image (Max 6MB)"}
             className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-100 transition-colors cursor-pointer shrink-0 animate-in fade-in zoom-in"
           >
             <ImageIcon size={18} />

@@ -3,7 +3,6 @@
 import React from "react";
 import { XCircle } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
-import { LocationCascader } from "@/components/ui/LocationCascader";
 
 interface AddVendorModalProps {
   isAddModalOpen: boolean;
@@ -15,16 +14,6 @@ interface AddVendorModalProps {
   isCreatingProfile: boolean;
   profileType: string;
   setProfileType: (val: string) => void;
-  allCategories: any[];
-  isCategoriesLoading: boolean;
-  selectedCategoryIds: number[];
-  setSelectedCategoryIds: (val: number[]) => void;
-  selectedDevision: string;
-  setSelectedDevision: (val: string) => void;
-  selectedDistrict: string;
-  setSelectedDistrict: (val: string) => void;
-  selectedArea: string;
-  setSelectedArea: (val: string) => void;
 }
 
 export default function AddVendorModal({
@@ -37,16 +26,6 @@ export default function AddVendorModal({
   isCreatingProfile,
   profileType,
   setProfileType,
-  allCategories,
-  isCategoriesLoading,
-  selectedCategoryIds,
-  setSelectedCategoryIds,
-  selectedDevision,
-  setSelectedDevision,
-  selectedDistrict,
-  setSelectedDistrict,
-  selectedArea,
-  setSelectedArea,
 }: AddVendorModalProps) {
   if (!isAddModalOpen) return null;
 
@@ -141,16 +120,6 @@ export default function AddVendorModal({
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Categories</label>
-              <CustomSelect
-                isMulti
-                options={allCategories.map((c: any) => ({ value: String(c.id), label: c.name }))}
-                value={selectedCategoryIds.map(String)}
-                onChange={(val) => setSelectedCategoryIds(Array.isArray(val) ? val.map(Number) : [])}
-                placeholder={isCategoriesLoading ? "Loading categories..." : "Select Categories..."}
-              />
-            </div>
-            <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
                 Company / Business Name (Optional)
               </label>
@@ -159,27 +128,6 @@ export default function AddVendorModal({
                 type="text"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#FF6014]/40 focus:ring-2 focus:ring-rose-100 transition-all"
                 placeholder="Acme Services Ltd."
-              />
-            </div>
-            <div>
-              <LocationCascader
-                selectedDevisionId={selectedDevision}
-                selectedDistrictId={selectedDistrict}
-                selectedAreaId={selectedArea}
-                onDevisionChange={setSelectedDevision}
-                onDistrictChange={setSelectedDistrict}
-                onAreaChange={setSelectedArea}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                Specific Location (Optional)
-              </label>
-              <input
-                name="location"
-                type="text"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all"
-                placeholder="City, Region"
               />
             </div>
             <div>

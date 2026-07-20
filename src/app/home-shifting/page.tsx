@@ -514,7 +514,7 @@ export default function HomeShiftingPage() {
                         className="border-2 border-dashed border-slate-200 hover:border-[#FF6014]/50 rounded-2xl p-4 text-center cursor-pointer transition-all hover:bg-[#FFF8F4]/50 group">
                         <Upload size={18} className="text-slate-400 group-hover:text-[#FF6014] mx-auto mb-1 transition-colors" />
                         <p className="text-xs font-bold text-slate-500">Click to upload photos</p>
-                        <p className="text-[11px] text-slate-400 mt-0.5">JPG, PNG — up to 5MB each</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5">JPG, PNG — up to 6MB each</p>
                       </div>
                       <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={addFiles} />
                       {previews.length > 0 && (

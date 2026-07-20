@@ -109,7 +109,7 @@ const Hero = () => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
       paginate(1);
-    }, 4000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [slides.length]);
 

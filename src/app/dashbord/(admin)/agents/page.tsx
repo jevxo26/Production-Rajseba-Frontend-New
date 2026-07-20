@@ -18,16 +18,6 @@ export default function AgentsPage() {
     setOpenDropdownId,
     step,
     isUsersLoading,
-    isCategoriesLoading,
-    allCategories,
-    selectedDevision,
-    setSelectedDevision,
-    selectedDistrict,
-    setSelectedDistrict,
-    selectedArea,
-    setSelectedArea,
-    selectedCategoryIds,
-    setSelectedCategoryIds,
     pictureFile,
     setPictureFile,
     shopImage1File,
@@ -117,16 +107,6 @@ export default function AgentsPage() {
           isCreatingUser={isCreatingUser}
           handleCreateProfile={handleCreateProfile}
           isCreatingProfile={isCreatingProfile}
-          isCategoriesLoading={isCategoriesLoading}
-          allCategories={allCategories}
-          selectedDevision={selectedDevision}
-          setSelectedDevision={setSelectedDevision}
-          selectedDistrict={selectedDistrict}
-          setSelectedDistrict={setSelectedDistrict}
-          selectedArea={selectedArea}
-          setSelectedArea={setSelectedArea}
-          selectedCategoryIds={selectedCategoryIds}
-          setSelectedCategoryIds={setSelectedCategoryIds}
           pictureFile={pictureFile}
           setPictureFile={setPictureFile}
           shopImage1File={shopImage1File}

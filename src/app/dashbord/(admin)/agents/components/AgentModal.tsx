@@ -2,8 +2,6 @@
 
 import React from "react";
 import { XCircle } from "lucide-react";
-import { LocationCascader } from "@/components/ui/LocationCascader";
-import { CategoryTagSelector } from "@/components/ui/CategoryTagSelector";
 
 interface AgentModalProps {
   step: 1 | 2;
@@ -12,16 +10,6 @@ interface AgentModalProps {
   isCreatingUser: boolean;
   handleCreateProfile: (e: React.FormEvent<HTMLFormElement>) => void;
   isCreatingProfile: boolean;
-  isCategoriesLoading: boolean;
-  allCategories: any[];
-  selectedCategoryIds: number[];
-  setSelectedCategoryIds: (ids: number[]) => void;
-  selectedDevision: string;
-  setSelectedDevision: (val: string) => void;
-  selectedDistrict: string;
-  setSelectedDistrict: (val: string) => void;
-  selectedArea: string;
-  setSelectedArea: (val: string) => void;
   pictureFile: File | null;
   setPictureFile: (val: File | null) => void;
   shopImage1File: File | null;
@@ -41,16 +29,6 @@ export default function AgentModal({
   isCreatingUser,
   handleCreateProfile,
   isCreatingProfile,
-  isCategoriesLoading,
-  allCategories,
-  selectedCategoryIds,
-  setSelectedCategoryIds,
-  selectedDevision,
-  setSelectedDevision,
-  selectedDistrict,
-  setSelectedDistrict,
-  selectedArea,
-  setSelectedArea,
   pictureFile,
   setPictureFile,
   shopImage1File,
@@ -148,10 +126,10 @@ export default function AgentModal({
                 placeholder="199XXXXXXXXXX"
               />
             </div>
-            
+
             {/* Profile / Logo picture */}
             <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile / Logo Picture</label>
+              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Profile / Logo Picture (Max 6MB)</label>
               <div className="relative border border-slate-200 bg-slate-50 hover:bg-white rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer group transition-all">
                 <span className="text-xs font-bold text-slate-600 truncate max-w-[280px]">
                   {pictureFile ? pictureFile.name : "Choose profile photo..."}
@@ -175,7 +153,7 @@ export default function AgentModal({
             {/* Shop Images */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Shop Image 1</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Shop Image 1 (Max 6MB)</label>
                 <div className="relative border border-slate-200 bg-slate-50 hover:bg-white rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer group transition-all">
                   <span className="text-xs font-bold text-slate-600 truncate max-w-[120px]">
                     {shopImage1File ? shopImage1File.name : "Image 1"}
@@ -196,7 +174,7 @@ export default function AgentModal({
                 )}
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Shop Image 2</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Shop Image 2 (Max 6MB)</label>
                 <div className="relative border border-slate-200 bg-slate-50 hover:bg-white rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer group transition-all">
                   <span className="text-xs font-bold text-slate-600 truncate max-w-[120px]">
                     {shopImage2File ? shopImage2File.name : "Image 2"}
@@ -221,7 +199,7 @@ export default function AgentModal({
             {/* NID Images */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">NID Front Page</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">NID Front Page (Max 6MB)</label>
                 <div className="relative border border-slate-200 bg-slate-50 hover:bg-white rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer group transition-all">
                   <span className="text-xs font-bold text-slate-600 truncate max-w-[120px]">
                     {nidFrontFile ? nidFrontFile.name : "NID Front"}
@@ -242,7 +220,7 @@ export default function AgentModal({
                 )}
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">NID Back Page</label>
+                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">NID Back Page (Max 6MB)</label>
                 <div className="relative border border-slate-200 bg-slate-50 hover:bg-white rounded-xl px-4 py-2.5 flex items-center justify-between cursor-pointer group transition-all">
                   <span className="text-xs font-bold text-slate-600 truncate max-w-[120px]">
                     {nidBackFile ? nidBackFile.name : "NID Back"}
@@ -263,35 +241,7 @@ export default function AgentModal({
                 )}
               </div>
             </div>
-            <CategoryTagSelector
-              categories={allCategories}
-              selectedIds={selectedCategoryIds}
-              onChange={(ids) => setSelectedCategoryIds(ids as number[])}
-              isLoading={isCategoriesLoading}
-              label="Categories (Optional)"
-              hint="Tap to select or deselect categories"
-            />
-            <div>
-              <LocationCascader
-                selectedDevisionId={selectedDevision}
-                selectedDistrictId={selectedDistrict}
-                selectedAreaId={selectedArea}
-                onDevisionChange={setSelectedDevision}
-                onDistrictChange={setSelectedDistrict}
-                onAreaChange={setSelectedArea}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">
-                Specific Location (Optional)
-              </label>
-              <input
-                name="location"
-                type="text"
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 transition-all"
-                placeholder="City, Region"
-              />
-            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Description</label>
               <textarea

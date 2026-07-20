@@ -57,6 +57,9 @@ export default function ProfileCard({
           ✓
         </span>
       </div>
+      <p className="text-[9px] text-slate-400 mt-[-8px]">
+        {lang === "bn" ? "সর্বোচ্চ ৬ এমবি" : "Max 6MB"}
+      </p>
       <div>
         <h3 className="text-lg font-bold text-slate-800">{name}</h3>
         <span className="text-xs font-semibold text-[#FF6014] bg-[#FFF8F4] px-2.5 py-0.5 rounded-lg mt-1 inline-block capitalize">
