@@ -221,6 +221,12 @@ export default function TopServices() {
                     </div>
                   )}
 
+                  {/* Bookings Completed Badge */}
+                  <div className="absolute bottom-3 right-3 bg-[#FF6014]/90 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1.5 shadow-[0_4px_12px_rgba(255,96,20,0.25)] border border-white/20 uppercase tracking-wider z-10">
+                    <CheckCircle size={10} className="text-white fill-white/10" />
+                    <span>{totalBookings} Completed</span>
+                  </div>
+
                   {/* Wishlist heart */}
                   <Button
                     variant="ghost"

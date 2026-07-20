@@ -29,6 +29,7 @@ import {
   Truck,
   Sparkles,
   ArrowRight,
+  Heart,
 } from "lucide-react";
 import { TbAirConditioning, TbTruck } from "react-icons/tb";
 import {
@@ -46,6 +47,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useGetPublicCategoriesQuery, useSearchPublicServicesQuery } from "@/redux/features/landing/landingApi";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { logout as authLogout, getRoleName } from "@/redux/features/auth/authSlice";
+import { useGetSavedServicesQuery } from "@/redux/features/admin/user";
 
 interface NavLink {
   label: string;
@@ -181,6 +183,10 @@ export function Navbar() {
     { skip: !searchQuery }
   );
   const searchResults = searchRes?.data || [];
+  const { data: savedRes } = useGetSavedServicesQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+  const savedCount = savedRes?.data?.length || 0;
   const [mounted, setMounted] = useState(false);
   const [showServicesDropdown, setShowServicesDropdown] = useState(false);
   const [showMobileAccordion, setShowMobileAccordion] = useState(false);
@@ -590,6 +596,48 @@ export function Navbar() {
               >
                 {searchOpen ? <X className="w-[18px] h-[18px]" /> : <Search className="w-[18px] h-[18px]" />}
               </motion.button>
+
+              {/* Wishlist Heart Button with Badge */}
+              {mounted && isAuthenticated && (
+                <Link href="/dashbord/saved" className="relative p-1.5 flex items-center justify-center text-slate-500 hover:text-rose-500 transition-colors focus:outline-none shrink-0 z-20">
+                  <motion.div
+                    whileHover={{ scale: 1.15 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="flex items-center justify-center"
+                  >
+                    <Heart 
+                      size={20} 
+                      className={`stroke-[2.2] transition-transform ${savedCount > 0 ? 'fill-rose-500 text-rose-500' : ''}`} 
+                    />
+                  </motion.div>
+                  
+                  {/* Badge */}
+                  <AnimatePresence>
+                    {savedCount > 0 && (
+                      <motion.span
+                        key={savedCount}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ 
+                          scale: [1, 1.25, 1],
+                          opacity: 1
+                        }}
+                        transition={{ 
+                          scale: {
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            duration: 1.2,
+                            ease: "easeInOut"
+                          },
+                          opacity: { duration: 0.2 }
+                        }}
+                        className="absolute top-0 right-0 min-w-[16px] h-[16px] bg-[#FF6014] text-white text-[8px] font-black rounded-full flex items-center justify-center px-1 shadow-[0_0_8px_rgba(255,96,20,0.5)] border border-white"
+                      >
+                        {savedCount}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </Link>
+              )}
 
               {/* Auth Buttons or Profile Dropdown — desktop/laptop only */}
               {!mounted || authLoading ? (

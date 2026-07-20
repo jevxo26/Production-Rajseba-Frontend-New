@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { ArrowRight, Star, Clock } from "lucide-react";
+import { ArrowRight, Star, Clock, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useGetPublicServicesQuery } from "@/redux/features/landing/landingApi";
@@ -62,6 +62,7 @@ interface TrendingServiceItem {
   badge?: string;
   slug: string;
   done: string;
+  bookingsCount?: number;
 }
 
 export default function TrendingServices() {
@@ -81,9 +82,21 @@ export default function TrendingServices() {
       filteredServices = allServices.filter((service: any) => {
         let match = true;
         if (q) {
-          const nameMatch = service.name?.toLowerCase().includes(q);
-          const descMatch = (service.description || service.subtitle || "")?.toLowerCase().includes(q);
-          if (!nameMatch && !descMatch) match = false;
+          const words = q
+            .trim()
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((w) => w.length > 0);
+          const title = (service.name || "").toLowerCase();
+          const desc = (service.description || service.subtitle || "").toLowerCase();
+          const category = (service.category?.name || "").toLowerCase();
+          const allWordsMatch = words.every(
+            (word) =>
+              title.includes(word) ||
+              desc.includes(word) ||
+              category.includes(word)
+          );
+          if (!allWordsMatch) match = false;
         }
         if (categorySlug) {
           if (service.category?.slug !== categorySlug) match = false;
@@ -115,14 +128,9 @@ export default function TrendingServices() {
       // Format reviews count
       const reviewsStr = totalReviews > 0 ? `${totalReviews}+` : `${(1.0 + (hash % 40) * 0.1).toFixed(1)}k`;
 
-      // Done options based on actual bookings if available, else fallback
-      let done = "";
-      if (item.bookings && item.bookings.length > 0) {
-        done = `${item.bookings.length}+ done`;
-      } else {
-        const doneOptions = ["80+ done", "120+ done", "210+ done", "300+ done", "400+ done"];
-        done = doneOptions[hash % doneOptions.length];
-      }
+      // Done options based on actual bookings
+      const bookingsCount = item.bookings?.length || 0;
+      const done = `${bookingsCount} done`;
 
       // Get lowest price from nested services
       let priceVal = 1000;
@@ -146,6 +154,7 @@ export default function TrendingServices() {
         badge: index === 0 ? "MOST BOOKED" : index === 1 ? "HOT" : hash % 3 === 0 ? "POPULAR" : undefined,
         slug: item.slug || "",
         done,
+        bookingsCount,
       };
     });
 
@@ -227,6 +236,11 @@ export default function TrendingServices() {
                   <span className="absolute top-3.5 right-3.5 flex items-center gap-1 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] font-extrabold text-amber-500 shadow-sm border border-slate-100/50">
                     ★ {service.rating}
                   </span>
+                  {/* Bookings Completed Badge */}
+                  <div className="absolute bottom-3.5 right-3.5 bg-[#FF6014]/90 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1.5 shadow-[0_4px_12px_rgba(255,96,20,0.25)] border border-white/20 uppercase tracking-wider z-10">
+                    <CheckCircle size={10} className="text-white fill-white/10" />
+                    <span>{service.bookingsCount || 0} Completed</span>
+                  </div>
                 </div>
 
                 {/* Content Section */}

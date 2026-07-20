@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Heart, Star, ArrowRight } from "lucide-react";
+import { Clock, Heart, Star, ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "@/redux/hooks";
 import { useToggleSavedServiceMutation, useGetSavedServicesQuery } from "@/redux/features/admin/user";
@@ -20,6 +20,7 @@ interface ServiceListing {
   availability: string[];
   daysAgo: number;
   slug?: string;
+  bookingsCount?: number;
 }
 
 export default function ServiceCard({ service }: { service: ServiceListing }) {
@@ -77,16 +78,21 @@ export default function ServiceCard({ service }: { service: ServiceListing }) {
           {service.rating}
         </span>
 
+        {/* Bookings Completed Badge */}
+        <div className="absolute bottom-3 left-3 bg-[#FF6014]/90 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1.5 shadow-[0_4px_12px_rgba(255,96,20,0.25)] border border-white/20 uppercase tracking-wider z-10">
+          <CheckCircle size={10} className="text-white fill-white/10" />
+          <span>{service.bookingsCount || 0} Completed</span>
+        </div>
+
         {/* Wishlist Heart Button */}
         <button
           onClick={handleWishlist}
           disabled={isToggling}
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          className={`absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 cursor-pointer disabled:opacity-60 z-20 ${
-            isWishlisted
+          className={`absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 cursor-pointer disabled:opacity-60 z-20 ${isWishlisted
               ? "bg-[#FF6014] text-white scale-110"
               : "bg-white/90 text-slate-400 hover:bg-rose-50 hover:text-[#FF6014] hover:scale-110"
-          }`}
+            }`}
         >
           <Heart
             size={14}

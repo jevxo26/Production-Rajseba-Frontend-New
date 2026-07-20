@@ -55,14 +55,11 @@ export function mapPackagesToDisplay(
       globalIdx % 3 === 1 ? "popular" : globalIdx % 3 === 2 ? "dark" : "light";
     const features = normalizePackageFeatures(pkg);
     const idVal = typeof pkg.id === "number" ? pkg.id : globalIdx;
-    let bookingsCount = undefined;
-    if (Array.isArray(pkg.bookings) && pkg.bookings.length > 0) {
+    let bookingsCount = 0;
+    if (Array.isArray(pkg.bookings)) {
       bookingsCount = pkg.bookings.length;
-    } else if (typeof pkg.bookings_count === "number" && pkg.bookings_count > 0) {
+    } else if (typeof pkg.bookings_count === "number") {
       bookingsCount = pkg.bookings_count;
-    } else {
-      const fallbackOptions = [45, 60, 95, 110, 150];
-      bookingsCount = fallbackOptions[idVal % fallbackOptions.length];
     }
 
     return {

@@ -26,10 +26,10 @@ export function PackageOfferCard({
     <motion.div
       variants={itemVariants}
       className={`rounded-3xl relative flex flex-col h-full transition-all hover:-translate-y-1 overflow-hidden ${pkg.variant === "popular"
-          ? "border-2 border-blue-500 bg-blue-50/50 shadow-blue-500/20 shadow-xl"
-          : pkg.variant === "dark"
-            ? "bg-[#261817] text-white border border-blue-200 hover:border-blue-500 hover:shadow-blue-500/20"
-            : "bg-white border border-blue-200 shadow-sm hover:border-blue-500 hover:shadow-blue-500/20 hover:shadow-xl"
+        ? "border-2 border-blue-500 bg-blue-50/50 shadow-blue-500/20 shadow-xl"
+        : pkg.variant === "dark"
+          ? "bg-[#261817] text-white border border-blue-200 hover:border-blue-500 hover:shadow-blue-500/20"
+          : "bg-white border border-blue-200 shadow-sm hover:border-blue-500 hover:shadow-blue-500/20 hover:shadow-xl"
         }`}
     >
       {/* Badge */}
@@ -50,6 +50,14 @@ export function PackageOfferCard({
           {/* Gradient overlay so bottom text is always readable */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
+          {/* Bookings Completed Badge */}
+          {(pkg.bookingsCount !== undefined && pkg.bookingsCount !== null) && (
+            <div className="absolute top-3 left-3 bg-[#FF6014]/90 backdrop-blur-md text-white px-2.5 py-1 rounded-full text-[9px] font-black flex items-center gap-1.5 shadow-[0_4px_12px_rgba(255,96,20,0.25)] border border-white/20 uppercase tracking-wider z-10">
+              <CheckCircle size={10} className="text-white fill-white/10" />
+              <span>{pkg.bookingsCount} Completed</span>
+            </div>
+          )}
+
           {/* Service label bottom-left */}
           {pkg.serviceName && (
             <div className="absolute bottom-3 left-3 z-10">
@@ -64,8 +72,8 @@ export function PackageOfferCard({
         <div className="px-6 pt-6 pb-2">
           <span
             className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${pkg.variant === "dark"
-                ? "bg-white/10 text-slate-300"
-                : "bg-[#FF6014]/10 text-[#FF6014]"
+              ? "bg-white/10 text-slate-300"
+              : "bg-[#FF6014]/10 text-[#FF6014]"
               }`}
           >
             {pkg.serviceName}
@@ -107,13 +115,11 @@ export function PackageOfferCard({
             <div className="text-2xl font-bold text-slate-400">Get Quote</div>
           )}
           {(pkg.bookingsCount !== undefined && pkg.bookingsCount !== null) && (
-            <p className={`text-[10px] font-semibold pt-1.5 flex items-center gap-1 ${
-              pkg.variant === "dark" ? "text-slate-400" : "text-slate-500"
-            }`}>
+            <p className={`text-[10px] font-semibold pt-1.5 flex items-center gap-1 ${pkg.variant === "dark" ? "text-slate-400" : "text-slate-500"
+              }`}>
               <CheckCircle size={11} className="text-emerald-500 flex-shrink-0" />
-              <span><span className={`font-bold ${
-                pkg.variant === "dark" ? "text-emerald-400" : "text-emerald-600"
-              }`}>{pkg.bookingsCount}</span> bookings completed</span>
+              <span><span className={`font-bold ${pkg.variant === "dark" ? "text-emerald-400" : "text-emerald-600"
+                }`}>{pkg.bookingsCount}</span> bookings completed</span>
             </p>
           )}
         </div>
@@ -145,10 +151,10 @@ export function PackageOfferCard({
           type="button"
           onClick={() => onBook?.(pkg)}
           className={`w-full py-3 rounded-2xl font-bold text-sm transition-all cursor-pointer active:scale-[0.98] ${pkg.variant === "dark"
-              ? "bg-white text-slate-900 hover:bg-slate-100"
-              : pkg.variant === "popular"
-                ? "bg-[#FF6014] text-white hover:bg-[#E0530A] shadow-md shadow-[#FF6014]/20"
-                : "bg-slate-900 text-white hover:bg-black"
+            ? "bg-white text-slate-900 hover:bg-slate-100"
+            : pkg.variant === "popular"
+              ? "bg-[#FF6014] text-white hover:bg-[#E0530A] shadow-md shadow-[#FF6014]/20"
+              : "bg-slate-900 text-white hover:bg-black"
             }`}
         >
           {pkg.buttonText}

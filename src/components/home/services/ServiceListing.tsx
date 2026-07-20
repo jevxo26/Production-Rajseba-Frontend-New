@@ -183,14 +183,9 @@ export default function ServiceListing({
       const id = String(item.id);
       const hash = getHash(id);
 
-      // Done options based on actual bookings if available, else fallback
-      let done = "";
-      if (item.bookings && item.bookings.length > 0) {
-        done = `${item.bookings.length}+ done`;
-      } else {
-        const doneOptions = ["80+ done", "120+ done", "210+ done", "300+ done", "400+ done"];
-        done = doneOptions[hash % doneOptions.length];
-      }
+      // Done options based on actual bookings
+      const bookingsCount = item.bookings?.length || 0;
+      const done = `${bookingsCount} done`;
 
       // Availability options
       const availOptions = [
@@ -241,6 +236,7 @@ export default function ServiceListing({
         price: priceVal,
         priceDisplay: priceVal > 0 ? `৳${priceVal.toLocaleString()}` : "Contact for price",
         done,
+        bookingsCount,
         rating,
         availability,
         daysAgo,
@@ -264,12 +260,22 @@ export default function ServiceListing({
     }
 
     if (!hasSearchFilters && searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (s) =>
-          s.title.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q),
-      );
+      const words = searchQuery
+        .trim()
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => w.length > 0);
+      list = list.filter((s) => {
+        const title = s.title.toLowerCase();
+        const desc = s.description.toLowerCase();
+        const category = (s.categoryLabel || "").toLowerCase();
+        return words.every(
+          (word) =>
+            title.includes(word) ||
+            desc.includes(word) ||
+            category.includes(word)
+        );
+      });
     }
     if (selectedRating)
       list = list.filter((s) => s.rating >= parseFloat(selectedRating));
@@ -317,12 +323,21 @@ export default function ServiceListing({
       if (!hasSearchFilters && activeCategory !== "all" && s.category !== activeCategory)
         return false;
       if (!hasSearchFilters && searchQuery) {
-        const q = searchQuery.toLowerCase();
-        if (
-          !s.title.toLowerCase().includes(q) &&
-          !s.description.toLowerCase().includes(q)
-        )
-          return false;
+        const words = searchQuery
+          .trim()
+          .toLowerCase()
+          .split(/\s+/)
+          .filter((w) => w.length > 0);
+        const title = s.title.toLowerCase();
+        const desc = s.description.toLowerCase();
+        const category = (s.categoryLabel || "").toLowerCase();
+        const match = words.every(
+          (word) =>
+            title.includes(word) ||
+            desc.includes(word) ||
+            category.includes(word)
+        );
+        if (!match) return false;
       }
       if (s.price > priceMax) return false;
       if (
