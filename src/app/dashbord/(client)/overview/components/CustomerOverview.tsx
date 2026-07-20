@@ -201,59 +201,59 @@ export default function CustomerOverview() {
           </div>
 
           {/* Right side: Modern Light Glass Counters */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0 flex-wrap sm:flex-nowrap">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 shrink-0 w-full lg:w-auto">
             {/* Active Bookings Counter */}
-            <Link href="/dashbord/bookings">
+            <Link href="/dashbord/bookings" className="w-full">
               <motion.div
                 whileHover={{ y: -3 }}
-                className="bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer"
+                className="bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-2.5 sm:p-4 text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center"
               >
                 {loadingBookings ? (
-                  <Loader2 size={18} className="animate-spin text-[#FF6014] mx-auto" />
+                  <Loader2 size={16} className="animate-spin text-[#FF6014] mx-auto" />
                 ) : (
-                  <span className="text-2xl md:text-3xl font-black text-[#FF6014] block leading-tight">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-[#FF6014] block leading-tight">
                     {activeBookings.length.toString().padStart(2, "0")}
                   </span>
                 )}
-                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
-                  <Clock size={10} className="text-[#FF6014]" />
-                  {lang === "bn" ? "সক্রিয় বুকিং" : "Active Orders"}
+                <span className="text-[8px] sm:text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-0.5 sm:gap-1">
+                  <Clock size={10} className="text-[#FF6014] shrink-0" />
+                  <span className="truncate">{lang === "bn" ? "সক্রিয় বুকিং" : "Active Orders"}</span>
                 </span>
               </motion.div>
             </Link>
 
             {/* Completed Services Counter */}
-            <Link href="/dashbord/bookings">
+            <Link href="/dashbord/bookings" className="w-full">
               <motion.div
                 whileHover={{ y: -3 }}
-                className="bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer"
+                className="bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-2.5 sm:p-4 text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center"
               >
                 {loadingBookings ? (
-                  <Loader2 size={18} className="animate-spin text-emerald-500 mx-auto" />
+                  <Loader2 size={16} className="animate-spin text-emerald-500 mx-auto" />
                 ) : (
-                  <span className="text-2xl md:text-3xl font-black text-emerald-600 block leading-tight">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-black text-emerald-600 block leading-tight">
                     {completedBookings.length.toString().padStart(2, "0")}
                   </span>
                 )}
-                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
-                  <CheckCircle2 size={10} className="text-emerald-500" />
-                  {lang === "bn" ? "সম্পন্ন" : "Completed"}
+                <span className="text-[8px] sm:text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-0.5 sm:gap-1">
+                  <CheckCircle2 size={10} className="text-emerald-500 shrink-0" />
+                  <span className="truncate">{lang === "bn" ? "সম্পন্ন" : "Completed"}</span>
                 </span>
               </motion.div>
             </Link>
 
             {/* Saved Wishlist Counter */}
-            <Link href="/dashbord/saved">
+            <Link href="/dashbord/saved" className="w-full">
               <motion.div
                 whileHover={{ y: -3 }}
-                className="bg-white/90 backdrop-blur-md border border-rose-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-rose-300/40 hover:shadow-md transition-all cursor-pointer"
+                className="bg-white/90 backdrop-blur-md border border-rose-100/80 rounded-2xl p-2.5 sm:p-4 text-center shadow-2xs hover:border-rose-300/40 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center"
               >
-                <span className="text-2xl md:text-3xl font-black text-rose-500 block leading-tight">
+                <span className="text-xl sm:text-2xl md:text-3xl font-black text-rose-500 block leading-tight">
                   {savedServices.length.toString().padStart(2, "0")}
                 </span>
-                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
-                  <Heart size={10} className="text-rose-500 fill-rose-500" />
-                  {lang === "bn" ? "উইশলিস্ট" : "Wishlist"}
+                <span className="text-[8px] sm:text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-0.5 sm:gap-1">
+                  <Heart size={10} className="text-rose-500 fill-rose-500 shrink-0" />
+                  <span className="truncate">{lang === "bn" ? "উইশলিস্ট" : "Wishlist"}</span>
                 </span>
               </motion.div>
             </Link>
