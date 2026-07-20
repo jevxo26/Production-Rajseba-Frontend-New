@@ -183,13 +183,13 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
     : rolesList[3];
 
   return (
-    <header className="bg-[#FFF8F4]/95 backdrop-blur-md border-b border-slate-100 px-4 sm:px-8 py-4 flex items-center justify-between z-30 sticky top-0 shadow-sm">
+    <header className="bg-white/60 backdrop-blur-xl border-b border-[#FF6014]/15 px-4 sm:px-8 py-4 flex items-center justify-between z-30 sticky top-0 shadow-[0_4px_30px_rgba(255,96,20,0.03)]">
       {/* Search Bar */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
         <button onClick={onMenuClick} className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl md:hidden shrink-0 focus:outline-none transition-colors">
           <Menu size={20} />
         </button>
-        <div ref={searchContainerRef} className="relative w-full max-w-md hidden md:block group">
+        <div ref={searchContainerRef} className="relative w-full max-w-md hidden sm:block group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#FF6014] transition-colors" size={16} />
           <input
             type="text"
@@ -200,7 +200,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
             }}
             onFocus={() => setShowSearchResults(true)}
             placeholder={lang === "bn" ? "বুকিং আইডি, সার্ভিস, ক্লায়েন্ট খুঁজুন..." : "Search booking ID, service, client..."}
-            className="w-full bg-slate-50 border border-slate-100 hover:border-slate-200 rounded-2xl pl-11 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6014]/30 focus:ring-4 focus:ring-[#FFF8F4] transition-all shadow-sm"
+            className="w-full bg-white/70 border border-slate-200/80 hover:border-[#FF6014]/30 rounded-2xl pl-11 pr-10 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#FF6014]/40 focus:ring-4 focus:ring-[#FF6014]/10 transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
           />
           {searchQuery && (
             <button
@@ -230,12 +230,12 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
             });
 
             return (
-              <div className="absolute left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 max-h-[350px] overflow-y-auto">
-                <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div className="absolute left-0 right-0 mt-2 bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/40 overflow-hidden z-50 max-h-[350px] overflow-y-auto">
+                <div className="px-4 py-2.5 bg-white/20 border-b border-white/30 flex items-center justify-between">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
                     {lang === "bn" ? "বুকিং ফলাফল" : "Booking Search Results"}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-400 bg-white border border-slate-150 px-2 py-0.5 rounded-full shrink-0">
+                  <span className="text-[10px] font-bold text-slate-400 bg-white/55 border border-slate-150 px-2 py-0.5 rounded-full shrink-0">
                     {results.length} {lang === "bn" ? "টি পাওয়া গেছে" : "found"}
                   </span>
                 </div>
@@ -266,7 +266,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                             setShowSearchResults(false);
                             router.push(`/dashbord/manage-bookings/${b.id}`);
                           }}
-                          className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 transition-all text-left group"
+                          className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[#FF6014]/5 transition-all text-left group"
                         >
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-0.5">
@@ -311,7 +311,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
         {/* Language Toggle Button */}
         <button
           onClick={() => dispatch(toggleLanguage())}
-          className="p-2 sm:p-2.5 hover:bg-slate-50 rounded-xl sm:rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm flex items-center gap-1.5 focus:outline-none"
+          className="p-2 sm:p-2.5 hover:bg-[#FF6014]/5 rounded-xl sm:rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-white/40 hover:shadow-sm flex items-center gap-1.5 focus:outline-none"
           title={lang === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
         >
           <Languages size={18} />
@@ -324,7 +324,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
         <div className="relative" ref={notificationDropdownRef}>
           <button 
             onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
-            className="p-2.5 hover:bg-slate-50 rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-slate-100 hover:shadow-sm"
+            className="p-2.5 hover:bg-[#FF6014]/5 rounded-full relative text-slate-500 hover:text-slate-900 transition-all border border-transparent hover:border-white/40 hover:shadow-sm"
           >
             <Bell size={18} className={unreadCount > 0 ? "animate-bounce text-[#FF6014]" : ""} />
             {unreadCount > 0 && (
@@ -335,7 +335,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
           </button>
           
           {notificationDropdownOpen && (
-            <div className="fixed top-[76px] right-4 left-4 sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:w-[400px] bg-white border border-slate-100/85 rounded-[28px] shadow-2xl shadow-slate-900/10 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="fixed top-[76px] right-4 left-4 sm:absolute sm:top-auto sm:right-0 sm:left-auto sm:w-[400px] bg-white/80 backdrop-blur-xl border border-white/50 rounded-[28px] shadow-2xl shadow-slate-900/5 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               {/* Header */}
               <div className="flex justify-between items-center pb-3">
                 <div className="flex items-center gap-3">
@@ -353,7 +353,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                 </div>
                 <button
                   onClick={() => setNotificationDropdownOpen(false)}
-                  className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors"
+                  className="w-8 h-8 rounded-full bg-white/40 hover:bg-white/60 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -374,8 +374,8 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                       onClick={() => setNotificationFilter(tab.value)}
                       className={`text-[11px] uppercase tracking-wider font-extrabold px-3.5 py-1.5 rounded-full transition-all shrink-0 active:scale-[0.97] ${
                         isActive
-                          ? "bg-slate-950 text-white shadow-xs"
-                          : "bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+                          ? "bg-[#FF6014] text-white shadow-xs"
+                          : "bg-white/40 hover:bg-white/60 text-slate-500 hover:text-slate-700"
                       }`}
                     >
                       {lang === "bn" ? tab.labelBn : tab.labelEn}
@@ -417,8 +417,8 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                         }}
                         className={`group p-3.5 rounded-[20px] transition-all duration-200 border flex gap-3.5 items-start cursor-pointer relative ${
                           isUnread
-                            ? "bg-[#FFFDFB] border-orange-100/70 hover:bg-orange-50/20 hover:border-orange-200/50 shadow-xs"
-                            : "bg-slate-50/70 border-transparent hover:bg-slate-50 hover:border-slate-100"
+                            ? "bg-white/60 border-orange-100/50 hover:bg-white/80 hover:border-orange-200/70 shadow-xs"
+                            : "bg-white/30 border-transparent hover:bg-white/50 hover:border-white/40"
                         }`}
                       >
                         {/* Circular Icon Container */}
@@ -453,7 +453,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
         <div className="relative" ref={profileDropdownRef}>
           <button
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center gap-3 pl-5 border-l border-slate-100 text-left hover:opacity-90 transition-all active:scale-[0.98] focus:outline-none"
+            className="flex items-center gap-3 pl-5 border-l border-white/40 text-left hover:opacity-90 transition-all active:scale-[0.98] focus:outline-none"
           >
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-slate-800 leading-none">{name}</p>
@@ -469,10 +469,10 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
           </button>
 
           {profileDropdownOpen && (
-            <div className="absolute right-0 mt-3 w-64 bg-[#FFF8F4] border border-slate-100 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-3 w-64 bg-white/85 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
 
               {/* User Info Header */}
-              <div className="px-4 py-3 border-b border-slate-100">
+              <div className="px-4 py-3 border-b border-white/30">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-[#FF6014] to-[#FF6014] text-white font-bold rounded-xl flex items-center justify-center overflow-hidden shadow-md shadow-[#FF6014]/20 select-none shrink-0">
                     {profileImg ? (
@@ -497,9 +497,9 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                 <Link
                   href="/dashbord/profile"
                   onClick={() => setProfileDropdownOpen(false)}
-                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-slate-50 transition-all"
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-white/40 transition-all"
                 >
-                  <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
+                  <div className="p-1.5 rounded-lg bg-white/50 text-slate-500">
                     <User size={16} />
                   </div>
                   <span className="font-medium">{lang === "bn" ? "আমার প্রোফাইল" : "My Profile"}</span>
@@ -508,24 +508,24 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                 <Link
                   href="/dashbord/settings"
                   onClick={() => setProfileDropdownOpen(false)}
-                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-slate-50 transition-all"
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-slate-700 hover:bg-white/40 transition-all"
                 >
-                  <div className="p-1.5 rounded-lg bg-slate-50 text-slate-500">
+                  <div className="p-1.5 rounded-lg bg-white/50 text-slate-500">
                     <Settings size={16} />
                   </div>
                   <span className="font-medium">{lang === "bn" ? "সেটিংস" : "Settings"}</span>
                 </Link>
 
-                <div className="my-1 border-t border-slate-100" />
+                <div className="my-1 border-t border-white/30" />
 
                 <button
                   onClick={() => {
                     setProfileDropdownOpen(false);
                     logout();
                   }}
-                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-[#E0530A] hover:bg-[#FFF8F4] transition-all"
+                  className="w-full flex items-center gap-3 p-2 rounded-xl text-left text-sm text-[#E0530A] hover:bg-white/40 transition-all"
                 >
-                  <div className="p-1.5 rounded-lg bg-[#FFF8F4] text-[#FF6014]">
+                  <div className="p-1.5 rounded-lg bg-white/50 text-[#FF6014]">
                     <LogOut size={16} />
                   </div>
                   <span className="font-semibold">{lang === "bn" ? "লগআউট" : "Sign Out"}</span>

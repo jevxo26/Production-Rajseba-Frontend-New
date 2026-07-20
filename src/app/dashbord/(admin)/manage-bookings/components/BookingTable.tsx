@@ -85,9 +85,9 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
       case "completed":
         return "bg-emerald-50 text-emerald-700 border border-emerald-200";
       case "cancelled":
-        return "bg-[#FFF8F4] text-[#E0530A] border border-[#FF6014]/30";
+        return "bg-rose-50 text-rose-600 border border-rose-200";
       default:
-        return "bg-slate-100 text-slate-600";
+        return "bg-slate-100 text-slate-650";
     }
   };
 
@@ -108,7 +108,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
               : t.na}
           </span>
           {item.time && (
-             <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-0.5 rounded-lg text-[10px] font-bold mt-1 ml-1 border border-amber-100/50">
+             <span className="inline-flex items-center gap-1 bg-slate-50 text-slate-600 px-2 py-0.5 rounded-lg text-[10px] font-semibold mt-1 ml-1 border border-slate-200/50">
                <Clock size={10} /> {item.time}
              </span>
           )}
@@ -192,7 +192,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
               e.stopPropagation();
               printBookingInvoice(item);
             }}
-            className="p-2 rounded-xl border border-[#FF6014]/20 hover:border-[#FF6014] hover:text-white hover:bg-[#FF6014] text-[#FF6014] bg-[#FFF8F4] transition-all shadow-sm cursor-pointer"
+            className="p-2 rounded-xl border border-[#FF6014]/20 hover:border-[#FF6014] hover:text-white hover:bg-[#FF6014] text-[#FF6014] bg-[#FF6014]/5 transition-all shadow-sm cursor-pointer"
             title="Download Invoice"
           >
             <Download size={16} />
@@ -210,15 +210,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
   ];
 
   const getRowClassName = (row: any) => {
-    // Only apply a subtle background if we want to differentiate by status
-    switch (row.status?.toLowerCase()) {
-      case "pending": return "bg-amber-50/40 hover:bg-amber-50/60";
-      case "assigned": return "bg-blue-50/40 hover:bg-blue-50/60";
-      case "on_the_way": return "bg-purple-50/40 hover:bg-purple-50/60";
-      case "completed": return "bg-emerald-50/40 hover:bg-emerald-50/60";
-      case "cancelled": return "bg-rose-50/40 hover:bg-rose-50/60";
-      default: return "";
-    }
+    return "bg-white hover:bg-slate-50/80 transition-colors";
   };
 
   const renderExpandedContent = (row: any) => {

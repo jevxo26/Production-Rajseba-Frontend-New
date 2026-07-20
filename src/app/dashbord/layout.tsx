@@ -9,7 +9,7 @@ import { useAppSelector } from "@/redux/hooks";
 /* ── Premium full-screen loading spinner ───────────────────────────────── */
 function DashboardLoader() {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#FFF8F4]">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#F8FAFC]">
       {/* Soft background blobs */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-[#FF6014]/10 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/3 w-[280px] h-[280px] rounded-full bg-rose-200/20 blur-[80px] pointer-events-none" />
@@ -104,7 +104,7 @@ export default function DashboardLayout({
 
   return (
     <ConfirmProvider>
-      <div className="flex h-screen overflow-hidden bg-[#FFF8F4] text-slate-900 relative">
+      <div className="flex h-screen overflow-hidden bg-[#F8FAFC] text-slate-900 relative">
         {/* Repeating background icons pattern */}
         <div
           className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"

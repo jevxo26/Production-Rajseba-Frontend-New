@@ -14,7 +14,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     <div
       data-slot="table-container"
       className={cn(
-        "relative w-full overflow-x-auto md:overflow-x-visible",
+        "relative w-full overflow-x-auto",
         "[&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar]:w-1.5",
         "[&::-webkit-scrollbar-track]:bg-slate-50",
         "[&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300"
@@ -22,7 +22,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm border-collapse", className)}
+        className={cn("w-full table-auto caption-bottom text-sm border-collapse", className)}
         {...props}
       />
     </div>
@@ -296,7 +296,7 @@ export function CustomTable<T extends { id?: string | number;[key: string]: any 
                                       ? "bg-rose-50 text-brand-primary hover:bg-rose-100 border border-rose-100"
                                       : act.variant === "secondary"
                                         ? "bg-slate-50 text-slate-500 hover:bg-slate-100 border border-slate-200"
-                                        : "bg-[#FFF8F4] text-[#FF6014] hover:bg-[#FFF0EB] border border-[#FFF0EB]"
+                                        : "bg-[#FF6014]/5 text-[#FF6014] hover:bg-[#FF6014]/10 border border-[#FF6014]/15"
                                   )}
                                 >
                                   {ActIcon ? <ActIcon size={16} /> : <span className="text-[10px] font-bold px-1">{act.label}</span>}

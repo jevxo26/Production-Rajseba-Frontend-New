@@ -322,7 +322,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
       />
 
       <div
-        className={`bg-[#FFF8F4] text-slate-800 border-r-[2px] border-[#FF6014]/15 shadow-[6px_0_24px_rgba(255,96,20,0.02)] transition-all duration-300 flex flex-col h-screen fixed inset-y-0 left-0 z-[60] md:relative md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        className={`bg-white text-slate-800 border-r-[2px] border-[#FF6014]/15 shadow-[6px_0_24px_rgba(0,0,0,0.015)] transition-all duration-300 flex flex-col h-screen fixed inset-y-0 left-0 z-[60] md:relative md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           } ${collapsed ? "w-20" : "w-64"} overflow-hidden`}
       >
         {/* Repeating background icons pattern inside sidebar */}
@@ -340,7 +340,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
               className={collapsed ? "h-8 w-8 object-contain shrink-0" : "h-11 w-auto object-contain shrink-0"}
             />
             {!collapsed && (
-              <span className="text-[9px] text-[#FF6014] font-black tracking-wider uppercase bg-[#FFF8F4] border border-[#FF6014]/20 px-2.5 py-0.5 rounded-full shrink-0">
+              <span className="text-[9px] text-[#FF6014] font-black tracking-wider uppercase bg-[#FF6014]/5 border border-[#FF6014]/20 px-2.5 py-0.5 rounded-full shrink-0">
                 {roleName}
               </span>
             )}
@@ -405,7 +405,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
                     onClick={handleToggle}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group border relative ${containsActive
                       ? isExpanded
-                        ? "bg-[#FFF8F4] border-[#FF6014]/15 text-[#FF6014] font-extrabold shadow-sm"
+                        ? "bg-[#FF6014]/5 border-[#FF6014]/15 text-[#FF6014] font-extrabold shadow-sm"
                         : "bg-gradient-to-r from-[#FF6014] to-[#FF7C71] text-white font-extrabold shadow-md shadow-[#FF6014]/20 scale-[1.01] border-transparent"
                       : "border-transparent text-slate-600 hover:bg-[#FF6014]/5 hover:text-[#FF6014] hover:translate-x-1 font-semibold"
                       }`}
@@ -497,8 +497,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
 
         {/* Refer & Earn Promo Card (For client role in expanded state) */}
         {role === "client" && !collapsed && (
-          <div className="bg-[#FFF8F4]/80 backdrop-blur-md border border-slate-100 p-4 rounded-3xl shadow-sm mb-4 mx-4 relative z-10">
-            <div className="w-9 h-9 bg-[#FFF8F4] border border-[#FFF0EB] rounded-full flex items-center justify-center text-[#FF6014] mx-auto">
+          <div className="bg-slate-50/80 backdrop-blur-md border border-slate-200/50 p-4 rounded-3xl shadow-sm mb-4 mx-4 relative z-10">
+            <div className="w-9 h-9 bg-white border border-slate-200/60 rounded-full flex items-center justify-center text-[#FF6014] mx-auto">
               <Gift size={16} />
             </div>
             <h4 className="text-xs font-bold text-slate-800 text-center mt-2">Refer & Earn</h4>
