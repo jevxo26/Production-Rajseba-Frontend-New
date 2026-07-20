@@ -90,6 +90,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
         return [
           homeItem,
           { label: lang === "bn" ? "ওভারভিউ" : "Overview", icon: LayoutGrid, href: "/dashbord" },
+          { label: lang === "bn" ? "অ্যানালিটিক্স" : "Analytics", icon: BarChart3, href: "/dashbord/analytics" },
           {
             label: lang === "bn" ? "অপারেশনস" : "Operations",
             icon: Calendar,
@@ -142,8 +143,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             label: lang === "bn" ? "মার্কেটিং" : "Marketing",
             icon: Percent,
             children: [
-              { label: lang === "bn" ? "কুপনসমূহ" : "Coupons", href: "/dashbord/coupons", icon: Percent },
-              { label: lang === "bn" ? "অ্যানালিটিক্স" : "Analytics", href: "/dashbord/analytics", icon: BarChart3 }
+              { label: lang === "bn" ? "কুপনসমূহ" : "Coupons", href: "/dashbord/coupons", icon: Percent }
             ]
           },
           {
