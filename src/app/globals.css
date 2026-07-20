@@ -455,3 +455,28 @@ html.dashboard-html {
   scrollbar-width: thin !important;
   scrollbar-color: rgba(255, 96, 20, 0.15) transparent !important;
 }
+
+/* ============================================================
+   Print Styles for Manual Invoice
+   ============================================================ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #invoice-print-area, #invoice-print-area * {
+    visibility: visible;
+  }
+  #invoice-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
