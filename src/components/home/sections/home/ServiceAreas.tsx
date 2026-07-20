@@ -115,17 +115,17 @@ export default function ServiceAreas() {
               <motion.div
                 key={area.id}
                 variants={itemVariants}
-                className={`group relative rounded-3xl border p-5 transition-all duration-300 flex flex-col justify-between ${area.highlight
-                    ? "bg-gradient-to-br from-[#FFFDFB] to-[#FFF9F6] border-[#FF6014]/20 shadow-[0_10px_35px_rgba(255,96,20,0.035)] hover:border-[#FF6014]/40"
-                    : area.active
-                      ? "bg-white border-slate-100 hover:border-[#FF6014]/25 hover:shadow-[0_10px_30px_rgba(0,0,0,0.02)]"
-                      : "bg-slate-50/50 border-slate-100 opacity-60"
+                className={`group relative rounded-3xl border-2 p-5.5 transition-all duration-300 flex flex-col justify-between ${area.highlight
+                  ? "bg-gradient-to-br from-white to-[#FFF8F4] border-[#FF6014]/40 shadow-md hover:shadow-xl hover:border-[#FF6014]"
+                  : area.active
+                    ? "bg-white border-orange-100 hover:border-[#FF6014]/50 shadow-sm hover:shadow-md"
+                    : "bg-slate-50/70 border-slate-200/60 opacity-75"
                   }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${area.active ? "bg-[#FFF4EE] text-[#FF6014]" : "bg-slate-100 text-slate-400"}`}>
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-8.5 h-8.5 rounded-xl flex items-center justify-center ${area.active ? "bg-[#FFF4EE] text-[#FF6014] border border-[#FF6014]/20" : "bg-slate-100 text-slate-400 border border-slate-200"}`}>
                         <MapPin size={16} />
                       </div>
                       <h3 className={`font-black text-sm ${area.active ? "text-slate-800" : "text-slate-400"}`}>
@@ -134,10 +134,10 @@ export default function ServiceAreas() {
                     </div>
                     <span
                       className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 ${area.highlight
-                          ? "bg-[#FF6014] text-white border-[#FF6014]"
-                          : area.active
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                            : "bg-slate-200 text-slate-500 border-slate-300"
+                        ? "bg-[#FF6014] text-white border-[#FF6014]"
+                        : area.active
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200/80 font-black"
+                          : "bg-slate-200 text-slate-500 border-slate-300"
                         }`}
                     >
                       {area.active && (
@@ -155,9 +155,9 @@ export default function ServiceAreas() {
                       {area.zones.slice(0, 4).map((zone: string) => (
                         <span
                           key={zone}
-                          className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-colors ${area.active
-                              ? "bg-slate-50 border-slate-100/80 text-slate-500 group-hover:bg-[#FFF8F4] group-hover:border-[#FF6014]/10 group-hover:text-[#FF6014]/80"
-                              : "bg-slate-100 border-slate-200 text-slate-400"
+                          className={`px-2.5 py-1 rounded-xl text-[10px] font-extrabold border transition-colors ${area.active
+                            ? "bg-slate-50/90 border-slate-200/80 text-slate-600 group-hover:bg-[#FFF8F4] group-hover:border-[#FF6014]/30 group-hover:text-[#FF6014]"
+                            : "bg-slate-100 border-slate-200 text-slate-400"
                             }`}
                         >
                           {zone}
@@ -179,31 +179,7 @@ export default function ServiceAreas() {
           </motion.div>
         )}
 
-        {/* CTA */}
-        <div className="mt-12 relative overflow-hidden bg-gradient-to-br from-[#FFFDFB] to-[#FFF4EE] border border-[#FF6014]/20 rounded-[32px] p-6 md:p-8 shadow-md">
-          {/* Background glows */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-[#FF6014]/5 blur-[80px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FF6014]/2 blur-[80px] rounded-full pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <span className="inline-flex items-center gap-1.5 text-[9px] font-extrabold text-[#FF6014] uppercase tracking-[.12em] bg-[#FFF4EE] px-3.5 py-1.5 rounded-full border border-[#FF6014]/25 mb-3">
-                <Sparkles className="w-3 h-3" />
-                Rapid Expansion
-              </span>
-              <h3 className="text-lg md:text-xl font-black text-slate-800 tracking-tight">
-                Don't see your area? We're expanding fast!
-              </h3>
-              <p className="text-slate-500 text-xs mt-1.5 max-w-xl font-medium">
-                Leave your location details and we will notify you immediately once Rajseba verified professionals arrive in your neighborhood.
-              </p>
-            </div>
-            <button className="shrink-0 bg-[#FF6014] hover:bg-[#FF6014]/90 active:scale-[0.98] text-white text-xs font-black px-6 py-3.5 rounded-2xl shadow-lg shadow-[#FF6014]/20 transition-all flex items-center gap-2">
-              <MapPin size={14} />
-              Request My Area
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );
