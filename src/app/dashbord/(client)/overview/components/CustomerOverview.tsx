@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import {
   Sparkles,
   Plus,
-  Share2,
   ChevronRight,
   Calendar,
   MessageCircle,
@@ -24,19 +23,28 @@ import {
   User,
   ShieldCheck,
   Tag,
-  Star
+  Star,
+  Heart,
+  Headphones,
+  ShieldAlert,
+  Check,
+  ArrowRight,
+  TrendingUp
 } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "@/redux/hooks";
 import { CustomTable } from "@/components/ui/table";
 import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
+import { useGetSavedServicesQuery } from "@/redux/features/admin/user";
 
 export default function CustomerOverview() {
   const authUser = useAppSelector((state) => state.auth.user);
   const lang = useAppSelector((state) => state.lang.value);
   const { data: bookingsRes, isLoading: loadingBookings } = useGetAllBookingsQuery();
+  const { data: savedRes } = useGetSavedServicesQuery(undefined, { skip: !authUser });
 
   const allBookings = bookingsRes?.data || [];
+  const savedServices = savedRes?.data || [];
   const userId = authUser?.id || authUser?._id;
   const myBookings = allBookings.filter((b: any) => b.user?.id === userId || b.user?.id === Number(userId));
   const activeBookings = myBookings.filter((b: any) => ["assigned", "on_the_way", "pending"].includes(b.status));
@@ -64,6 +72,27 @@ export default function CustomerOverview() {
     { name: lang === "bn" ? "বাসা ক্লিনিং" : "Home Cleaning", icon: Home, color: "text-teal-600 bg-teal-50 border-teal-100", href: "/services" },
     { name: lang === "bn" ? "প্লাম্বিং সেবা" : "Plumbing & Gas", icon: Droplets, color: "text-indigo-600 bg-indigo-50 border-indigo-100", href: "/services" },
     { name: lang === "bn" ? "অ্যাপ্লায়েন্স রিপেয়ার" : "Appliance Repair", icon: Tv, color: "text-amber-600 bg-amber-50 border-amber-100", href: "/services" },
+  ];
+
+  const trustBadges = [
+    {
+      title: lang === "bn" ? "১০০% ভেরিফাইড টেকনিশিয়ান" : "100% Vetted Experts",
+      desc: lang === "bn" ? "ব্যাকগ্রাউন্ড ভেরিফাইড ও প্রফেশনাল স্পেশালিস্ট" : "Background checked & certified professionals",
+      icon: ShieldCheck,
+      color: "text-emerald-600 bg-emerald-50 border-emerald-100"
+    },
+    {
+      title: lang === "bn" ? "দ্রুত সার্ভিস আগমন" : "Fast Service Arrival",
+      desc: lang === "bn" ? "নির্ধারিত সময়ে সার্ভিস প্রদানে প্রতিশ্রুতিবদ্ধ" : "On-time arrival guaranteed at your doorstep",
+      icon: Zap,
+      color: "text-[#FF6014] bg-orange-50 border-orange-100"
+    },
+    {
+      title: lang === "bn" ? "২৪/৭ কেয়ার সাপোর্ট" : "24/7 Care Support",
+      desc: lang === "bn" ? "যেকোনো সহায়তায় রাজসেবা টিম সর্বদা প্রস্তুত" : "Always available to assist your queries",
+      icon: Headphones,
+      color: "text-blue-600 bg-blue-50 border-blue-100"
+    }
   ];
 
   const customerColumns = [
@@ -142,17 +171,16 @@ export default function CustomerOverview() {
       animate="show"
       className="w-full space-y-7 relative z-10"
     >
-      {/* ── Premium Light Glassmorphism Banner ── */}
+      {/* ── Ultra Premium Light Glassmorphism Banner ── */}
       <motion.div
         variants={itemVariants}
         whileHover={{ y: -2 }}
         className="relative overflow-hidden rounded-[32px] bg-white/90 backdrop-blur-xl border border-orange-100/90 p-6 md:p-8 shadow-sm group hover:shadow-xl hover:shadow-[#FF6014]/5 transition-all duration-300"
       >
-        {/* Decorative Subtle Orange Glows */}
-        <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-gradient-to-br from-[#FF6014]/15 to-[#FFB3AD]/10 blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
-        <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-orange-100/50 blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-60 h-60 rounded-full bg-gradient-to-br from-[#FF6014]/15 to-[#FFB3AD]/10 blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+        <div className="absolute -left-16 -bottom-16 w-52 h-52 rounded-full bg-orange-100/50 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Left side: User Profile Greeting */}
           <div className="space-y-3">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50/90 border border-orange-200/60 text-[11px] font-black text-[#FF6014] shadow-2xs">
@@ -173,40 +201,62 @@ export default function CustomerOverview() {
           </div>
 
           {/* Right side: Modern Light Glass Counters */}
-          <div className="flex items-center gap-3 sm:gap-4 self-stretch md:self-auto">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex-1 md:flex-none bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer"
-            >
-              {loadingBookings ? (
-                <Loader2 size={18} className="animate-spin text-[#FF6014] mx-auto" />
-              ) : (
-                <span className="text-2xl md:text-3xl font-black text-[#FF6014] block leading-tight">
-                  {activeBookings.length.toString().padStart(2, "0")}
+          <div className="flex items-center gap-3 sm:gap-4 self-stretch lg:self-auto overflow-x-auto pb-1 sm:pb-0">
+            {/* Active Bookings Counter */}
+            <Link href="/dashbord/bookings">
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-orange-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-[#FF6014]/30 hover:shadow-md transition-all cursor-pointer"
+              >
+                {loadingBookings ? (
+                  <Loader2 size={18} className="animate-spin text-[#FF6014] mx-auto" />
+                ) : (
+                  <span className="text-2xl md:text-3xl font-black text-[#FF6014] block leading-tight">
+                    {activeBookings.length.toString().padStart(2, "0")}
+                  </span>
+                )}
+                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
+                  <Clock size={10} className="text-[#FF6014]" />
+                  {lang === "bn" ? "সক্রিয় বুকিং" : "Active Orders"}
                 </span>
-              )}
-              <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
-                <Clock size={10} className="text-[#FF6014]" />
-                {lang === "bn" ? "সক্রিয় বুকিং" : "Active Bookings"}
-              </span>
-            </motion.div>
+              </motion.div>
+            </Link>
 
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex-1 md:flex-none bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer"
-            >
-              {loadingBookings ? (
-                <Loader2 size={18} className="animate-spin text-emerald-500 mx-auto" />
-              ) : (
-                <span className="text-2xl md:text-3xl font-black text-emerald-600 block leading-tight">
-                  {completedBookings.length.toString().padStart(2, "0")}
+            {/* Completed Services Counter */}
+            <Link href="/dashbord/bookings">
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-emerald-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-emerald-300/40 hover:shadow-md transition-all cursor-pointer"
+              >
+                {loadingBookings ? (
+                  <Loader2 size={18} className="animate-spin text-emerald-500 mx-auto" />
+                ) : (
+                  <span className="text-2xl md:text-3xl font-black text-emerald-600 block leading-tight">
+                    {completedBookings.length.toString().padStart(2, "0")}
+                  </span>
+                )}
+                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
+                  <CheckCircle2 size={10} className="text-emerald-500" />
+                  {lang === "bn" ? "সম্পন্ন" : "Completed"}
                 </span>
-              )}
-              <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
-                <CheckCircle2 size={10} className="text-emerald-500" />
-                {lang === "bn" ? "সম্পন্ন" : "Completed"}
-              </span>
-            </motion.div>
+              </motion.div>
+            </Link>
+
+            {/* Saved Wishlist Counter */}
+            <Link href="/dashbord/saved">
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                className="flex-1 lg:flex-none bg-white/90 backdrop-blur-md border border-rose-100/80 rounded-2xl p-3.5 md:p-4 min-w-[115px] text-center shadow-2xs hover:border-rose-300/40 hover:shadow-md transition-all cursor-pointer"
+              >
+                <span className="text-2xl md:text-3xl font-black text-rose-500 block leading-tight">
+                  {savedServices.length.toString().padStart(2, "0")}
+                </span>
+                <span className="text-[9px] font-extrabold text-slate-400 tracking-wider uppercase mt-1 flex items-center justify-center gap-1">
+                  <Heart size={10} className="text-rose-500 fill-rose-500" />
+                  {lang === "bn" ? "উইশলিস্ট" : "Wishlist"}
+                </span>
+              </motion.div>
+            </Link>
           </div>
         </div>
       </motion.div>
@@ -229,7 +279,7 @@ export default function CustomerOverview() {
               <motion.div key={i} whileHover={{ y: -3, scale: 1.02 }}>
                 <Link
                   href={qs.href}
-                  className="bg-white p-3.5 rounded-2xl border border-slate-100 hover:border-[#FF6014]/20 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 flex items-center gap-3 group/qs cursor-pointer"
+                  className="bg-white/90 backdrop-blur-xl p-3.5 rounded-2xl border border-slate-100/90 hover:border-[#FF6014]/30 hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all duration-300 flex items-center gap-3 group/qs cursor-pointer"
                 >
                   <div className={`p-2.5 rounded-xl border ${qs.color} shrink-0 group-hover/qs:scale-110 transition-transform`}>
                     <Icon size={18} />
@@ -252,10 +302,11 @@ export default function CustomerOverview() {
 
       {/* ── Action Banners Row ── */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Book New Service CTA */}
         <motion.div whileHover={{ scale: 1.015, y: -2 }}>
           <Link
             href="/services"
-            className="relative overflow-hidden bg-gradient-to-r from-[#FF6014] to-[#E0530A] text-white p-6 rounded-[28px] shadow-lg shadow-[#FF6014]/20 flex items-center justify-between group transition-all cursor-pointer"
+            className="relative overflow-hidden bg-gradient-to-r from-[#FF6014] to-[#E0530A] text-white p-6 rounded-[28px] shadow-lg shadow-[#FF6014]/20 flex items-center justify-between group transition-all cursor-pointer h-full"
           >
             <div className="flex items-center gap-4">
               <div className="p-3 bg-white/20 rounded-2xl border border-white/20 backdrop-blur-md">
@@ -266,37 +317,45 @@ export default function CustomerOverview() {
                   {lang === "bn" ? "নতুন সার্ভিস বুক করুন" : "Book a New Service"}{" "}
                   <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </h3>
-                <p className="text-xs text-orange-100 mt-0.5 font-semibold">
-                  {lang === "bn" ? "আজই অভিজ্ঞ পেশাদার দ্বারা সেবা নিন" : "Get professional help today in minutes"}
+                <p className="text-xs text-orange-100 mt-0.5 font-semibold leading-relaxed">
+                  {lang === "bn" ? "আজই অভিজ্ঞ পেশাদার দ্বারা প্রিমিয়াম সেবা নিন" : "Get expert home assistance today in minutes"}
                 </p>
               </div>
             </div>
           </Link>
         </motion.div>
 
-        <motion.div whileHover={{ scale: 1.015, y: -2 }} className="bg-white/90 backdrop-blur-xl p-6 rounded-[28px] border border-slate-100/90 shadow-sm flex items-center justify-between hover:shadow-lg hover:shadow-[#FF6014]/5 transition-all">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-[#FFF8F4] rounded-2xl text-[#FF6014] border border-orange-100 shadow-2xs">
-              <Share2 size={22} />
+        {/* Rajseba Care & Instant Support Banner */}
+        <motion.div whileHover={{ scale: 1.015, y: -2 }} className="h-full">
+          <Link
+            href="/dashbord/help"
+            className="bg-white/90 backdrop-blur-xl p-6 rounded-[28px] border border-slate-100/90 shadow-sm flex items-center justify-between hover:shadow-xl hover:shadow-[#FF6014]/5 hover:border-orange-200/60 transition-all cursor-pointer h-full group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-50 rounded-2xl text-[#FF6014] border border-orange-100 shadow-2xs group-hover:scale-105 transition-transform">
+                <Headphones size={24} />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-lg font-black text-slate-800 tracking-tight">
+                    {lang === "bn" ? "রাজসেবা কেয়ার & সাপোর্ট" : "Rajseba Care & Support"}
+                  </h3>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 font-semibold leading-relaxed">
+                  {lang === "bn" ? "যেকোনো বুকিং সহায়তা বা সহায়তার জন্য চ্যাট করুন" : "Get 24/7 help with your booking questions"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-1.5">
-                {lang === "bn" ? "বন্ধুকে রেফার করুন" : "Refer a Friend"}
-                <Star size={14} className="text-amber-400 fill-amber-400" />
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5 font-semibold">
-                {lang === "bn" ? "শেয়ার করে বোনাস ক্রেডিট জিতুন" : "Earn bonus credits for sharing Rajseba"}
-              </p>
+            <div className="p-2.5 bg-gradient-to-r from-[#FF6014] to-[#E0530A] text-white rounded-2xl shadow-md shadow-[#FF6014]/20 group-hover:translate-x-0.5 transition-transform">
+              <ArrowRight size={16} />
             </div>
-          </div>
-          <button className="p-2.5 bg-[#FF6014] text-white rounded-full hover:bg-[#E0530A] transition-colors shadow-sm focus:outline-none cursor-pointer">
-            <ChevronRight size={16} />
-          </button>
+          </Link>
         </motion.div>
       </motion.div>
 
       {/* ── Active Bookings Section ── */}
-      {activeBookings.length > 0 && (
+      {activeBookings.length > 0 ? (
         <motion.div variants={itemVariants} className="space-y-4">
           <div className="flex justify-between items-center px-1">
             <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -348,9 +407,9 @@ export default function CustomerOverview() {
                       </p>
                     </div>
                   </div>
-                  <button className="p-2.5 bg-white text-[#FF6014] rounded-xl hover:bg-[#FFF8F4] border border-slate-100 shadow-2xs transition-colors cursor-pointer">
+                  <Link href="/dashbord/help" className="p-2.5 bg-white text-[#FF6014] rounded-xl hover:bg-[#FFF8F4] border border-slate-100 shadow-2xs transition-colors cursor-pointer">
                     <MessageCircle size={16} />
-                  </button>
+                  </Link>
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold">
@@ -361,6 +420,36 @@ export default function CustomerOverview() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+      ) : (
+        /* ── Rajseba Trust Badges Feature Grid ── */
+        <motion.div variants={itemVariants} className="space-y-3 pt-2">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+              <ShieldCheck size={14} className="text-[#FF6014]" />
+              {lang === "bn" ? "কেন রাজসেবা বেছে নেবেন" : "Why Choose Rajseba"}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {trustBadges.map((badge, idx) => {
+              const BadgeIcon = badge.icon;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white/90 backdrop-blur-xl p-5 rounded-[24px] border border-slate-100/90 shadow-2xs flex items-start gap-3.5 hover:shadow-md hover:border-orange-100 transition-all"
+                >
+                  <div className={`p-3 rounded-2xl border ${badge.color} shrink-0`}>
+                    <BadgeIcon size={20} />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-black text-slate-900 tracking-tight">{badge.title}</h4>
+                    <p className="text-[11px] text-slate-500 font-semibold leading-relaxed mt-1">{badge.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       )}
