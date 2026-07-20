@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, CheckCircle2, Building2, Loader2, Sparkles, Clock, Globe } from "lucide-react";
+import { MapPin, Loader2, Globe, Building2, ShieldCheck } from "lucide-react";
 import {
   useGetAllDevisionsQuery,
   useGetAllDistrictsQuery,
@@ -14,8 +14,8 @@ const containerVariants = {
 } as const;
 
 const itemVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 15 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 65, damping: 15 } },
+  hidden: { opacity: 0, scale: 0.96, y: 15 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 75, damping: 16 } },
 } as const;
 
 export default function ServiceAreas() {
@@ -50,54 +50,50 @@ export default function ServiceAreas() {
   const isLoading = isDivisionsLoading || isDistrictsLoading;
 
   return (
-    <section className="py-5 md:py-8 lg:py-10 overflow-hidden relative">
+    <section className="py-8 md:py-12 relative overflow-hidden">
       <div className="w-full md:max-w-[92%] lg:max-w-[960px] xl:max-w-[1140px] min-[1440px]:max-w-[1280px] 2xl:max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
 
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
-          <div className="inline-flex items-center gap-2 bg-[#FFF4EE] border border-[#FF6014]/20 text-[#FF6014] px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider mb-4">
-            <Globe className="w-3.5 h-3.5" />
-            Coverage Areas
+        {/* ── Modern Centered Header ── */}
+        <div className="text-center max-w-2xl mx-auto mb-8 md:mb-10 space-y-3">
+          <div className="inline-flex items-center gap-2 bg-[#FFF4EE] border border-[#FF6014]/20 text-[#FF6014] px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider shadow-2xs">
+            <Globe className="w-3.5 h-3.5 animate-spin-slow" />
+            <span>Coverage Areas</span>
           </div>
-          <h2 className="text-lg md:text-xl lg:text-2xl font-medium text-slate-900 tracking-tight leading-tight flex items-center justify-center gap-2">
-            <Globe className="w-5 h-5 md:w-6 md:h-6 text-[#FF6014]" />
+
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-snug">
             We Serve Across <span className="text-[#FF6014]">Bangladesh</span>
           </h2>
-          <p className="mt-3.5 text-slate-400 text-sm md:text-base font-medium max-w-2xl mx-auto leading-relaxed">
+
+          <p className="text-xs md:text-sm text-slate-500 font-semibold max-w-xl mx-auto leading-relaxed">
             {isLoading
-              ? "Mapping our coverage areas..."
-              : `Rajseba is available in ${activeCount} divisions with ${totalDistricts} districts and verified professionals ready to serve you.`}
+              ? "Mapping our service coverage areas..."
+              : `Verified Rajseba service partners operate across ${activeCount} active divisions and ${totalDistricts} districts.`}
           </p>
+
+          {/* ── High-end Glassmorphic Coverage Summary Pill ── */}
+          {!isLoading && (
+            <div className="inline-flex flex-wrap items-center justify-center gap-3 bg-white/90 backdrop-blur-xl border border-orange-100 p-2 sm:p-2.5 rounded-2xl shadow-sm mt-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800 px-3 py-1 rounded-xl bg-orange-50/80 border border-orange-100">
+                <MapPin size={13} className="text-[#FF6014]" />
+                {activeCount} Active Divisions
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800 px-3 py-1 rounded-xl bg-emerald-50/80 border border-emerald-100">
+                <Building2 size={13} className="text-emerald-600" />
+                {totalDistricts} Districts
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800 px-3 py-1 rounded-xl bg-blue-50/80 border border-blue-100">
+                <ShieldCheck size={13} className="text-blue-600" />
+                500+ Verified Experts
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Stats bar */}
-        <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-center gap-3 md:gap-4 mb-12">
-          {[
-            { value: isLoading ? "—" : `${activeCount}`, label: "Active Divisions", icon: MapPin },
-            { value: isLoading ? "—" : `${totalDistricts}`, label: "Districts Covered", icon: Building2 },
-            { value: "500+", label: "Verified Partners", icon: CheckCircle2 },
-            { value: "24/7", label: "Instant Support", icon: Clock },
-          ].map((stat, idx) => {
-            const StatIcon = stat.icon;
-            return (
-              <div key={idx} className="flex items-center gap-3 bg-white/70 backdrop-blur-md border border-slate-100/80 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.015)]">
-                <div className="w-8.5 h-8.5 rounded-xl bg-[#FFF8F4] flex items-center justify-center text-[#FF6014] shrink-0 border border-[#FF6014]/10">
-                  <StatIcon className="w-4 h-4" />
-                </div>
-                <div className="text-left">
-                  <p className="text-base font-black text-slate-900 leading-none">{stat.value}</p>
-                  <p className="text-[8px] font-extrabold uppercase tracking-wider text-slate-400 mt-1">{stat.label}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Division Grid */}
+        {/* ── Division Grid ── */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-[#FF6014]" />
-            <p className="text-xs font-bold text-slate-400">Loading divisions & districts...</p>
+            <p className="text-xs font-bold text-slate-400">Loading coverage map...</p>
           </div>
         ) : areas.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-slate-200 rounded-2xl">
@@ -115,26 +111,27 @@ export default function ServiceAreas() {
               <motion.div
                 key={area.id}
                 variants={itemVariants}
-                className={`group relative rounded-3xl border-2 p-5.5 transition-all duration-300 flex flex-col justify-between ${area.highlight
-                  ? "bg-gradient-to-br from-white to-[#FFF8F4] border-[#FF6014]/40 shadow-md hover:shadow-xl hover:border-[#FF6014]"
+                whileHover={{ y: -3 }}
+                className={`group relative rounded-[28px] border-2 p-5 transition-all duration-300 flex flex-col justify-between ${area.highlight
+                  ? "bg-gradient-to-br from-white via-white to-[#FFF8F4] border-[#FF6014]/40 shadow-md hover:shadow-xl hover:border-[#FF6014]"
                   : area.active
-                    ? "bg-white border-orange-100 hover:border-[#FF6014]/50 shadow-sm hover:shadow-md"
+                    ? "bg-white/90 backdrop-blur-xl border-orange-100/90 hover:border-[#FF6014]/40 shadow-xs hover:shadow-lg"
                     : "bg-slate-50/70 border-slate-200/60 opacity-75"
                   }`}
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8.5 h-8.5 rounded-xl flex items-center justify-center ${area.active ? "bg-[#FFF4EE] text-[#FF6014] border border-[#FF6014]/20" : "bg-slate-100 text-slate-400 border border-slate-200"}`}>
-                        <MapPin size={16} />
+                      <div className={`w-9 h-9 rounded-2xl flex items-center justify-center ${area.active ? "bg-orange-50 text-[#FF6014] border border-orange-200/60 shadow-2xs" : "bg-slate-100 text-slate-400 border border-slate-200"}`}>
+                        <MapPin size={17} />
                       </div>
-                      <h3 className={`font-black text-sm ${area.active ? "text-slate-800" : "text-slate-400"}`}>
+                      <h3 className={`font-black text-sm ${area.active ? "text-slate-900" : "text-slate-400"}`}>
                         {area.city}
                       </h3>
                     </div>
                     <span
-                      className={`text-[9px] font-extrabold px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 ${area.highlight
-                        ? "bg-[#FF6014] text-white border-[#FF6014]"
+                      className={`text-[9px] font-extrabold px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${area.highlight
+                        ? "bg-[#FF6014] text-white border-[#FF6014] shadow-2xs"
                         : area.active
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200/80 font-black"
                           : "bg-slate-200 text-slate-500 border-slate-300"
@@ -170,16 +167,15 @@ export default function ServiceAreas() {
                 </div>
 
                 {area.zones.length > 4 && (
-                  <div className="mt-3 pt-3 border-t border-slate-50 text-[10px] text-slate-400 font-extrabold uppercase tracking-wider pl-1">
-                    +{area.zones.length - 4} more districts
+                  <div className="mt-3 pt-3 border-t border-slate-100 text-[10px] text-slate-400 font-extrabold uppercase tracking-wider pl-1 flex items-center justify-between">
+                    <span>+{area.zones.length - 4} more districts</span>
+                    <span className="text-[#FF6014] font-black group-hover:translate-x-0.5 transition-transform">→</span>
                   </div>
                 )}
               </motion.div>
             ))}
           </motion.div>
         )}
-
-
       </div>
     </section>
   );
