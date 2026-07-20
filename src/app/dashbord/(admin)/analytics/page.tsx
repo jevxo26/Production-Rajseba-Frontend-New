@@ -691,15 +691,20 @@ export default function AnalyticsPage() {
       {/* 5. TOP PERFORMERS GRID: TOP VENDORS & TOP AGENTS */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Vendors Leaderboard */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4 relative overflow-hidden group"
+        >
           <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
             <div className="flex items-center gap-2">
-              <UserCheck size={18} className="text-[#FF6014]" />
+              <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl shadow-xs">
+                <UserCheck size={18} />
+              </div>
               <h3 className="text-base font-extrabold text-slate-900">
                 {lang === "bn" ? "সেরা ভেন্ডর তালিকা (Top 5)" : "Top Vendors Leaderboard"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-2.5 py-1 rounded-full border border-orange-200/60">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
               Verified Partners
             </span>
           </div>
@@ -707,25 +712,29 @@ export default function AnalyticsPage() {
           <div className="space-y-3">
             {topVendors.map((vendor: any, idx: number) => (
               <motion.div
-                whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 key={vendor.id || idx}
-                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:border-[#FF6014]/40 hover:bg-orange-50/40 transition-all cursor-pointer shadow-2xs"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                whileHover={{ x: 6, scale: 1.01 }}
+                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:border-[#FF6014]/50 hover:bg-orange-50/50 hover:shadow-md hover:shadow-orange-500/5 transition-all cursor-pointer shadow-2xs"
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${idx === 0
-                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-xs"
+                    className={`w-8 h-8 rounded-2xl flex items-center justify-center text-xs font-black shadow-xs ${
+                      idx === 0
+                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-amber-500/30"
                         : idx === 1
-                          ? "bg-slate-200 text-slate-800 shadow-xs"
-                          : idx === 2
-                            ? "bg-orange-200 text-orange-950 shadow-xs"
-                            : "bg-slate-100 text-slate-600"
-                      }`}
+                        ? "bg-slate-200 text-slate-800"
+                        : idx === 2
+                        ? "bg-orange-200 text-orange-950"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
                   >
                     #{idx + 1}
                   </span>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-800">{vendor.name}</h4>
+                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors">{vendor.name}</h4>
                     <p className="text-[11px] text-slate-400 font-medium">{vendor.email}</p>
                   </div>
                 </div>
@@ -741,18 +750,23 @@ export default function AnalyticsPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Top Agents Leaderboard */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4 relative overflow-hidden group"
+        >
           <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
             <div className="flex items-center gap-2">
-              <Users size={18} className="text-[#FF6014]" />
+              <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl shadow-xs">
+                <Users size={18} />
+              </div>
               <h3 className="text-base font-extrabold text-slate-900">
                 {lang === "bn" ? "সেরা এজেন্ট তালিকা (Top 5)" : "Top Agents Leaderboard"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-2.5 py-1 rounded-full border border-orange-200/60">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
               Field Officers
             </span>
           </div>
@@ -760,25 +774,29 @@ export default function AnalyticsPage() {
           <div className="space-y-3">
             {topAgents.map((agent: any, idx: number) => (
               <motion.div
-                whileHover={{ x: 4, transition: { duration: 0.2 } }}
                 key={agent.id || idx}
-                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:border-[#FF6014]/40 hover:bg-orange-50/40 transition-all cursor-pointer shadow-2xs"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                whileHover={{ x: 6, scale: 1.01 }}
+                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:border-[#FF6014]/50 hover:bg-orange-50/50 hover:shadow-md hover:shadow-orange-500/5 transition-all cursor-pointer shadow-2xs"
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${idx === 0
-                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-xs"
+                    className={`w-8 h-8 rounded-2xl flex items-center justify-center text-xs font-black shadow-xs ${
+                      idx === 0
+                        ? "bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-amber-500/30"
                         : idx === 1
-                          ? "bg-slate-200 text-slate-800 shadow-xs"
-                          : idx === 2
-                            ? "bg-orange-200 text-orange-950 shadow-xs"
-                            : "bg-slate-100 text-slate-600"
-                      }`}
+                        ? "bg-slate-200 text-slate-800"
+                        : idx === 2
+                        ? "bg-orange-200 text-orange-950"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
                   >
                     #{idx + 1}
                   </span>
                   <div>
-                    <h4 className="text-xs font-extrabold text-slate-800">{agent.name}</h4>
+                    <h4 className="text-xs font-extrabold text-slate-800 group-hover:text-[#FF6014] transition-colors">{agent.name}</h4>
                     <p className="text-[11px] text-slate-400 font-medium">{agent.email}</p>
                   </div>
                 </div>
@@ -794,21 +812,26 @@ export default function AnalyticsPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* 6. TOP SERVICES & RECENT BOOKINGS */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Services */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4"
+        >
           <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
             <div className="flex items-center gap-2">
-              <Briefcase size={18} className="text-[#FF6014]" />
+              <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl shadow-xs">
+                <Briefcase size={18} />
+              </div>
               <h3 className="text-base font-extrabold text-slate-900">
                 {lang === "bn" ? "সেরা আয়ের সার্ভিস গিগ (Top 5)" : "Top 5 Revenue Generating Services"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-2.5 py-1 rounded-full border border-orange-200/60">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-[#FF6014] px-3 py-1 rounded-full border border-orange-200/60 shadow-2xs">
               Highest Demand
             </span>
           </div>
@@ -816,12 +839,15 @@ export default function AnalyticsPage() {
           <div className="space-y-3">
             {topServices.map((svc: any, idx: number) => (
               <motion.div
-                whileHover={{ x: 3 }}
                 key={svc.id || idx}
-                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:bg-orange-50/40 transition-all shadow-2xs"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.04 }}
+                whileHover={{ x: 5, scale: 1.01 }}
+                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:bg-orange-50/50 hover:border-orange-300 transition-all shadow-2xs cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-orange-100/80 text-[#FF6014] rounded-xl text-xs font-black">
+                  <div className="p-2 bg-gradient-to-br from-[#FF6014] to-orange-500 text-white rounded-xl text-xs font-black shadow-xs">
                     #{idx + 1}
                   </div>
                   <div>
@@ -843,18 +869,24 @@ export default function AnalyticsPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Bookings Feed */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-4"
+        >
           <div className="flex items-center justify-between border-b border-orange-100/80 pb-3">
             <div className="flex items-center gap-2">
-              <Clock size={18} className="text-amber-500" />
+              <div className="p-2 bg-amber-100/80 text-amber-600 rounded-xl shadow-xs">
+                <Clock size={18} />
+              </div>
               <h3 className="text-base font-extrabold text-slate-900">
                 {lang === "bn" ? "সাম্প্রতিক বুকিং অ্যাক্টিভিটি" : "Recent Customer Bookings"}
               </h3>
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full border border-amber-200/60">
+            <span className="text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 px-3 py-1 rounded-full border border-amber-200/60 shadow-2xs flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
               Live Activity
             </span>
           </div>
@@ -862,20 +894,24 @@ export default function AnalyticsPage() {
           <div className="space-y-3">
             {recentBookings.map((b: any, idx: number) => (
               <motion.div
-                whileHover={{ x: 3 }}
                 key={b.id || idx}
-                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:bg-orange-50/40 transition-all shadow-2xs"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.04 }}
+                whileHover={{ x: 5, scale: 1.01 }}
+                className="flex items-center justify-between p-3.5 rounded-2xl border border-orange-100/80 bg-white/70 hover:bg-orange-50/50 hover:border-orange-300 transition-all shadow-2xs cursor-pointer"
               >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-extrabold text-slate-800">{b.customerName}</span>
                     <span
-                      className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${b.status === "COMPLETED"
+                      className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${
+                        b.status === "COMPLETED"
                           ? "bg-emerald-50 text-emerald-600 border border-emerald-200/50"
                           : b.status === "ASSIGNED"
-                            ? "bg-orange-50 text-[#FF6014] border border-orange-200/50"
-                            : "bg-amber-50 text-amber-600 border border-amber-200/50"
-                        }`}
+                          ? "bg-orange-50 text-[#FF6014] border border-orange-200/50"
+                          : "bg-amber-50 text-amber-600 border border-amber-200/50"
+                      }`}
                     >
                       {b.status}
                     </span>
@@ -897,15 +933,18 @@ export default function AnalyticsPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </motion.div>
 
       {/* 7. CATEGORY DISTRIBUTION & REGIONAL ACTIVITY */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Service Category Share */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6"
+        >
           <div>
-            <h3 className="text-base font-bold text-slate-900">
+            <h3 className="text-base font-extrabold text-slate-900">
               {lang === "bn" ? "সার্ভিস ক্যাটাগরি শেয়ার" : "Service Category Share"}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -917,7 +956,7 @@ export default function AnalyticsPage() {
 
           <div className="space-y-4">
             {categoryBreakdown.map((cat: any, i: number) => (
-              <div key={i} className="space-y-1.5">
+              <motion.div key={i} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-semibold text-slate-700">
                   <span className="text-slate-800 font-bold">{cat.name}</span>
                   <div className="flex gap-2">
@@ -925,23 +964,26 @@ export default function AnalyticsPage() {
                     <span className="text-[#FF6014] font-bold">{cat.percentage}%</span>
                   </div>
                 </div>
-                <div className="h-2.5 w-full bg-slate-50 border border-slate-100 rounded-full overflow-hidden">
+                <div className="h-3 w-full bg-orange-50/70 border border-orange-100 rounded-full overflow-hidden p-0.5">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${cat.percentage}%` }}
-                    transition={{ duration: 0.6, delay: i * 0.05 }}
-                    className={`h-full ${cat.color || "bg-[#FF6014]"} rounded-full`}
+                    transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
+                    className={`h-full ${cat.color || "bg-[#FF6014]"} rounded-full shadow-xs`}
                   />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Regional Activity */}
-        <div className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6">
+        <motion.div
+          whileHover={{ y: -2 }}
+          className="bg-white/80 backdrop-blur-xl p-6 rounded-3xl border border-orange-100/90 shadow-sm space-y-6"
+        >
           <div>
-            <h3 className="text-base font-bold text-slate-900">
+            <h3 className="text-base font-extrabold text-slate-900">
               {lang === "bn" ? "আঞ্চলিক কভারেজ ও চাহিদা" : "Regional Coverage & Demand"}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -953,32 +995,48 @@ export default function AnalyticsPage() {
 
           <div className="space-y-3">
             {regionalActivity.map((region: any, i: number) => (
-              <div
+              <motion.div
                 key={i}
-                className="flex items-center justify-between p-3.5 border border-orange-100/80 bg-white/70 rounded-2xl hover:bg-orange-50/40 transition-colors shadow-2xs"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+                whileHover={{ x: 5, scale: 1.01 }}
+                className="p-3.5 border border-orange-100/80 bg-white/70 rounded-2xl hover:bg-orange-50/50 hover:border-orange-300 transition-all shadow-2xs space-y-2 cursor-pointer"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-[#FFF8F4] text-[#FF6014] rounded-xl border border-orange-100">
-                    <MapPin size={18} />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-[#FFF8F4] text-[#FF6014] rounded-xl border border-orange-100 shadow-xs">
+                      <MapPin size={18} />
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-extrabold text-slate-800">{region.name}</h5>
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        {region.count} completed
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="text-xs font-extrabold text-slate-800">{region.name}</h5>
-                    <span className="text-[11px] text-slate-400 font-medium">
-                      {region.count} completed
+
+                  <div className="text-right">
+                    <span className="text-xs font-black text-slate-900">{region.percentage}%</span>
+                    <span className="text-[10px] font-bold text-emerald-600 block">
+                      {region.trend || "+8%"} growth
                     </span>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-xs font-black text-slate-900">{region.percentage}%</span>
-                  <span className="text-[10px] font-bold text-emerald-600 block">
-                    {region.trend || "+8%"} growth
-                  </span>
+                {/* Micro Progress Bar */}
+                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${region.percentage}%` }}
+                    transition={{ duration: 0.6, delay: i * 0.05 }}
+                    className="h-full bg-gradient-to-r from-[#FF6014] to-orange-400 rounded-full"
+                  />
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
