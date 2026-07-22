@@ -113,91 +113,101 @@ export default function VendorTable({
     {
       key: "actions",
       header: "Actions",
-      render: (user: VendorItem) => (
-        <div className="relative flex justify-end">
-          <button
-            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <MoreVertical size={16} />
-          </button>
+      render: (user: VendorItem) => {
+        const index = vendors.findIndex((v) => v.id === user.id);
+        const isNearBottom = vendors.length > 2 && index >= vendors.length - 2;
+        return (
+          <div className="relative flex justify-end">
+            <button
+              onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <MoreVertical size={16} />
+            </button>
 
-          {openDropdownId === user.id && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                <button
-                  onClick={() => {
-                    onViewDetails(user.id);
-                    setOpenDropdownId(null);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
+            {openDropdownId === user.id && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
+                <div
+                  className={`absolute right-0 ${
+                    isNearBottom ? "bottom-full mb-1" : "top-full mt-1"
+                  } w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in ${
+                    isNearBottom ? "slide-in-from-bottom-2" : "slide-in-from-top-2"
+                  } duration-200`}
                 >
-                  <Eye size={14} className="text-slate-400" /> View Details
-                </button>
-
-                <button
-                  onClick={() => {
-                    onEditVendor(user);
-                    setOpenDropdownId(null);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
-                >
-                  <Edit size={14} className="text-slate-400" /> Edit Vendor
-                </button>
-
-                {user.status !== "active" && (
                   <button
                     onClick={() => {
-                      handleActivate(user.id);
+                      onViewDetails(user.id);
                       setOpenDropdownId(null);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                   >
-                    <ShieldCheck size={14} /> Activate
+                    <Eye size={14} className="text-slate-400" /> View Details
                   </button>
-                )}
 
-                {user.status !== "inactive" && (
                   <button
                     onClick={() => {
-                      handleDeactivate(user.id);
+                      onEditVendor(user);
                       setOpenDropdownId(null);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                   >
-                    <XCircle size={14} /> Deactivate
+                    <Edit size={14} className="text-slate-400" /> Edit Vendor
                   </button>
-                )}
 
-                {user.status !== "blocked" && (
+                  {user.status !== "active" && (
+                    <button
+                      onClick={() => {
+                        handleActivate(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
+                    >
+                      <ShieldCheck size={14} /> Activate
+                    </button>
+                  )}
+
+                  {user.status !== "inactive" && (
+                    <button
+                      onClick={() => {
+                        handleDeactivate(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
+                    >
+                      <XCircle size={14} /> Deactivate
+                    </button>
+                  )}
+
+                  {user.status !== "blocked" && (
+                    <button
+                      onClick={() => {
+                        handleBlock(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
+                    >
+                      <XCircle size={14} /> Block
+                    </button>
+                  )}
+
+                  <div className="h-px bg-slate-100 my-1 mx-2" />
+
                   <button
                     onClick={() => {
-                      handleBlock(user.id);
+                      handleDelete(user.id);
                       setOpenDropdownId(null);
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
                   >
-                    <XCircle size={14} /> Block
+                    <Trash2 size={14} /> Delete
                   </button>
-                )}
-
-                <div className="h-px bg-slate-100 my-1 mx-2" />
-
-                <button
-                  onClick={() => {
-                    handleDelete(user.id);
-                    setOpenDropdownId(null);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
-                >
-                  <Trash2 size={14} /> Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      ),
+                </div>
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 

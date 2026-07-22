@@ -110,76 +110,86 @@ export default function AgentTable({
     {
       key: "actions",
       header: "Actions",
-      render: (user: AgentItem) => (
-        <div className="relative flex justify-end">
-          <button
-            onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <MoreVertical size={16} />
-          </button>
+      render: (user: AgentItem) => {
+        const index = agents.findIndex((v) => v.id === user.id);
+        const isNearBottom = agents.length > 2 && index >= agents.length - 2;
+        return (
+          <div className="relative flex justify-end">
+            <button
+              onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            >
+              <MoreVertical size={16} />
+            </button>
 
-          {openDropdownId === user.id && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                <button
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setOpenDropdownId(null);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
+            {openDropdownId === user.id && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setOpenDropdownId(null)} />
+                <div
+                  className={`absolute right-0 ${
+                    isNearBottom ? "bottom-full mb-1" : "top-full mt-1"
+                  } w-44 bg-white rounded-xl shadow-lg border border-slate-100 z-50 py-1 animate-in fade-in ${
+                    isNearBottom ? "slide-in-from-bottom-2" : "slide-in-from-top-2"
+                  } duration-200`}
                 >
-                  View Details
-                </button>
-                {user.status !== "active" && (
                   <button
                     onClick={() => {
-                      handleActivate(user.id);
+                      setSelectedUser(user);
                       setOpenDropdownId(null);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
+                    className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                   >
-                    Activate
+                    View Details
                   </button>
-                )}
-                {user.status !== "inactive" && (
+                  {user.status !== "active" && (
+                    <button
+                      onClick={() => {
+                        handleActivate(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 font-medium"
+                    >
+                      Activate
+                    </button>
+                  )}
+                  {user.status !== "inactive" && (
+                    <button
+                      onClick={() => {
+                        handleDeactivate(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
+                    >
+                      Deactivate
+                    </button>
+                  )}
+                  {user.status !== "blocked" && (
+                    <button
+                      onClick={() => {
+                        handleBlock(user.id);
+                        setOpenDropdownId(null);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
+                    >
+                      Block
+                    </button>
+                  )}
+                  <div className="h-px bg-slate-100 my-1 mx-2" />
                   <button
                     onClick={() => {
-                      handleDeactivate(user.id);
-                      setOpenDropdownId(null);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2 font-medium"
-                  >
-                    Deactivate
-                  </button>
-                )}
-                {user.status !== "blocked" && (
-                  <button
-                    onClick={() => {
-                      handleBlock(user.id);
+                      handleDelete(user.id);
                       setOpenDropdownId(null);
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
                   >
-                    Block
+                    Delete
                   </button>
-                )}
-                <div className="h-px bg-slate-100 my-1 mx-2" />
-                <button
-                  onClick={() => {
-                    handleDelete(user.id);
-                    setOpenDropdownId(null);
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm text-[#E0530A] hover:bg-[#FFF8F4] flex items-center gap-2 font-medium"
-                >
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      ),
+                </div>
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 
