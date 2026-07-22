@@ -63,26 +63,7 @@ export default function VendorTable({
         </div>
       ),
     },
-    {
-      key: "categoryName",
-      header: "Category",
-      render: (vendor: VendorItem) => (
-        <div className="flex flex-wrap gap-1">
-          {vendor.profile?.categories?.length > 0 ? (
-            vendor.profile.categories.map((cat: any) => (
-              <span
-                key={cat.id}
-                className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
-              >
-                {cat.name}
-              </span>
-            ))
-          ) : (
-            <span className="text-slate-400 italic font-normal text-xs">{vendor.categoryName}</span>
-          )}
-        </div>
-      ),
-    },
+
     {
       key: "wallet",
       header: "Wallet & Comm.",
