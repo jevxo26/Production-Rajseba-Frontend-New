@@ -192,16 +192,6 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
           <button
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/dashbord/manage-bookings/${item.id}`);
-            }}
-            className="p-2 rounded-xl border border-blue-250/20 hover:border-blue-500 hover:text-white hover:bg-blue-500 text-blue-500 bg-blue-50/5 transition-all shadow-sm cursor-pointer"
-            title={t.viewDetails}
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
               printBookingInvoice(item);
             }}
             className="p-2 rounded-xl border border-[#FF6014]/20 hover:border-[#FF6014] hover:text-white hover:bg-[#FF6014] text-[#FF6014] bg-[#FF6014]/5 transition-all shadow-sm cursor-pointer"
@@ -225,7 +215,15 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
   ];
 
   const getRowClassName = (row: any) => {
-    return "bg-white hover:bg-slate-50/80 transition-colors";
+    // Only apply a subtle background if we want to differentiate by status
+    switch (row.status?.toLowerCase()) {
+      case "pending": return "bg-amber-50/40 hover:bg-amber-50/60";
+      case "assigned": return "bg-blue-50/40 hover:bg-blue-50/60";
+      case "on_the_way": return "bg-purple-50/40 hover:bg-purple-50/60";
+      case "completed": return "bg-emerald-50/40 hover:bg-emerald-50/60";
+      case "cancelled": return "bg-rose-50/40 hover:bg-rose-50/60";
+      default: return "";
+    }
   };
 
   const renderExpandedContent = (row: any) => {
@@ -478,7 +476,7 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
         columns={columns}
         data={filteredBookings}
         rowClassName={getRowClassName}
-        onRowClick={(row) => router.push(`/dashbord/manage-bookings/${row.id}`)}
+        expandableContent={renderExpandedContent}
       />
 
       <AssignEmployeeModal
