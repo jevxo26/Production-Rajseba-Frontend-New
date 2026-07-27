@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Block private/dashboard routes from indexing
+Disallow: /dashbord/
+Disallow: /api/
+Disallow: /profile
+Disallow: /bookings
+Disallow: /track/
+
+# Block auth pages
+Disallow: /login
+Disallow: /signup
+
+# Sitemap location
+Sitemap: https://rajseba.com/sitemap.xml

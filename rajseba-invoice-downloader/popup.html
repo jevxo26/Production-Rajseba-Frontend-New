@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --primary: #FF6014;
+      --primary-hover: #E0530A;
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-hidden: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .logo-glow {
+      width: 32px;
+      height: 32px;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      border-radius: 50%;
+      position: absolute;
+      z-index: -1;
+      filter: blur(8px);
+      opacity: 0.8;
+    }
+
+    .logo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon {
+      font-size: 24px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 2px 0 0 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .badge {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input[type="text"] {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-glow"></div>
+        <div class="logo-icon">⚡</div>
+      </div>
+      <div>
+        <h1 class="title">Rajseba Downloader</h1>
+        <p class="subtitle">Direct PDF invoice auto-save</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="status-row">
+        <span>Extension Status</span>
+        <span class="badge">ACTIVE</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Settings</h2>
+      <div class="form-group">
+        <label for="folderName">Download Folder Name</label>
+        <input type="text" id="folderName" placeholder="Rajseba Invoices" value="Rajseba Invoices">
+      </div>
+    </div>
+
+    <div class="footer">
+      Powered by <a href="https://rajseba.com" target="_blank">Rajseba</a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Rajseba Invoice Downloader",
+  "version": "1.0.0",
+  "description": "Instantly download Rajseba invoices as PDFs without opening print dialogs or previews.",
+  "permissions": [
+    "downloads",
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "https://*.rajseba.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost/*",
+        "https://*.rajseba.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Rajseba Invoice Downloader"
+  }
+}
