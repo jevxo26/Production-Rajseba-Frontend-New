@@ -64,8 +64,8 @@ export default function UsersPage() {
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900">{lang === "bn" ? "ইউজার ম্যানেজমেন্ট" : "User Management"}</h1>
-            <p className="text-xs text-slate-400 mt-0.5">{lang === "bn" ? "প্ল্যাটফর্মের সব ইউজার দেখুন এবং ম্যানেজ করুন।" : "Verify service professionals and manage platform customers."}</p>
+            <h1 className="text-xl font-extrabold text-slate-900">{lang === "bn" ? "ক্লায়েন্ট ম্যানেজমেন্ট" : "Client Management"}</h1>
+            <p className="text-xs text-slate-400 mt-0.5">{lang === "bn" ? "প্ল্যাটফর্মের সব ক্লায়েন্ট দেখুন এবং ম্যানেজ করুন।" : "Verify service professionals and manage platform clients."}</p>
           </div>
         </div>
         <div className="flex gap-2">

@@ -116,7 +116,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
             icon: Users,
             children: [
               { label: lang === "bn" ? "সুপার অ্যাডমিন" : "Super Admins", href: "/dashbord/superadmins", icon: Shield },
-              { label: lang === "bn" ? "ইউজার ম্যানেজ করুন" : "Manage Users", href: "/dashbord/users", icon: Users },
+              { label: lang === "bn" ? "ক্লায়েন্ট ম্যানেজ করুন" : "Manage Clients", href: "/dashbord/users", icon: Users },
               { label: lang === "bn" ? "ভেন্ডর ম্যানেজ করুন" : "Manage Vendors", href: "/dashbord/vendors", icon: Briefcase },
               { label: lang === "bn" ? "এজেন্ট ম্যানেজ করুন" : "Manage Agents", href: "/dashbord/agents", icon: Zap },
               { label: lang === "bn" ? "কর্মচারী ম্যানেজ করুন" : "Manage Employees", href: "/dashbord/employees", icon: UserPlus },

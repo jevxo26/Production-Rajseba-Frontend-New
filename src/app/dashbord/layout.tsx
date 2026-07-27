@@ -2,9 +2,9 @@
 
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
-// import { RoleProvider } from "@/context/RoleContext";
 import { useState, useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
+import ToasterProvider from "@/components/ToasterProvider";
 
 /* ── Premium full-screen loading spinner ───────────────────────────────── */
 function DashboardLoader() {
@@ -104,7 +104,8 @@ export default function DashboardLayout({
 
   return (
     <ConfirmProvider>
-      <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100 relative">
+      <div className="flex h-screen overflow-hidden bg-white relative">
+        <ToasterProvider />
         {/* Repeating background icons pattern */}
         <div
           className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"

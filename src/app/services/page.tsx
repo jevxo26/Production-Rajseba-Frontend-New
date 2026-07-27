@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 const Services = () => {
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden">
+    <div className="min-h-screen bg-white text-slate-900 relative overflow-x-hidden">
       <ServiceHero />
       <div
         className="absolute inset-0 bg-[url('/bg-icons-design.png')] bg-repeat opacity-10 pointer-events-none z-0"

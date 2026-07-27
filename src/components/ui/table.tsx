@@ -31,7 +31,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("bg-premium-light border-b border-slate-800/80", className)}
+      className={cn("bg-slate-50 border-b border-slate-200", className)}
       {...props}
     />
   )
@@ -41,7 +41,7 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
-      className={cn("divide-y divide-slate-800/80 [&_tr:last-child]:border-0", className)}
+      className={cn("bg-white divide-y divide-slate-100 [&_tr:last-child]:border-0", className)}
       {...props}
     />
   )
@@ -52,7 +52,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "border-t border-slate-800/80 bg-premium-light font-semibold [&>tr]:last:border-b-0",
+        "border-t border-slate-200 bg-slate-50 font-semibold [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -65,7 +65,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-slate-800/80 transition-colors hover:bg-slate-800/50",
+        "border-b border-slate-100 transition-colors hover:bg-slate-50/80 bg-white",
         className
       )}
       {...props}
@@ -78,7 +78,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-12 px-3 md:px-6 text-left align-middle font-bold text-premium-gray uppercase tracking-wider text-xs whitespace-nowrap",
+        "h-12 px-3 md:px-6 text-left align-middle font-bold text-slate-700 uppercase tracking-wider text-xs whitespace-nowrap",
         className
       )}
       {...props}
@@ -91,7 +91,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-3 md:px-6 py-3 md:py-4 align-middle whitespace-nowrap text-sm text-premium-slate font-semibold",
+        "px-3 md:px-6 py-3 md:py-4 align-middle whitespace-nowrap text-sm text-slate-900 font-semibold",
         className
       )}
       {...props}

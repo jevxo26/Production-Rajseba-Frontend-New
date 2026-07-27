@@ -35,47 +35,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "api.rajseba.com",
+        hostname: "**",
+        port: "",
+        pathname: "/**",
       },
       {
         protocol: "http",
-        hostname: "api.rajseba.com",
-      },
-      {
-        protocol: "https",
-        hostname: "rajseba.com",
-      },
-      {
-        protocol: "http",
-        hostname: "rajseba.com",
-      },
-      {
-        protocol: "https",
-        hostname: "www.rajseba.com",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "i.ibb.co",
-      },
-      {
-        protocol: "http",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "firebasestorage.googleapis.com",
-      },
-      {
-        protocol: "https",
-        hostname: "*.amazonaws.com",
+        hostname: "**",
+        port: "",
+        pathname: "/**",
       },
     ],
   },

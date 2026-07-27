@@ -61,8 +61,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${baiJamjuree.variable} antialiased`}>
-      <body className={`min-h-screen flex flex-col bg-slate-950 text-slate-100 ${baiJamjuree.className} antialiased`}>
+    <html lang="en" className={`${baiJamjuree.variable} antialiased`}>
+      <body className={`min-h-screen flex flex-col bg-white text-slate-900 ${baiJamjuree.className} antialiased`}>
         <StoreProvider>
           <LayoutWrapper>
             {children}

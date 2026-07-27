@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Eye, ShieldCheck, XCircle, Ban, Trash2 } from "lucide-react";
 import { CustomTable } from "@/components/ui/table";
 
@@ -111,13 +112,13 @@ export default function AgentTable({
       render: (user: AgentItem) => (
         <div className="flex items-center justify-end gap-1.5">
           {/* View Details */}
-          <button
-            onClick={() => setSelectedUser(user)}
+          <Link
+            href={`/dashbord/agents/${user.id}`}
             title="View Agent Details (ডিটেইলস দেখুন)"
             className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all duration-200 active:scale-95 group relative"
           >
             <Eye size={16} />
-          </button>
+          </Link>
 
           {/* Activate */}
           {user.status !== "active" && (
