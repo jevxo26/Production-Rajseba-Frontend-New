@@ -46,8 +46,8 @@ export default function CompanyBrandingPage() {
     if (res?.data) {
       setFormData({
         companyName: res.data.companyName || "",
-        logoUrl: res.data.logoUrl || "",
-        footerLogoUrl: res.data.footerLogoUrl || "",
+        logoUrl: res.data.logoUrl ? res.data.logoUrl.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com") : "",
+        footerLogoUrl: res.data.footerLogoUrl ? res.data.footerLogoUrl.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com") : "",
         email: res.data.email || "",
         phone: res.data.phone || "",
         address: res.data.address || "",

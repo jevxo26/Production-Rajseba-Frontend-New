@@ -112,7 +112,8 @@ export default function Footer() {
   const { data: brandingRes, isLoading: isBrandingLoading } = useGetPublicCompanyBrandingQuery();
   const branding = brandingRes?.data;
 
-  const footerLogo = branding?.footerLogoUrl || branding?.logoUrl || "/logo.png";
+  const rawFooterLogo = branding?.footerLogoUrl || branding?.logoUrl || "/logo.png";
+  const footerLogo = rawFooterLogo.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
   const companyName = branding?.companyName || "Rajseba";
   const footerDesc = branding?.footerDescription || "Bangladesh's leading service marketplace, connecting you with verified professionals for shifting, cleaning, and home maintenance. Fast, safe, and reliable.";
 

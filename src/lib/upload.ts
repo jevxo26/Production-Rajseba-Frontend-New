@@ -21,7 +21,8 @@ export const uploadImage = async (file: File): Promise<string> => {
     const result = await response.json();
 
     if (result && (result.url || result.data?.url)) {
-      return result.url || result.data.url;
+      const rawUrl = result.url || result.data.url;
+      return rawUrl.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
     } else {
       throw new Error(result?.message || "Failed to upload image to server");
     }

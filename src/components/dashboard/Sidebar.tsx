@@ -334,7 +334,8 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
   };
 
   const { data: brandingRes, isLoading: isBrandingLoading } = useGetPublicCompanyBrandingQuery();
-  const companyLogo = brandingRes?.data?.logoUrl || "/rajshiblogo.png";
+  const rawCompanyLogo = brandingRes?.data?.logoUrl || "/rajshiblogo.png";
+  const companyLogo = rawCompanyLogo.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
   const companyName = brandingRes?.data?.companyName || "Rajseba";
 
   if (!mounted) {
