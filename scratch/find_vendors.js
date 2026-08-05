@@ -1,6 +1,6 @@
 async function run() {
   try {
-    const res = await fetch('https://api.rajseba.com/profiles');
+    const res = await fetch('https://rajseba-api.onrender.com/profiles');
     const json = await res.json();
     if (json && Array.isArray(json)) {
       const activeVendors = json.filter(p => p.user && p.user.role && (p.user.role.name === 'Vendor' || p.user.role === 'vendor' || p.user.role.name === 'vendor'));

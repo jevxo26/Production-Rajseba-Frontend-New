@@ -1,6 +1,6 @@
 async function test() {
   try {
-    const res = await fetch('https://api.rajseba.com/bookings/46');
+    const res = await fetch('https://rajseba-api.onrender.com/bookings/46');
     const json = await res.json();
     console.log("Services Response Status:", res.status);
     if (json && json.data) {

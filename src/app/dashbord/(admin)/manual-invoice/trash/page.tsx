@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Trash2, RotateCcw, AlertTriangle, ArrowLeft, Hourglass } from "lucide-react";
 
-const API = "https://api.rajseba.com";
+const API = "https://rajseba-api.onrender.com";
 
 interface Invoice {
   id: number;

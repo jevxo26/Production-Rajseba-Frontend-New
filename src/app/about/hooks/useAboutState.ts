@@ -22,7 +22,7 @@ export function useAboutState() {
     const headers: any = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    fetch("https://api.rajseba.com/users", { headers })
+    fetch("https://rajseba-api.onrender.com/users", { headers })
       .then((res) => res.json())
       .then((json) => {
         const users = json.data || (Array.isArray(json) ? json : []);

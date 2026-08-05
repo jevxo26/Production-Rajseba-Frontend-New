@@ -22,7 +22,7 @@ const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 // Fetch live categories from the backend at build/request time
 async function getCategories(): Promise<string[]> {
   try {
-    const res = await fetch("https://api.rajseba.com/category", {
+    const res = await fetch("https://rajseba-api.onrender.com/category", {
       next: { revalidate: 3600 }, // ISR — re-fetch every 1 hour
     });
     if (!res.ok) return [];
