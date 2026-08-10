@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Trash2, Eye, Users, Settings, FileText, AlertTriangle, Receipt, DollarSign, CheckCircle, AlertCircle } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
 
 interface CatalogService { id: number; name: string; rate: number; }
 interface InvoiceItem { description: string; inceFit?: string; qty: number; rate: number; amount: number; }

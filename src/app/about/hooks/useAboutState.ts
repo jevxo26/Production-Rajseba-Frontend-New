@@ -22,7 +22,7 @@ export function useAboutState() {
     const headers: any = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
     fetch(`${apiBase}/users`, { headers })
       .then((res) => res.json())
       .then((json) => {
