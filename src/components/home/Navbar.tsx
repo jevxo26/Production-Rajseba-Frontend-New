@@ -202,7 +202,7 @@ export function Navbar() {
   const isHomepage = pathname === "/";
 
   const roleName = getRoleName(role);
-  const profileImg = user?.profile?.avatar || user?.profile?.images?.[0] || user?.profile?.picture || user?.avatar;
+  const profileImg = formatImageUrl(user?.profile?.avatar || user?.profile?.images?.[0] || user?.profile?.picture || user?.avatar);
   const profile = user ? {
     name: user.name || "User",
     email: user.email || "",

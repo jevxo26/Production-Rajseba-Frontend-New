@@ -11,6 +11,7 @@ import { useGetNotificationsQuery, useMarkNotificationAsReadMutation } from "@/r
 import { useGetAllBookingsQuery } from "@/redux/features/admin/booking";
 import { toggleLanguage } from "@/redux/features/shared/langSlice";
 import { format } from "date-fns";
+import { formatImageUrl } from "@/lib/utils";
 
 export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -177,7 +178,7 @@ export function TopNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const name = mounted && authUser?.name ? authUser.name : "User";
   const email = mounted ? (authUser?.email || authUser?.phone || "") : "";
   const avatarText = name.substring(0, 2).toUpperCase();
-  const profileImg = mounted ? (authUser?.profile?.avatar || authUser?.profile?.images?.[0] || authUser?.profile?.picture || authUser?.avatar) : undefined;
+  const profileImg = mounted ? formatImageUrl(authUser?.profile?.avatar || authUser?.profile?.images?.[0] || authUser?.profile?.picture || authUser?.avatar) : undefined;
   const activeRoleConfig = mounted
     ? (rolesList.find((x) => x.value === role) || rolesList[3])
     : rolesList[3];

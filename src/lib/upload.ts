@@ -2,8 +2,9 @@
  * Uploads a file (image) directly to our backend NestJS API server and returns the uploaded image URL.
  * 
  * @param file - The Image file to upload.
- * @returns Promise<string> - The URL of the uploaded image.
  */
+import { formatImageUrl } from "@/lib/utils";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
 
 export const uploadImage = async (file: File): Promise<string> => {
@@ -23,8 +24,8 @@ export const uploadImage = async (file: File): Promise<string> => {
     const result = await response.json();
 
     if (result && (result.url || result.data?.url)) {
-      const rawUrl = result.url || result.data.url;
-      return rawUrl.replace(/https?:\/\/(api\.rajseba\.com|rajseba-api\.onrender\.com|[a-z0-9]+\.sslip\.io)/g, API_URL);
+      const rawUrl = result.url || result.data?.url;
+      return formatImageUrl(rawUrl);
     } else {
       throw new Error(result?.message || "Failed to upload image to server");
     }

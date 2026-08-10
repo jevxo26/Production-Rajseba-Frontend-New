@@ -8,6 +8,7 @@ import { useUpdateUserMutation } from "@/redux/features/admin/user";
 import { useCreateProfileMutation, useUpdateProfileMutation } from "@/redux/features/admin/profile";
 import { useGetAllCategoriesQuery } from "@/redux/features/admin/category";
 import { uploadImage } from "@/lib/upload";
+import { formatImageUrl } from "@/lib/utils";
 
 export function useProfileState() {
   const role = useAppSelector((state) => state.auth.role) || "client";
@@ -46,7 +47,7 @@ export function useProfileState() {
   useEffect(() => {
     const img = profile?.images?.[0] || profile?.picture || profile?.avatar || user?.avatar;
     if (img) {
-      setAvatarUrl(img);
+      setAvatarUrl(formatImageUrl(img));
     }
   }, [profile, user?.avatar]);
 

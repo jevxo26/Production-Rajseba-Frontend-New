@@ -79,7 +79,8 @@ export default function CompanyBrandingPage() {
       toast.loading(lang === "bn" ? "ছবি আপলোড হচ্ছে..." : "Uploading image...", { id: "image-upload" });
       const uploadedUrl = await uploadImage(file);
       if (uploadedUrl) {
-        setFormData((prev) => ({ ...prev, [fieldName]: uploadedUrl }));
+        const formattedUrl = formatImageUrl(uploadedUrl);
+        setFormData((prev) => ({ ...prev, [fieldName]: formattedUrl }));
         toast.success(lang === "bn" ? "ছবি সফলভাবে আপলোড হয়েছে!" : "Image uploaded successfully!", { id: "image-upload" });
       }
     } catch {
@@ -90,7 +91,12 @@ export default function CompanyBrandingPage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     try {
-      await saveBranding(formData).unwrap();
+      const payload = {
+        ...formData,
+        logoUrl: formatImageUrl(formData.logoUrl),
+        footerLogoUrl: formatImageUrl(formData.footerLogoUrl),
+      };
+      await saveBranding(payload).unwrap();
       toast.success(lang === "bn" ? "কোম্পানি ব্র্যান্ডিং সেভ করা হয়েছে!" : "Company branding saved successfully!");
     } catch (err: any) {
       toast.error(err?.data?.message || (lang === "bn" ? "সেভ করতে ব্যর্থ হয়েছে" : "Failed to save company branding"));
