@@ -16,6 +16,7 @@ import {
 import { useGetCompanyBrandingQuery, useSaveCompanyBrandingMutation } from "@/redux/features/admin/companyBranding";
 import { useAppSelector } from "@/redux/hooks";
 import { uploadImage } from "@/lib/upload";
+import { formatImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function CompanyBrandingPage() {
@@ -46,8 +47,8 @@ export default function CompanyBrandingPage() {
     if (res?.data) {
       setFormData({
         companyName: res.data.companyName || "",
-        logoUrl: res.data.logoUrl ? res.data.logoUrl.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com") : "",
-        footerLogoUrl: res.data.footerLogoUrl ? res.data.footerLogoUrl.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com") : "",
+        logoUrl: res.data.logoUrl ? formatImageUrl(res.data.logoUrl) : "",
+        footerLogoUrl: res.data.footerLogoUrl ? formatImageUrl(res.data.footerLogoUrl) : "",
         email: res.data.email || "",
         phone: res.data.phone || "",
         address: res.data.address || "",

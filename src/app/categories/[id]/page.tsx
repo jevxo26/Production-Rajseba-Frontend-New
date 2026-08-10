@@ -8,10 +8,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
   try {
+    const { id } = await params;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
     const res = await fetch(
-      `https://rajseba-api.onrender.com/category/${id}`,
+      `${apiBase}/category/${id}`,
       { next: { revalidate: 3600 } }
     );
     const json = await res.json();

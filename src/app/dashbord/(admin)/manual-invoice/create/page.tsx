@@ -6,7 +6,7 @@ import { ArrowLeft, User, FileText, Palette, Package, Plus, Trash2, Check, Alert
 import { toast } from "sonner";
 import { CustomSelect } from "@/components/ui/select";
 
-const API = "https://rajseba-api.onrender.com";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
 
 interface Customer { id: number; name: string; phone: string; email?: string; address?: string; profile?: { location?: string }; }
 interface ServiceItem { id: number; name: string; rate: number; }

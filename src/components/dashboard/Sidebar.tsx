@@ -53,6 +53,7 @@ import { UserRole, getRoleName, logout as authLogout } from "@/redux/features/au
 import { motion, AnimatePresence } from "framer-motion";
 import { toggleLanguage } from "@/redux/features/shared/langSlice";
 import { useGetPublicCompanyBrandingQuery } from "@/redux/features/landing/landingApi";
+import { formatImageUrl } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 interface SidebarGroup {
@@ -335,7 +336,7 @@ export function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => voi
 
   const { data: brandingRes, isLoading: isBrandingLoading } = useGetPublicCompanyBrandingQuery();
   const rawCompanyLogo = brandingRes?.data?.logoUrl || "/rajshiblogo.png";
-  const companyLogo = rawCompanyLogo.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
+  const companyLogo = formatImageUrl(rawCompanyLogo);
   const companyName = brandingRes?.data?.companyName || "Rajseba";
 
   if (!mounted) {

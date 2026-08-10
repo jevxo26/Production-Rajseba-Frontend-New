@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import { useGetPublicCompanyBrandingQuery } from "@/redux/features/landing/landingApi";
+import { formatImageUrl } from "@/lib/utils";
 
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
@@ -113,7 +114,7 @@ export default function Footer() {
   const branding = brandingRes?.data;
 
   const rawFooterLogo = branding?.footerLogoUrl || branding?.logoUrl || "/logo.png";
-  const footerLogo = rawFooterLogo.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
+  const footerLogo = formatImageUrl(rawFooterLogo);
   const companyName = branding?.companyName || "Rajseba";
   const footerDesc = branding?.footerDescription || "Bangladesh's leading service marketplace, connecting you with verified professionals for shifting, cleaning, and home maintenance. Fast, safe, and reliable.";
 

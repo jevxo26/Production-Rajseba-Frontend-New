@@ -2,10 +2,12 @@ import type { MetadataRoute } from "next";
 
 const BASE_URL = "https://rajseba.com";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
+
 // Fetch all categories dynamically
 async function getCategories(): Promise<{ id: number; name: string; updatedAt?: string }[]> {
   try {
-    const res = await fetch(`https://rajseba-api.onrender.com/category`, {
+    const res = await fetch(`${API_URL}/category`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return [];
@@ -19,7 +21,7 @@ async function getCategories(): Promise<{ id: number; name: string; updatedAt?: 
 // Fetch all public services
 async function getServices(): Promise<{ id: number; name: string; updatedAt?: string }[]> {
   try {
-    const res = await fetch(`https://rajseba-api.onrender.com/services`, {
+    const res = await fetch(`${API_URL}/services`, {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return [];

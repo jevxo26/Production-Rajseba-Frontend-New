@@ -43,6 +43,7 @@ import {
   FaHouseDamage,
   FaHeadset,
 } from "react-icons/fa";
+import { formatImageUrl } from "@/lib/utils";
 import { MdOutlineCleaningServices, MdLocalLaundryService } from "react-icons/md";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useGetPublicCategoriesQuery, useSearchPublicServicesQuery, useGetPublicCompanyBrandingQuery } from "@/redux/features/landing/landingApi";
@@ -306,7 +307,7 @@ export function Navbar() {
 
   const { data: brandingRes, isLoading: isBrandingLoading } = useGetPublicCompanyBrandingQuery();
   const rawCompanyLogo = brandingRes?.data?.logoUrl || "/rajshiblogo.png";
-  const companyLogo = rawCompanyLogo.replace(/https?:\/\/api\.rajseba\.com/g, "https://rajseba-api.onrender.com");
+  const companyLogo = formatImageUrl(rawCompanyLogo);
   const companyName = brandingRes?.data?.companyName || "Rajseba";
 
   return (

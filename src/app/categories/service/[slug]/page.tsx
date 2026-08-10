@@ -6,9 +6,10 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
   try {
-    const allRes = await fetch("https://rajseba-api.onrender.com/services/public", {
+    const { slug } = await params;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
+    const allRes = await fetch(`${apiBase}/services/public`, {
       next: { revalidate: 3600 },
     });
     const allJson = await allRes.json();
@@ -20,7 +21,7 @@ export async function generateMetadata({
       };
     }
 
-    const res = await fetch(`https://rajseba-api.onrender.com/services/${serviceObj.id}`, {
+    const res = await fetch(`${apiBase}/services/${serviceObj.id}`, {
       next: { revalidate: 3600 },
     });
     const json = await res.json();

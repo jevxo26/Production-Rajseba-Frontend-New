@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import InvoiceTemplate1 from "@/components/manual-invoice/InvoiceTemplate1";
 import InvoiceTemplate2 from "@/components/manual-invoice/InvoiceTemplate2";
 
-const API = "https://rajseba-api.onrender.com";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
 
 export default function InvoiceViewPage() {
   const { id } = useParams<{ id: string }>();
