@@ -6,6 +6,7 @@ export const customRequestApi = baseApi.injectEndpoints({
       name: string;
       phone: string;
       email?: string;
+      location?: string;
       title?: string;
       description: string;
       user_id?: number;

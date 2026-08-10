@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useGetBookingByIdQuery, useUpdateBookingStatusMutation, useDeleteBookingMutation, useAssignEmployeeToBookingMutation } from "@/redux/features/admin/booking";
 import { useGetEmployeesByVendorQuery } from "@/redux/features/admin/user";
-import { Calendar, User, Package as PkgIcon, MapPin, Briefcase, ShieldCheck, Trash2, ArrowLeft, Clock, CheckCircle, XCircle, Mail, FileText, ChevronRight, AlertCircle } from "lucide-react";
+import { Calendar, User, Phone, Package as PkgIcon, MapPin, Briefcase, ShieldCheck, Trash2, ArrowLeft, Clock, CheckCircle, XCircle, Mail, FileText, ChevronRight, AlertCircle } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -48,6 +48,18 @@ export default function BookingDetailsPage() {
 
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
   const rawRole = useAppSelector((state: any) => state.auth?.role);
+
+  // Helper to extract clean information from booking notes
+  const notesText = booking?.notes || "";
+  const nameInNotes = notesText.match(/(?:Client Name|Customer Name|Client|Name):\s*([^|\n]+)/i)?.[1]?.trim();
+  const displayClientName = nameInNotes || booking?.user?.name || booking?.user?.fullName || "Client";
+
+  const phoneInNotes = notesText.match(/(?:Client Phone|Phone Number|Phone|Tel|Mobile):\s*([^|\n]+)/i)?.[1]?.trim();
+  const displayClientPhone = phoneInNotes || booking?.user?.phone || booking?.user?.phoneNumber || booking?.user?.mobile || "No phone provided";
+
+  const serviceInNotes = notesText.match(/(?:Service Details|Requested Service|Service Inquiry|Service):\s*([^|\n]+)/i)?.[1]?.trim();
+  const instructionsInNotes = notesText.match(/(?:Instructions|Details|Notes|Requirements):\s*([^|\n]+)/i)?.[1]?.trim();
+  const cleanRawNotes = notesText.replace(/^["']|["']$/g, '').trim();
 
   useEffect(() => {
     if (booking?.employees) {
@@ -199,19 +211,32 @@ export default function BookingDetailsPage() {
               Client Information
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex items-center gap-3.5 p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                <div className="p-3 bg-slate-100 text-slate-700 rounded-xl border border-slate-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Client Name */}
+              <div className="flex items-center gap-3.5 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 shadow-2xs">
+                <div className="p-2.5 bg-white text-slate-700 rounded-xl border border-slate-200 shadow-2xs shrink-0">
                   <User size={16} />
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Client Name</p>
-                  <p className="text-sm font-black text-slate-900 mt-0.5">{booking.user?.name || "Unknown Client"}</p>
+                  <p className="text-sm font-black text-slate-900 mt-0.5">{displayClientName}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3.5 p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                <div className="p-3 bg-slate-100 text-slate-700 rounded-xl border border-slate-200">
+              {/* Phone Number */}
+              <div className="flex items-center gap-3.5 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 shadow-2xs">
+                <div className="p-2.5 bg-white text-[#FF6014] rounded-xl border border-orange-200/80 shadow-2xs shrink-0">
+                  <Phone size={16} />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Phone Number</p>
+                  <p className="text-sm font-black text-slate-900 mt-0.5">{displayClientPhone}</p>
+                </div>
+              </div>
+
+              {/* Email Address */}
+              <div className="flex items-center gap-3.5 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 shadow-2xs">
+                <div className="p-2.5 bg-white text-slate-700 rounded-xl border border-slate-200 shadow-2xs shrink-0">
                   <Mail size={16} />
                 </div>
                 <div>
@@ -220,28 +245,45 @@ export default function BookingDetailsPage() {
                 </div>
               </div>
 
-              <div className="md:col-span-2 flex items-start gap-3.5 p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                <div className="p-3 bg-slate-100 text-slate-700 rounded-xl border border-slate-200 mt-0.5">
+              {/* Service Location */}
+              <div className="flex items-center gap-3.5 p-4 bg-slate-50/70 rounded-2xl border border-slate-200/80 shadow-2xs">
+                <div className="p-2.5 bg-white text-slate-700 rounded-xl border border-slate-200 shadow-2xs shrink-0">
                   <MapPin size={16} />
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Service Location</p>
-                  <p className="text-sm font-extrabold text-slate-800 mt-1 leading-relaxed">{booking.location}</p>
+                  <p className="text-sm font-extrabold text-slate-800 mt-0.5 leading-relaxed">{booking.location}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Additional Notes Card */}
+          {/* Additional Notes / Special Instructions Card */}
           {booking.notes && (
             <div className="bg-white rounded-3xl p-6 border border-amber-200/80 shadow-sm space-y-4">
               <h3 className="text-sm font-black text-amber-900 tracking-tight flex items-center gap-2 border-b border-amber-100 pb-3">
                 <span className="p-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200"><FileText size={16} /></span>
                 Special Instructions / Client Notes
               </h3>
-              <p className="text-sm text-slate-800 leading-relaxed font-bold pl-3 border-l-4 border-amber-400 bg-amber-50/50 py-3 pr-3 rounded-r-xl">
-                "{booking.notes}"
-              </p>
+              
+              <div className="space-y-3">
+                {serviceInNotes && (
+                  <div className="flex items-center gap-2 bg-orange-50 border border-orange-200/80 rounded-2xl p-3 text-xs font-black text-[#FF6014]">
+                    <Briefcase size={15} className="shrink-0 text-[#FF6014]" />
+                    <span>Requested Service Option: {serviceInNotes}</span>
+                  </div>
+                )}
+
+                {instructionsInNotes ? (
+                  <p className="text-sm text-slate-800 leading-relaxed font-bold pl-3 border-l-4 border-amber-400 bg-amber-50/50 py-3 pr-3 rounded-r-xl">
+                    {instructionsInNotes}
+                  </p>
+                ) : !serviceInNotes && cleanRawNotes ? (
+                  <p className="text-sm text-slate-800 leading-relaxed font-bold pl-3 border-l-4 border-amber-400 bg-amber-50/50 py-3 pr-3 rounded-r-xl">
+                    {cleanRawNotes}
+                  </p>
+                ) : null}
+              </div>
             </div>
           )}
         </div>

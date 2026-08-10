@@ -27,9 +27,11 @@ export default function EditNestedServicePage() {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
   const [price, setPrice] = useState("");
+  const [isContactForPrice, setIsContactForPrice] = useState(false);
   const [subServices, setSubServices] = useState<{ 
     name: string; 
     price: string; 
+    is_contact_for_price?: boolean;
     agent_commission_percentage: string; 
     vendor_commission_percentage: string;
     description: string;
@@ -47,9 +49,11 @@ export default function EditNestedServicePage() {
         setDescription(nested.description || "");
         setImage(nested.image || "");
         setPrice(nested.starting_price != null ? String(nested.starting_price) : "");
+        setIsContactForPrice(!!nested.is_contact_for_price);
         setSubServices(nested.subServices ? nested.subServices.map((s: any) => ({ 
           name: s.name, 
           price: String(s.price),
+          is_contact_for_price: !!s.is_contact_for_price,
           agent_commission_percentage: String(s.agent_commission_percentage || 0),
           vendor_commission_percentage: String(s.vendor_commission_percentage || 0),
           description: s.description || "",
@@ -84,26 +88,42 @@ export default function EditNestedServicePage() {
     }
 
     try {
+      const dataPayload: any = {
+        name: name.trim(),
+        description: description.trim() || undefined,
+        image: image.trim() || undefined,
+        sub_services: subServices
+          .filter((s) => s.name.trim() !== "")
+          .map((s) => {
+            const subObj: any = {
+              name: s.name.trim(),
+              price: !s.is_contact_for_price ? Number(s.price || 0) : 0,
+              agent_commission_percentage: Number(s.agent_commission_percentage || 0),
+              vendor_commission_percentage: Number(s.vendor_commission_percentage || 0),
+              description: s.description.trim() || undefined,
+              image1: s.image1.trim() || undefined,
+              image2: s.image2.trim() || undefined,
+              faq: s.faq.filter(f => f.question.trim() !== "" && f.answer.trim() !== "")
+            };
+            if (s.is_contact_for_price) {
+              subObj.is_contact_for_price = true;
+            }
+            return subObj;
+          }),
+      };
+
+      if (isContactForPrice) {
+        dataPayload.is_contact_for_price = true;
+      } else {
+        dataPayload.is_contact_for_price = false;
+        if (price !== "") {
+          dataPayload.starting_price = Number(price);
+        }
+      }
+
       await updateMut({
         id: nestedServiceId,
-        data: {
-          name: name.trim(),
-          description: description.trim() || undefined,
-          image: image.trim() || undefined,
-          starting_price: price !== "" ? Number(price) : undefined,
-          sub_services: subServices
-          .filter((s) => s.name.trim() !== "")
-          .map((s) => ({
-            name: s.name.trim(),
-            price: Number(s.price || 0),
-            agent_commission_percentage: Number(s.agent_commission_percentage || 0),
-            vendor_commission_percentage: Number(s.vendor_commission_percentage || 0),
-            description: s.description.trim() || undefined,
-            image1: s.image1.trim() || undefined,
-            image2: s.image2.trim() || undefined,
-            faq: s.faq.filter(f => f.question.trim() !== "" && f.answer.trim() !== "")
-          })),
-        },
+        data: dataPayload,
       }).unwrap();
       toast.success("নেস্টেড সার্ভিস সফলভাবে আপডেট হয়েছে!");
       router.push("/dashbord/nested-services");
@@ -174,16 +194,33 @@ export default function EditNestedServicePage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                শুরুর মূল্য (Starting Price - ৳)
-              </label>
-              <Input
-                type="number"
-                placeholder="যেমন: ৫০০"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                min={0}
-              />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  শুরুর মূল্য (Starting Price - ৳)
+                </label>
+                <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-[#FF6014] select-none bg-orange-50/80 px-2 py-0.5 rounded-lg border border-orange-100">
+                  <input
+                    type="checkbox"
+                    checked={isContactForPrice}
+                    onChange={(e) => setIsContactForPrice(e.target.checked)}
+                    className="w-3.5 h-3.5 accent-[#FF6014] rounded cursor-pointer"
+                  />
+                  <span>যোগাযোগের মাধ্যমে (Contact for Price)</span>
+                </label>
+              </div>
+              {isContactForPrice ? (
+                <div className="w-full bg-amber-50/80 border border-amber-200 rounded-xl px-4 py-3 text-xs font-bold text-amber-800 flex items-center gap-2">
+                  <span>📞 সরাসরি যোগাযোগের মাধ্যমে সার্ভিস মূল্য নির্ধারণ (Contact for Price)</span>
+                </div>
+              ) : (
+                <Input
+                  type="number"
+                  placeholder="যেমন: ৫০০"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  min={0}
+                />
+              )}
             </div>
           </div>
 
@@ -194,7 +231,7 @@ export default function EditNestedServicePage() {
               </label>
               <button
                 type="button"
-                onClick={() => setSubServices([...subServices, { name: "", price: "", agent_commission_percentage: "", vendor_commission_percentage: "", description: "", image1: "", image2: "", faq: [] }])}
+                onClick={() => setSubServices([...subServices, { name: "", price: "", is_contact_for_price: false, agent_commission_percentage: "", vendor_commission_percentage: "", description: "", image1: "", image2: "", faq: [] }])}
                 className="text-xs font-bold text-[#FF6014] flex items-center gap-1 hover:underline"
               >
                 <PlusCircle size={14} /> অপশন যোগ করুন
@@ -208,13 +245,28 @@ export default function EditNestedServicePage() {
                   <div key={idx} className="border border-slate-200 rounded-xl p-4 bg-white space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-semibold text-slate-700">অপশন {idx + 1}</h4>
-                      <button
-                        type="button"
-                        onClick={() => setSubServices(subServices.filter((_, i) => i !== idx))}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <label className="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-600 select-none bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
+                          <input
+                            type="checkbox"
+                            checked={sub.is_contact_for_price || false}
+                            onChange={(e) => {
+                              const newSubs = [...subServices];
+                              newSubs[idx].is_contact_for_price = e.target.checked;
+                              setSubServices(newSubs);
+                            }}
+                            className="w-3.5 h-3.5 accent-[#FF6014] rounded cursor-pointer"
+                          />
+                          <span>Contact for Price</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setSubServices(subServices.filter((_, i) => i !== idx))}
+                          className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -227,17 +279,23 @@ export default function EditNestedServicePage() {
                           setSubServices(newSubs);
                         }}
                       />
-                      <Input
-                        type="number"
-                        placeholder="মূল্য (৳)"
-                        value={sub.price}
-                        onChange={(e) => {
-                          const newSubs = [...subServices];
-                          newSubs[idx].price = e.target.value;
-                          setSubServices(newSubs);
-                        }}
-                        min={0}
-                      />
+                      {sub.is_contact_for_price ? (
+                        <div className="w-full bg-amber-50/80 border border-amber-200 rounded-xl px-3 py-2 text-xs font-bold text-amber-800 flex items-center gap-1.5">
+                          <span>📞 Contact for Price (ম্যানুয়াল মূল্য)</span>
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          placeholder="মূল্য (৳)"
+                          value={sub.price}
+                          onChange={(e) => {
+                            const newSubs = [...subServices];
+                            newSubs[idx].price = e.target.value;
+                            setSubServices(newSubs);
+                          }}
+                          min={0}
+                        />
+                      )}
                       {role === "superadmin" && (
                         <>
                           <Input

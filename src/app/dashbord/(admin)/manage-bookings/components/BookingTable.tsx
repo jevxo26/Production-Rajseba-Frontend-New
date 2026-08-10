@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CustomTable } from "@/components/ui/table";
-import { Calendar, User, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText, Download, Eye } from "lucide-react";
+import { Calendar, User, Phone, Package as PkgIcon, MapPin, Clock, Trash2, Briefcase, FileText, Download, Eye } from "lucide-react";
 import AssignEmployeeModal from "./AssignEmployeeModal";
 import { printBookingInvoice } from "@/utils/invoicePrint";
 
@@ -121,18 +121,33 @@ export default function BookingTable({ filteredBookings, setDeleteModalBookingId
       key: "user",
       header: t.clientLocation,
       accessorKey: "user",
-      render: (item: any) => (
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 font-bold text-slate-800 text-sm">
-            <User size={14} className="text-slate-400" />
-            {item.user?.name || t.unknown}
+      render: (item: any) => {
+        const notesStr = item.notes || "";
+        const nameInNotes = notesStr.match(/(?:Client Name|Customer Name|Client|Name):\s*([^|\n]+)/i)?.[1]?.trim();
+        const phoneInNotes = notesStr.match(/(?:Client Phone|Phone Number|Phone|Tel|Mobile):\s*([^|\n]+)/i)?.[1]?.trim();
+
+        const clientName = nameInNotes || item.user?.name || item.user?.fullName || t.unknown;
+        const clientPhone = phoneInNotes || item.user?.phone || item.user?.phoneNumber || item.user?.mobile;
+
+        return (
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5 font-bold text-slate-800 text-sm">
+              <User size={14} className="text-slate-400 shrink-0" />
+              <span className="truncate max-w-[160px]">{clientName}</span>
+            </div>
+            {clientPhone && (
+              <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                <Phone size={12} className="text-[#FF6014] shrink-0" />
+                <span>{clientPhone}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+              <MapPin size={12} className="shrink-0" />
+              <span className="truncate max-w-[150px]">{item.location}</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-            <MapPin size={12} />
-            <span className="truncate max-w-[150px]">{item.location}</span>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: "service",

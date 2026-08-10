@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Droplet,
@@ -10,13 +10,27 @@ import {
   Calendar,
   Plus,
   Minus,
+  Sparkles,
+  User,
+  Mail,
+  MapPin,
+  FileText,
+  CheckCircle2,
+  Loader2,
+  X,
+  Send,
 } from "lucide-react";
 import Link from "next/link";
+import { useAppSelector } from "@/redux/hooks";
+import { useCreateCustomRequestMutation } from "@/redux/features/admin/customRequestApi";
+import { useCreateBookingMutation } from "@/redux/features/admin/booking";
+import { toast } from "sonner";
 
 interface SubService {
   id: number;
   name: string;
   price: string;
+  is_contact_for_price?: boolean;
   description?: string;
   image1?: string;
   image2?: string;
@@ -28,6 +42,7 @@ interface SpecializedService {
   title: string;
   description: string;
   price?: string;
+  is_contact_for_price?: boolean;
   image?: string;
   subServices?: SubService[];
   type: "normal" | "emergency";
@@ -80,6 +95,113 @@ export function SpecializedServices({
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  const authUser = useAppSelector((state) => state.auth.user);
+  const [createBooking] = useCreateBookingMutation();
+  const [createCustomRequest] = useCreateCustomRequestMutation();
+
+  // User Info Modal for Contact / Manual Price Service
+  const [contactModalData, setContactModalData] = useState<{
+    isOpen: boolean;
+    serviceTitle: string;
+    subTitle?: string;
+    subId?: number;
+  }>({ isOpen: false, serviceTitle: "" });
+
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    phone: "",
+    location: "",
+    notes: "",
+  });
+  const [submittingContact, setSubmittingContact] = useState(false);
+
+  // Auto-fill logged in user details when modal opens
+  useEffect(() => {
+    if (contactModalData.isOpen) {
+      const uName = authUser?.name || authUser?.fullName || authUser?.profile?.name || "";
+      const uPhone = authUser?.phone || authUser?.phoneNumber || authUser?.mobile || authUser?.profile?.phone || "";
+      const uLocation = authUser?.location || authUser?.address || authUser?.profile?.address || authUser?.profile?.location || "";
+
+      setContactForm({
+        name: uName,
+        phone: uPhone,
+        location: uLocation,
+        notes: "",
+      });
+    }
+  }, [contactModalData.isOpen, authUser]);
+
+  const handleSubmitContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!contactForm.name.trim()) {
+      toast.error("আপনার নাম দেওয়া আবশ্যক");
+      return;
+    }
+    if (!contactForm.phone.trim()) {
+      toast.error("আপনার ফোন নম্বর দেওয়া আবশ্যক");
+      return;
+    }
+    if (!contactForm.location.trim()) {
+      toast.error("আপনার ঠিকানা / এলাকা দেওয়া আবশ্যক");
+      return;
+    }
+
+    setSubmittingContact(true);
+    try {
+      const serviceTitle = contactModalData.serviceTitle;
+      const subTitle = contactModalData.subTitle;
+      const fullTitle = subTitle ? `${serviceTitle} (${subTitle})` : serviceTitle;
+      const uEmail = authUser?.email || authUser?.profile?.email || "";
+      const todayDate = new Date().toISOString().split("T")[0];
+
+      const subServiceItems = contactModalData.subId
+        ? [{ sub_service_id: Number(contactModalData.subId), quantity: 1 }]
+        : [];
+
+      // Build complete booking payload with service details, sub-services, client name & phone number
+      const bookingPayload: any = {
+        vendor_id: Number(vendorId || 1),
+        service_id: serviceId ? Number(serviceId) : undefined,
+        sub_service_items: subServiceItems.length > 0 ? subServiceItems : undefined,
+        sub_service_ids: contactModalData.subId ? [Number(contactModalData.subId)] : undefined,
+        date: todayDate,
+        location: contactForm.location.trim(),
+        notes: `Service Details: ${fullTitle} | Client Name: ${contactForm.name.trim()} | Phone: ${contactForm.phone.trim()}${
+          contactForm.notes.trim() ? ` | Notes: ${contactForm.notes.trim()}` : ""
+        }`,
+        user_id: authUser?.id ? Number(authUser.id) : undefined,
+      };
+
+      // Create Booking so it shows up in Operations -> Manage Bookings
+      await createBooking(bookingPayload).unwrap();
+
+      // Also record in custom requests for redundancy
+      try {
+        await createCustomRequest({
+          name: contactForm.name.trim(),
+          phone: contactForm.phone.trim(),
+          email: uEmail || undefined,
+          title: `Nested Service Inquiry: ${fullTitle}`,
+          description: `Service: ${fullTitle}\nLocation: ${contactForm.location.trim()}${
+            contactForm.notes.trim() ? `\nDetails: ${contactForm.notes.trim()}` : ""
+          }`,
+          user_id: authUser?.id ? Number(authUser.id) : undefined,
+        }).unwrap();
+      } catch (e) {
+        // ignore secondary logging error
+      }
+
+      toast.success("আপনার বুকিং অনুরোধটি সফলভাবে জমা হয়েছে! আমাদের প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন।");
+      setContactModalData({ isOpen: false, serviceTitle: "" });
+      setContactForm({ name: "", phone: "", location: "", notes: "" });
+    } catch (err: any) {
+      toast.error(err?.data?.message || err?.message || "বুকিং জমা দিতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।");
+    } finally {
+      setSubmittingContact(false);
+    }
+  };
+
   const displayServices: SpecializedService[] =
     nestedServices && nestedServices.length > 0
       ? nestedServices.map((ns) => {
@@ -95,6 +217,7 @@ export function SpecializedServices({
           description:
             ns.description || "Expert service technician ready to assist you.",
           price: ns.starting_price || ns.price,
+          is_contact_for_price: !!ns.is_contact_for_price,
           image: ns.image,
           subServices: filteredSubs,
           type: "normal" as const,
@@ -110,11 +233,14 @@ export function SpecializedServices({
   };
 
   const handleInitiateBooking = (service: SpecializedService) => {
+    if (service.is_contact_for_price) {
+      setContactModalData({ isOpen: true, serviceTitle: service.title });
+      return;
+    }
     const serviceSubs = service.subServices || [];
     if (serviceSubs.length > 0) {
       const hasSelection = serviceSubs.some((ss) => isInCart(ss.id));
       if (!hasSelection) {
-        // Find first subservice and add it, or request user to add one
         onAddToCart(service, serviceSubs[0].id);
       }
     }
@@ -245,7 +371,16 @@ export function SpecializedServices({
                 </div>
 
                 <div className="flex items-center justify-between sm:justify-end border-t sm:border-t-0 border-slate-50 pt-4 sm:pt-0 gap-5 shrink-0">
-                  {service.price && (
+                  {service.is_contact_for_price ? (
+                    <div className="text-left sm:text-right">
+                      <span className="text-[9px] text-[#FF6014] font-extrabold uppercase tracking-wider block">
+                        Manual Price
+                      </span>
+                      <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 font-extrabold text-xs px-2.5 py-1 rounded-full border border-amber-200">
+                        <Phone className="w-3 h-3 text-[#FF6014]" /> Contact for Price
+                      </span>
+                    </div>
+                  ) : service.price ? (
                     <div className="text-left sm:text-right">
                       <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">
                         Starting Price
@@ -254,7 +389,7 @@ export function SpecializedServices({
                         ৳{Number(service.price).toLocaleString()}
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   {!hasSubServices ? (
                     <button
@@ -262,12 +397,14 @@ export function SpecializedServices({
                         e.stopPropagation();
                         handleInitiateBooking(service);
                       }}
-                      className="inline-flex items-center gap-1.5 bg-[#FF6014] hover:bg-[#E0530A]
-                        text-white px-5 py-2.5 rounded-full text-xs font-bold
-                        transition shadow-md shadow-rose-100 cursor-pointer active:scale-95"
+                      className={`inline-flex items-center gap-1.5 text-white px-5 py-2.5 rounded-full text-xs font-bold transition shadow-md cursor-pointer active:scale-95 ${
+                        service.is_contact_for_price
+                          ? "bg-amber-600 hover:bg-amber-700 shadow-amber-100"
+                          : "bg-[#FF6014] hover:bg-[#E0530A] shadow-rose-100"
+                      }`}
                     >
-                      <Calendar className="w-3.5 h-3.5" />
-                      Book Now
+                      {service.is_contact_for_price ? <Phone className="w-3.5 h-3.5" /> : <Calendar className="w-3.5 h-3.5" />}
+                      {service.is_contact_for_price ? "Contact Now" : "Book Now"}
                     </button>
                   ) : (
                     <div className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-95
@@ -319,13 +456,27 @@ export function SpecializedServices({
                                 <h4 className={`text-xs sm:text-sm font-bold leading-snug transition-colors ${isSelected ? "text-[#FF6014]" : "text-slate-800 group-hover:text-[#FF6014]"}`}>
                                   {sub.name}
                                 </h4>
-                                <div className="text-[#FF6014] text-xs sm:text-sm font-black mt-0.5">
-                                  ৳{Number(sub.price).toLocaleString()}
-                                </div>
+                                {sub.is_contact_for_price ? (
+                                  <div className="inline-flex items-center gap-1 text-[#FF6014] text-xs font-extrabold mt-0.5 bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">
+                                    <Phone className="w-3 h-3" /> Contact for Price
+                                  </div>
+                                ) : (
+                                  <div className="text-[#FF6014] text-xs sm:text-sm font-black mt-0.5">
+                                    ৳{Number(sub.price).toLocaleString()}
+                                  </div>
+                                )}
                               </div>
 
                               <div className="shrink-0 w-[96px] sm:w-28" onClick={(e) => e.stopPropagation()}>
-                                {isAdded ? (
+                                {sub.is_contact_for_price ? (
+                                  <button
+                                    onClick={() => setContactModalData({ isOpen: true, serviceTitle: service.title, subTitle: sub.name, subId: sub.id })}
+                                    className="w-full py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 bg-amber-600 text-white hover:bg-amber-700 shadow-xs"
+                                  >
+                                    <Phone size={12} strokeWidth={3} />
+                                    Contact
+                                  </button>
+                                ) : isAdded ? (
                                   <div className="flex items-center gap-1 bg-[#FFF8F4] border border-[#FF6014]/20 rounded-lg sm:rounded-xl p-0.5 w-full justify-between">
                                     <button
                                       type="button"
@@ -369,6 +520,156 @@ export function SpecializedServices({
           );
         })}
       </div>
+
+      {/* User Information Request Modal for Contact for Price / Manual Price */}
+      {contactModalData.isOpen && (
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center p-3.5 sm:p-4 bg-slate-950/40 backdrop-blur-[3px] animate-in fade-in duration-150 font-sans"
+          onClick={() => setContactModalData({ isOpen: false, serviceTitle: "" })}
+        >
+          <div
+            className="bg-white/90 backdrop-blur-xl rounded-3xl max-w-lg w-full shadow-[0_20px_50px_rgba(0,0,0,0.22)] border border-white/60 overflow-hidden flex flex-col relative animate-in zoom-in-95 duration-200 max-h-[85dvh] sm:max-h-[90vh] my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#FF6014]/90 via-[#FF7A3D]/90 to-[#E0530A]/90 backdrop-blur-md p-4 sm:p-5 text-white relative shrink-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                  <Sparkles size={14} />
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-white/95">
+                  Service Information Request
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black tracking-tight leading-snug pr-8">
+                {contactModalData.serviceTitle}
+              </h3>
+              {contactModalData.subTitle && (
+                <div className="mt-1 inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md text-white px-2.5 py-0.5 rounded-full text-xs font-extrabold">
+                  <span>অপশন: {contactModalData.subTitle}</span>
+                </div>
+              )}
+              <p className="text-[11px] sm:text-xs text-white/90 mt-1 font-medium leading-relaxed">
+                অনুগ্রহ করে আপনার যোগাযোগের তথ্য প্রদান করুন। আমাদের টিম দ্রুত আপনার সাথে যোগাযোগ করবে।
+              </p>
+
+              <button
+                type="button"
+                onClick={() => setContactModalData({ isOpen: false, serviceTitle: "" })}
+                className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center text-white transition-all active:scale-95 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Body / Form */}
+            <form onSubmit={handleSubmitContact} className="p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto flex-1">
+              
+              {/* Logged in auto-fill alert */}
+              {authUser && (
+                <div className="flex items-center gap-2 bg-orange-500/10 backdrop-blur-sm border border-[#FF6014]/20 rounded-xl p-2.5 sm:p-3 text-xs font-semibold text-[#FF6014]">
+                  <CheckCircle2 size={16} className="shrink-0 text-[#FF6014]" />
+                  <div className="leading-tight text-[11px] sm:text-xs">
+                    <span>লগইন অ্যাকাউন্ট থেকে তথ্য পূরণ করা হয়েছে!</span>
+                    <span className="block text-[10px] sm:text-[11px] text-slate-500 font-normal mt-0.5">প্রয়োজনে এডিট (Edit) করতে পারবেন।</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Form Input Fields */}
+              <div className="space-y-3">
+                
+                {/* Full Name */}
+                <div className="space-y-1">
+                  <label className="text-[10px] sm:text-[11px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <User size={13} className="text-[#FF6014]" /> আপনার নাম <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="যেমন: মোঃ রহিম হোসেন"
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                    className="w-full bg-white/70 backdrop-blur-xs border border-slate-200/80 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs font-semibold text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#FF6014] focus:ring-2 focus:ring-[#FF6014]/20 focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Phone Number */}
+                <div className="space-y-1">
+                  <label className="text-[10px] sm:text-[11px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Phone size={13} className="text-[#FF6014]" /> ফোন নম্বর <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="যেমন: 01712345678"
+                    value={contactForm.phone}
+                    onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                    className="w-full bg-white/70 backdrop-blur-xs border border-slate-200/80 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs font-semibold text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#FF6014] focus:ring-2 focus:ring-[#FF6014]/20 focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Location / Address */}
+                <div className="space-y-1">
+                  <label className="text-[10px] sm:text-[11px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <MapPin size={13} className="text-[#FF6014]" /> ঠিকানা / এলাকা <span className="text-red-500 font-bold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="যেমন: হাউজিং এস্টেট, রাজশাহী"
+                    value={contactForm.location}
+                    onChange={(e) => setContactForm({ ...contactForm, location: e.target.value })}
+                    className="w-full bg-white/70 backdrop-blur-xs border border-slate-200/80 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs font-semibold text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#FF6014] focus:ring-2 focus:ring-[#FF6014]/20 focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Notes / Special Instructions */}
+                <div className="space-y-1">
+                  <label className="text-[10px] sm:text-[11px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText size={13} className="text-[#FF6014]" /> বিশেষ বার্তা / নোট <span className="text-slate-400 font-normal text-[10px]">(ঐচ্ছিক)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="আপনার কাজের বিবরণ বা প্রয়োজনীয় বিষয়গুলো লিখুন..."
+                    value={contactForm.notes}
+                    onChange={(e) => setContactForm({ ...contactForm, notes: e.target.value })}
+                    className="w-full bg-white/70 backdrop-blur-xs border border-slate-200/80 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 outline-none focus:border-[#FF6014] focus:ring-2 focus:ring-[#FF6014]/20 focus:bg-white transition-all resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setContactModalData({ isOpen: false, serviceTitle: "" })}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-100/80 transition-all cursor-pointer"
+                >
+                  বাতিল করুন
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingContact}
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-[#FF6014] hover:bg-[#E0530A] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md shadow-[#FF6014]/20 hover:shadow-none transition-all disabled:opacity-60 active:scale-[0.98] cursor-pointer"
+                >
+                  {submittingContact ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      জমা হচ্ছে...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={14} />
+                      অনুরোধ পাঠান (Submit)
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

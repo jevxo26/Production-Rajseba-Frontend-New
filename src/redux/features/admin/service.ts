@@ -28,6 +28,7 @@ export interface SubService {
   id: number;
   name: string;
   price: number;
+  is_contact_for_price?: boolean;
   nestedService?: NestedService;
   description?: string;
   image1?: string;
@@ -41,6 +42,7 @@ export interface NestedService {
   description?: string;
   image?: string;
   starting_price?: number;
+  is_contact_for_price?: boolean;
   subServices?: SubService[];
   service?: Service;
   createdAt?: string;
@@ -54,15 +56,38 @@ export interface CreateNestedServiceRequest {
   description?: string;
   image?: string;
   starting_price?: number;
-  sub_services?: { name: string; price: number }[];
+  is_contact_for_price?: boolean;
+  sub_services?: {
+    name: string;
+    price: number;
+    is_contact_for_price?: boolean;
+    agent_commission_percentage?: number;
+    vendor_commission_percentage?: number;
+    description?: string;
+    image1?: string;
+    image2?: string;
+    faq?: { question: string; answer: string }[];
+  }[];
 }
 
 export interface UpdateNestedServiceRequest {
+  service_id?: number;
   name?: string;
   description?: string;
   image?: string;
   starting_price?: number;
-  sub_services?: { name: string; price: number }[];
+  is_contact_for_price?: boolean;
+  sub_services?: {
+    name: string;
+    price: number;
+    is_contact_for_price?: boolean;
+    agent_commission_percentage?: number;
+    vendor_commission_percentage?: number;
+    description?: string;
+    image1?: string;
+    image2?: string;
+    faq?: { question: string; answer: string }[];
+  }[];
 }
 
 export interface ServiceApiResponse<T> {
