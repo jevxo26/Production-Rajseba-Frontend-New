@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from '@/lib/token';
 
-const API_BASE_URL = "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
