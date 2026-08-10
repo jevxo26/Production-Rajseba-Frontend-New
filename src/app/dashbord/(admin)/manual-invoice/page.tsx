@@ -3,14 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Trash2, Eye, Users, Settings, FileText, AlertTriangle, Receipt, DollarSign, CheckCircle, AlertCircle } from "lucide-react";
+import { CustomSelect } from "@/components/ui/select";
 
 const API = "https://rajseba-api.onrender.com";
 
+interface CatalogService { id: number; name: string; rate: number; }
+interface InvoiceItem { description: string; inceFit?: string; qty: number; rate: number; amount: number; }
 interface Invoice {
   id: number;
   invoiceNumber: string;
   date: string;
   customer: { name: string; phone: string; address: string };
+  items?: InvoiceItem[];
   totalPayableAmount: number;
   paidAmount: number;
   dueAmount: number;
@@ -34,6 +38,8 @@ export default function ManualInvoicePage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "Paid" | "Due">("all");
+  const [servicesList, setServicesList] = useState<CatalogService[]>([]);
+  const [serviceFilter, setServiceFilter] = useState<string>("all");
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
   const fetchInvoices = async () => {
@@ -53,7 +59,23 @@ export default function ManualInvoicePage() {
     }
   };
 
-  useEffect(() => { fetchInvoices(); }, []);
+  const fetchCatalogServices = async () => {
+    try {
+      const token = localStorage.getItem("rajseba_access_token") || localStorage.getItem("token") || "";
+      const res = await fetch(`${API}/api/manual-services`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setServicesList(Array.isArray(data) ? data : []);
+      }
+    } catch { /* non-blocking */ }
+  };
+
+  useEffect(() => {
+    fetchInvoices();
+    fetchCatalogServices();
+  }, []);
 
   const handleDelete = async (id: number) => {
     try {
@@ -75,9 +97,14 @@ export default function ManualInvoicePage() {
     const matchesSearch =
       inv.invoiceNumber.toLowerCase().includes(q) ||
       inv.customer.name.toLowerCase().includes(q) ||
-      inv.customer.phone.includes(q);
+      inv.customer.phone.includes(q) ||
+      (inv.items && inv.items.some((it) => it.description?.toLowerCase().includes(q) || it.inceFit?.toLowerCase().includes(q)));
     const matchesFilter = filter === "all" || inv.paymentStatus === filter;
-    return matchesSearch && matchesFilter;
+    const matchesService =
+      serviceFilter === "all" ||
+      !serviceFilter ||
+      (inv.items && inv.items.some((it) => it.description?.toLowerCase() === serviceFilter.toLowerCase()));
+    return matchesSearch && matchesFilter && matchesService;
   });
 
   const totalRevenue = invoices.reduce((s, i) => s + Number(i.totalPayableAmount), 0);
@@ -179,12 +206,30 @@ export default function ManualInvoicePage() {
             <Search size={18} className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400" />
             <input
               className="w-full bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 transition-all"
-              placeholder="Search by invoice #, customer name or phone..."
+              placeholder="Search by invoice #, customer name, phone, or service catalog..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
+            {servicesList.length > 0 && (
+              <div className="w-64">
+                <CustomSelect
+                  options={[
+                    { value: "all", label: "Catalog Services: All" },
+                    ...servicesList.map((svc) => ({
+                      value: svc.name,
+                      label: svc.name,
+                      desc: `${Number(svc.rate).toLocaleString()} BDT`,
+                    })),
+                  ]}
+                  value={serviceFilter}
+                  onChange={(val) => setServiceFilter(val || "all")}
+                  placeholder="Catalog Services: All"
+                  size="sm"
+                />
+              </div>
+            )}
             {(["all", "Paid", "Due"] as const).map((f) => (
               <button
                 key={f}

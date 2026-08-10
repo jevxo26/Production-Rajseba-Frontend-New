@@ -4,7 +4,9 @@ import React from "react";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 interface InvoiceItem {
+  serviceName?: string;
   description: string;
+  inceFit?: string;
   qty: number;
   rate: number;
   amount: number;
@@ -279,6 +281,20 @@ export default function InvoiceTemplate1({ invoice }: InvoiceTemplateProps) {
                   color: "#64748b",
                   textTransform: "uppercase",
                   letterSpacing: "0.5px",
+                  width: "15%",
+                }}
+              >
+                Ince/Fit
+              </th>
+              <th
+                style={{
+                  textAlign: "center",
+                  padding: "12px 16px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                   width: "10%",
                 }}
               >
@@ -318,7 +334,22 @@ export default function InvoiceTemplate1({ invoice }: InvoiceTemplateProps) {
             {invoice.items.map((item, i) => (
               <tr key={i} style={{ borderBottom: "1px solid #e2e8f0" }}>
                 <td style={{ padding: "14px 16px", fontSize: "13px", fontWeight: 600, color: "#1e293b" }}>
-                  {item.description}
+                  {item.serviceName && <div style={{ fontSize: "13px", fontWeight: 800, color: "#0f172a" }}>{item.serviceName}</div>}
+                  {item.description && (item.description !== item.serviceName) && (
+                    <div style={{ fontSize: "12px", color: item.serviceName ? "#64748b" : "#1e293b" }}>{item.description}</div>
+                  )}
+                  {!item.serviceName && !item.description && "-"}
+                </td>
+                <td
+                  style={{
+                    padding: "14px 16px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#475569",
+                    textAlign: "center",
+                  }}
+                >
+                  {item.inceFit || "-"}
                 </td>
                 <td
                   style={{

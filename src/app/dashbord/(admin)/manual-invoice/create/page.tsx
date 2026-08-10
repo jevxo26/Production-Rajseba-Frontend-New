@@ -2,16 +2,17 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, FileText, Palette, Package, Plus, Trash2, Check, AlertTriangle, FilePlus2 } from "lucide-react";
+import { ArrowLeft, User, FileText, Palette, Package, Plus, Trash2, Check, AlertTriangle, FilePlus2, Sparkles, ChevronDown, Search } from "lucide-react";
 import { toast } from "sonner";
+import { CustomSelect } from "@/components/ui/select";
 
 const API = "https://rajseba-api.onrender.com";
 
 interface Customer { id: number; name: string; phone: string; email?: string; address?: string; profile?: { location?: string }; }
 interface ServiceItem { id: number; name: string; rate: number; }
-interface LineItem { description: string; qty: number; rate: number; amount: number; }
+interface LineItem { serviceName?: string; description: string; inceFit?: string; qty: number; rate: number; amount: number; }
 
-const EMPTY_ITEM: LineItem = { description: "", qty: 1, rate: 0, amount: 0 };
+const EMPTY_ITEM: LineItem = { serviceName: "", description: "", inceFit: "", qty: 1, rate: 0, amount: 0 };
 const DEFAULT_PO = { accountName: "RAJSEBA.COM", accountNumber: "02433002451", bankName: "Bank Asia PLC", branch: "Rajshahi Branch", routingNumber: "070811937" };
 
 function toWords(n: number): string {
@@ -55,6 +56,7 @@ export default function CreateInvoicePage() {
   const [items, setItems] = useState<LineItem[]>([{ ...EMPTY_ITEM }]);
   const [svcSuggestions, setSvcSuggestions] = useState<ServiceItem[][]>([[]]);
   const [showSvcDrop, setShowSvcDrop] = useState<boolean[]>([false]);
+  const [activeCatalogIndex, setActiveCatalogIndex] = useState<number | null>(null);
 
   // Loading & Submit state
   const [initialLoading, setInitialLoading] = useState(true);
@@ -128,29 +130,23 @@ export default function CreateInvoicePage() {
   // Items
   const updateItem = (i: number, field: keyof LineItem, value: string) => {
     const updated = [...items];
-    const item = { ...updated[i], [field]: field === "description" ? value : Number(value) };
+    const isStringField = field === "description" || field === "serviceName" || field === "inceFit";
+    const item = { ...updated[i], [field]: isStringField ? value : Number(value) };
     item.amount = item.qty * item.rate;
     updated[i] = item;
     setItems(updated);
   };
 
-  const handleDescChange = (i: number, val: string) => {
-    updateItem(i, "description", val);
-    if (val.trim().length > 0) {
-      const q = val.toLowerCase();
-      const matches = services.filter(s => s.name.toLowerCase().includes(q)).slice(0, 5);
-      const newSvc = [...svcSuggestions]; newSvc[i] = matches; setSvcSuggestions(newSvc);
-      const newShow = [...showSvcDrop]; newShow[i] = matches.length > 0; setShowSvcDrop(newShow);
-    } else {
-      const newShow = [...showSvcDrop]; newShow[i] = false; setShowSvcDrop(newShow);
-    }
-  };
-
   const selectService = (i: number, svc: ServiceItem) => {
     const updated = [...items];
-    updated[i] = { ...updated[i], description: svc.name, rate: svc.rate, amount: updated[i].qty * svc.rate };
+    updated[i] = {
+      ...updated[i],
+      serviceName: svc.name,
+      description: updated[i].description || svc.name,
+      rate: Number(svc.rate),
+      amount: updated[i].qty * Number(svc.rate),
+    };
     setItems(updated);
-    const newShow = [...showSvcDrop]; newShow[i] = false; setShowSvcDrop(newShow);
   };
 
   const addItem = () => {
@@ -176,8 +172,8 @@ export default function CreateInvoicePage() {
     if (!invoiceNumber.trim() || !custName.trim() || !custPhone.trim() || !custAddress.trim()) {
       setError("Invoice number and customer details are required."); return;
     }
-    if (items.some(it => !it.description.trim() || it.qty <= 0)) {
-      setError("All line items must have a description and valid quantity."); return;
+    if (items.some(it => (!it.serviceName?.trim() && !it.description.trim()) || it.qty <= 0)) {
+      setError("All line items must have a service or description and valid quantity."); return;
     }
     setSubmitting(true);
     try {
@@ -445,14 +441,16 @@ export default function CreateInvoicePage() {
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Template</label>
-                  <select
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 cursor-pointer"
+                  <CustomSelect
+                    options={[
+                      { value: "template1", label: "Template 1 — RDS Dark Style" },
+                      { value: "template2", label: "Template 2 — Rajseba Orange Style" },
+                    ]}
                     value={templateName}
-                    onChange={e => setTemplateName(e.target.value as any)}
-                  >
-                    <option value="template1">Template 1 — RDS Dark Style</option>
-                    <option value="template2">Template 2 — Rajseba Orange Style</option>
-                  </select>
+                    onChange={val => setTemplateName(val as any)}
+                    placeholder="Select template..."
+                    size="sm"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Signee Name</label>
@@ -493,8 +491,10 @@ export default function CreateInvoicePage() {
                 <thead>
                   <tr className="bg-slate-50/75 border-b border-slate-100 text-slate-450 font-extrabold uppercase tracking-wider text-[10px]">
                     <th className="px-4 py-3 w-10">#</th>
-                    <th className="px-4 py-3 min-w-[240px]">Description</th>
-                    <th className="px-4 py-3 w-28">Qty</th>
+                    <th className="px-4 py-3 min-w-[180px]">Service</th>
+                    <th className="px-4 py-3 min-w-[200px]">Description</th>
+                    <th className="px-4 py-3 w-28">Ince/Fit</th>
+                    <th className="px-4 py-3 w-24">Qty</th>
                     <th className="px-4 py-3 w-28">Rate (BDT)</th>
                     <th className="px-4 py-3 w-32">Amount (BDT)</th>
                     <th className="px-4 py-3 w-10"></th>
@@ -502,49 +502,75 @@ export default function CreateInvoicePage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50 overflow-visible">
                   {items.map((item, i) => (
-                    <tr key={i} className="hover:bg-slate-50/20 transition-colors overflow-visible">
-                      <td className="px-4 py-4 text-slate-400 font-bold">{i + 1}</td>
-                      <td className="px-4 py-4 relative overflow-visible">
-                        <input
-                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
-                          value={item.description}
-                          onChange={e => handleDescChange(i, e.target.value)}
-                          placeholder="Service description..."
-                          autoComplete="off"
-                        />
-                        {showSvcDrop[i] && svcSuggestions[i]?.length > 0 && (
-                          <div className="absolute left-4 right-4 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden divide-y divide-slate-50">
-                            {svcSuggestions[i].map(svc => (
-                              <div
-                                key={svc.id}
-                                className="px-4 py-2.5 text-xs text-slate-700 hover:bg-[#FFF8F4] hover:text-[#FF6014] cursor-pointer transition-colors"
-                                onMouseDown={() => selectService(i, svc)}
-                              >
-                                <strong>{svc.name}</strong> — {Number(svc.rate).toLocaleString()} BDT
-                              </div>
-                            ))}
-                          </div>
+                    <tr key={i} className="hover:bg-slate-50/30 transition-colors overflow-visible">
+                      <td className="px-4 py-3.5 text-slate-400 font-bold text-xs">{i + 1}</td>
+                      <td className="px-4 py-3.5 relative overflow-visible">
+                        {services.length > 0 ? (
+                          <CustomSelect
+                            options={services.map((s) => ({
+                              value: s.name,
+                              label: s.name,
+                              desc: `${Number(s.rate).toLocaleString()} BDT`,
+                            }))}
+                            value={item.serviceName || ""}
+                            onChange={(val) => {
+                              const selectedSvc = services.find((s) => s.name === val);
+                              if (selectedSvc) {
+                                selectService(i, selectedSvc);
+                              } else {
+                                updateItem(i, "serviceName", val || "");
+                              }
+                            }}
+                            placeholder="Select Service..."
+                            size="sm"
+                          />
+                        ) : (
+                          <input
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
+                            value={item.serviceName || ""}
+                            onChange={(e) => updateItem(i, "serviceName", e.target.value)}
+                            placeholder="Service name..."
+                            autoComplete="off"
+                          />
                         )}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5">
                         <input
-                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 transition-all"
+                          value={item.description}
+                          onChange={(e) => updateItem(i, "description", e.target.value)}
+                          placeholder="Item description / details..."
+                          autoComplete="off"
+                        />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <input
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 transition-all"
+                          type="text"
+                          placeholder="e.g. 10x12"
+                          value={item.inceFit || ""}
+                          onChange={e => updateItem(i, "inceFit", e.target.value)}
+                        />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <input
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 transition-all"
                           type="number"
                           min="1"
                           value={item.qty}
                           onChange={e => updateItem(i, "qty", e.target.value)}
                         />
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-3.5">
                         <input
-                          className="w-full bg-slate-50 border border-slate-205 rounded-xl text-xs font-medium text-slate-700 px-3 py-3 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40"
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6014]/20 focus:border-[#FF6014]/40 transition-all"
                           type="number"
                           min="0"
                           value={item.rate}
                           onChange={e => updateItem(i, "rate", e.target.value)}
                         />
                       </td>
-                      <td className="px-4 py-4 font-bold text-slate-800">
+                      <td className="px-4 py-3.5 font-extrabold text-slate-800 text-xs">
                         {item.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-4">

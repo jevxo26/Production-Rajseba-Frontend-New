@@ -251,7 +251,18 @@ export function CustomSelect({
       "&:active": {
         backgroundColor: "#E04F00",
       }
-    })
+    }),
+    menuPortal: (base: any) => ({
+      ...base,
+      zIndex: 999999,
+    }),
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 999999,
+      borderRadius: "0.75rem",
+      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+      overflow: "hidden",
+    }),
   };
 
   const CustomOption = (props: any) => {
@@ -261,31 +272,33 @@ export function CustomSelect({
         ref={innerRef} 
         {...innerProps} 
         className={cn(
-          "flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors text-sm",
-          isSelected ? "bg-[#FF6014] text-white" : isFocused ? "bg-[#FFF0EB] text-slate-900" : "bg-white text-slate-700"
+          "px-3 py-2 text-xs cursor-pointer flex items-center justify-between transition-colors",
+          isSelected ? "bg-[#FF6014] text-white font-bold" : isFocused ? "bg-[#FFF0EB] text-[#FF6014]" : "text-slate-700 hover:bg-slate-50"
         )}
       >
-        {data.icon && (
-          <div className={cn("p-1 rounded", isSelected ? "bg-[#FF6014] text-white" : "bg-slate-50 text-slate-500")}>
-            <data.icon className="size-4" />
-          </div>
+        <span className="truncate font-medium">{data.label}</span>
+        {data.desc && (
+          <span className={cn(
+            "text-[10px] ml-2 font-bold px-1.5 py-0.5 rounded shrink-0",
+            isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"
+          )}>
+            {data.desc}
+          </span>
         )}
-        <div>
-          <p className="font-semibold leading-tight">{data.label}</p>
-          {data.desc && (
-            <p className={cn("text-[10px] leading-tight mt-0.5", isSelected ? "text-orange-100" : "text-slate-400")}>{data.desc}</p>
-          )}
-        </div>
       </div>
     );
   };
 
   const CustomSingleValue = (props: any) => {
-    const { data } = props;
+    const { data, children, innerProps } = props;
     return (
-      <div className="flex items-center gap-1.5 text-xs font-extrabold text-slate-700 absolute inset-y-0 left-0 pl-3 pr-8 whitespace-nowrap truncate max-w-full">
-        {data.icon && <data.icon className="size-3.5 text-slate-400 shrink-0" />}
+      <div {...innerProps} className="flex items-center justify-between w-full text-xs font-semibold text-slate-800 pr-2">
         <span className="truncate">{data.label}</span>
+        {data.desc && (
+          <span className="text-[10px] bg-orange-50 text-[#FF6014] border border-orange-100 font-extrabold px-1.5 py-0.5 rounded ml-1.5 shrink-0">
+            {data.desc}
+          </span>
+        )}
       </div>
     );
   };
@@ -316,6 +329,9 @@ export function CustomSelect({
         isMulti={isMulti}
         isClearable={isMulti}
         styles={selectStyles}
+        menuPortalTarget={typeof window !== "undefined" ? document.body : null}
+        menuPosition="fixed"
+        menuPlacement="auto"
         components={isMulti ? { Option: CustomOption } : { Option: CustomOption, SingleValue: CustomSingleValue }}
       />
 
