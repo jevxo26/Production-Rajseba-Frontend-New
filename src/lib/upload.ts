@@ -4,7 +4,7 @@
  * @param file - The Image file to upload.
  * @returns Promise<string> - The URL of the uploaded image.
  */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
 
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
