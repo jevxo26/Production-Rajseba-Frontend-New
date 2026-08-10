@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Trash2, FolderOpen, AlertTriangle, Settings } from "lucide-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
 
 interface ServiceItem { id: number; name: string; rate: number; createdAt: string; }
 

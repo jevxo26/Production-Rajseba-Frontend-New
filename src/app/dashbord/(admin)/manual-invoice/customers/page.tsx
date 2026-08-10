@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Trash2, Users, AlertTriangle, Lock, User, Check } from "lucide-react";
 import { toast } from "sonner";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
 
 interface Customer {
   id: number | null;

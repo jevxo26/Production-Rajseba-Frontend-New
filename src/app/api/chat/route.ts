@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
 
 export async function POST(req: NextRequest) {
   try {

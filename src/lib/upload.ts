@@ -4,7 +4,7 @@
  * @param file - The Image file to upload.
  * @returns Promise<string> - The URL of the uploaded image.
  */
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://r9m77f0yp91zaqi9xf0jqc9h.200.141.14.181.sslip.io";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
 
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -24,7 +24,7 @@ export const uploadImage = async (file: File): Promise<string> => {
 
     if (result && (result.url || result.data?.url)) {
       const rawUrl = result.url || result.data.url;
-      return rawUrl.replace(/https?:\/\/(api\.rajseba\.com|rajseba-api\.onrender\.com)/g, API_URL);
+      return rawUrl.replace(/https?:\/\/(api\.rajseba\.com|rajseba-api\.onrender\.com|[a-z0-9]+\.sslip\.io)/g, API_URL);
     } else {
       throw new Error(result?.message || "Failed to upload image to server");
     }

@@ -8,7 +8,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { id } = await params;
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://rajseba-api.onrender.com";
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://www.rajapi.jevxo.com";
     const res = await fetch(`${apiBase}/services/${id}`, {
       next: { revalidate: 3600 },
     });
